@@ -1,0 +1,24 @@
+---
+- name: Test Playbook
+  gather_facts: true
+  check_mode: yes
+  diff: yes
+  hosts: localhost
+  connection: local
+  vars:
+    container_mount: "/srv/containers"
+    postgres_service: "postgresql-12.service"
+    domain_name: "dresrv.com"
+    domain_cert: "/srv/web/certs/dresrv_cert.pem"
+    domain_key: "/srv/web/certs/dresrv_key.pem"
+  # vars_files:
+  #   - "group_vars/server.yml"
+  roles:
+    - { role: mail }
+  # tasks:
+  #   - name: Test secret
+  #     debug:
+  #       msg:
+  #         - "Secret {{ gitea_secret_key }}"
+  #         - "Internal token {{ gitea_internal_token }}"
+  #         - "JWT secret {{ gitea_jwt_secret }}"

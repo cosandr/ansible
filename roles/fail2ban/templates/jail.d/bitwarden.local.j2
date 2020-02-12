@@ -1,0 +1,9 @@
+[bitwarden]
+enabled = true 
+port = 80,443,8343,3012
+filter = bitwarden
+action = iptables-allports[name=bitwarden]
+logpath = {{ container_mount }}/bitwarden/bitwarden.log
+maxretry = 5
+bantime = 6h
+findtime = 1m 

@@ -1,0 +1,41 @@
+- name: Install glances
+  package:
+    name: glances
+    state: present
+
+- name: Install glances optional depedencies (Arch)
+  when: ansible_distribution == "Archlinux"
+  pacman:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - python-py-cpuinfo
+      - python-netifaces
+      - python-bottle
+
+- name: Install glances optional depedencies (Fedora)
+  when: ansible_distribution == "Fedora"
+  dnf:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+      - python3-cpuinfo 
+      - python3-netifaces
+      - python3-bottle
+
+- name: Install Glances systemd service
+  copy:
+    src: files/glances.service
+    dest: /etc/systemd/system/glances.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Enable and start Glances systemd service
+  systemd:
+    daemon_reload: yes
+    name: glances.service
+    enabled: yes
+    state: started

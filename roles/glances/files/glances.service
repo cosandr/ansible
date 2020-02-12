@@ -1,0 +1,10 @@
+[Unit]
+Description=Glances web server
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/glances --time=10 --webserver 
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

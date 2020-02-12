@@ -1,0 +1,81 @@
+APP_NAME = Gitea: Git with a cup of tea
+RUN_USER = git
+RUN_MODE = prod
+
+[security]
+INSTALL_LOCK = true
+SECRET_KEY = {{ gitea_secret_key }}
+INTERNAL_TOKEN = {{ gitea_internal_token }}
+
+[oauth2]
+ENABLE = false
+
+[ui]
+DEFAULT_THEME = arc-green
+
+[database]
+DB_TYPE  = postgres
+HOST     = 127.0.0.1:5432
+NAME     = gitea
+USER     = gitea
+PASSWD   = gitea
+SSL_MODE = disable
+
+[repository]
+ROOT = /home/git/gitea-repositories
+
+[server]
+DISABLE_SSH      = false
+SSH_DOMAIN       = {{ domain_name }}
+SSH_PORT         = 22
+START_SSH_SERVER = false
+DOMAIN           = git.{{ domain_name }}
+PROTOCOL         = https
+HTTP_ADDR		     = 127.0.0.1
+HTTP_PORT        = 3000
+ROOT_URL         = %(PROTOCOL)s://%(DOMAIN)s/
+LFS_START_SERVER = true
+LFS_CONTENT_PATH = /var/lib/gitea/data/lfs
+LFS_JWT_SECRET   = {{ gitea_jwt_secret }}
+OFFLINE_MODE     = false
+CERT_FILE        = {{ domain_cert }}
+KEY_FILE         = {{ domain_key }}
+
+[mailer]
+ENABLED = true
+FROM = git@{{ domain_name }}
+MAILER_TYPE = sendmail
+
+[service]
+REGISTER_EMAIL_CONFIRM            = false
+ENABLE_NOTIFY_MAIL                = false
+DISABLE_REGISTRATION              = true
+ALLOW_ONLY_EXTERNAL_REGISTRATION  = false
+ENABLE_CAPTCHA                    = false
+REQUIRE_SIGNIN_VIEW               = false
+DEFAULT_KEEP_EMAIL_PRIVATE        = false
+DEFAULT_ALLOW_CREATE_ORGANIZATION = true
+DEFAULT_ENABLE_TIMETRACKING       = true
+NO_REPLY_ADDRESS                  = noreply.example.org
+
+[picture]
+DISABLE_GRAVATAR        = false
+ENABLE_FEDERATED_AVATAR = true
+
+[openid]
+ENABLE_OPENID_SIGNIN = false
+ENABLE_OPENID_SIGNUP = false
+
+[session]
+PROVIDER = memory
+
+[cache]
+ENABLED = true
+ADAPTER = memory
+INTERVAL = 60
+
+[log]
+MODE      = file
+LEVEL     = Warn
+ROOT_PATH = /var/log/gitea/
+REDIRECT_MACARON_LOG = true

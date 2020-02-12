@@ -1,0 +1,104 @@
+---
+- name: Install Gitea (Pacman)
+  when: ansible_distribution == "Archlinux"
+  pacman:
+    name: gitea
+    state: present 
+
+- name: Install Gitea (Manual)
+  when: ansible_distribution != "Archlinux"
+  debug:
+    msg: "Not implemented"
+
+- name: Create git user
+  when: ansible_distribution != "Archlinux"
+  user:
+    name: git
+    group: git
+    comment: "Git Version Control"
+    state: present
+    system: yes
+    shell: /bin/bash
+    create_home: yes
+    home: /home/git
+    password_lock: yes
+
+- name: Create /etc/gitea
+  when: ansible_distribution != "Archlinux"
+  file:
+    path: /etc/gitea
+    state: directory
+    owner: root
+    group: git
+    mode: 750
+
+- name: Create /var/lib/gitea directories
+  when: ansible_distribution != "Archlinux"
+  file:
+    path: "/var/lib/gitea/{{ item }}"
+    state: directory
+    owner: git
+    group: git
+    mode: 750
+    recurse: yes
+  with_items:
+    - custom
+    - data
+    - log
+
+- name: Install Gitea systemd service
+  when: ansible_distribution != "Archlinux"
+  template:
+    src: templates/gitea.service.j2
+    dest: /etc/systemd/system/gitea.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Install Gitea nginx config
+  template:
+    src: templates/nginx.conf.j2
+    dest: /etc/nginx/sites-enabled/gitea.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Enable and start Gitea systemd service
+  systemd:
+    daemon_reload: yes
+    name: gitea.service
+    enabled: yes
+    state: started
+
+- name: Install gitea config
+  vars:
+    gitea_secret_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          37613036636234306235303733393836323031333336663030623531393732386164633839383530
+          3138633363633633316130316564366231663862366335370a643936373633636637613333656461
+          31336534346634323534333330333234636464393864663966633266343863343562316333323131
+          3239323237323964380a656634336639373330616531356164643965323231303563663230363564
+          37313438323466313530326535663063623137383665323833313462326463336364346461343763
+          6631313231326332623931313661646333316163353161633534
+    gitea_internal_token: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          61646535623330656337643564366131393437373666653330616161376566656439643438633431
+          6461333461323538643134336566373734303964623335320a613738303538336261376261303263
+          35636236306663333963343464653930613661363764646362363839616466613434386538613837
+          6131383833396461350a643564373038623330303134346366336438636363616633666334343132
+          65643362356233613133623563613361663333393933663833663363393235353363643539616236
+          3939326665366632386437646462326633326634333232343436
+    gitea_jwt_secret: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          33616634636563376162333132343164373734646632333232353034306436383862646362303064
+          3862643133613238633861333933373965386332636334360a643461626463366331333234306430
+          35643632353335383161626565346334306538313938336333366337633063336566323661326230
+          3732343563653162320a303064646134373439373236636530633631373430353036356265623934
+          33636538613536643036633339636335386465353137373637646632333565363964666161636665
+          3838333036346463303266323861323337353636336530623939
+  template:
+    src: templates/app.ini.j2
+    dest: /etc/gitea/app.ini
+    owner: root
+    group: git
+    mode: 0640

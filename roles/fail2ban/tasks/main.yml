@@ -1,0 +1,22 @@
+- name: Install fail2ban
+  package:
+    name: fail2ban
+
+- name: Copy fail2ban configs
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - { src: 'files/jail.local', dest: '/etc/fail2ban/jail.local' }
+    - { src: 'files/filter.d/bitwarden.conf', dest: '/etc/fail2ban/filter.d/bitwarden.conf' }
+
+- name: Fail2ban bitwarden jail template
+  template:
+    src: templates/jail.d/bitwarden.local.j2
+    dest: /etc/fail2ban/jail.d/bitwarden.local
+    owner: root
+    group: root
+    mode: 0644
