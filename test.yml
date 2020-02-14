@@ -14,7 +14,7 @@
   # vars_files:
   #   - "group_vars/server.yml"
   roles:
-    - { role: mail }
+    - { role: postgres }
   # tasks:
   #   - name: Test secret
   #     debug:

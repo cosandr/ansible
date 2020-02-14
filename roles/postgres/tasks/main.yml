@@ -1,2 +1,71 @@
----
 # Fedora: /var/lib/pgsql/12/data
+---
+- name: Install PostgreSQL (Arch)
+  when: ansible_distribution == "Archlinux"
+  pacman:
+    name: postgres
+    state: present
+
+- name: Install PostgreSQL Repo (Fedora)
+  when: ansible_distribution == "Fedora"
+  dnf:
+    name: 'https://download.postgresql.org/pub/repos/yum/reporpms/F-{{ ansible_distribution_major_version }}-x86_64/pgdg-fedora-repo-latest.noarch.rpm'
+    state: present
+
+- name: Install PostgreSQL 12 (Fedora)
+  when: ansible_distribution == "Fedora"
+  dnf:
+    name:
+      - postgresql12-contrib
+      - postgresql12-server
+    state: present
+
+- name: Get pg_hba.conf path
+  check_mode: no
+  become: true
+  become_user: postgres
+  shell: "psql -t -P format=unaligned -c 'show hba_file';"
+  register: pg_hba
+
+- name: Show pg_hba.conf path
+  when: pg_hba.stdout is defined
+  debug:
+    msg: "{{ pg_hba.stdout }}"
+
+- name: Show pg_hba.conf path
+  when: (pg_hba.stdout is undefined) or (pg_hba.stdout|length <= 0)
+  debug:
+    msg: "Cannot find pg_hba.conf path"
+
+- name: Copy pg_hba.conf
+  when: (pg_hba.stdout is defined) and (pg_hba.stdout|length > 0)
+  vars:
+    - local_subnet: "10.1.0.0/24"
+  template:
+    src: templates/pg_hba.conf.j2
+    dest: "{{ pg_hba.stdout }}"
+    owner: postgres
+    group: postgres
+    mode: 0600
+
+- name: Get PGSQL service name
+  when: ansible_distribution == "Archlinux"
+  set_fact:
+    postgres_service: "postgres.service"
+
+- name: Get PGSQL service name
+  when: ansible_distribution == "Fedora"
+  set_fact:
+    postgres_service: "postgres-12.service"
+
+- name: Cannot restart service
+  when: postgres_service is undefined
+  debug:
+    msg: "Could not find postgres service name, restart manually"
+
+- name: Restart PostgreSQL service
+  when: postgres_service is defined
+  systemd:
+    name: "{{ postgres_service }}"
+    enabled: yes
+    state: restarted

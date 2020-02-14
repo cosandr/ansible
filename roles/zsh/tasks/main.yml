@@ -1,0 +1,13 @@
+---
+- name: Install ZSH
+  package:
+    name: zsh
+    state: present
+
+- name: Copy zprofile
+  copy:
+    src: files/zprofile
+    dest: /etc/zprofile
+    owner: root
+    group: root
+    mode: 0644
