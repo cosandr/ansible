@@ -4,10 +4,13 @@
   diff: yes
   hosts: localhost
   connection: local
-  vars_files: .secrets.yml
+  vars_files: .secrets/vars.yml
   vars:
     prometheus_version: latest
     prometheus_skip_install: true
+    tls_ca_file: ca.crt
+    tls_crt_file: dresrv.crt
+    tls_key_file: dresrv.key
     prometheus_port: 9092
     node_port: 9100
     cadvisor_port: 8080
@@ -44,9 +47,9 @@
         scheme: https
         scrape_interval: 20s
         tls_config:
-          ca_file: /etc/prometheus/ca.crt
-          cert_file: /etc/prometheus/dresrv.crt
-          key_file: /etc/prometheus/dresrv.key
+          ca_file: /etc/prometheus/tls/{{ tls_ca_file }}
+          cert_file: /etc/prometheus/tls/{{ tls_crt_file }}
+          key_file: /etc/prometheus/tls/{{ tls_key_file }}
 
       - job_name: 'cadvisor'
         scrape_interval: 5s
