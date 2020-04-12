@@ -1,0 +1,67 @@
+---
+- name: Prometheus Stack playbook
+  gather_facts: true
+  diff: yes
+  hosts: localhost
+  connection: local
+  vars_files: .secrets.yml
+  vars:
+    prometheus_version: latest
+    prometheus_skip_install: true
+    prometheus_port: 9092
+    node_port: 9100
+    cadvisor_port: 8080
+    psqlexporter_port: 9187
+    nginxexporter_port: 9113
+    prometheus_web_listen_address: "0.0.0.0:{{ prometheus_port }}"
+    prometheus_targets:
+      romeotv:
+        - targets: ['{{ rtv_domain }}:7766']
+          labels:
+            job: "romeo-tv"
+            __metrics_path__: /cadvisor/metrics
+
+        - targets: ['{{ rtv_domain }}:7766']
+          labels:
+            job: "romeo-tv"
+            __metrics_path__: /node/metrics
+    prometheus_scrape_configs:
+      - job_name: "prometheus"
+        metrics_path: "{{ prometheus_metrics_path }}"
+        static_configs:
+          - targets:
+              - "localhost:{{ prometheus_port }}"
+
+      - job_name: "node"
+        static_configs:
+          - targets:
+              - "localhost:{{ node_port }}"
+
+      - job_name: "romeo-tv"
+        file_sd_configs:
+          - files:
+            - "{{ prometheus_config_dir }}/file_sd/romeotv.yml"
+        scheme: https
+        scrape_interval: 20s
+        tls_config:
+          ca_file: /etc/prometheus/ca.crt
+          cert_file: /etc/prometheus/dresrv.crt
+          key_file: /etc/prometheus/dresrv.key
+
+      - job_name: 'cadvisor'
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['localhost:{{ cadvisor_port }}']
+
+      - job_name: 'psqlexporter'
+        scrape_interval: 15s
+        static_configs:
+          - targets: ['localhost:{{ psqlexporter_port }}']
+
+      - job_name: 'nginxexporter'
+        scrape_interval: 10s
+        static_configs:
+          - targets: ['localhost:{{ nginxexporter_port }}']
+  roles:
+    - { role: prometheus }
+    # - { role: grafana }

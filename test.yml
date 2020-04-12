@@ -14,7 +14,7 @@
   # vars_files:
   #   - "group_vars/server.yml"
   roles:
-    - { role: postgres }
+    - { role: prometheus }
   # tasks:
   #   - name: Test secret
   #     debug:
