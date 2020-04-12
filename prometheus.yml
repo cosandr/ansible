@@ -13,7 +13,7 @@
     tls_key_file: dresrv.key
     prometheus_port: 9092
     node_port: 9100
-    cadvisor_port: 8080
+    cadvisor_port: 8081
     psqlexporter_port: 9187
     nginxexporter_port: 9113
     prometheus_web_listen_address: "0.0.0.0:{{ prometheus_port }}"
@@ -65,6 +65,25 @@
         scrape_interval: 10s
         static_configs:
           - targets: ['localhost:{{ nginxexporter_port }}']
+    grafana_skip_install: true
+    grafana_instance: "localhost"
+    grafana_domain: "localhost"
+    grafana_port: 3001
+    grafana_security:
+      admin_user: admin
+      admin_password: "{{ grafana_admin_pass }}"
+    grafana_database:
+      type: postgres
+      host: localhost:5432
+      user: grafana
+      password: "{{ grafana_psql_pass }}"
+    grafana_datasources:
+      - name: "Prometheus"
+        type: "prometheus"
+        access: "proxy"
+        url: "http://localhost:{{ prometheus_port }}/"
+        basicAuth: false
+    grafana_dashboards: []
   roles:
-    - { role: prometheus }
-    # - { role: grafana }
+    # - { role: prometheus }
+    - { role: grafana }
