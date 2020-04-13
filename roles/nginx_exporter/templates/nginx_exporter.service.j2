@@ -1,0 +1,26 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Nginx Exporter
+Requires=network-online.target
+After=network-online.target
+Requires=nginx.service
+After=nginx.service
+
+[Service]
+Type=simple
+User=nginx_exporter
+Group=nginx_exporter
+ExecStart={{ _nginx_exporter_binary_install_dir }}/nginx_exporter \
+  -nginx.scrape-uri="{{ nginx_exporter_scrape_uri }}" \
+  -nginx.ssl-verify={{ nginx_exporter_ssl_verify }} \
+  -web.listen-address="{{ nginx_exporter_web_listen_address }}"
+Restart=always
+ExecReload=/bin/kill -HUP $MAINPID
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=full
+PrivateDevices=true
+
+[Install]
+WantedBy=multi-user.target

@@ -3,6 +3,7 @@ node_exporter_version: 0.18.1
 
 node_exporter_db_dir: /var/lib/node_exporter
 
+node_exporter_no_sysusers: false
 node_exporter_skip_install: false
 
 node_exporter_collectors: []

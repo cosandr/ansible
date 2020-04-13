@@ -1,0 +1,10 @@
+---
+- name: create or update systemd service unit
+  template:
+    src: nginx_exporter.service.j2
+    dest: /etc/systemd/system/nginx_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart nginx_exporter

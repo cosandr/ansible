@@ -22,13 +22,16 @@
       owner: root
       group: root
   
-  - name: restart systemd-sysusers
+  - name: restart node_exporter
     become: true
     systemd:
-      name: systemd-sysusers
+      daemon_reload: true
+      name: node_exporter
       state: restarted
 
-  when: node_exporter_systemd_version | int >= 215
+  when:
+    - not node_exporter_no_sysusers
+    - node_exporter_systemd_version | int >= 215
 
 - block:
   - name: use systemd-sysusers
@@ -50,7 +53,8 @@
       createhome: false
       home: "{{ node_exporter_db_dir }}"
 
-  when: node_exporter_systemd_version | int < 215
+  when: 
+    - (node_exporter_no_sysusers) or (node_exporter_systemd_version | int < 215)
 
 - name: create node_exporter data directory
   file:

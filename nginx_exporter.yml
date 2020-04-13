@@ -1,0 +1,14 @@
+---
+- name: Nginx Exporter playbook
+  gather_facts: true
+  diff: yes
+  hosts: localhost
+  connection: local
+  vars:
+    nginx_exporter_no_sysusers: true
+    nginx_exporter_version: "latest"
+    nginx_exporter_web_listen_address: "127.0.0.1:9113"
+    nginx_exporter_scrape_uri: "http://127.0.0.1:80/nginx_status"
+    nginx_exporter_skip_install: true
+  roles:
+  - { role: nginx_exporter }
