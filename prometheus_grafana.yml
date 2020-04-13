@@ -7,7 +7,7 @@
   vars_files: .secrets/vars.yml
   vars:
     prometheus_version: latest
-    prometheus_skip_install: false
+    prometheus_skip_install: true
     tls_ca_file: ca.crt
     tls_crt_file: dresrv.crt
     tls_key_file: dresrv.key
@@ -39,6 +39,7 @@
         static_configs:
           - targets:
               - "localhost:{{ node_port }}"
+              - "10.1.0.3:9100"
 
       - job_name: "romeo-tv"
         file_sd_configs:
@@ -86,4 +87,4 @@
     grafana_dashboards: []
   roles:
     - { role: prometheus }
-    - { role: grafana }
+    # - { role: grafana }

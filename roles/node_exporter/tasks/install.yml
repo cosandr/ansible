@@ -21,6 +21,12 @@
       mode: 0644
       owner: root
       group: root
+  
+  - name: restart systemd-sysusers
+    become: true
+    systemd:
+      name: systemd-sysusers
+      state: restarted
 
   when: node_exporter_systemd_version | int >= 215
 
@@ -44,15 +50,15 @@
       createhome: false
       home: "{{ node_exporter_db_dir }}"
 
-  - name: create node_exporter data directory
-    file:
-      path: "{{ node_exporter_db_dir }}"
-      state: directory
-      owner: node_exporter
-      group: node_exporter
-      mode: 0770
-
   when: node_exporter_systemd_version | int < 215
+
+- name: create node_exporter data directory
+  file:
+    path: "{{ node_exporter_db_dir }}"
+    state: directory
+    owner: node_exporter
+    group: node_exporter
+    mode: 0770
 
 - name: ensure textfile_collector exists
   copy:
