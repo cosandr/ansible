@@ -1,0 +1,137 @@
+---
+- name: get systemd version
+  command: systemctl --version
+  changed_when: false
+  check_mode: false
+  register: __systemd_version
+
+- name: set systemd version fact
+  set_fact:
+    node_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
+
+- block:
+  - name: use systemd-sysusers
+    debug:
+      msg: "Systemd version {{ node_exporter_systemd_version }} OK for sysusers"
+
+  - name: copy node_exporter sysusers file
+    template:
+      src: node_exporter.sysusers.j2
+      dest: /usr/lib/sysusers.d/node_exporter.conf
+      mode: 0644
+      owner: root
+      group: root
+
+  when: node_exporter_systemd_version | int >= 215
+
+- block:
+  - name: use systemd-sysusers
+    debug:
+      msg: "Systemd version {{ node_exporter_systemd_version }} too low for sysusers"
+
+  - name: create node_exporter system group
+    group:
+      name: node_exporter
+      system: true
+      state: present
+
+  - name: create node_exporter system user
+    user:
+      name: node_exporter
+      system: true
+      shell: "/usr/sbin/nologin"
+      group: node_exporter
+      createhome: false
+      home: "{{ node_exporter_db_dir }}"
+
+  - name: create node_exporter data directory
+    file:
+      path: "{{ node_exporter_db_dir }}"
+      state: directory
+      owner: node_exporter
+      group: node_exporter
+      mode: 0770
+
+  when: node_exporter_systemd_version | int < 215
+
+- name: ensure textfile_collector exists
+  copy:
+    content: ""
+    dest: "{{ node_exporter_db_dir }}/textfile_collector"
+    force: no
+    group: node_exporter
+    owner: node_exporter
+    mode: 0660
+
+- block:
+    - name: Get latest release
+      uri:
+        url: "https://api.github.com/repos/node_exporter/node_exporter/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: false
+        user: "{{ lookup('env', 'GH_USER') | default(omit) }}"
+        password: "{{ lookup('env', 'GH_TOKEN') | default(omit) }}"
+      no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
+      register: _latest_release
+      until: _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set node-exporter version to {{ _latest_release.json.tag_name[1:] }}"
+      set_fact:
+        node_exporter_version: "{{ _latest_release.json.tag_name[1:] }}"
+  when:
+    - node_exporter_version == "latest"
+
+- block:
+    - name: "Get checksum list"
+      set_fact:
+        __node_exporter_checksums: "{{ lookup('url', 'https://github.com/prometheus/node_exporter/releases/download/v' + node_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
+      run_once: true
+      check_mode: false
+
+    - name: "Get checksum for {{ go_arch }} architecture"
+      set_fact:
+        __node_exporter_checksum: "{{ item.split(' ')[0] }}"
+      with_items: "{{ __node_exporter_checksums }}"
+      when:
+        - "('linux-' + go_arch + '.tar.gz') in item"
+  delegate_to: localhost
+  when:
+    - not node_exporter_version == "latest"
+
+- name: download node_exporter binary to local folder
+  become: false
+  get_url:
+    url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    checksum: "sha256:{{ __node_exporter_checksum }}"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  # run_once: true # <-- this cannot be set due to multi-arch support
+  delegate_to: localhost
+  check_mode: false
+
+- name: unpack node_exporter binaries
+  become: false
+  unarchive:
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp"
+    creates: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/node_exporter"
+  delegate_to: localhost
+  check_mode: false
+
+- name: propagate official node_exporter binary
+  copy:
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}/node_exporter"
+    dest: "{{ _node_exporter_binary_install_dir }}/node_exporter"
+    mode: 0755
+    owner: root
+    group: root
+  notify:
+    - restart node_exporter

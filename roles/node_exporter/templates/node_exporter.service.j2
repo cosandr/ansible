@@ -1,0 +1,30 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Node Exporter
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=node_exporter
+Group=node_exporter
+ExecStart={{ _node_exporter_binary_install_dir }}/node_exporter \
+{% for name in node_exporter_collectors %}
+  --collector.{{ name }} \
+{% endfor %}
+{% for name in node_exporter_no_collectors %}
+  --no-collector.{{ name }} \
+{% endfor %}
+{% if "textfile" not in node_exporter_no_collectors %}
+  --collector.textfile.directory={{ node_exporter_db_dir }}/textfile_collector \
+{% endif %}
+  --web.listen-address={{ node_exporter_web_listen_address }}
+Restart=always
+ExecReload=/bin/kill -HUP $MAINPID
+NoNewPrivileges=true
+ProtectHome=read-only
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target

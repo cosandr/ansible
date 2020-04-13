@@ -7,7 +7,7 @@
   vars_files: .secrets/vars.yml
   vars:
     prometheus_version: latest
-    prometheus_skip_install: true
+    prometheus_skip_install: false
     tls_ca_file: ca.crt
     tls_crt_file: dresrv.crt
     tls_key_file: dresrv.key
@@ -85,5 +85,5 @@
         basicAuth: false
     grafana_dashboards: []
   roles:
-    # - { role: prometheus }
+    - { role: prometheus }
     - { role: grafana }

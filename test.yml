@@ -1,7 +1,7 @@
 ---
 - name: Test Playbook
   gather_facts: true
-  check_mode: yes
+  check_mode: true
   diff: yes
   hosts: localhost
   connection: local
@@ -11,14 +11,59 @@
     domain_name: "dresrv.com"
     domain_cert: "/srv/web/certs/dresrv_cert.pem"
     domain_key: "/srv/web/certs/dresrv_key.pem"
+    node_exporter_config_dir: /etc/node_exporter
+    node_exporter_db_dir: /var/lib/node_exporter
+    node_collectors:
+      - systemd
+      - btrfs
+      - another
+      - hello
+    node_no_collectors:
+      - mdadm
+      - ignoreme
+      - metoo
   # vars_files:
   #   - "group_vars/server.yml"
-  roles:
-    - { role: prometheus }
-  # tasks:
-  #   - name: Test secret
-  #     debug:
-  #       msg:
-  #         - "Secret {{ gitea_secret_key }}"
-  #         - "Internal token {{ gitea_internal_token }}"
-  #         - "JWT secret {{ gitea_jwt_secret }}"
+  tasks:
+    - name: Get systemd version
+      command: systemctl --version
+      changed_when: false
+      check_mode: false
+      register: __systemd_version
+    
+    - name: systemd_version
+      debug:
+        msg: "{{ __systemd_version.stdout }}"
+
+    - name: Set systemd version fact
+      set_fact:
+        node_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
+
+    - name: systemd only number
+      debug:
+        msg: "{{ node_exporter_systemd_version }}"
+    # - name: default to no extra options
+    #   set_fact:
+    #     _node_extra_collectors: ""
+    #     _node_no_collectors: ""
+
+    # - name: add extra collectors
+    #   set_fact:
+    #     _node_extra_collectors: " --collector.{{ ' --collector.'.join(node_collectors) }}"
+    #   when: node_collectors != []
+
+    # - name: add disabled collectors
+    #   set_fact:
+    #     _node_no_collectors: " --no-collector.{{ ' --no-collector.'.join(node_no_collectors) }}"
+    #   when: node_no_collectors != []
+    
+    # - name: copy options file
+    #   copy:
+    #     content: |
+    #       OPTIONS="--collector.textfile.directory {{ node_exporter_db_dir }}/textfile_collector{{ _node_extra_collectors }}{{ _node_no_collectors }}"
+    #     dest: "{{ node_exporter_config_dir }}/options"
+    #     force: true
+    #     owner: root
+    #     group: node_exporter
+    #     mode: 0640
+
