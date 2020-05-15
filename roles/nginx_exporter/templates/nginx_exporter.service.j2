@@ -6,6 +6,8 @@ Requires=network-online.target
 After=network-online.target
 Requires=nginx.service
 After=nginx.service
+Requires=prometheus.service
+After=prometheus.service
 
 [Service]
 Type=simple

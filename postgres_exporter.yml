@@ -1,0 +1,13 @@
+---
+- name: Postgres Exporter playbook
+  gather_facts: true
+  diff: yes
+  hosts: localhost
+  connection: local
+  vars:
+    postgres_exporter_version: latest
+    postgres_exporter_skip_install: false
+    postgres_exporter_web_listen_address: 127.0.0.1:9187
+    postgres_service_name: postgresql-12.service
+  roles:
+  - { role: postgres_exporter }

@@ -1,0 +1,26 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Node Exporter
+Requires=network-online.target
+After=network-online.target
+Requires=prometheus.service
+After=prometheus.service
+Requires={{ postgres_service_name }}
+After={{ postgres_service_name }}
+
+[Service]
+Type=simple
+User=postgres
+Group=postgres
+Environment=DATA_SOURCE_NAME="user=postgres host=/var/run/postgresql/ sslmode=disable"
+ExecStart={{ _postgres_exporter_binary_install_dir }}/postgres_exporter \
+  --web.listen-address={{ postgres_exporter_web_listen_address }}
+Restart=always
+ExecReload=/bin/kill -HUP $MAINPID
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target

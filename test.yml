@@ -25,23 +25,16 @@
   # vars_files:
   #   - "group_vars/server.yml"
   tasks:
-    - name: Get systemd version
-      command: systemctl --version
-      changed_when: false
+    - name: collect facts about system services
+      shell: systemctl is-active --quiet firewalldd
+      register: services_state
       check_mode: false
-      register: __systemd_version
-    
-    - name: systemd_version
-      debug:
-        msg: "{{ __systemd_version.stdout }}"
 
-    - name: Set systemd version fact
-      set_fact:
-        node_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
-
-    - name: systemd only number
+    - name: Debug
       debug:
-        msg: "{{ node_exporter_systemd_version }}"
+        var: services_state
+
+
     # - name: default to no extra options
     #   set_fact:
     #     _node_extra_collectors: ""

@@ -4,6 +4,8 @@
 Description=Node Exporter
 Requires=network-online.target
 After=network-online.target
+Requires=prometheus.service
+After=prometheus.service
 
 [Service]
 Type=simple
