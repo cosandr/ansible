@@ -39,7 +39,12 @@
         static_configs:
           - targets:
               - "localhost:{{ node_port }}"
+
+      - job_name: "desktop"
+        static_configs:
+          - targets:
               - "10.1.0.3:9100"
+              - "10.1.0.3:9401"
 
       - job_name: "romeo-tv"
         file_sd_configs:
@@ -86,5 +91,5 @@
         basicAuth: false
     grafana_dashboards: []
   roles:
-    - { role: prometheus }
-    # - { role: grafana }
+    # - { role: prometheus }
+    - { role: grafana }

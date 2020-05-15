@@ -1,0 +1,8 @@
+---
+- name: SSHD playbook
+  gather_facts: true
+  diff: yes
+  hosts: localhost
+  connection: local
+  roles:
+  - { role: sshd }
