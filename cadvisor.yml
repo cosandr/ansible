@@ -1,0 +1,14 @@
+---
+- name: Cadvisor playbook
+  gather_facts: true
+  diff: yes
+  hosts: localhost
+  connection: local
+  vars:
+    cadvisor_version: 0.36.0
+    cadvisor_skip_install: false
+    cadvisor_docker_only: true
+    cadvisor_listen_ip: 127.0.0.1
+    cadvisor_port: 8081
+  roles:
+  - { role: cadvisor }

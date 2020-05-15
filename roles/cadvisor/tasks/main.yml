@@ -1,0 +1,21 @@
+---
+- include: install.yml
+  become: true
+  tags:
+    - cadvisor_install
+  when: not cadvisor_skip_install
+
+- include: configure.yml
+  become: true
+  tags:
+    - cadvisor_configure
+
+- name: ensure cadvisor service is started and enabled
+  become: true
+  systemd:
+    daemon_reload: true
+    name: cadvisor
+    state: started
+    enabled: true
+  tags:
+    - cadvisor_run

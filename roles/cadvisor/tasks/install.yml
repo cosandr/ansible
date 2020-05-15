@@ -1,0 +1,46 @@
+---
+- block:
+    - name: Get latest release
+      uri:
+        url: "https://api.github.com/repos/google/cadvisor/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: false
+        user: "{{ lookup('env', 'GH_USER') | default(omit) }}"
+        password: "{{ lookup('env', 'GH_TOKEN') | default(omit) }}"
+      no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
+      register: _latest_release
+      until: _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set cadvisor version to {{ _latest_release.json.tag_name[1:] }}"
+      set_fact:
+        cadvisor_version: "{{ _latest_release.json.tag_name[1:] }}"
+  when:
+    - cadvisor_version == "latest"
+
+- name: download cadvisor binary to local folder
+  become: false
+  get_url:
+    url: "https://github.com/google/cadvisor/releases/download/v{{ cadvisor_version }}/cadvisor"
+    dest: "/tmp/ansible_cadvisor_{{ cadvisor_version }}"
+  register: _download_binary
+  until: _download_binary is succeeded
+  retries: 5
+  delay: 2
+  run_once: true
+  delegate_to: localhost
+  check_mode: false
+
+- name: propagate official cadvisor binary
+  copy:
+    src: "/tmp/ansible_cadvisor_{{ cadvisor_version }}"
+    dest: "{{ _cadvisor_binary_install_dir }}/cadvisor"
+    mode: 0755
+    owner: root
+    group: root
+  notify:
+    - restart cadvisor

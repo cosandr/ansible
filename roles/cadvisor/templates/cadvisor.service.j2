@@ -1,0 +1,28 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Cadvisor
+Requires=network-online.target
+After=network-online.target
+Requires=prometheus.service
+After=prometheus.service
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=simple
+User=root
+ExecStart={{ _cadvisor_binary_install_dir }}/cadvisor \
+  --docker="unix:///var/run/docker.sock" \
+  --logtostderr=true \
+  --docker_only={{ cadvisor_docker_only }} \
+  --listen_ip={{ cadvisor_listen_ip }} \
+  --port={{ cadvisor_port }}
+Restart=always
+ExecReload=/bin/kill -HUP $MAINPID
+NoNewPrivileges=true
+ProtectHome=read-only
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target
