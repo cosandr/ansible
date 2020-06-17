@@ -1,6 +1,6 @@
 [submodule "roles/prometheus"]
 	path = roles/prometheus
-	url = https://github.com/cloudalchemy/ansible-prometheus
+	url = https://gitlab.com/cosandr/ansible-prometheus
 [submodule "roles/grafana"]
 	path = roles/grafana
-	url = https://github.com/cloudalchemy/ansible-grafana
+	url = https://gitlab.com/cosandr/ansible-grafana

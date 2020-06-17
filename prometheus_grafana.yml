@@ -102,12 +102,18 @@
               __metrics_path__: /node/metrics
 
     grafana_skip_install: true
+    grafana_url: "https://{{ grafana_domain }}/grafana/"
     grafana_instance: "localhost"
-    grafana_domain: "localhost"
+    grafana_address: "127.0.0.1"
     grafana_port: 3001
     grafana_security:
-      admin_user: admin
+      admin_user: "{{ grafana_admin_user }}"
       admin_password: "{{ grafana_admin_pass }}"
+    grafana_smtp:
+      host: "{{ smtp_host }}:{{ smtp_port }}"
+      user: "{{ smtp_user }}"
+      password: "{{ smtp_pass }}"
+      from_address: "{{ grafana_smtp_from }}"
     grafana_database:
       type: postgres
       host: localhost:5432
@@ -121,5 +127,5 @@
         basicAuth: false
     grafana_dashboards: []
   roles:
-    - { role: prometheus }
+    # - { role: prometheus }
     - { role: grafana }
