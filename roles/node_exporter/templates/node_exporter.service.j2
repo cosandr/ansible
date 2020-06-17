@@ -4,8 +4,10 @@
 Description=Node Exporter
 Requires=network-online.target
 After=network-online.target
+{% if inventory_hostname == "server" %}
 Requires=prometheus.service
 After=prometheus.service
+{% endif %}
 
 [Service]
 Type=simple

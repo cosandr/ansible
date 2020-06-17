@@ -3,8 +3,10 @@
   gather_facts: true
   check_mode: true
   diff: yes
-  hosts: localhost
-  connection: local
+  hosts: all
+  vars_files: 
+    - .secrets/vars.yml
+    - role_vars/grafana.yml
   vars:
     container_mount: "/srv/containers"
     postgres_service: "postgresql-12.service"
@@ -25,14 +27,12 @@
   # vars_files:
   #   - "group_vars/server.yml"
   tasks:
-    - name: collect facts about system services
-      shell: systemctl is-active --quiet firewalldd
-      register: services_state
-      check_mode: false
-
-    - name: Debug
-      debug:
-        var: services_state
+  - name: "Ansible | inventory hostname"
+    debug:
+      var: role_name
+    # - name: "Ansible | List all known variables and facts"
+    #   debug:
+    #     var: hostvars[inventory_hostname]
 
 
     # - name: default to no extra options

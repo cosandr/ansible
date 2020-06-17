@@ -1,0 +1,44 @@
+---
+- name: Server playbook
+  gather_facts: true
+  diff: yes
+  hosts: server
+  vars_files: 
+    - .secrets/vars.yml
+    - role_vars/cadvisor.yml
+    - role_vars/grafana.yml
+    - role_vars/nginx_exporter.yml
+    - role_vars/node_exporter.yml
+    - role_vars/postgres_exporter.yml
+    - role_vars/prometheus.yml
+  vars:
+    cadvisor_skip_install: false
+    cadvisor_version: "0.36.0"
+    grafana_skip_install: true
+    grafana_version: "latest"
+    nginx_exporter_skip_install: true
+    nginx_exporter_version: "latest"
+    node_exporter_skip_install: false
+    node_exporter_version: "latest"
+    postgres_exporter_skip_install: false
+    postgres_exporter_version: "latest"
+    prometheus_skip_install: false
+    prometheus_version: "latest"
+  tasks:
+    - import_role: { name: cadvisor }
+      tags: ["prometheus-stack", "cadvisor"]
+
+    - import_role: { name: grafana }
+      tags: ["prometheus-stack", "grafana"]
+
+    - import_role: { name: nginx_exporter }
+      tags: ["prometheus-stack", "nginx_exporter"]
+
+    - import_role: { name: node_exporter }
+      tags: ["prometheus-stack", "node_exporter"]
+
+    - import_role: { name: postgres_exporter }
+      tags: ["prometheus-stack", "postgres_exporter"]
+
+    - import_role: { name: prometheus }
+      tags: ["prometheus-stack", "prometheus"]

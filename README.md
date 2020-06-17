@@ -25,4 +25,17 @@ bw get item ansible | jq -j '.fields[] | select(.name == "vault") | .value' > .v
 ansible-playbook <playbook> --ask-vault-pass
 # from file
 ansible-playbook <playbook> --vault-password-file .vault_key
+# Run only on server host (if hosts is all in playbook)
+ansible-playbook -l server playbook.yml
+# Run only one tag in playbook
+ansible-playbook playbook.yml --tags "grafana"
+```
+
+## Hosts file example
+```
+localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3
+
+desktop ansible_connection=local ansible_become=yes ansible_python_interpreter=/usr/bin/python3
+
+server ansible_host=10.1.0.2 ansible_user=root ansible_python_interpreter=/usr/bin/python3
 ```

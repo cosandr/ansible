@@ -1,5 +1,0 @@
----
-
-gitea_secret_key: "test1"
-gitea_internal_token: "test2"
-gitea_jwt_secret: "test3"

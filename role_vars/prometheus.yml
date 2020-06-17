@@ -1,0 +1,88 @@
+---
+tls_ca_file: ca.crt
+tls_crt_file: dresrv.crt
+tls_key_file: dresrv.key
+desktop_ip: 10.1.0.3
+desktop_label: desktop
+server_label: "{{ server_hostname }}"
+prometheus_web_listen_address: "0.0.0.0:{{ prometheus_port }}"
+prometheus_global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+prometheus_scrape_configs:
+  - job_name: "prometheus"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs:
+      - targets: ["localhost:{{ prometheus_port }}"]
+        labels:
+          instance: "{{ server_label }}"
+
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["localhost:{{ cadvisor_port }}"]
+        labels:
+          instance: "{{ server_label }}"
+
+  - job_name: "node"
+    static_configs:
+      - targets: ["localhost:{{ node_port }}"]
+        labels:
+          instance: "{{ server_label }}"
+      - targets: ["{{ desktop_ip }}:{{ node_port }}"]
+        labels:
+          instance: "{{ desktop_label }}"
+
+  - job_name: "aquaero"
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["{{ desktop_ip }}:2782"]
+        labels:
+          instance: "{{ desktop_label }}"
+
+  - job_name: "wmi"
+    static_configs:
+      - targets: ["{{ desktop_ip }}:9182"]
+        labels:
+          instance: "{{ desktop_label }}"
+
+  - job_name: "nvidia"
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["{{ desktop_ip }}:9401"]
+        labels:
+          instance: "{{ desktop_label }}"
+
+  - job_name: 'postgres'
+    scrape_interval: 60s
+    static_configs:
+      - targets: ['localhost:{{ psqlexporter_port }}']
+        labels:
+          instance: "{{ server_label }}"
+
+  - job_name: 'nginx'
+    scrape_interval: 60s
+    static_configs:
+      - targets: ['localhost:{{ nginxexporter_port }}']
+        labels:
+          instance: "{{ server_label }}"
+
+  - job_name: "romeo-tv"
+    scheme: https
+    scrape_interval: 30s
+    tls_config:
+      ca_file: /etc/prometheus/tls/{{ tls_ca_file }}
+      cert_file: /etc/prometheus/tls/{{ tls_crt_file }}
+      key_file: /etc/prometheus/tls/{{ tls_key_file }}
+    static_configs:
+      - targets: ['{{ rtv_domain }}:7766']
+        labels:
+          job: "cadvisor"
+          instance: "RomeoTV"
+          __metrics_path__: /cadvisor/metrics
+
+      - targets: ['{{ rtv_domain }}:7766']
+        labels:
+          job: "node"
+          instance: "RomeoTV"
+          __metrics_path__: /node/metrics

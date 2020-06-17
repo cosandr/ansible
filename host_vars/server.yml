@@ -1,0 +1,11 @@
+---
+server_hostname: DreSRV
+nginx_status_url: "http://127.0.0.1:80/nginx_status"
+cadvisor_port: 8081
+grafana_port: 3001
+nginxexporter_port: 9113
+postgres_port: 5432
+prometheus_port: 9092
+psqlexporter_port: 9187
+postgres_service_name: postgresql-12.service
+node_exporter_web_listen_address: "127.0.0.1:{{ node_port }}"

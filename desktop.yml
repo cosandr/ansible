@@ -1,0 +1,17 @@
+---
+- name: Desktop playbook
+  gather_facts: true
+  diff: yes
+  hosts: desktop
+  vars_files: 
+    - .secrets/vars.yml
+    - role_vars/node_exporter.yml
+  vars:
+    node_exporter_skip_install: false
+    node_exporter_version: "latest"
+  tasks:
+    - import_role: { name: node_exporter }
+      tags: ["prometheus-stack", "node_exporter"]
+
+    - import_role: { name: nvidia_exporter }
+      tags: ["prometheus-stack", "nvidia_exporter"]

@@ -1,0 +1,24 @@
+---
+grafana_url: "https://{{ grafana_domain }}/grafana/"
+grafana_instance: "localhost"
+grafana_address: "127.0.0.1"
+grafana_security:
+  admin_user: "{{ grafana_admin_user }}"
+  admin_password: "{{ grafana_admin_pass }}"
+grafana_smtp:
+  host: "{{ smtp_host }}:{{ smtp_port }}"
+  user: "{{ smtp_user }}"
+  password: "{{ smtp_pass }}"
+  from_address: "{{ grafana_smtp_from }}"
+grafana_database:
+  type: postgres
+  host: "localhost:{{ postgres_port }}"
+  user: grafana
+  password: "{{ grafana_psql_pass }}"
+grafana_datasources:
+  - name: "Prometheus"
+    type: "prometheus"
+    access: "proxy"
+    url: "http://localhost:{{ prometheus_port }}/"
+    basicAuth: false
+grafana_dashboards: []

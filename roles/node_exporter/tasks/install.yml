@@ -76,7 +76,7 @@
 - block:
     - name: Get latest release
       uri:
-        url: "https://api.github.com/repos/node_exporter/node_exporter/releases/latest"
+        url: "https://api.github.com/repos/prometheus/node_exporter/releases/latest"
         method: GET
         return_content: true
         status_code: 200
