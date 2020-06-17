@@ -7,7 +7,7 @@
   vars_files: .secrets/vars.yml
   vars:
     prometheus_version: latest
-    prometheus_skip_install: true
+    prometheus_skip_install: false
     tls_ca_file: ca.crt
     tls_crt_file: dresrv.crt
     tls_key_file: dresrv.key
@@ -16,61 +16,91 @@
     cadvisor_port: 8081
     psqlexporter_port: 9187
     nginxexporter_port: 9113
+    desktop_ip: 10.1.0.3
+    desktop_label: desktop
+    server_label: DreSRV
     prometheus_web_listen_address: "0.0.0.0:{{ prometheus_port }}"
-    prometheus_targets:
-      romeotv:
-        - targets: ['{{ rtv_domain }}:7766']
-          labels:
-            job: "romeo-tv"
-            __metrics_path__: /cadvisor/metrics
-
-        - targets: ['{{ rtv_domain }}:7766']
-          labels:
-            job: "romeo-tv"
-            __metrics_path__: /node/metrics
+    prometheus_global:
+      scrape_interval: 15s
+      scrape_timeout: 10s
+      evaluation_interval: 15s
     prometheus_scrape_configs:
       - job_name: "prometheus"
         metrics_path: "{{ prometheus_metrics_path }}"
         static_configs:
-          - targets:
-              - "localhost:{{ prometheus_port }}"
+          - targets: ["localhost:{{ prometheus_port }}"]
+            labels:
+              instance: "{{ server_label }}"
+
+      - job_name: "cadvisor"
+        static_configs:
+          - targets: ["localhost:{{ cadvisor_port }}"]
+            labels:
+              instance: "{{ server_label }}"
 
       - job_name: "node"
         static_configs:
-          - targets:
-              - "localhost:{{ node_port }}"
+          - targets: ["localhost:{{ node_port }}"]
+            labels:
+              instance: "{{ server_label }}"
+          - targets: ["{{ desktop_ip }}:9100"]
+            labels:
+              instance: "{{ desktop_label }}"
 
-      - job_name: "desktop"
+      - job_name: "aquaero"
+        scrape_interval: 30s
         static_configs:
-          - targets:
-              - "10.1.0.3:9100"
-              - "10.1.0.3:9401"
+          - targets: ["{{ desktop_ip }}:2782"]
+            labels:
+              instance: "{{ desktop_label }}"
+
+      - job_name: "wmi"
+        static_configs:
+          - targets: ["{{ desktop_ip }}:9182"]
+            labels:
+              instance: "{{ desktop_label }}"
+
+      - job_name: "nvidia"
+        scrape_interval: 30s
+        static_configs:
+          - targets: ["{{ desktop_ip }}:9401"]
+            labels:
+              instance: "{{ desktop_label }}"
+
+      - job_name: 'postgres'
+        scrape_interval: 60s
+        static_configs:
+          - targets: ['localhost:{{ psqlexporter_port }}']
+            labels:
+              instance: "{{ server_label }}"
+
+      - job_name: 'nginx'
+        scrape_interval: 60s
+        static_configs:
+          - targets: ['localhost:{{ nginxexporter_port }}']
+            labels:
+              instance: "{{ server_label }}"
 
       - job_name: "romeo-tv"
-        file_sd_configs:
-          - files:
-            - "{{ prometheus_config_dir }}/file_sd/romeotv.yml"
         scheme: https
-        scrape_interval: 20s
+        scrape_interval: 30s
         tls_config:
           ca_file: /etc/prometheus/tls/{{ tls_ca_file }}
           cert_file: /etc/prometheus/tls/{{ tls_crt_file }}
           key_file: /etc/prometheus/tls/{{ tls_key_file }}
-
-      - job_name: 'cadvisor'
-        scrape_interval: 5s
         static_configs:
-          - targets: ['localhost:{{ cadvisor_port }}']
+          - targets: ['{{ rtv_domain }}:7766']
+            labels:
+              job: "cadvisor"
+              instance: "RomeoTV"
+              __metrics_path__: /cadvisor/metrics
 
-      - job_name: 'psqlexporter'
-        scrape_interval: 15s
-        static_configs:
-          - targets: ['localhost:{{ psqlexporter_port }}']
+          - targets: ['{{ rtv_domain }}:7766']
+            labels:
+              job: "node"
+              instance: "RomeoTV"
+              __metrics_path__: /node/metrics
 
-      - job_name: 'nginxexporter'
-        scrape_interval: 10s
-        static_configs:
-          - targets: ['localhost:{{ nginxexporter_port }}']
     grafana_skip_install: true
     grafana_instance: "localhost"
     grafana_domain: "localhost"
@@ -91,5 +121,5 @@
         basicAuth: false
     grafana_dashboards: []
   roles:
-    # - { role: prometheus }
+    - { role: prometheus }
     - { role: grafana }
