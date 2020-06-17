@@ -127,5 +127,5 @@
         basicAuth: false
     grafana_dashboards: []
   roles:
-    # - { role: prometheus }
+    - { role: prometheus }
     - { role: grafana }
