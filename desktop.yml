@@ -9,7 +9,14 @@
   vars:
     node_exporter_skip_install: false
     node_exporter_version: "latest"
+    node_exporter_port: "{{ ports.node_exporter }}"
+    nvidiaexporter_port: "{{ ports.nvidia_exporter }}"
   tasks:
+    - name: Merge ports
+      set_fact:
+        ports: "{{ ports | combine(_ports, recursive=true) }}"
+      tags: ["always"]
+
     - import_role: { name: node_exporter }
       tags: ["prometheus-stack", "node_exporter"]
 

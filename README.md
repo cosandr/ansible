@@ -28,14 +28,34 @@ ansible-playbook <playbook> --vault-password-file .vault_key
 # Run only on server host (if hosts is all in playbook)
 ansible-playbook -l server playbook.yml
 # Run only one tag in playbook
-ansible-playbook playbook.yml --tags "grafana"
+ansible-playbook playbook.yml --tags grafana
+# Run in vscode docker
+ansible-playbook -i docker_hosts server.yml --tags nginx
 ```
 
 ## Hosts file example
+`/etc/ansible/hosts` on source machine (running playbook)
 ```
 localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3
 
 desktop ansible_connection=local ansible_become=yes ansible_python_interpreter=/usr/bin/python3
 
 server ansible_host=10.1.0.2 ansible_user=root ansible_python_interpreter=/usr/bin/python3
+```
+
+## Docker ports example
+`/etc/ansible/facts.d/docker.fact` on remote (target) machine
+```
+[ports]
+bitwarden_notifications=3012
+bitwarden=8343
+glances=61208
+monitorix=8080
+nextcloud=25683
+portainer=9000
+radarr=7878
+sonarr=8989
+transmission=9091
+vouch=9090
+vscode=8443
 ```

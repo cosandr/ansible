@@ -6,57 +6,53 @@
   hosts: all
   vars_files: 
     - .secrets/vars.yml
-    - role_vars/grafana.yml
+    - host_vars/server.yml
   vars:
-    container_mount: "/srv/containers"
-    postgres_service: "postgresql-12.service"
-    domain_name: "dresrv.com"
-    domain_cert: "/srv/web/certs/dresrv_cert.pem"
-    domain_key: "/srv/web/certs/dresrv_key.pem"
-    node_exporter_config_dir: /etc/node_exporter
-    node_exporter_db_dir: /var/lib/node_exporter
-    node_collectors:
-      - systemd
-      - btrfs
-      - another
-      - hello
-    node_no_collectors:
-      - mdadm
-      - ignoreme
-      - metoo
-  # vars_files:
-  #   - "group_vars/server.yml"
+    nginx_upstreams: []
   tasks:
-  - name: "Ansible | inventory hostname"
-    debug:
-      var: role_name
     # - name: "Ansible | List all known variables and facts"
     #   debug:
     #     var: hostvars[inventory_hostname]
+    - name: Merge ports
+      set_fact:
+        ports: "{{ ports | combine(_ports, recursive=true) }}"
+    - block:
+      - name: "Docker ports"
+        debug:
+          var: ansible_local.docker.ports
 
-
-    # - name: default to no extra options
-    #   set_fact:
-    #     _node_extra_collectors: ""
-    #     _node_no_collectors: ""
-
-    # - name: add extra collectors
-    #   set_fact:
-    #     _node_extra_collectors: " --collector.{{ ' --collector.'.join(node_collectors) }}"
-    #   when: node_collectors != []
-
-    # - name: add disabled collectors
-    #   set_fact:
-    #     _node_no_collectors: " --no-collector.{{ ' --no-collector.'.join(node_no_collectors) }}"
-    #   when: node_no_collectors != []
+      - name: Merge Docker ports
+        set_fact:
+          ports: "{{ ports | combine(ansible_local.docker.ports, recursive=true) }}"
     
-    # - name: copy options file
-    #   copy:
-    #     content: |
-    #       OPTIONS="--collector.textfile.directory {{ node_exporter_db_dir }}/textfile_collector{{ _node_extra_collectors }}{{ _node_no_collectors }}"
-    #     dest: "{{ node_exporter_config_dir }}/options"
-    #     force: true
-    #     owner: root
-    #     group: node_exporter
-    #     mode: 0640
+      when: ansible_local is defined and ansible_local.docker is defined and ansible_local.docker.ports is defined
 
+    - name: "All ports"
+      debug:
+        var: ports
+    
+    - name: Include vars
+      include_vars: "roles/nginx/vars/{{ ansible_os_family }}.yml"
+    
+    - name: Create mapping of managed sites
+      set_fact:
+        nginx_managed_sites: "{{ nginx_managed_sites|default({}) | combine( { 'ansible-' + item | basename | regex_replace('(.*)\\.j2$', '\\1'): item } ) }}"
+      loop: "{{ lookup('fileglob', 'roles/nginx/templates/sites/*', wantlist=True) }}"
+    
+    - name: List of existing managed sites
+      set_fact:
+        check_sites_exist: "{{ check_sites_exist|default([]) + [ item | basename ] }}"
+      loop: "{{ lookup('fileglob', nginx_vhost_path + '/ansible-*', wantlist=True) }}"
+    
+    - block:
+      - name: Delete old managed sites
+        debug:
+          msg: "{{ nginx_vhost_path }}/{{ item }}"
+        when: item not in nginx_managed_sites
+        with_items: "{{ check_sites_exist }}"
+      when: check_sites_exist is defined and check_sites_exist | length > 0
+    
+    - name: dsada
+      debug:
+        msg: "yes"
+      when: ports.cadvisor is defined

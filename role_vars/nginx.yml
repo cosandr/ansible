@@ -1,0 +1,9 @@
+---
+nginx_server_tokens: "off"
+nginx_yum_repo_enabled: false
+nginx_remove_default_vhost: true
+nginx_load_modules: ["ngx_http_dav_ext_module", "ngx_rtmp_module"]
+nginx_skip_sites: ["webdav.conf.j2", "nextcloud-baremetal.conf.j2"]
+nginx_vhost_path: /etc/nginx/sites-enabled
+nginx_types_hash_max_size: "4096"
+nginx_types_hash_bucket_size: "64"

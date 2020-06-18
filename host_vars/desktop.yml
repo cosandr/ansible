@@ -1,3 +1,5 @@
 ---
-nvidiaexporter_port: 9401
-node_exporter_web_listen_address: "0.0.0.0:{{ node_port }}"
+_ports:
+  nvidia_exporter: 9401
+node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
+server_local_ip: 10.1.0.2

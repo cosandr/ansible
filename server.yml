@@ -5,6 +5,7 @@
   hosts: server
   vars_files: 
     - .secrets/vars.yml
+    - role_vars/nginx.yml
     - role_vars/cadvisor.yml
     - role_vars/grafana.yml
     - role_vars/nginx_exporter.yml
@@ -12,21 +13,52 @@
     - role_vars/postgres_exporter.yml
     - role_vars/prometheus.yml
   vars:
+    cadvisor_port: "{{ ports.cadvisor }}"
     cadvisor_skip_install: false
     cadvisor_version: "0.36.0"
+    grafana_port: "{{ ports.grafana }}"
     grafana_skip_install: true
     grafana_version: "latest"
     nginx_exporter_skip_install: true
     nginx_exporter_version: "latest"
+    nginx_rtmp_port: "{{ ports.rtmp }}"
+    nginx_skip_install: false
+    nginxexporter_port: "{{ ports.nginx_exporter }}"
     node_exporter_skip_install: false
     node_exporter_version: "latest"
+    node_exporter_port: "{{ ports.node_exporter }}"
     postgres_exporter_skip_install: false
     postgres_exporter_version: "latest"
+    postgres_port: "{{ ports.postgres }}"
+    prometheus_port: "{{ ports.prometheus }}"
     prometheus_skip_install: false
     prometheus_version: "latest"
+    psqlexporter_port: "{{ ports.psql_exporter }}"
   tasks:
+    - name: Merge ports
+      set_fact:
+        ports: "{{ ports | combine(_ports, recursive=true) }}"
+      tags: ["always"]
+
+    - name: Merge Docker ports
+      set_fact:
+        ports: "{{ ports | combine(ansible_local.docker.ports, recursive=true) }}"
+      when: ansible_local.docker is defined and ansible_local.docker.ports is defined
+      tags: ["always"]
+
+    # - name: "Ports"
+    #   debug:
+    #     var: ports
+    #   tags: ["always"]
+
+    - import_role: { name: nginx }
+      tags: ["nginx"]
+
     - import_role: { name: cadvisor }
       tags: ["prometheus-stack", "cadvisor"]
+
+    - import_role: { name: prometheus }
+      tags: ["prometheus-stack", "prometheus"]
 
     - import_role: { name: grafana }
       tags: ["prometheus-stack", "grafana"]
@@ -39,6 +71,3 @@
 
     - import_role: { name: postgres_exporter }
       tags: ["prometheus-stack", "postgres_exporter"]
-
-    - import_role: { name: prometheus }
-      tags: ["prometheus-stack", "prometheus"]

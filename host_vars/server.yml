@@ -1,11 +1,18 @@
 ---
 server_hostname: DreSRV
-nginx_status_url: "http://127.0.0.1:80/nginx_status"
-cadvisor_port: 8081
-grafana_port: 3001
-nginxexporter_port: 9113
-postgres_port: 5432
-prometheus_port: 9092
-psqlexporter_port: 9187
+# Assumed http://localhost/
+nginx_status_url: "nginx_status"
 postgres_service_name: postgresql-12.service
-node_exporter_web_listen_address: "127.0.0.1:{{ node_port }}"
+node_exporter_web_listen_address: "127.0.0.1:{{ node_exporter_port }}"
+web_root: "/var/www"
+adminer_root: "{{ web_root }}/adminer"
+_ports:
+  adminer: 54322
+  cadvisor: 8081
+  gitea: 3000
+  grafana: 3001
+  nginx_exporter: 9113
+  postgres: 5432
+  prometheus: 9092
+  psql_exporter: 9187
+  rtmp: 1935
