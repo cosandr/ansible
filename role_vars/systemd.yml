@@ -6,6 +6,14 @@ systemd_units:
         description: Gitea backup
         after: [ "{{ postgres_service_name }}", "gitea.service" ]
         requires: [ "{{ postgres_service_name }}", "gitea.service" ]
+      service:
+        environment:
+          - "DIR=/tank/backup/gitea/"
+          - "TMPDIR=/tmp/giteabackup/"
+          - "KEEP=5"
+          - "PERMS=640"
+          - "PERMS_USER=root"
+          - "PERMS_GROUP={{ my_user }}"
     timer:
       timer:
         # Daily at 03:30
@@ -17,6 +25,13 @@ systemd_units:
         description: PostgreSQL backup
         after: [ "{{ postgres_service_name }}" ]
         requires: [ "{{ postgres_service_name }}" ]
+      service:
+        environment:
+          - "DIR=/tank/backup/pgsql/"
+          - "KEEP=5"
+          - "PERMS=640"
+          - "PERMS_USER=root"
+          - "PERMS_GROUP={{ my_user }}"
     timer:
       timer:
         # Daily at 03:00
@@ -28,6 +43,13 @@ systemd_units:
       timer:
         # Every 3 days at 04:00
         oncalendar: "*-*-01/3 04:00:00"
+      service:
+        environment:
+          - "CONTAINER_DATA=/srv/containers"
+          - "BORG_PASS_FILE=/root/borg_remote.pass"
+          - "SSH_USER={{ my_user }}"
+          - "SSH_PORT={{ rtv_ssh_port }}"
+          - "SSH_HOST={{ rtv_domain }}"
 
   - name: backup-root
     service: { unit: { description: Borg backup / to zpool } }
@@ -35,6 +57,9 @@ systemd_units:
       timer:
         # Every Friday at 22:00
         oncalendar: "Fri *-*-* 22:00:00"
+      service:
+        environment:
+          - "BORG_REPO=/tank/backup/borg"
 
   - name: ngx-recompile-modules
     disabled: yes
@@ -43,6 +68,11 @@ systemd_units:
       timer:
         # Every day at 03:05
         oncalendar: "*-*-* 03:05:00"
+      service:
+        environment:
+          - "MAIL_TO={{ my_email }}"
+          - "WORK_DIR=/srv/general/nginx"
+          - "NGX_MOD_PATH={{ nginx_modules_path }}"
 
   - name: clear-recycle
     service: { unit: { description: Clear recycle bins } }
@@ -57,6 +87,9 @@ systemd_units:
       timer:
         # Every day at 02:30
         oncalendar: "*-*-* 02:30:00"
+      service:
+        environment:
+          - "FILENAME={{ nginx_cloudflare_real_ips }}"
 
   - name: update-gitea
     service: { unit: { description: Update Gitea } }
@@ -64,6 +97,9 @@ systemd_units:
       timer:
         # Every 7 days at 03:45
         oncalendar: "*-*-01/7 03:45:00"
+      service:
+        environment:
+          - "BIN_PATH=/usr/local/bin/gitea"
 
   - name: zfs-automount
     service:
@@ -73,6 +109,8 @@ systemd_units:
       service:
         remainafterexit: yes
         exec_start: [ "bash -c 'cat /root/tank.pass | zfs load-key tank && zfs mount -a'" ]
+      install:
+        wantedby: zfs-mount.service
 
   - name: zfs-mail-status
     service:
@@ -90,7 +128,8 @@ systemd_units:
       unit:
         description: Start ZFS pool scrub
       service:
-        exec_start: [ "zpool scrub tank" ]
+        # exec_start: [ "zpool scrub tank" ]
+        exec_start: [ "zpool scrub tank", "zfs --version" ]
     timer:
       timer:
         # Every first day of the month at 03:00
@@ -117,6 +156,7 @@ systemd_units:
         user: andrei
         group: andrei
         environment:
+          - "CONTAINER_DATA=/srv/containers"
           - "TERM=xterm-256color"
           - "CONTAINER_ENGINE=docker"
     timer:
@@ -151,6 +191,7 @@ systemd_units:
       unit:
         description: Mpop refresh job
       service:
+        type: simple
         user: root
         exec_start: [ "/usr/bin/mpop -q" ]
     timer:

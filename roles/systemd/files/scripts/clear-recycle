@@ -1,0 +1,29 @@
+#!/bin/bash
+
+declare -a mounts=("/srv/" "/tank/")
+
+now=$(date +"%Y.%m.%d %H:%M:%S")
+count=0
+echo "Start clearing at $now"
+for i in "${mounts[@]}"
+do
+    # echo "- $i"
+    # Shared folders
+    for d in "$i"* ; do
+        # Check inside for .recycle
+        # echo "-- $d"
+        if [ -d "$d"/.recycle ];
+        then
+            # Skip empty folders
+            toplvl=$(ls "$d"/.recycle/ | wc -l)
+            if [ "$toplvl" -ne 0 ];
+            then
+                find "$d"/.recycle/* -print -delete
+            fi
+            # echo "-- $d has recycle"
+            ((count += toplvl))
+        fi
+    done
+done
+now=$(date +"%Y.%m.%d %H:%M:%S")
+echo "Deleted $count at $now"

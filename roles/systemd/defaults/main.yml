@@ -1,5 +1,5 @@
 ---
-systemd_script_install_path: /usr/local/bin/systemd
+systemd_script_install_path: /usr/local/bin/systemd/ansible
 systemd_unit_install_path: /etc/systemd/system
 
 systemd_units: []

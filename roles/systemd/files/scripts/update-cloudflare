@@ -1,0 +1,23 @@
+#!/bin/bash
+
+FILENAME=${FILENAME:-/etc/nginx/cloudflare.conf}
+
+echo "#Cloudflare ip addresses" > "$FILENAME";
+echo "" >> "$FILENAME";
+
+echo "# - IPv4" >> "$FILENAME";
+for i in `curl https://www.cloudflare.com/ips-v4`; do
+  echo "set_real_ip_from $i;" >> "$FILENAME";
+done
+
+echo "" >> "$FILENAME";
+echo "# - IPv6" >> "$FILENAME";
+for i in `curl https://www.cloudflare.com/ips-v6`; do
+  echo "set_real_ip_from $i;" >> "$FILENAME";
+done
+
+echo "" >> "$FILENAME";
+echo "real_ip_header CF-Connecting-IP;" >> "$FILENAME";
+
+#test configuration and reload nginx
+nginx -t && systemctl reload nginx

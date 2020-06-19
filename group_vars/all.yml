@@ -1,3 +1,4 @@
 ---
+my_user: andrei
 ports:
   node_exporter: 9100

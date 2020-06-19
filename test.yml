@@ -7,7 +7,7 @@
   vars_files: 
     - .secrets/vars.yml
     - host_vars/server.yml
-    - role_vars/systemd_timers.yml
+    - role_vars/systemd.yml
   tasks:
     # - name: "Ansible | List all known variables and facts"
     #   debug:
@@ -30,5 +30,15 @@
       debug:
         var: ports
 
-    - import_role: { name: systemd_timers }
-      tags: ["systemd_timers"]
+    - import_role: { name: nginx }
+      tags: ["nginx"]
+  
+    - import_role: { name: systemd }
+      tags: ["systemd"]
+    
+    # - name: Set authorized ssh key, extracting just that data from 'users'
+    #   debug:
+    #     msg: "{{ item.0.name }}\n{{ item.1 }}"
+    #   with_subelements:
+    #      - "{{ users }}"
+    #      - authorized

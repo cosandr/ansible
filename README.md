@@ -30,7 +30,7 @@ ansible-playbook -l server playbook.yml
 # Run only one tag in playbook
 ansible-playbook playbook.yml --tags grafana
 # Run in vscode docker
-ansible-playbook -i docker_hosts server.yml --tags nginx
+ansible-playbook -i hosts_local server.yml --tags nginx
 ```
 
 ## Hosts file example

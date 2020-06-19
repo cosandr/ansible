@@ -1,0 +1,87 @@
+#!/bin/bash
+
+BORG_PASS_FILE=${BORG_PASS_FILE:-/root/borg_remote.pass}
+SSH_USER=${SSH_USER:-andrei}
+SSH_PORT=${SSH_PORT:-22}
+SSH_HOST=${SSH_HOST:-}
+CONTAINER_DATA=${CONTAINER_DATA:-/srv/containers}
+
+if [[ -z $SSH_HOST ]]; then
+    echo "SSH_HOST is required"
+    exit 1
+fi
+
+# Root needs ssh key on remote server!
+# command="/usr/local/bin/borg serve --umask=077"
+# Make sure SSH works
+if ! ssh -q -o "BatchMode=yes" "${SSH_USER}@${SSH_HOST}" -p "$SSH_PORT" exit &>/dev/null
+then
+    echo "Cannot SSH into remote server"
+    exit 1
+fi
+
+# Read passphrase from word-protected file
+BORG_PASSPHRASE=$(< "$BORG_PASS_FILE" )
+
+if [[ $? -ne 0 ]]; then
+    echo "Cannot read pass file"
+    exit 1
+fi
+
+export BORG_PASSPHRASE
+export BORG_REPO=ssh://"${SSH_USER}@${SSH_HOST}:${SSH_PORT}"/~/borg_repo
+export BORG_REMOTE_PATH='/usr/local/bin/borg'
+
+# some helpers and error handling:
+info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
+trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
+
+info "Starting backup"
+
+# Backup the most important directories into an archive named after
+# the machine this script is currently running on:
+
+borg create                           \
+    --stats                           \
+    --show-rc                         \
+    --compression auto,zstd           \
+    --exclude-caches                  \
+    ::'{hostname}-{now}'              \
+    /tank/backup/pgsql                \
+    /tank/backup/gitea                \
+    "$CONTAINER_DATA"/nextcloud/data  \
+    "$CONTAINER_DATA"/bitwarden/data  \
+    /home/andrei/src                  \
+
+backup_exit=$?
+
+info "Pruning repository"
+
+# Use the `prune` subcommand to maintain 7 daily, 4 weekly and 6 monthly
+# archives of THIS machine. The '{hostname}-' prefix is very important to
+# limit prune's operation to this machine's archives and not apply to
+# other machines' archives also:
+
+borg prune                          \
+    --list                          \
+    --prefix '{hostname}-'          \
+    --show-rc                       \
+    --keep-daily    2               \
+    --keep-weekly   2               \
+    --keep-monthly  6               \
+
+prune_exit=$?
+
+# use highest exit code as global exit code
+global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))
+
+if [ ${global_exit} -eq 0 ]; then
+    info "Backup and Prune finished successfully"
+elif [ ${global_exit} -eq 1 ]; then
+    info "Backup and/or Prune finished with warnings"
+else
+    info "Backup and/or Prune finished with errors"
+fi
+
+unset BORG_PASSPHRASE BORG_REPO
+exit ${global_exit}

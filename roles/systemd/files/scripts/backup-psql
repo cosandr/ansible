@@ -1,0 +1,35 @@
+#!/bin/bash
+
+DIR=${DIR:-/tank/backup/pgsql}
+KEEP=${KEEP:-5}
+PERMS=${PERMS:-640}
+PERMS_USER=${PERMS_USER:-root}
+PERMS_GROUP=${PERMS_GROUP:-root}
+
+DATESTAMP=$(date +%Y%m%d_%H%M)
+
+# create backup dir if it does not exist
+mkdir -p "${DIR}"
+
+# remove backups older than $DAYS_KEEP
+#DAYS_KEEP=30
+#find ${DIR}* -mtime +$DAYS_KEEP -exec rm -f {} \; 2> /dev/null
+
+# remove all backups except the $KEEP latests
+BACKUPS=$(find "${DIR}" -name "*.sql" | wc -l | sed 's/\ //g')
+while [ "$BACKUPS" -ge "$KEEP" ]
+do
+  ls -tr1 "${DIR}"/*.sql | head -n 1 | xargs rm -f 
+  # BACKUPS=$(expr "$BACKUPS" - 1)
+  BACKUPS=$(( BACKUPS - 1))
+done
+
+FILENAME="${DIR}/${DATESTAMP}.sql"
+pg_dumpall -U postgres -c > "$FILENAME"
+chown "$PERMS_USER:$PERMS_GROUP" "$FILENAME"
+chmod "$PERMS" "$FILENAME"
+
+echo "[${DATESTAMP}] Successfully dumped PG data."
+
+# Restore
+# psql -U postgres < dump.sql
