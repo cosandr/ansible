@@ -1,0 +1,30 @@
+---
+- name: Read nginx vars
+  include_vars: "../../nginx/vars/{{ ansible_os_family }}.yml"
+
+- name: Define nginx_user.
+  set_fact:
+    nginx_user: "{{ __nginx_user }}"
+  when: nginx_user is not defined
+    
+- name: Create script service files 
+  template:
+    src: templates/unit.service.j2
+    dest: "{{ systemd_unit_install_path }}/{{ item.name }}.service"
+    user: root
+    group: root
+    mode: 0644
+  when: item.disabled is not defined or not item.disabled
+  with_items: "{{ systemd_units }}"
+
+- name: Create script timer files 
+  template:
+    src: templates/unit.timer.j2
+    dest: "{{ systemd_unit_install_path }}/{{ item.name }}.timer"
+    user: root
+    group: root
+    mode: 0644
+  when:
+    - item.disabled is not defined or not item.disabled
+    - item.timer is defined
+  with_items: "{{ systemd_units }}"

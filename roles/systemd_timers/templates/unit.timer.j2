@@ -1,0 +1,51 @@
+{{ ansible_managed | comment }}
+[Unit]
+{% if item.timer.unit is not defined %}
+{% if item.timer.unit.description is defined %}
+Description={{ item.timer.unit.description }}
+{% elif item.service.unit is defined and item.service.unit.description is defined %}
+Description={{ item.service.unit.description }} timer
+{% else %}
+Description={{ item.name }} timer
+{% endif %}
+{% else %}
+{% set val = item.timer.unit %}
+{% if item.timer.unit.description is defined %}
+Description={{ item.timer.unit.description }}
+{% elif item.service.unit is defined and item.service.unit.description is defined %}
+Description={{ item.service.unit.description }} timer
+{% else %}
+Description={{ item.name }} timer
+{% endif %}
+{% if val.after is defined and val.after | length > 0 %}
+{% for service in val.after %}
+After={{ service }}
+{% endfor %}
+{% endif %}
+{% if val.requires is defined and val.requires | length > 0 %}
+{% for service in val.requires %}
+Requires={{ service }}
+{% endfor %}
+{% endif %}
+{% endif %}
+
+[Timer]
+{% set val = item.timer.timer %}
+{% if val.oncalendar is defined %}
+Persistent={{ val.persistent | default('true') | lower }}
+OnCalendar={{ val.oncalendar }}
+{% endif %}
+{% if val.onbootsec is defined %}
+OnBootSec={{ val.onbootsec }}
+{% endif %}
+{% if val.onunitactivesec is defined %}
+OnUnitActiveSec={{ val.onunitactivesec }}
+{% endif %}
+
+[Install]
+{% if item.timer.install is not defined %}
+WantedBy=timers.target
+{% else %}
+{% set val = item.timer.install %}
+WantedBy={{ val.wantedby | default('timers.target') }}
+{% endif %}

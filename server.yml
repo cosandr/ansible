@@ -12,6 +12,7 @@
     - role_vars/node_exporter.yml
     - role_vars/postgres_exporter.yml
     - role_vars/prometheus.yml
+    - role_vars/systemd_timers.yml
   vars:
     cadvisor_port: "{{ ports.cadvisor }}"
     cadvisor_skip_install: false
@@ -53,6 +54,9 @@
 
     - import_role: { name: nginx }
       tags: ["nginx"]
+
+    - import_role: { name: systemd_timers }
+      tags: ["systemd_timers"]
 
     - import_role: { name: cadvisor }
       tags: ["prometheus-stack", "cadvisor"]

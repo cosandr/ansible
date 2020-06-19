@@ -1,0 +1,45 @@
+---
+systemd_script_install_path: /usr/local/bin/systemd
+systemd_unit_install_path: /etc/systemd/system
+
+systemd_units: []
+#   - name: complete-example
+#     # If true, this unit will not be created, existing ones will be deleted
+#     disabled: false
+#     # If service section is missing it will create a simple service file as below
+# # [Unit]
+# # Description=complete-example
+# # 
+# # [Service]
+# # ExecStart=/usr/local/bin/systemd/complete-example
+# # 
+# # [Install]
+# # WantedBy=multi-user.target
+#     service:
+#       unit:
+#         description: Gitea backup # default <name>
+#         after: [ "nginx.service" ]
+#         requires: [ "nginx.service" ]
+#       service:
+#         type: simple # default oneshot
+#         user: nginx
+#         group: http
+#         remainafterexit: yes
+#         environment:
+#           - "TERM=xterm-256color"
+#           - "CONTAINER_ENGINE=docker"
+#         exec_start: [ "/bin/echo", "/bin/sleep" ]
+#       install:
+#         wantedby: graphical.target # default multi-user.target
+#     # No timer is created if this section is missing
+#     timer:
+#       unit:
+#         description: Timer description # default service description or <name>
+#       timer:
+#         persistent: false
+#         # One of the on* options is required
+#         oncalendar: "*-*-* 03:30:00"
+#         onbootsec: 30
+#         onunitactivesec: 10min
+#       install:
+#         wantedby: timers.target

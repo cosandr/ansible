@@ -7,8 +7,7 @@
   vars_files: 
     - .secrets/vars.yml
     - host_vars/server.yml
-  vars:
-    nginx_upstreams: []
+    - role_vars/systemd_timers.yml
   tasks:
     # - name: "Ansible | List all known variables and facts"
     #   debug:
@@ -30,29 +29,6 @@
     - name: "All ports"
       debug:
         var: ports
-    
-    - name: Include vars
-      include_vars: "roles/nginx/vars/{{ ansible_os_family }}.yml"
-    
-    - name: Create mapping of managed sites
-      set_fact:
-        nginx_managed_sites: "{{ nginx_managed_sites|default({}) | combine( { 'ansible-' + item | basename | regex_replace('(.*)\\.j2$', '\\1'): item } ) }}"
-      loop: "{{ lookup('fileglob', 'roles/nginx/templates/sites/*', wantlist=True) }}"
-    
-    - name: List of existing managed sites
-      set_fact:
-        check_sites_exist: "{{ check_sites_exist|default([]) + [ item | basename ] }}"
-      loop: "{{ lookup('fileglob', nginx_vhost_path + '/ansible-*', wantlist=True) }}"
-    
-    - block:
-      - name: Delete old managed sites
-        debug:
-          msg: "{{ nginx_vhost_path }}/{{ item }}"
-        when: item not in nginx_managed_sites
-        with_items: "{{ check_sites_exist }}"
-      when: check_sites_exist is defined and check_sites_exist | length > 0
-    
-    - name: dsada
-      debug:
-        msg: "yes"
-      when: ports.cadvisor is defined
+
+    - import_role: { name: systemd_timers }
+      tags: ["systemd_timers"]

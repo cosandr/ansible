@@ -1,0 +1,172 @@
+---
+systemd_units:
+  - name: backup-gitea
+    service:
+      unit:
+        description: Gitea backup
+        after: [ "{{ postgres_service_name }}", "gitea.service" ]
+        requires: [ "{{ postgres_service_name }}", "gitea.service" ]
+    timer:
+      timer:
+        # Daily at 03:30
+        oncalendar: "*-*-* 03:30:00"
+
+  - name: backup-psql
+    service:
+      unit:
+        description: PostgreSQL backup
+        after: [ "{{ postgres_service_name }}" ]
+        requires: [ "{{ postgres_service_name }}" ]
+    timer:
+      timer:
+        # Daily at 03:00
+        oncalendar: "*-*-* 03:00:00"
+
+  - name: backup-remote
+    service: { unit: { description: Borg backup important data to remote location } }
+    timer:
+      timer:
+        # Every 3 days at 04:00
+        oncalendar: "*-*-01/3 04:00:00"
+
+  - name: backup-root
+    service: { unit: { description: Borg backup / to zpool } }
+    timer:
+      timer:
+        # Every Friday at 22:00
+        oncalendar: "Fri *-*-* 22:00:00"
+
+  - name: ngx-recompile-modules
+    disabled: yes
+    service: { unit: { description: Make sure there are no outdated nginx modules } }
+    timer:
+      timer:
+        # Every day at 03:05
+        oncalendar: "*-*-* 03:05:00"
+
+  - name: clear-recycle
+    service: { unit: { description: Clear recycle bins } }
+    timer:
+      timer:
+        # Every 14 days at 02:00
+        oncalendar: "*-*-1,15 2:00:00"
+
+  - name: update-cloudflare
+    service: { unit: { description: Update Cloudflare real IP database } }
+    timer:
+      timer:
+        # Every day at 02:30
+        oncalendar: "*-*-* 02:30:00"
+
+  - name: update-gitea
+    service: { unit: { description: Update Gitea } }
+    timer:
+      timer:
+        # Every 7 days at 03:45
+        oncalendar: "*-*-01/7 03:45:00"
+
+  - name: zfs-automount
+    service:
+      unit:
+        description: Unlock and mount tank pool
+        after: [ "zfs-import.target" ]
+      service:
+        remainafterexit: yes
+        exec_start: [ "bash -c 'cat /root/tank.pass | zfs load-key tank && zfs mount -a'" ]
+
+  - name: zfs-mail-status
+    service:
+      unit:
+        description: Send email with ZFS pool status
+      service:
+        exec_start: [ "bash -c \"zpool status | mail -s 'zpool status' {{ my_email }}\"" ]
+    timer:
+      timer:
+        # Every first day of the month at 08:00
+        oncalendar: "*-*-01 08:00:00"
+
+  - name: zfs-scrub
+    service:
+      unit:
+        description: Start ZFS pool scrub
+      service:
+        exec_start: [ "zpool scrub tank" ]
+    timer:
+      timer:
+        # Every first day of the month at 03:00
+        oncalendar: "*-*-01 03:00:00"
+
+  - name: docker-on-boot
+    disabled: yes
+    service:
+      unit:
+        description: Start docker containers
+        after: [ "network.target", "zfs-automount.service", "docker.service" ]
+        requires: [ "docker.service" ]
+      service:
+        exec_start: [ "bash -c 'docker container start $(< /srv/containers/onboot.txt )'" ]
+
+  - name: docker-autoupdate
+    disabled: yes
+    service:
+      unit:
+        description: Auto update containers
+        after: [ "network.target", "zfs-automount.service", "docker.service" ]
+        requires: [ "docker.service" ]
+      service:
+        user: andrei
+        group: andrei
+        environment:
+          - "TERM=xterm-256color"
+          - "CONTAINER_ENGINE=docker"
+    timer:
+      timer:
+        oncalendar: "*-*-* 04:00:00" # Every day at 04:00
+
+  - name: fix-libvirtd-nat
+    service:
+      unit:
+        description: Set up iptables after libvirtd
+        after: [ "libvirtd.service", "firewalld.service" ]
+        requires: [ "libvirtd.service", "firewalld.service" ]
+      service:
+        exec_start:
+          # Allow forwarding on entire libvirt interface
+          - "iptables -I FORWARD -o virbr0 -d 192.168.122.0/24 -j ACCEPT"
+          # Forward Windows 10 VM RDP
+          - "iptables -t nat -I PREROUTING -p tcp --dport 3389 -j DNAT --to 192.168.122.2:3389"
+          # Forward SSH for arch VM
+          - "iptables -t nat -I PREROUTING -p tcp --dport 225 -j DNAT --to 192.168.122.5:22"
+          - "iptables -t nat -I PREROUTING -p tcp --dport 2225 -j DNAT --to 192.168.122.5:2222"
+          # Forward SSH for srvsim VM
+          - "iptables -t nat -I PREROUTING -p tcp --dport 226 -j DNAT --to 192.168.122.6:22"
+          - "iptables -t nat -I PREROUTING -p tcp --dport 2226 -j DNAT --to 192.168.122.6:2222"
+    timer:
+      timer:
+        persistent: false
+        onbootsec: 30
+
+  - name: mpop-refresh
+    service:
+      unit:
+        description: Mpop refresh job
+      service:
+        user: root
+        exec_start: [ "/usr/bin/mpop -q" ]
+    timer:
+      timer:
+        onbootsec: 15min
+        onunitactivesec: 15min
+
+  - name: nextcloud-cron
+    disabled: yes
+    service:
+      unit:
+        description: Nextcloud cron.php job
+      service:
+        user: "{{ nginx_user }}"
+        exec_start: [ "/usr/bin/php -f {{ web_root }}/nextcloud/cron.php" ]
+    timer:
+      timer:
+        onbootsec: 5min
+        onunitactivesec: 5min
