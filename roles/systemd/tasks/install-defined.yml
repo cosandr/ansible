@@ -1,0 +1,49 @@
+---
+- name: List of all enabled units with defined exec
+  no_log: true
+  set_fact:
+    check_exec_def: "{{ ( check_exec_def | default([]) ) + [ item.name ] }}"
+  with_items: "{{ systemd_units }}"
+  when:
+    - ( item.disabled is not defined or
+        item.disabled == false )
+    - item.service is defined
+    - item.service.service is defined
+    - item.service.service.exec_start is defined
+
+- block:
+  - name: Create defined services 
+    template:
+      src: templates/unit.service.j2
+      dest: "{{ systemd_unit_install_path }}/{{ item.name }}.service"
+      owner: root
+      group: root
+      mode: 0644
+    with_items: "{{ systemd_units }}"
+    loop_control:
+      label: "{{item.name}}"
+    when:
+      - item.name in check_exec_def
+
+  - name: Create defined timers 
+    template:
+      src: templates/unit.timer.j2
+      dest: "{{ systemd_unit_install_path }}/{{ item.name }}.timer"
+      owner: root
+      group: root
+      mode: 0644
+    with_items: "{{ systemd_units }}"
+    loop_control:
+      label: "{{item.name}}"
+    when:
+      - item.timer is defined
+      - item.name in check_exec_def
+
+  when:
+    - check_exec_def is defined
+    - check_exec_def | length > 0
+
+- name: No defined services
+  debug:
+    msg: "Nothing to do"
+  when: check_exec_def is not defined or (check_exec_def | length == 0)

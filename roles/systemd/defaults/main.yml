@@ -1,7 +1,21 @@
 ---
+# Where to install scripts in {files,templates}/scripts
 systemd_script_install_path: /usr/local/bin/systemd/ansible
-systemd_unit_install_path: /etc/systemd/system
 
+# Where to install systemd units
+systemd_unit_install_path: /etc/systemd/system
+# systemd_unit_install_path: /usr/lib/systemd/system
+
+# Skip checking if any services are missing their associated executable
+# If this is true, all services will be installed,
+# even if they (probably) can't be run
+systemd_no_check_missing: false
+
+# Delete scripts in systemd_script_install_path that are no longer needed,
+# useful when one gets disabled for example
+systemd_delete_old_scripts: true
+
+# List of service definitions, see commented out example below
 systemd_units: []
 #   - name: complete-example
 #     # If true, this unit will not be created, existing ones will be deleted
@@ -11,7 +25,7 @@ systemd_units: []
 # # Description=complete-example
 # # 
 # # [Service]
-# # ExecStart=/usr/local/bin/systemd/complete-example
+# # ExecStart=/usr/local/bin/systemd/ansible/complete-example
 # # 
 # # [Install]
 # # WantedBy=multi-user.target

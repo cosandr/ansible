@@ -1,21 +1,19 @@
 {{ ansible_managed | comment }}
 [Unit]
 {% if item.timer.unit is not defined %}
-{% if item.timer.unit.description is defined %}
-Description={{ item.timer.unit.description }}
-{% elif item.service.unit is defined and item.service.unit.description is defined %}
-Description={{ item.service.unit.description }} timer
-{% else %}
+{% if item.service is not defined or item.service.unit is not defined %}
 Description={{ item.name }} timer
+{% else %}
+Description={{ item.service.unit.description | default(item.name) }} timer
 {% endif %}
 {% else %}
 {% set val = item.timer.unit %}
-{% if item.timer.unit.description is defined %}
-Description={{ item.timer.unit.description }}
-{% elif item.service.unit is defined and item.service.unit.description is defined %}
-Description={{ item.service.unit.description }} timer
-{% else %}
+{% if val.description is defined %}
+Description={{ val.description }}
+{% elif item.service is not defined or item.service.unit is not defined %}
 Description={{ item.name }} timer
+{% else %}
+Description={{ item.service.unit.description | default(item.name) }} timer
 {% endif %}
 {% if val.after is defined and val.after | length > 0 %}
 {% for service in val.after %}

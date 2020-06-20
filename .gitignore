@@ -1,2 +1,4 @@
 .secrets/
 __pycache__
+*.retry
+*.pyc

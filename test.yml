@@ -7,7 +7,19 @@
   vars_files: 
     - .secrets/vars.yml
     - host_vars/server.yml
-    - role_vars/systemd.yml
+    # - role_vars/systemd.yml
+  vars:
+    systemd_no_check_missing: true
+    systemd_units:
+      - name: timer-no-service-undefined
+        timer:
+          timer:
+            onbootsec: 30
+      - name: empty-service-undefined
+      - name: basic-service-defined
+        service:
+          service:
+            exec_start: [ "/bin/cat /etc/shadow" ]
   tasks:
     # - name: "Ansible | List all known variables and facts"
     #   debug:
