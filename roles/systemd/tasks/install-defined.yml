@@ -54,7 +54,7 @@
 
   - name: Set defined timer state
     service:
-      name: "{{ item.name }}.service"
+      name: "{{ item.name }}.timer"
       enabled: "{{ item.timer.enabled | default(false) }}"
       state: "{{ 'started' if (item.timer.started | default(false)) else 'stopped' }}"
     with_items: "{{ systemd_units }}"
