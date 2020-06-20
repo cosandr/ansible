@@ -12,7 +12,6 @@
     - role_vars/node_exporter.yml
     - role_vars/postgres_exporter.yml
     - role_vars/prometheus.yml
-    - role_vars/systemd.yml
   vars:
     cadvisor_port: "{{ ports.cadvisor }}"
     cadvisor_skip_install: false
@@ -36,6 +35,9 @@
     prometheus_version: "latest"
     psqlexporter_port: "{{ ports.psql_exporter }}"
   tasks:
+    - import_role: { name: common }
+      tags: ["all", "common"]
+
     - name: Merge ports
       set_fact:
         ports: "{{ ports | combine(_ports, recursive=true) }}"

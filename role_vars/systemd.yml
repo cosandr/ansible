@@ -15,6 +15,8 @@ systemd_units:
           - "PERMS_USER=root"
           - "PERMS_GROUP={{ my_user }}"
     timer:
+      enabled: true
+      started: true
       timer:
         # Daily at 03:30
         oncalendar: "*-*-* 03:30:00"
@@ -33,6 +35,8 @@ systemd_units:
           - "PERMS_USER=root"
           - "PERMS_GROUP={{ my_user }}"
     timer:
+      enabled: true
+      started: true
       timer:
         # Daily at 03:00
         oncalendar: "*-*-* 03:00:00"
@@ -40,6 +44,8 @@ systemd_units:
   - name: backup-remote
     service: { unit: { description: Borg backup important data to remote location } }
     timer:
+      enabled: true
+      started: true
       timer:
         # Every 3 days at 04:00
         oncalendar: "*-*-01/3 04:00:00"
@@ -54,6 +60,8 @@ systemd_units:
   - name: backup-root
     service: { unit: { description: Borg backup / to zpool } }
     timer:
+      enabled: true
+      started: true
       timer:
         # Every Friday at 22:00
         oncalendar: "Fri *-*-* 22:00:00"
@@ -65,6 +73,8 @@ systemd_units:
     disabled: yes
     service: { unit: { description: Make sure there are no outdated nginx modules } }
     timer:
+      enabled: true
+      started: true
       timer:
         # Every day at 03:05
         oncalendar: "*-*-* 03:05:00"
@@ -77,6 +87,8 @@ systemd_units:
   - name: clear-recycle
     service: { unit: { description: Clear recycle bins } }
     timer:
+      enabled: true
+      started: true
       timer:
         # Every 14 days at 02:00
         oncalendar: "*-*-1,15 2:00:00"
@@ -84,6 +96,8 @@ systemd_units:
   - name: update-cloudflare
     service: { unit: { description: Update Cloudflare real IP database } }
     timer:
+      enabled: true
+      started: true
       timer:
         # Every day at 02:30
         oncalendar: "*-*-* 02:30:00"
@@ -94,6 +108,8 @@ systemd_units:
   - name: update-gitea
     service: { unit: { description: Update Gitea } }
     timer:
+      enabled: true
+      started: true
       timer:
         # Every 7 days at 03:45
         oncalendar: "*-*-01/7 03:45:00"
@@ -103,6 +119,7 @@ systemd_units:
 
   - name: zfs-automount
     service:
+      enabled: true
       unit:
         description: Unlock and mount tank pool
         after: [ "zfs-import.target" ]
@@ -114,6 +131,7 @@ systemd_units:
 
   - name: zfs-mail-status
     service:
+      enabled: true
       unit:
         description: Send email with ZFS pool status
       service:
@@ -129,8 +147,10 @@ systemd_units:
         description: Start ZFS pool scrub
       service:
         # exec_start: [ "zpool scrub tank" ]
-        exec_start: [ "zpool scrub tank", "zfs --version" ]
+        exec_start: [ "zpool scrub tank" ]
     timer:
+      enabled: true
+      started: true
       timer:
         # Every first day of the month at 03:00
         oncalendar: "*-*-01 03:00:00"
@@ -138,6 +158,7 @@ systemd_units:
   - name: docker-on-boot
     disabled: yes
     service:
+      enabled: true
       unit:
         description: Start docker containers
         after: [ "network.target", "zfs-automount.service", "docker.service" ]
@@ -160,6 +181,8 @@ systemd_units:
           - "TERM=xterm-256color"
           - "CONTAINER_ENGINE=docker"
     timer:
+      enabled: true
+      started: true
       timer:
         oncalendar: "*-*-* 04:00:00" # Every day at 04:00
 
@@ -182,6 +205,7 @@ systemd_units:
           - "iptables -t nat -I PREROUTING -p tcp --dport 226 -j DNAT --to 192.168.122.6:22"
           - "iptables -t nat -I PREROUTING -p tcp --dport 2226 -j DNAT --to 192.168.122.6:2222"
     timer:
+      enabled: true
       timer:
         persistent: false
         onbootsec: 30
@@ -195,6 +219,8 @@ systemd_units:
         user: root
         exec_start: [ "/usr/bin/mpop -q" ]
     timer:
+      enabled: true
+      started: true
       timer:
         onbootsec: 15min
         onunitactivesec: 15min
@@ -208,6 +234,8 @@ systemd_units:
         user: "{{ nginx_user }}"
         exec_start: [ "/usr/bin/php -f {{ web_root }}/nextcloud/cron.php" ]
     timer:
+      enabled: true
+      started: true
       timer:
         onbootsec: 5min
         onunitactivesec: 5min

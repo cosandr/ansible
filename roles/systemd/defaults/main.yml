@@ -30,6 +30,8 @@ systemd_units: []
 # # [Install]
 # # WantedBy=multi-user.target
 #     service:
+#       enabled: false
+#       started: false
 #       unit:
 #         description: Gitea backup # default <name>
 #         after: [ "nginx.service" ]
@@ -47,6 +49,8 @@ systemd_units: []
 #         wantedby: graphical.target # default multi-user.target
 #     # No timer is created if this section is missing
 #     timer:
+#       enabled: false
+#       started: false
 #       unit:
 #         description: Timer description # default service description or <name>
 #       timer:

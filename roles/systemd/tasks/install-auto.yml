@@ -136,6 +136,7 @@
     with_items: "{{ systemd_units }}"
     loop_control:
       label: "{{item.name}}"
+    notify: reload systemd
     when:
       - item.service is not defined
       - item.name not in systemd_missing_scripts
@@ -151,6 +152,7 @@
     with_items: "{{ systemd_units }}"
     loop_control:
       label: "{{item.name}}"
+    notify: reload systemd
     when:
       - item.service is defined
       - item.name not in systemd_missing_scripts
@@ -166,6 +168,33 @@
     with_items: "{{ systemd_units }}"
     loop_control:
       label: "{{item.name}}"
+    notify: reload systemd
+    when:
+      - item.timer is defined
+      - item.name not in systemd_missing_scripts
+      - item.name in check_exec_auto
+
+  - name: Set undefined service state
+    service:
+      name: "{{ item.name }}.service"
+      enabled: "{{ item.service.enabled | default(false) }}"
+      state: "{{ 'started' if (item.service.started | default(false)) else 'stopped' }}"
+    with_items: "{{ systemd_units }}"
+    loop_control:
+      label: "{{item.name}}: enabled? {{ item.service.enabled | default(false) }} started? {{ item.service.started | default(false) }}"
+    when:
+      - item.service is defined
+      - item.name not in systemd_missing_scripts
+      - item.name in check_exec_auto
+
+  - name: Set undefined timer state
+    service:
+      name: "{{ item.name }}.service"
+      enabled: "{{ item.timer.enabled | default(false) }}"
+      state: "{{ 'started' if (item.timer.started | default(false)) else 'stopped' }}"
+    with_items: "{{ systemd_units }}"
+    loop_control:
+      label: "{{item.name}}: enabled? {{ item.timer.enabled | default(false) }} started? {{ item.timer.started | default(false) }}"
     when:
       - item.timer is defined
       - item.name not in systemd_missing_scripts

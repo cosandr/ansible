@@ -21,6 +21,8 @@
           service:
             exec_start: [ "/bin/cat /etc/shadow" ]
   tasks:
+    - import_role: { name: common }
+      tags: ["all", "common"]
     # - name: "Ansible | List all known variables and facts"
     #   debug:
     #     var: hostvars[inventory_hostname]

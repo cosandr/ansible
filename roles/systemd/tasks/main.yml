@@ -1,4 +1,9 @@
 ---
+- name: Load vars
+  include_vars: "{{ playbook_dir }}/role_vars/{{ role_name }}.yml"
+  ignore_errors: true
+  tags: ["all"]
+
 - include_tasks: "install-defined.yml"
 
 - include_tasks: "install-auto.yml"

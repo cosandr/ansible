@@ -12,6 +12,9 @@
     node_exporter_port: "{{ ports.node_exporter }}"
     nvidiaexporter_port: "{{ ports.nvidia_exporter }}"
   tasks:
+    - import_role: { name: common }
+      tags: ["all", "common"]
+
     - name: Merge ports
       set_fact:
         ports: "{{ ports | combine(_ports, recursive=true) }}"
