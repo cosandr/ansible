@@ -1,0 +1,9 @@
+---
+
+sanoid_dependencies:
+  - lzop
+  - mbuffer
+  - perl
+  - perl-capture-tiny
+  - perl-config-inifiles
+  - pv

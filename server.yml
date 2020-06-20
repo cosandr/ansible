@@ -54,6 +54,8 @@
     #     var: ports
     #   tags: ["always"]
 
+    - import_role: { name: sanoid }
+
     - import_role: { name: nginx }
       tags: ["nginx"]
 

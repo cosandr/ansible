@@ -9,6 +9,7 @@
     - host_vars/server.yml
     # - role_vars/systemd.yml
   vars:
+    sanoid_version: master
     systemd_no_check_missing: true
     systemd_units:
       - name: timer-no-service-undefined
@@ -43,13 +44,15 @@
     - name: "All ports"
       debug:
         var: ports
+    
+    - import_role: name=sanoid
 
     - import_role: { name: nginx }
       tags: ["nginx"]
   
     - import_role: { name: systemd }
       tags: ["systemd"]
-    
+
     # - name: Set authorized ssh key, extracting just that data from 'users'
     #   debug:
     #     msg: "{{ item.0.name }}\n{{ item.1 }}"

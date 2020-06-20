@@ -1,0 +1,35 @@
+{{ ansible_managed | comment }}
+
+###########################
+# modules below this line #
+###########################
+{% for path, vars in sanoid_backup_modules.items() %}
+
+[{{ path }}]
+{% for k, v in vars.items() %}
+{% if v is sameas true %}
+    {{ k }} = yes
+{% elif v is sameas false %}
+    {{ k }} = no
+{% else %}
+    {{ k }} = {{ v }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+#############################
+# templates below this line #
+#############################
+{% for name, vars in sanoid_backup_templates.items() %}
+
+[template_{{ name }}]
+{% for k, v in vars.items() %}
+{% if v is sameas true %}
+    {{ k }} = yes
+{% elif v is sameas false %}
+    {{ k }} = no
+{% else %}
+    {{ k }} = {{ v }}
+{% endif %}
+{% endfor %}
+{% endfor %}

@@ -1,0 +1,50 @@
+---
+
+# 'latest' will get the newest release, 'master' gets the current master branch
+sanoid_version: 2.0.3
+
+sanoid_config_dir: /etc/sanoid
+
+sanoid_bin_dir: /usr/local/bin
+
+sanoid_unit_dir: /etc/systemd/system
+
+sanoid_timer_minutes: 15
+
+sanoid_enable_units: yes
+
+sanoid_backup_modules: {}
+# sanoid_backup_modules:
+#   "zpoolname/datasetname":
+#     use_template: "production,demo"
+#     hourly: 12
+#     monthly: 1
+# #
+# # output
+# #
+# [zpoolname/datasetname]
+#   use_template = production,demo
+#   hourly = 12
+#   monthly = 1
+
+sanoid_backup_templates: {}
+# sanoid_backup_templates:
+#   "production":
+#     frequently: 0
+#     hourly: 36
+#     daily: 30
+#     monthly: 3
+#     yearly: 0
+#     autosnap: yes
+#     autoprune: yes
+# #
+# # output
+# #
+# [template_production]
+#   frequently = 0
+#   hourly = 36
+#   daily = 30
+#   monthly = 3
+#   yearly = 0
+#   autosnap = yes
+#   autoprune = yes

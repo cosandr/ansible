@@ -1,0 +1,38 @@
+---
+- block:
+  - name: Get latest release
+    uri:
+      url: "https://api.github.com/repos/jimsalterjrs/sanoid/releases/latest"
+      method: GET
+      return_content: true
+      status_code: 200
+      body_format: json
+      validate_certs: false
+      user: "{{ lookup('env', 'GH_USER') | default(omit) }}"
+      password: "{{ lookup('env', 'GH_TOKEN') | default(omit) }}"
+    no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
+    register: _latest_release
+    until: _latest_release.status == 200
+    retries: 5
+    check_mode: false
+
+  - name: "Set sanoid version to {{ _latest_release.json.tag_name[1:] }}"
+    set_fact:
+      sanoid_version: "{{ _latest_release.json.tag_name[1:] }}"
+
+  - name: "Download sanoid version {{ sanoid_version }}"
+    git:
+      dest: /tmp/sanoid-git
+      repo: "https://github.com/jimsalterjrs/sanoid"
+      version: "v{{ sanoid_version }}"
+    check_mode: false
+
+  when: sanoid_version != "master"
+
+- name: "Download sanoid master branch"
+  git:
+    dest: /tmp/sanoid-git
+    repo: "https://github.com/jimsalterjrs/sanoid"
+    version: "HEAD"
+  check_mode: false
+  when: sanoid_version == "master"

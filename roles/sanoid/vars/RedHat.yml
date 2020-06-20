@@ -1,0 +1,11 @@
+---
+
+sanoid_dependencies:
+  - lzop
+  - mbuffer
+  - mhash
+  - perl
+  - perl-Capture-Tiny
+  - perl-Config-IniFiles
+  - perl-Data-Dumper
+  - pv

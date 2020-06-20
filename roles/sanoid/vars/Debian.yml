@@ -1,0 +1,9 @@
+---
+
+sanoid_dependencies:
+  - debhelper
+  - libcapture-tiny-perl
+  - libconfig-inifiles-perl
+  - lzop
+  - mbuffer
+  - pv
