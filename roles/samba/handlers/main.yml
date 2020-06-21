@@ -1,0 +1,4 @@
+---
+- name: validate samba configuration
+  command: testparm
+  changed_when: false

@@ -7,7 +7,7 @@
   vars_files: 
     - .secrets/vars.yml
     - host_vars/server.yml
-    # - role_vars/systemd.yml
+    - role_vars/samba.yml
   vars:
     sanoid_version: master
     systemd_no_check_missing: true
@@ -44,14 +44,19 @@
     - name: "All ports"
       debug:
         var: ports
+        verbosity: 1    
     
-    - import_role: name=sanoid
-
-    - import_role: { name: nginx }
-      tags: ["nginx"]
-  
-    - import_role: { name: systemd }
-      tags: ["systemd"]
+    # - name: "Get /home filesystem type"
+    #   check_mode: no
+    #   command: 'stat -f -c %T /home'
+    #   register: p
+    
+    # - name: "Set /home filesystem type fact"
+    #   set_fact:
+    #     home_fs_type: "{{ p.stdout }}"
+    
+    # - debug:
+    #     var: home_fs_type
 
     # - name: Set authorized ssh key, extracting just that data from 'users'
     #   debug:

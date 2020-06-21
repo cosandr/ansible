@@ -34,6 +34,7 @@
     prometheus_skip_install: false
     prometheus_version: "latest"
     psqlexporter_port: "{{ ports.psql_exporter }}"
+    samba_skip_install: yes
   tasks:
     - import_role: { name: common }
       tags: ["all", "common"]
@@ -53,6 +54,8 @@
     #   debug:
     #     var: ports
     #   tags: ["always"]
+
+    - import_role: { name: samba }
 
     - import_role: { name: sanoid }
 

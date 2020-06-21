@@ -1,0 +1,47 @@
+---
+samba_skip_install: no
+
+samba_workgroup: WORKGROUP
+
+samba_server_role: standalone server
+
+samba_hosts_allow: []
+
+samba_logging: systemd
+
+# Used when logging is 'file'
+samba_log_file: "/var/log/samba/%m.log"
+samba_max_log_size: 50
+
+# Key, value pairs of extra options
+samba_extra_global_options: {}
+
+samba_interfaces: []
+
+samba_shares: {}
+  # "homes":
+  #   comment: "Home Directories"
+  #   browseable: no
+  #   writable: yes
+
+
+### Options below are only used for setting VFS object options ###
+
+# Name of the home directory share, probably 'homes'
+__samba_home_share: homes
+
+# Path to home directories, probably '/home'
+__samba_home_path: /home
+
+# ZFS snapshots created by Sanoid
+__samba_zfs_snapshots:
+  "vfs objects": "shadow_copy2"
+  "shadow: snapdir": ".zfs/snapshot"
+  "shadow: sort": "desc"
+  "shadow: format": "_%Y-%m-%d_%H:%M:%S"
+  "shadow: snapprefix": '^autosnap'
+  "shadow: delimiter": "_"
+
+# BTRFS snapshots created by snapper
+__samba_btrfs_snapshots:
+  "vfs objects": "snapper"

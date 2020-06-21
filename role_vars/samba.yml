@@ -1,0 +1,36 @@
+---
+samba_hosts_allow:
+  - 127.0.0.1
+  - "{{ ansible_default_ipv4.network }}/24"
+
+samba_interfaces:
+  - lo
+  - "{{ ansible_default_ipv4.interface }}"
+
+samba_extra_global_options:
+  "security": user
+  "server string": "{{ ansible_hostname }} {{ ansible_distribution }}"
+  "client min protocol": SMB2
+  "server min protocol": SMB2
+  "passdb backend": tdbsam
+  "load printers": no
+  "allow insecure wide links": no
+  "mangled names": no
+
+samba_shares:
+  homes:
+    comment: "Home Directories"
+    browseable: no
+    writable: yes
+    "follow symlinks": yes
+    "wide links": yes
+
+  srv:
+    comment: "BTRFS Storage"
+    path: "/srv"
+    "read only": no
+  
+  tank:
+    comment: "ZFS Pool"
+    path: "/tank"
+    "hide files": "/yes/"

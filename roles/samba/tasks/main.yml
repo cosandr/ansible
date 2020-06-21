@@ -1,0 +1,13 @@
+---
+- import_tasks: "preflight.yml"
+  tags: ["samba"]
+
+- import_tasks: "install.yml"
+  tags: ["samba"]
+  when: not samba_skip_install
+
+- import_tasks: "add_vfs.yml"
+  tags: ["samba"]
+
+- import_tasks: "configure.yml"
+  tags: ["samba"]

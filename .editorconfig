@@ -2,10 +2,14 @@
 end_of_line = lf
 insert_final_newline = true
 
-[*.{py,sh}]
+[*.{py,sh,py.j2, sh.j2}]
 indent_style = space
 indent_size = 4
 
 [*.{yml,yaml}]
 indent_style = space
 indent_size = 2
+
+[*.{conf,conf.j2}]
+indent_style = space
+indent_size = 4

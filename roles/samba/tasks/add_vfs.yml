@@ -1,0 +1,61 @@
+---
+- block:
+  - name: "Get home share filesystem type"
+    no_log: yes
+    check_mode: no
+    command: "stat -f -c %T {{ __samba_home_path }}"
+    register: __home_stat
+  
+  - name: "Add home share vfs options for snapper"
+    no_log: yes
+    set_fact:
+      samba_shares: "{{ samba_shares|combine({__samba_home_share: __samba_btrfs_snapshots}, recursive=True) }}"
+    when: __home_stat.stdout == 'btrfs'
+  
+  - name: "Add home share vfs options for sanoid"
+    no_log: yes
+    set_fact:
+      samba_shares: "{{ samba_shares|combine({__samba_home_share: __samba_zfs_snapshots}, recursive=True) }}"
+    when: __home_stat.stdout == 'zfs'
+  
+  when: __samba_home_share in samba_shares
+
+- name: "Get filesystem types for other shares"
+  check_mode: no
+  command: "stat -f -c %T {{ item.value.path }}"
+  register: __other_stat
+  with_dict: "{{ samba_shares }}"
+  loop_control:
+    label: "share {{ item.key }}"
+  when:
+    - item.key != __samba_home_share
+    - item.value.path is defined
+
+- name: "Print check paths"
+  debug:
+    var: __other_stat
+    verbosity: 1
+
+- name: Add vfs options for snapper
+  set_fact:
+    samba_shares: "{{ samba_shares|combine({item.item.key: __samba_btrfs_snapshots}, recursive=True) }}"
+  with_items: "{{ __other_stat.results }}"
+  loop_control:
+    label: "share {{ item.item.key }}"
+  when:
+    - item.skipped is not defined or not item.skipped
+    - item.failed is defined
+    - not item.failed
+    - item.stdout == 'btrfs'
+
+- name: "Add vfs options for sanoid"
+  set_fact:
+    samba_shares: "{{ samba_shares|combine({item.item.key: __samba_zfs_snapshots}, recursive=True) }}"
+  with_items: "{{ __other_stat.results }}"
+  loop_control:
+    label: "share {{ item.item.key }}"
+  when:
+    - item.skipped is not defined or not item.skipped
+    - item.failed is defined
+    - not item.failed
+    - item.stdout == 'zfs'
