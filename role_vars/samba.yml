@@ -16,6 +16,7 @@ samba_extra_global_options:
   "load printers": no
   "allow insecure wide links": no
   "mangled names": no
+  "unix extensions": no
 
 samba_shares:
   homes:

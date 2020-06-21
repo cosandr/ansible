@@ -1,4 +1,10 @@
 ---
 - name: validate samba configuration
-  command: testparm
+  command: testparm -s
   changed_when: false
+
+- name: restart samba
+  become: true
+  service:
+    name: smb
+    state: restarted

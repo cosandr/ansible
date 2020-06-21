@@ -6,4 +6,6 @@
     owner: root
     group: root
     mode: 0644
-  notify: validate samba configuration
+  notify:
+    - validate samba configuration
+    - restart samba
