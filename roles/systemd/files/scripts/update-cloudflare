@@ -19,5 +19,6 @@ done
 echo "" >> "$FILENAME";
 echo "real_ip_header CF-Connecting-IP;" >> "$FILENAME";
 
-#test configuration and reload nginx
-nginx -t && systemctl reload nginx
+# test configuration and restart nginx
+# reload sometimes results in core dump for some reason
+nginx -t && systemctl restart nginx
