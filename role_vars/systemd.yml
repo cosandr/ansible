@@ -42,13 +42,15 @@ systemd_units:
         oncalendar: "*-*-* 03:00:00"
 
   - name: backup-remote
-    service: { unit: { description: Borg backup important data to remote location } }
     timer:
       enabled: true
       started: true
       timer:
         # Every 3 days at 04:00
         oncalendar: "*-*-01/3 04:00:00"
+    service:
+      unit:
+        description: Borg backup important data to remote location
       service:
         environment:
           - "CONTAINER_DATA=/srv/containers"
@@ -58,26 +60,30 @@ systemd_units:
           - "SSH_HOST={{ rtv_domain }}"
 
   - name: backup-root
-    service: { unit: { description: Borg backup / to zpool } }
     timer:
       enabled: true
       started: true
       timer:
         # Every Friday at 22:00
         oncalendar: "Fri *-*-* 22:00:00"
+    service:
+      unit:
+        description: Borg backup / to zpool
       service:
         environment:
           - "BORG_REPO=/tank/backup/borg"
 
   - name: ngx-recompile-modules
     disabled: yes
-    service: { unit: { description: Make sure there are no outdated nginx modules } }
     timer:
       enabled: true
       started: true
       timer:
         # Every day at 03:05
         oncalendar: "*-*-* 03:05:00"
+    service:
+      unit:
+        description: Make sure there are no outdated nginx modules
       service:
         environment:
           - "MAIL_TO={{ my_email }}"
@@ -94,25 +100,29 @@ systemd_units:
         oncalendar: "*-*-1,15 2:00:00"
 
   - name: update-cloudflare
-    service: { unit: { description: Update Cloudflare real IP database } }
     timer:
       enabled: true
       started: true
       timer:
         # Every day at 02:30
         oncalendar: "*-*-* 02:30:00"
+    service:
+      unit:
+        description: Update Cloudflare real IP database
       service:
         environment:
           - "FILENAME={{ nginx_cloudflare_real_ips }}"
 
   - name: update-gitea
-    service: { unit: { description: Update Gitea } }
     timer:
       enabled: true
       started: true
       timer:
         # Every 7 days at 03:45
         oncalendar: "*-*-01/7 03:45:00"
+    service:
+      unit:
+        description: Update Gitea
       service:
         environment:
           - "BIN_PATH=/usr/local/bin/gitea"
