@@ -17,13 +17,7 @@
 {% endif %}
 
 {% for name, value in samba_extra_global_options.items() %}
-{% if value is sameas true %}
-    {{ name }} = yes
-{% elif value is sameas false %}
-    {{ name }} = no
-{% else %}
-    {{ name }} = {{ value }}
-{% endif %}
+    {{ name }} = {{ value | bool_to_yes }}
 {% endfor %}
 
 #============================ Share Definitions ==============================
@@ -31,12 +25,6 @@
 
 [{{ name }}]
 {% for k, v in vars.items() %}
-{% if v is sameas true %}
-    {{ k }} = yes
-{% elif v is sameas false %}
-    {{ k }} = no
-{% else %}
-    {{ k }} = {{ v }}
-{% endif %}
+    {{ k }} = {{ v | bool_to_yes }}
 {% endfor %}
 {% endfor %}

@@ -30,7 +30,7 @@ User={{ val.user }}
 Group={{ val.group }}
 {% endif %}
 {% if val.remainafterexit is defined %}
-RemainAfterExit={{ val.remainafterexit | lower  }}
+RemainAfterExit={{ val.remainafterexit | bool_to_yes }}
 {% endif %}
 {% if val.environment is defined and val.environment | length > 0 %}
 {% for env in val.environment %}

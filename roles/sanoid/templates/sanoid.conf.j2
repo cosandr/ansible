@@ -7,12 +7,7 @@
 
 [{{ path }}]
 {% for k, v in vars.items() %}
-{% if v is sameas true %}
-    {{ k }} = yes
-{% elif v is sameas false %}
-    {{ k }} = no
-{% else %}
-    {{ k }} = {{ v }}
+    {{ k }} = {{ v | bool_to_yes }}
 {% endif %}
 {% endfor %}
 {% endfor %}
@@ -24,12 +19,7 @@
 
 [template_{{ name }}]
 {% for k, v in vars.items() %}
-{% if v is sameas true %}
-    {{ k }} = yes
-{% elif v is sameas false %}
-    {{ k }} = no
-{% else %}
-    {{ k }} = {{ v }}
+    {{ k }} = {{ v | bool_to_yes }}
 {% endif %}
 {% endfor %}
 {% endfor %}

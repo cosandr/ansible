@@ -30,7 +30,7 @@ Requires={{ service }}
 [Timer]
 {% set val = item.timer.timer %}
 {% if val.oncalendar is defined %}
-Persistent={{ val.persistent | default('true') | lower }}
+Persistent={{ val.persistent | bool_to_yes('yes') }}
 OnCalendar={{ val.oncalendar }}
 {% endif %}
 {% if val.onbootsec is defined %}
