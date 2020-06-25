@@ -3,9 +3,6 @@
   gather_facts: true
   diff: yes
   hosts: desktop
-  vars_files: 
-    - .secrets/vars.yml
-    - role_vars/node_exporter.yml
   vars:
     node_exporter_skip_install: false
     node_exporter_version: "latest"

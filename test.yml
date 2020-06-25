@@ -4,10 +4,6 @@
   check_mode: true
   diff: yes
   hosts: all
-  vars_files: 
-    - .secrets/vars.yml
-    - host_vars/server.yml
-    - role_vars/samba.yml
   vars:
     sanoid_version: master
     systemd_no_check_missing: true
@@ -22,6 +18,9 @@
           service:
             exec_start: [ "/bin/cat /etc/shadow" ]
   tasks:
+    - include_vars:
+        dir: host_vars/server
+
     - import_role: { name: common }
       tags: ["all", "common"]
     # - name: "Ansible | List all known variables and facts"
@@ -44,23 +43,8 @@
     - name: "All ports"
       debug:
         var: ports
-        verbosity: 1    
-    
-    # - name: "Get /home filesystem type"
-    #   check_mode: no
-    #   command: 'stat -f -c %T /home'
-    #   register: p
-    
-    # - name: "Set /home filesystem type fact"
-    #   set_fact:
-    #     home_fs_type: "{{ p.stdout }}"
-    
-    # - debug:
-    #     var: home_fs_type
+        verbosity: 1
 
-    # - name: Set authorized ssh key, extracting just that data from 'users'
-    #   debug:
-    #     msg: "{{ item.0.name }}\n{{ item.1 }}"
-    #   with_subelements:
-    #      - "{{ users }}"
-    #      - authorized
+    - name: "Show secrets"
+      debug:
+        var: server_domain

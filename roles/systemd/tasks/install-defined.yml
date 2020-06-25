@@ -1,9 +1,10 @@
 ---
 - name: List of all enabled units with defined exec
-  no_log: true
   set_fact:
     check_exec_def: "{{ ( check_exec_def | default([]) ) + [ item.name ] }}"
   with_items: "{{ systemd_units }}"
+  loop_control:
+    label: "{{item.name}}"
   when:
     - ( item.disabled is not defined or
         item.disabled == false )

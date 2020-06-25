@@ -1,0 +1,31 @@
+---
+_ports:
+  adminer: 54322
+  cadvisor: 8081
+  gitea: 3000
+  grafana: 3001
+  nginx_exporter: 9113
+  postgres: 5432
+  prometheus: 9092
+  psql_exporter: 9187
+  rtmp: 1935
+adminer_root: "{{ web_root }}/adminer"
+container_data: "/srv/containers"
+grafana_admin_pass: "{{ vault_grafana_admin_pass }}"
+grafana_admin_user: "{{ vault_grafana_admin_user }}"
+grafana_psql_pass: "{{ vault_grafana_psql_pass }}"
+nginx_status_url: "nginx_status"  # http://localhost/<nginx_status_url>
+node_exporter_web_listen_address: "127.0.0.1:{{ node_exporter_port }}"
+postgres_service_name: postgresql-12.service
+rsyno_dsm_domain: "{{ vault_rsyno_dsm_domain }}"
+rsyno_dsm_port: "{{ vault_rsyno_dsm_port }}"
+rtv_domain: "{{ vault_rtv_domain }}"
+rtv_ssh_port: "{{ vault_rtv_ssh_port }}"
+rtv_syncthing_port: "{{ vault_rtv_syncthing_port }}"
+server_domain: "dresrv.com"
+server_hostname: DreSRV
+smtp_host: "{{ vault_smtp_host }}"
+smtp_pass: "{{ vault_smtp_pass }}"
+smtp_port: "{{ vault_smtp_port }}"
+smtp_user: "{{ vault_smtp_user }}"
+web_root: "/var/www"

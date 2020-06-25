@@ -9,6 +9,8 @@ Encrypt stuff:
 bw generate --length 55 | ansible-vault encrypt_string --stdin-name 'gitea_secret_key'
 # Password from file
 ansible-vault encrypt_string --vault-password-file .vault_key --stdin-name 'gitea_secret_key'
+# Encrypt secrets
+ansible-vault encrypt .secrets/vars.yml --output roles/common/vars/vault.yml
 ```
 
 Get vault key from bw:

@@ -4,11 +4,6 @@
   include_vars: "{{ ansible_os_family }}.yml"
   tags: ["sanoid", "syncoid"]
 
-- name: Load vars
-  include_vars: "{{ playbook_dir }}/role_vars/{{ role_name }}.yml"
-  ignore_errors: true
-  tags: ["sanoid", "syncoid"]
-
 - name: Fail if unconfigured
   fail:
     msg: "Backup modules must be configured"

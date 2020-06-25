@@ -1,5 +1,6 @@
 ---
-grafana_url: "https://{{ grafana_domain }}/grafana/"
+grafana_domain: "www.{{ server_domain }}"
+grafana_url: "https://www.{{ server_domain }}/grafana/"
 grafana_instance: "localhost"
 grafana_address: "127.0.0.1"
 grafana_security:
@@ -9,7 +10,7 @@ grafana_smtp:
   host: "{{ smtp_host }}:{{ smtp_port }}"
   user: "{{ smtp_user }}"
   password: "{{ smtp_pass }}"
-  from_address: "{{ grafana_smtp_from }}"
+  from_address: "grafana@{{ server_domain }}"
 grafana_database:
   type: postgres
   host: "localhost:{{ postgres_port }}"
