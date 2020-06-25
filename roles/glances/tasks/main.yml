@@ -1,29 +1,13 @@
+---
+
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
 - name: Install glances
   package:
-    name: glances
+    name: "{{ item }}"
     state: present
-
-- name: Install glances optional depedencies (Arch)
-  when: ansible_distribution == "Archlinux"
-  pacman:
-    name: "{{ packages }}"
-    state: present
-  vars:
-    packages:
-      - python-py-cpuinfo
-      - python-netifaces
-      - python-bottle
-
-- name: Install glances optional depedencies (Fedora)
-  when: ansible_distribution == "Fedora"
-  dnf:
-    name: "{{ packages }}"
-    state: present
-  vars:
-    packages:
-      - python3-cpuinfo 
-      - python3-netifaces
-      - python3-bottle
+  with_items: "{{  __glances_packages }}"
 
 - name: Install Glances systemd service
   copy:
@@ -32,10 +16,10 @@
     owner: root
     group: root
     mode: 0644
+  notify: reload systemd
 
 - name: Enable and start Glances systemd service
   systemd:
-    daemon_reload: yes
     name: glances.service
     enabled: yes
     state: started

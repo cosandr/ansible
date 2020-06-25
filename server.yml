@@ -59,6 +59,12 @@
 
     - import_role: { name: sanoid }
 
+    - import_role: { name: fail2ban }
+      tags: ["fail2ban"]
+
+    - import_role: { name: glances }
+      tags: ["glances"]
+
     - import_role: { name: nginx }
       tags: ["nginx"]
 
