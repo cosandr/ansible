@@ -17,6 +17,8 @@ samba_extra_global_options:
   "allow insecure wide links": no
   "mangled names": no
   "unix extensions": no
+  "unix password sync": yes
+  "pam password change": yes
 
 samba_shares:
   homes:
@@ -29,9 +31,15 @@ samba_shares:
   srv:
     comment: "BTRFS Storage"
     path: "/srv"
-    "read only": no
+    writable: yes
   
   tank:
     comment: "ZFS Pool"
     path: "/tank"
+    writable: yes
     "hide files": "/yes/"
+
+  www:
+    comment: "Web Root"
+    path: "{{ web_root }}"
+    writable: yes

@@ -4,6 +4,7 @@ BORG_PASS_FILE=${BORG_PASS_FILE:-/root/borg_remote.pass}
 SSH_USER=${SSH_USER:-andrei}
 SSH_PORT=${SSH_PORT:-22}
 CONTAINER_DATA=${CONTAINER_DATA:-/srv/containers}
+BACKUP_USER=${BACKUP_USER:-andrei}
 
 if [[ -z $SSH_HOST ]]; then
     echo "SSH_HOST is required"
@@ -50,7 +51,7 @@ borg create                           \
     /tank/backup/gitea                \
     "$CONTAINER_DATA"/nextcloud/data  \
     "$CONTAINER_DATA"/bitwarden/data  \
-    /home/andrei/src                  \
+    ~"${BACKUP_USER}"/src             \
 
 backup_exit=$?
 

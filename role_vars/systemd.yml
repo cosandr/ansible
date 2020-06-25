@@ -54,6 +54,7 @@ systemd_units:
       service:
         environment:
           - "CONTAINER_DATA=/srv/containers"
+          - "BACKUP_USER={{ my_user }}"
           - "BORG_PASS_FILE=/root/borg_remote.pass"
           - "SSH_USER={{ my_user }}"
           - "SSH_PORT={{ rtv_ssh_port }}"
@@ -184,8 +185,8 @@ systemd_units:
         after: [ "network.target", "zfs-automount.service", "docker.service" ]
         requires: [ "docker.service" ]
       service:
-        user: andrei
-        group: andrei
+        user: "{{ my_user }}"
+        group: "{{ my_user }}"
         environment:
           - "CONTAINER_DATA=/srv/containers"
           - "TERM=xterm-256color"
