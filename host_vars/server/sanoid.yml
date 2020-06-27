@@ -20,6 +20,9 @@ sanoid_backup_modules:
   "tank/yes":
     use_template: "ignore"
 
+  "tank/keystore":
+    use_template: "ignore"
+
 
 sanoid_backup_templates:
   "main":

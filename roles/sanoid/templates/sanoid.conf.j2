@@ -8,7 +8,6 @@
 [{{ path }}]
 {% for k, v in vars.items() %}
     {{ k }} = {{ v | bool_to_yes }}
-{% endif %}
 {% endfor %}
 {% endfor %}
 
@@ -20,6 +19,5 @@
 [template_{{ name }}]
 {% for k, v in vars.items() %}
     {{ k }} = {{ v | bool_to_yes }}
-{% endif %}
 {% endfor %}
 {% endfor %}
