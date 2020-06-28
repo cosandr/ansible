@@ -207,14 +207,17 @@ systemd_units:
         exec_start:
           # Allow forwarding on entire libvirt interface
           - "iptables -I FORWARD -o virbr0 -d 192.168.122.0/24 -j ACCEPT"
-          # Forward Windows 10 VM RDP
-          - "iptables -t nat -I PREROUTING -p tcp --dport 3389 -j DNAT --to 192.168.122.2:3389"
-          # Forward SSH for arch VM
-          - "iptables -t nat -I PREROUTING -p tcp --dport 225 -j DNAT --to 192.168.122.5:22"
-          - "iptables -t nat -I PREROUTING -p tcp --dport 2225 -j DNAT --to 192.168.122.5:2222"
           # Forward SSH for srvsim VM
+          - "iptables -t nat -I PREROUTING -p tcp --dport 222 -j DNAT --to 192.168.122.2:22"
+          - "iptables -t nat -I PREROUTING -p tcp --dport 2222 -j DNAT --to 192.168.122.2:2222"
+          # Forward Windows 10 VM RDP
+          - "iptables -t nat -I PREROUTING -p tcp --dport 3389 -j DNAT --to 192.168.122.3:3389"
+          # Forward SSH for arch VM
+          - "iptables -t nat -I PREROUTING -p tcp --dport 224 -j DNAT --to 192.168.122.4:22"
+          - "iptables -t nat -I PREROUTING -p tcp --dport 2224 -j DNAT --to 192.168.122.4:2222"
+          # Forward SSH/webUI for unraid VM
           - "iptables -t nat -I PREROUTING -p tcp --dport 226 -j DNAT --to 192.168.122.6:22"
-          - "iptables -t nat -I PREROUTING -p tcp --dport 2226 -j DNAT --to 192.168.122.6:2222"
+          - "iptables -t nat -I PREROUTING -p tcp --dport 806 -j DNAT --to 192.168.122.6:80"
     timer:
       enabled: true
       timer:
