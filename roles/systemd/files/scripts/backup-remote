@@ -13,7 +13,7 @@ if [[ -z $SSH_HOST ]]; then
 fi
 
 # Root needs ssh key on remote server!
-# command="/usr/local/bin/borg serve --umask=077"
+# command="/usr/bin/borg serve --umask=077"
 # Make sure SSH works
 if ! ssh -q -o "BatchMode=yes" "${SSH_USER}@${SSH_HOST}" -p "$SSH_PORT" exit &>/dev/null
 then
@@ -31,7 +31,7 @@ fi
 
 export BORG_PASSPHRASE
 export BORG_REPO=ssh://"${SSH_USER}@${SSH_HOST}:${SSH_PORT}"/~/borg_repo
-export BORG_REMOTE_PATH='/usr/local/bin/borg'
+export BORG_REMOTE_PATH='/usr/bin/borg'
 
 # some helpers and error handling:
 info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
