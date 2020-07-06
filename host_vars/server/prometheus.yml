@@ -1,7 +1,5 @@
 ---
-tls_ca_file: ca.crt
-tls_crt_file: dresrv.crt
-tls_key_file: dresrv.key
+tls_ca_file: origin_ca_rsa_root.pem
 desktop_ip: 10.1.0.3
 desktop_label: desktop
 server_label: "{{ server_hostname }}"
@@ -70,10 +68,11 @@ prometheus_scrape_configs:
   - job_name: "romeo-tv"
     scheme: https
     scrape_interval: 30s
+    basic_auth:
+      username: "{{ rtv_scrape_user }}"
+      password: "{{ rtv_scrape_pass }}"
     tls_config:
-      ca_file: /etc/prometheus/tls/{{ tls_ca_file }}
-      cert_file: /etc/prometheus/tls/{{ tls_crt_file }}
-      key_file: /etc/prometheus/tls/{{ tls_key_file }}
+      ca_file: "/etc/prometheus/tls/{{ tls_ca_file }}"
     static_configs:
       - targets: ['{{ rtv_domain }}:7766']
         labels:

@@ -20,6 +20,8 @@ postgres_service_name: postgresql-12.service
 rsyno_dsm_domain: "{{ vault_rsyno_dsm_domain }}"
 rsyno_dsm_port: "{{ vault_rsyno_dsm_port }}"
 rtv_domain: "{{ vault_rtv_domain }}"
+rtv_scrape_pass: "{{ vault_rtv_scrape_pass }}"
+rtv_scrape_user: "{{ vault_rtv_scrape_user }}"
 rtv_ssh_port: "{{ vault_rtv_ssh_port }}"
 rtv_syncthing_port: "{{ vault_rtv_syncthing_port }}"
 server_domain: "dresrv.com"
