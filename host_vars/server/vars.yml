@@ -9,7 +9,6 @@ _ports:
   prometheus: 9092
   psql_exporter: 9187
   rtmp: 1935
-adminer_root: "{{ web_root }}/adminer"
 container_data: "/srv/containers"
 grafana_admin_pass: "{{ vault_grafana_admin_pass }}"
 grafana_admin_user: "{{ vault_grafana_admin_user }}"
@@ -19,11 +18,13 @@ node_exporter_web_listen_address: "127.0.0.1:{{ node_exporter_port }}"
 postgres_service_name: postgresql-12.service
 rsyno_dsm_domain: "{{ vault_rsyno_dsm_domain }}"
 rsyno_dsm_port: "{{ vault_rsyno_dsm_port }}"
+rtv_ddns_domain: "{{ vault_rtv_ddns_domain }}"
 rtv_domain: "{{ vault_rtv_domain }}"
 rtv_scrape_pass: "{{ vault_rtv_scrape_pass }}"
 rtv_scrape_user: "{{ vault_rtv_scrape_user }}"
 rtv_ssh_port: "{{ vault_rtv_ssh_port }}"
 rtv_syncthing_port: "{{ vault_rtv_syncthing_port }}"
+server_ddns_domain: "{{ vault_server_ddns_domain }}"
 server_domain: "dresrv.com"
 server_hostname: DreSRV
 smtp_host: "{{ vault_smtp_host }}"

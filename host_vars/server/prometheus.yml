@@ -74,13 +74,13 @@ prometheus_scrape_configs:
     tls_config:
       ca_file: "/etc/prometheus/tls/{{ tls_ca_file }}"
     static_configs:
-      - targets: ['{{ rtv_domain }}:7766']
+      - targets: ['{{ rtv_ddns_domain }}:7766']
         labels:
           job: "cadvisor"
           instance: "RomeoTV"
           __metrics_path__: /cadvisor/metrics
 
-      - targets: ['{{ rtv_domain }}:7766']
+      - targets: ['{{ rtv_ddns_domain }}:7766']
         labels:
           job: "node"
           instance: "RomeoTV"

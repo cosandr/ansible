@@ -58,7 +58,7 @@ systemd_units:
           - "BORG_PASS_FILE=/root/borg_remote.pass"
           - "SSH_USER={{ my_user }}"
           - "SSH_PORT={{ rtv_ssh_port }}"
-          - "SSH_HOST={{ rtv_domain }}"
+          - "SSH_HOST={{ rtv_ddns_domain }}"
 
   - name: backup-root
     timer:
