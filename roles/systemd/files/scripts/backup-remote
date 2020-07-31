@@ -30,7 +30,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 export BORG_PASSPHRASE
-export BORG_REPO=ssh://"${SSH_USER}@${SSH_HOST}:${SSH_PORT}"/~/borg_repo
+export BORG_REPO=ssh://"${SSH_USER}@${SSH_HOST}:${SSH_PORT}"/mnt/user/backup/borg_andrei
 export BORG_REMOTE_PATH='/usr/bin/borg'
 
 # some helpers and error handling:
