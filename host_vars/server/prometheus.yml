@@ -38,6 +38,12 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ desktop_label }}"
 
+  - job_name: "hwinfo"
+    static_configs:
+      - targets: ["{{ desktop_ip }}:10445"]
+        labels:
+          instance: "{{ desktop_label }}"
+
   - job_name: "wmi"
     static_configs:
       - targets: ["{{ desktop_ip }}:9182"]
