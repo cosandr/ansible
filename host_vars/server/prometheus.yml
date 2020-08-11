@@ -34,6 +34,9 @@ prometheus_scrape_configs:
   - job_name: "aquaero"
     scrape_interval: 30s
     static_configs:
+      - targets: ["localhost:2782"]
+        labels:
+          instance: "{{ server_label }}"
       - targets: ["{{ desktop_ip }}:2782"]
         labels:
           instance: "{{ desktop_label }}"
