@@ -1,9 +1,9 @@
 [submodule "roles/prometheus"]
 	path = roles/prometheus
-	url = git@gitlab.com:cosandr/ansible-prometheus.git
+	url = git@github.com:cosandr/ansible-prometheus.git
 [submodule "roles/grafana"]
 	path = roles/grafana
-	url = git@gitlab.com:cosandr/ansible-grafana.git
+	url = git@github.com:cosandr/ansible-grafana.git
 [submodule "roles/nginx"]
 	path = roles/nginx
-	url = git@gitlab.com:cosandr/ansible-nginx.git
+	url = git@github.com:cosandr/ansible-nginx.git
