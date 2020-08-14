@@ -1,4 +1,7 @@
 ---
+grafana_admin_pass: "{{ vault_grafana_admin_pass }}"
+grafana_admin_user: "{{ vault_grafana_admin_user }}"
+grafana_psql_pass: "{{ vault_grafana_psql_pass }}"
 grafana_domain: "www.{{ server_domain }}"
 grafana_url: "https://www.{{ server_domain }}/grafana/"
 grafana_instance: "localhost"

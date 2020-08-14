@@ -9,12 +9,8 @@ _ports:
   prometheus: 9092
   psql_exporter: 9187
   rtmp: 1935
+  vouch: 8682
 container_data: "/srv/containers"
-grafana_admin_pass: "{{ vault_grafana_admin_pass }}"
-grafana_admin_user: "{{ vault_grafana_admin_user }}"
-grafana_psql_pass: "{{ vault_grafana_psql_pass }}"
-nginx_status_url: "nginx_status"  # http://localhost/<nginx_status_url>
-node_exporter_web_listen_address: "127.0.0.1:{{ node_exporter_port }}"
 postgres_service_name: postgresql-12.service
 rsyno_dsm_domain: "{{ vault_rsyno_dsm_domain }}"
 rsyno_dsm_port: "{{ vault_rsyno_dsm_port }}"

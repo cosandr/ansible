@@ -1,0 +1,79 @@
+---
+- name: Get go dependencies
+  check_mode: false
+  shell:
+    cmd: "GOPATH={{ _vouch_tmp_dir }}/gopath GOBIN={{ _vouch_tmp_dir }}/gopath/bin go get"
+    chdir: "{{ _vouch_tmp_dir }}"
+
+- name: Build vouch binary
+  check_mode: false
+  shell:
+    cmd: "GOPATH={{ _vouch_tmp_dir }}/gopath ./do.sh gobuildstatic"
+    chdir: "{{ _vouch_tmp_dir }}"
+
+- name: Ensure binary path exists
+  file:
+    path: "{{ vouch_bin_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy binaries
+  diff: no
+  copy:
+    src: "{{ _vouch_tmp_dir }}/{{ _vouch_tmp_dir | basename }}"
+    dest: "{{ vouch_bin_dir }}/{{ vouch_bin_name }}"
+    mode: 0755
+    owner: root
+    group: root
+    remote_src: yes
+
+- name: Ensure config path exists
+  file:
+    path: "{{ vouch_config_dir }}"
+    state: directory
+    owner: root
+    group: "{{ vouch_user }}"
+    mode: 0750
+
+- name: Copy example config
+  diff: no
+  copy:
+    src: "{{ _vouch_tmp_dir }}/config/config.yml_example"
+    dest: "{{ vouch_config_dir }}/config.yml_example"
+    mode: 0640
+    owner: root
+    group: "{{ vouch_user }}"
+    remote_src: yes
+
+- name: Ensure data path exists
+  file:
+    path: "{{ vouch_data_dir }}/config"
+    state: directory
+    recurse: yes
+    owner: "{{ vouch_user }}"
+    group: root
+    mode: 0750
+
+- name: Copy static and templates
+  diff: no
+  copy:
+    src: "{{ _vouch_tmp_dir }}/{{ item }}"
+    dest: "{{ vouch_data_dir }}/"
+    owner: "{{ vouch_user }}"
+    group: root
+    mode: 0750
+    remote_src: yes
+  with_items:
+    - "static"
+    - "templates"
+    - ".defaults.yml"
+
+# - name: Generate JWT secret
+#   copy:
+#     content: "{{ lookup('password', '/dev/null length=64 chars=ascii_letters,digits,hexdigits') }}"
+#     dest: "{{ vouch_data_dir }}/config/secret"
+#     owner: root
+#     group: "{{ vouch_user }}"
+#     mode: 0640

@@ -1,18 +1,19 @@
 ---
-nginx_server_tokens: "off"
-nginx_yum_repo_enabled: false
-nginx_remove_default_vhost: true
-nginx_http_ssl_certificate: "/srv/web/certs/dresrv_cert.pem"
-nginx_http_ssl_certificate_key: "/srv/web/certs/dresrv_key.pem"
-nginx_rtv_ssl_certificate: "/srv/web/certs/tachi_cert.pem"
-nginx_rtv_ssl_certificate_key: "/srv/web/certs/tachi_key.pem"
-nginx_load_modules: ["ngx_http_dav_ext_module", "ngx_rtmp_module"]
-nginx_skip_sites: ["webdav.conf.j2", "nextcloud-baremetal.conf.j2"]
-nginx_vhost_path: /etc/nginx/sites-enabled
-nginx_types_hash_max_size: "4096"
-nginx_types_hash_bucket_size: "64"
-nginx_error_log_options: "warn"
 nginx_access_log_options: "main buffer=16k flush=2m"
+nginx_error_log_options: "warn"
+nginx_http_ssl_certificate_key: "/srv/web/certs/dresrv_key.pem"
+nginx_http_ssl_certificate: "/srv/web/certs/dresrv_cert.pem"
+nginx_load_modules: ["ngx_http_dav_ext_module", "ngx_rtmp_module"]
+nginx_remove_default_vhost: true
+nginx_rtv_ssl_certificate_key: "/srv/web/certs/tachi_key.pem"
+nginx_rtv_ssl_certificate: "/srv/web/certs/tachi_cert.pem"
+nginx_server_tokens: "off"
+nginx_skip_sites: ["webdav.conf.j2", "nextcloud-baremetal.conf.j2"]
+nginx_status_url: "nginx_status"  # http://localhost/<nginx_status_url>
+nginx_types_hash_bucket_size: "64"
+nginx_types_hash_max_size: "4096"
+nginx_vhost_path: /etc/nginx/sites-enabled
+nginx_yum_repo_enabled: false
 nginx_log_format: |-
   '$remote_addr - $remote_user [$time_local] "$request" '
   '$status $body_bytes_sent "$http_referer" '

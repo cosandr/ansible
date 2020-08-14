@@ -1,0 +1,41 @@
+---
+- block:
+  - block:
+    - name: Get tags
+      uri:
+        url: "https://api.github.com/repos/vouch/vouch-proxy/tags"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: false
+        user: "{{ lookup('env', 'GH_USER') | default(omit) }}"
+        password: "{{ lookup('env', 'GH_TOKEN') | default(omit) }}"
+      no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
+      register: _tags
+      until: _tags.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set vouch version to {{ _tags.json[0].name[1:] }}"
+      set_fact:
+        vouch_version: "{{ _tags.json[0].name[1:] }}"
+    
+    when: vouch_version == 'latest'
+
+  - name: "Download vouch version {{ vouch_version }}"
+    git:
+      dest: "{{ _vouch_tmp_dir }}"
+      repo: "https://github.com/vouch/vouch-proxy"
+      version: "v{{ vouch_version }}"
+    check_mode: false
+
+  when: vouch_version != "master"
+
+- name: "Download vouch master branch"
+  git:
+    dest: "{{ _vouch_tmp_dir }}"
+    repo: "https://github.com/vouch/vouch-proxy"
+    version: "HEAD"
+  check_mode: false
+  when: vouch_version == "master"

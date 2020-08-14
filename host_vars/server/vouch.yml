@@ -1,0 +1,14 @@
+---
+
+vouch_listen_address: 127.0.0.1
+vouch_listen_port: "{{ ports.vouch }}"
+vouch_user: "{{ nginx_user }}"
+
+vouch_domains:
+  - "{{ server_domain }}"
+vouch_whitelist: "{{ vault_vouch_github_whitelist }}"
+
+vouch_oauth:
+  provider: github
+  client_id: "{{ vault_vouch_github_client_id }}"
+  client_secret: "{{ vault_vouch_github_client_secret }}"

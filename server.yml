@@ -57,7 +57,10 @@
       tags: ["glances"]
 
     - import_role: { name: nginx }
-      tags: ["nginx"]
+      tags: ["nginx", "web-server"]
+
+    - import_role: { name: vouch }
+      tags: ["vouch", "web-server"]
 
     - import_role: { name: systemd }
       tags: ["systemd"]
