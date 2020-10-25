@@ -2,6 +2,7 @@
 tls_ca_file: origin_ca_rsa_root.pem
 desktop_ip: desktop.local
 desktop_label: desktop
+laptop_label: laptop
 server_label: "{{ server_hostname }}"
 prometheus_web_listen_address: "0.0.0.0:{{ prometheus_port }}"
 prometheus_global:
@@ -30,6 +31,9 @@ prometheus_scrape_configs:
       - targets: ["{{ desktop_ip }}:{{ node_exporter_port }}"]
         labels:
           instance: "{{ desktop_label }}"
+      - targets: ["localhost:65100"]
+        labels:
+          instance: "{{ laptop_label }}"
 
   - job_name: "aquaero"
     scrape_interval: 30s
@@ -52,6 +56,9 @@ prometheus_scrape_configs:
       - targets: ["{{ desktop_ip }}:9182"]
         labels:
           instance: "{{ desktop_label }}"
+      - targets: ["localhost:65101"]
+        labels:
+          instance: "{{ laptop_label }}"
 
   - job_name: "nvidia"
     scrape_interval: 30s

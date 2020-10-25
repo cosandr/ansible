@@ -1,4 +1,3 @@
 ---
-_ports:
-  nvidia_exporter: 9401
+_ports: {}
 node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"

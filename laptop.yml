@@ -1,13 +1,13 @@
 ---
-- name: Desktop playbook
+- name: Laptop playbook
   gather_facts: true
   diff: yes
-  hosts: desktop
+  hosts: laptop
   vars:
     node_exporter_skip_install: false
+    node_exporter_no_sysusers: true
     node_exporter_version: "latest"
     node_exporter_port: "{{ ports.node_exporter }}"
-    nvidiaexporter_port: "{{ ports.nvidia_exporter }}"
   tasks:
     - import_role: { name: common }
       tags: ["all", "common"]
@@ -19,6 +19,3 @@
 
     - import_role: { name: node_exporter }
       tags: ["prometheus-stack", "node_exporter"]
-
-    # - import_role: { name: nvidia_exporter }
-    #   tags: ["prometheus-stack", "nvidia_exporter"]
