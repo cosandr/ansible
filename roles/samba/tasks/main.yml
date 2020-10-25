@@ -4,7 +4,9 @@
 
 - import_tasks: "install.yml"
   tags: ["samba"]
-  when: not samba_skip_install
+  when:
+    - not samba_skip_install
+    - "'skip_install' not in ansible_run_tags"
 
 - import_tasks: "add_vfs.yml"
   tags: ["samba"]

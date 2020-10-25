@@ -3,7 +3,9 @@
   become: true
   tags:
     - cadvisor_install
-  when: not cadvisor_skip_install
+  when:
+    - not cadvisor_skip_install
+    - "'skip_install' not in ansible_run_tags"
 
 - include: configure.yml
   become: true

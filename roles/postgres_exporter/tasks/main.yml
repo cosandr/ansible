@@ -3,7 +3,9 @@
   become: true
   tags:
     - postgres_exporter_install
-  when: not postgres_exporter_skip_install
+  when:
+    - not postgres_exporter_skip_install
+    - "'skip_install' not in ansible_run_tags"
 
 - include: configure.yml
   become: true
