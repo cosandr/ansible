@@ -6,4 +6,4 @@
 	url = git@github.com:cosandr/ansible-grafana.git
 [submodule "roles/nginx"]
 	path = roles/nginx
-	url = git@github.com:cosandr/ansible-nginx.git
+	url = git@github.com:cosandr/ansible-role-nginx.git
