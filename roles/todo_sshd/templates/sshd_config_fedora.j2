@@ -132,3 +132,13 @@ AcceptEnv DISPLAY GDK_SCALE QT_SCALE_FACTOR QT_AUTO_SCREEN_SCALE_FACTOR QT_SCREE
 Match Address 10.1.0.0/28
     PermitRootLogin yes
     PasswordAuthentication yes
+
+# useradd -m -s /bin/false prom-tunnel
+Match User prom-tunnel
+    AllowAgentForwarding no
+    AllowTcpForwarding yes
+    GatewayPorts yes
+    PermitTunnel no
+    X11Forwarding no
+    PermitOpen localhost:65001 localhost:65002 localhost:65003 localhost:65004 localhost:65005 localhost:65006 localhost:65101 localhost:65102
+    ForceCommand echo 'This account can only be used for [reason]'
