@@ -27,12 +27,14 @@ prometheus_scrape_configs:
       - targets: ["localhost:{{ node_exporter_port }}"]
         labels:
           instance: "{{ server_label }}"
-      - targets: ["localhost:65001"]
+      - targets: ['localhost:17766']
         labels:
           instance: "{{ desktop_label }}"
-      - targets: ["localhost:65101"]
+          __metrics_path__: /node/metrics
+      - targets: ["localhost:27766"]
         labels:
           instance: "{{ laptop_label }}"
+          __metrics_path__: /node/metrics
 
   - job_name: "aquaero"
     scrape_interval: 30s
@@ -40,38 +42,44 @@ prometheus_scrape_configs:
       - targets: ["localhost:2782"]
         labels:
           instance: "{{ server_label }}"
-      - targets: ["localhost:65002"]
+      - targets: ["localhost:17766"]
         labels:
           instance: "{{ desktop_label }}"
+          __metrics_path__: /aquaero/metrics
 
   - job_name: "nvidia"
     scrape_interval: 30s
     static_configs:
-      - targets: ["localhost:65003"]
+      - targets: ["localhost:17766"]
         labels:
           instance: "{{ desktop_label }}"
+          __metrics_path__: /nvidia/metrics
 
   - job_name: "fah"
     scrape_interval: 60s
     static_configs:
-      - targets: ["localhost:65004"]
+      - targets: ["localhost:17766"]
         labels:
           instance: "{{ desktop_label }}"
+          __metrics_path__: /fah/metrics
 
   - job_name: "wmi"
     static_configs:
-      - targets: ["localhost:65005"]
+      - targets: ["localhost:17766"]
         labels:
           instance: "{{ desktop_label }}"
-      - targets: ["localhost:65102"]
+          __metrics_path__: /wmi/metrics
+      - targets: ["localhost:27766"]
         labels:
           instance: "{{ laptop_label }}"
+          __metrics_path__: /wmi/metrics
 
   - job_name: "hwinfo"
     static_configs:
-      - targets: ["localhost:65006"]
+      - targets: ["localhost:17766"]
         labels:
           instance: "{{ desktop_label }}"
+          __metrics_path__: /hwinfo/metrics
 
   - job_name: 'postgres'
     scrape_interval: 60s
