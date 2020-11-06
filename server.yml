@@ -5,27 +5,19 @@
   hosts: server
   vars:
     cadvisor_port: "{{ ports.cadvisor }}"
-    cadvisor_skip_install: false
-    cadvisor_version: "0.36.0"
+    cadvisor_version: "0.37.0"
     grafana_port: "{{ ports.grafana }}"
-    grafana_skip_install: true
     grafana_version: "latest"
-    nginx_exporter_skip_install: true
     nginx_exporter_version: "latest"
     nginx_rtmp_port: "{{ ports.rtmp }}"
-    nginx_skip_install: false
     nginxexporter_port: "{{ ports.nginx_exporter }}"
-    node_exporter_skip_install: false
     node_exporter_version: "latest"
     node_exporter_port: "{{ ports.node_exporter }}"
-    postgres_exporter_skip_install: false
     postgres_exporter_version: "latest"
     postgres_port: "{{ ports.postgres }}"
     prometheus_port: "{{ ports.prometheus }}"
-    prometheus_skip_install: false
     prometheus_version: "latest"
     psqlexporter_port: "{{ ports.psql_exporter }}"
-    samba_skip_install: yes
   tasks:
     - import_role: { name: common }
       tags: ["always", "common"]
@@ -47,8 +39,10 @@
     #   tags: ["always"]
 
     - import_role: { name: samba }
+      tags: ["samba"]
 
     - import_role: { name: sanoid }
+      tags: ["sanoid"]
 
     - import_role: { name: fail2ban }
       tags: ["fail2ban"]
