@@ -10,7 +10,7 @@ _ports:
   psql_exporter: 9187
   rtmp: 1935
   vouch: 8682
-container_data: "/srv/containers/containers"
+container_data: "/srv/containers"
 postgres_service_name: postgresql-13.service
 rsyno_dsm_domain: "{{ vault_rsyno_dsm_domain }}"
 rsyno_dsm_port: "{{ vault_rsyno_dsm_port }}"
