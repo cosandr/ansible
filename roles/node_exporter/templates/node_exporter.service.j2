@@ -13,6 +13,8 @@ After=prometheus.service
 Type=simple
 User=node_exporter
 Group=node_exporter
+# Workaround 5.9.8 kernel bug (?) causing energy_uj to have 400 permissions
+ExecStartPre=+-/usr/bin/find /sys/class/powercap/intel-rapl/ -name energy_uj -exec chmod 444 {} \;
 ExecStart={{ _node_exporter_binary_install_dir }}/node_exporter \
 {% for name in node_exporter_collectors %}
   --collector.{{ name }} \
