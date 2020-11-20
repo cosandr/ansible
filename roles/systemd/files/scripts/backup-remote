@@ -61,6 +61,7 @@ echo "Starting backup"
 
 # Backup the most important directories into an archive named after
 # the machine this script is currently running on:
+# shellcheck disable=SC2086
 
 borg create                 \
     --stats                 \
@@ -68,7 +69,7 @@ borg create                 \
     --compression auto,zstd \
     --exclude-caches        \
     ::'{hostname}-{now}'    \
-    "${backup_paths[*]}"
+    ${backup_paths[*]}
 
 backup_exit=$?
 
