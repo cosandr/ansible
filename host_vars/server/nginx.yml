@@ -8,7 +8,7 @@ nginx_remove_default_vhost: true
 nginx_rtv_ssl_certificate_key: "/srv/web/certs/tachi_key.pem"
 nginx_rtv_ssl_certificate: "/srv/web/certs/tachi_cert.pem"
 nginx_server_tokens: "off"
-nginx_skip_sites: ["webdav.conf.j2", "nextcloud-baremetal.conf.j2", "rtv.conf.j2"]
+nginx_skip_sites: ["webdav.conf.j2", "nextcloud-baremetal.conf.j2", "nextcloud-official.conf.j2", "rtv.conf.j2"]
 nginx_status_url: "nginx_status"  # http://localhost/<nginx_status_url>
 nginx_types_hash_bucket_size: "64"
 nginx_types_hash_max_size: "4096"
