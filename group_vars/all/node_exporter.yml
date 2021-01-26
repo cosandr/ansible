@@ -1,9 +1,9 @@
 ---
 node_exporter_collectors:
-  - systemd
-  - btrfs  # Only for >=v1.0
+  - btrfs
 node_exporter_no_collectors:
   - mdadm
+  - zfs
   - xfs
   - bcache
   - textfile

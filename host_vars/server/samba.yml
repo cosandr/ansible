@@ -2,6 +2,7 @@
 samba_hosts_allow:
   - 127.0.0.1
   - "{{ ansible_default_ipv4.network }}/24"
+  - 192.168.122.3
 
 samba_interfaces:
   - lo
@@ -19,6 +20,12 @@ samba_extra_global_options:
   "unix extensions": no
   "unix password sync": yes
   "pam password change": yes
+  # "local master": no
+  # "domain master": no
+  # "preferred master": no
+  # "disable netbios": yes
+  # "server role": standalone
+  # "wins support": no
 
 samba_shares:
   homes:
@@ -29,12 +36,12 @@ samba_shares:
     "wide links": yes
 
   srv:
-    comment: "BTRFS Storage"
+    comment: "SSD Storage"
     path: "/srv"
     writable: yes
   
   tank:
-    comment: "ZFS Pool"
+    comment: "Rust Storage"
     path: "/tank"
     writable: yes
     "hide files": "/yes/"

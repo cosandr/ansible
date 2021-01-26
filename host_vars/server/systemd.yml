@@ -128,37 +128,14 @@ systemd_units:
         environment:
           - "BIN_PATH=/usr/local/bin/gitea"
 
-  - name: zfs-automount
-    service:
-      enabled: true
-      unit:
-        description: Unlock and mount tank pool
-        after: [ "zfs-import.target" ]
-      service:
-        remainafterexit: yes
-        exec_start: [ "bash -c 'cat /root/tank.pass | zfs load-key tank && zfs mount -a'" ]
-      install:
-        wantedby: zfs-mount.service
-
-  - name: zfs-mail-status
-    service:
-      enabled: true
-      unit:
-        description: Send email with ZFS pool status
-      service:
-        exec_start: [ "bash -c \"zpool status | mail -s 'zpool status' {{ my_email }}\"" ]
-    timer:
-      timer:
-        # Every first day of the month at 08:00
-        oncalendar: "*-*-01 08:00:00"
-
-  - name: zfs-scrub
+  - name: btrfs-scrub
     service:
       unit:
-        description: Start ZFS pool scrub
+        description: Start BTRFS scrub
       service:
-        # exec_start: [ "zpool scrub tank" ]
-        exec_start: [ "zpool scrub tank" ]
+        exec_start:
+          - "btrfs scrub start /"
+          - "bash -c 'for d in /dev/mapper/tank_disk*; do btrfs scrub start -B $d; done'"
     timer:
       enabled: true
       started: true
@@ -172,7 +149,7 @@ systemd_units:
       enabled: true
       unit:
         description: Start docker containers
-        after: [ "network.target", "zfs-automount.service", "docker.service" ]
+        after: [ "network.target", "docker.service" ]
         requires: [ "docker.service" ]
       service:
         exec_start: [ "bash -c 'docker container start $(< {{ container_data }}/onboot.txt )'" ]
@@ -182,7 +159,7 @@ systemd_units:
     service:
       unit:
         description: Auto update containers
-        after: [ "network.target", "zfs-automount.service", "docker.service" ]
+        after: [ "network.target", "docker.service" ]
         requires: [ "docker.service" ]
       service:
         user: "{{ my_user }}"
@@ -253,3 +230,44 @@ systemd_units:
       timer:
         onbootsec: 5min
         onunitactivesec: 5min
+
+  - name: zfs-automount
+    disabled: yes
+    service:
+      enabled: true
+      unit:
+        description: Unlock and mount tank pool
+        after: [ "zfs-import.target" ]
+      service:
+        remainafterexit: yes
+        exec_start: [ "bash -c 'cat /root/tank.pass | zfs load-key tank && zfs mount -a'" ]
+      install:
+        wantedby: zfs-mount.service
+
+  - name: zfs-mail-status
+    disabled: yes
+    service:
+      enabled: true
+      unit:
+        description: Send email with ZFS pool status
+      service:
+        exec_start: [ "bash -c \"zpool status | mail -s 'zpool status' {{ my_email }}\"" ]
+    timer:
+      timer:
+        # Every first day of the month at 08:00
+        oncalendar: "*-*-01 08:00:00"
+
+  - name: zfs-scrub
+    disabled: yes
+    service:
+      unit:
+        description: Start ZFS pool scrub
+      service:
+        # exec_start: [ "zpool scrub tank" ]
+        exec_start: [ "zpool scrub tank" ]
+    timer:
+      enabled: true
+      started: true
+      timer:
+        # Every first day of the month at 03:00
+        oncalendar: "*-*-01 03:00:00"
