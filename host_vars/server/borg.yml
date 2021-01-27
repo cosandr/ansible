@@ -1,0 +1,70 @@
+---
+borg_create_home: no
+borg_home: /tank/backup/borg
+borg_pool: "{{ borg_home }}/repos"
+borg_local_repo: yes
+borg_server: yes
+borg_auth_users:
+  - host: desktop
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCNmdSfKHim4BJlPkf40WmeFb75FPy5HpQOC6lAZO5V root@desktop"
+borg_backups:
+  - name: "root"
+    timer_description: "Backup root every Friday at 22:00"
+    oncalendar: "Fri *-*-* 22:00:00"
+    passphrase: "{{ borg_server_passphrase }}"
+    repo: "{{ borg_home }}/repos/{{ ansible_hostname }}"
+    backup_name: "root"
+    paths:
+      - "/"
+      - "/srv"
+      - "/var"
+      - "/home"
+      - "/root"
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--exclude-caches"
+      - "--one-file-system"
+      - "--exclude '/**/.snapshots'"
+      - "--exclude 're:^(/dev|/proc|/sys|/tmp|/run)'"
+      - "--exclude '/home/*/.cache'"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-daily 2"
+      - "--keep-weekly 2"
+      - "--keep-monthly 6"
+  - name: "remote"
+    timer_description: "Backup to remote location every 3 days at 04:00"
+    oncalendar: "*-*-01/3 04:00:00"
+    passphrase: "{{ borg_remote_passphrase }}"
+    repo: "ssh://{{ my_user }}@{{ rtv_ddns_domain }}:{{ rtv_ssh_port }}/mnt/user/backup/borg_andrei"
+    backup_name: "{{ ansible_hostname }}"
+    pre_run: |
+      if ! ssh -q -o "BatchMode=yes" {{ my_user }}@{{ rtv_ddns_domain }} -p {{ rtv_ssh_port }} exit &>/dev/null
+      then
+          echo "Cannot SSH into remote server"
+          exit 1
+      fi
+      BACKUP_USER_HOME=$(getent passwd {{ my_user }} | cut -d : -f 6)
+    paths:
+      - "/tank/backup/pgsql"
+      - "/tank/backup/gitea"
+      - "{{ container_data }}/bitwarden/data"
+      - "{{ container_data }}/nextcloud/data"
+      - "${BACKUP_USER_HOME}"
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--exclude-caches"
+      - "--exclude '/**/.snapshots'"
+      - "--exclude '/home/*/.cache'"
+      - "--exclude '/home/*/.ccache'"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-daily 2"
+      - "--keep-weekly 2"
+      - "--keep-monthly 6"

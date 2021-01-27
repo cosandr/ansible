@@ -1,0 +1,91 @@
+---
+- block:
+  - name: Generate authorized_keys
+    authorized_key:
+      user: "{{ borg_user }}"
+      key: "{{ item.key }}"
+      key_options: 'command="cd {{ borg_pool }}/{{ item.host }};borg serve --restrict-to-path {{ borg_pool }}/{{ item.host }}",restrict'
+    with_items: "{{ borg_auth_users }}"
+
+  - name: Write authorized_keys
+    file:
+      path: "{{ borg_home }}/.ssh/authorized_keys"
+      owner: "{{ borg_user }}"
+      group: "{{ borg_group }}"
+      mode: 0600
+      state: file
+
+  - name: Create remote client repo directories
+    file:
+      path: "{{ borg_pool }}/{{ item.host }}"
+      owner: "{{ borg_user }}"
+      group: "{{ borg_group }}"
+      mode: 0700
+      state: directory
+    with_items: "{{ borg_auth_users }}"
+
+  - name: Create localhost client repo directory
+    file:
+      path: "{{ borg_pool }}/{{ ansible_hostname }}"
+      owner: "{{ borg_user }}"
+      group: "{{ borg_group }}"
+      mode: 0700
+      state: directory
+    when: borg_local_repo
+
+  when: borg_server
+
+- block:
+  - name: Create borg scripts directory
+    file:
+      path: "{{ borg_backup_script_path }}"
+      owner: "root"
+      group: "root"
+      mode: 0750
+      state: directory
+
+  - name: Copy scripts
+    template:
+      src: templates/backup.sh.j2
+      dest: "{{ borg_backup_script_path }}/backup-{{ item.name }}"
+      owner: "root"
+      group: "root"
+      mode: 0750
+    with_items: "{{ borg_backups }}"
+    loop_control:
+      label: "{{item.name}}"
+
+  - name: Copy service files
+    template:
+      src: templates/backup.service.j2
+      dest: "/etc/systemd/system/backup-{{ item.name }}.service"
+      owner: "root"
+      group: "root"
+      mode: 0644
+    with_items: "{{ borg_backups }}"
+    notify: reload systemd
+    loop_control:
+      label: "{{item.name}}"
+
+  - name: Copy timer files
+    template:
+      src: templates/backup.timer.j2
+      dest: "/etc/systemd/system/backup-{{ item.name }}.timer"
+      owner: "root"
+      group: "root"
+      mode: 0644
+    with_items: "{{ borg_backups }}"
+    notify: reload systemd
+    loop_control:
+      label: "{{item.name}}"
+  
+  - name: Enable and start timers
+    service:
+      name: "backup-{{ item.name }}.timer"
+      enabled: true
+      state: started
+    with_items: "{{ borg_backups }}"
+    loop_control:
+      label: "{{item.name}}"
+
+  when: borg_backups | length > 0

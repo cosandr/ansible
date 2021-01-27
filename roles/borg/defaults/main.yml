@@ -1,0 +1,29 @@
+borg_package_name: borg
+borg_user: backup
+borg_group: backup
+borg_create_home: yes
+borg_local_repo: no
+borg_server: no
+borg_home: /home/backup
+borg_pool: "{{ home }}/repos"
+borg_backup_script_path: "/usr/local/bin/borg"
+borg_auth_users: []
+#   - host: example
+#     key: "ssh-rsa <key> example@host"
+borg_backups: []
+# - name: "root"
+#   timer_description: "Backup root every day at 03:00"
+#   oncalendar: "*-*-* 03:00:00"
+#   persistent: no
+#   passphrase: "password"
+#   repo: "{{ borg_home }}/repos/{{ ansible_hostname }}"
+#   backup_name: "{{ ansible_hostname }}_root"
+#   paths:
+#     - "/"
+#   create_args:
+#     - "--exclude-caches"
+#     - "--exclude 're:^(/dev|/proc|/sys|/tmp|/run)'"
+#   prune_args:
+#     - "--keep-daily 2"
+#     - "--keep-weekly 2"
+#     - "--keep-monthly 6"

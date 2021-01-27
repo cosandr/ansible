@@ -17,6 +17,9 @@
         ports: "{{ ports | combine(_ports, recursive=true) }}"
       tags: ["always"]
 
+    - import_role: { name: borg }
+      tags: ["borg"]
+
     - import_role: { name: node_exporter }
       tags: ["prometheus-stack", "node_exporter"]
 

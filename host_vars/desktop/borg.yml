@@ -1,0 +1,110 @@
+---
+borg_server: no
+borg_auth_users:
+  - host: desktop
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCNmdSfKHim4BJlPkf40WmeFb75FPy5HpQOC6lAZO5V root@desktop"
+borg_backups:
+  - name: "root"
+    timer_description: "Backup root to server every 3 days at 20:00"
+    oncalendar: "*-*-01/3 20:00:00"
+    passphrase: "{{ borg_desktop_passphrase }}"
+    repo: "{{ borg_user }}@{{ server_local_ip }}:arch"
+    backup_name: "{{ ansible_hostname }}"
+    pre_run: |
+      if ! ssh -q -o "BatchMode=yes" {{ borg_user }}@{{ server_local_ip }} exit &>/dev/null
+      then
+          echo "Cannot SSH into remote server"
+          exit 1
+      fi
+      BACKUP_USER_HOME=$(getent passwd {{ my_user }} | cut -d : -f 6)
+      export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes
+    paths:
+      - "/"
+      - "/home"
+      - "${BACKUP_USER_HOME}"
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--one-file-system"
+      - "--exclude-caches"
+      - "--exclude 're:^(/dev|/proc|/sys|/tmp|/run)'"
+      - "--exclude '/home/*/.cache'"
+      - "--exclude '/home/*/.local/share/baloo'"
+      - "--exclude '/home/*/.local/share/containers'"
+      - "--exclude '/**/.snapshots'"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-daily 4"
+      - "--keep-weekly 2"
+      - "--keep-monthly 3"
+  - name: "windows"
+    timer_description: "Backup windows to server every 3 days at 21:00"
+    oncalendar: "*-*-01/3 21:00:00"
+    passphrase: "{{ borg_desktop_passphrase }}"
+    repo: "{{ borg_user }}@{{ server_local_ip }}:windows"
+    backup_name: "{{ ansible_hostname }}"
+    pre_run: |
+      if ! ssh -q -o "BatchMode=yes" {{ borg_user }}@{{ server_local_ip }} exit &>/dev/null
+      then
+          echo "Cannot SSH into remote server"
+          exit 1
+      fi
+      export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes
+      drives=('c' 'd')
+      declare -a unlocked
+      declare -a mounted
+      # Add bitlk_c to /etc/crypttab
+      # bitlk_c  PARTUUID=<uuid>    /etc/bitlk_c.key  noauto,bitlk
+      for d in "${drives[@]}"; do
+          if ! grep -q "win_$d" /proc/mounts ; then
+              if grep -qE "^bitlk_$d" /etc/crypttab && [[ ! -b "/dev/mapper/bitlk_$d" ]] ; then
+                  echo "Unlocking $d"
+                  set -e
+                  systemctl start "systemd-cryptsetup@bitlk_$d.service"
+                  set +e
+                  unlocked+=("$d")
+              fi
+              echo "Mounting $d"
+              set -e
+              mount -o ro "/win_$d"
+              set +e
+              mounted+=("$d")
+          fi
+      done
+
+      function cleanup {
+          for d in "${mounted[@]}"; do
+              echo "Unmounting $d"
+              umount "/win_$d"
+          done
+          for d in "${unlocked[@]}"; do
+              echo "Locking $d"
+              systemctl stop "systemd-cryptsetup@bitlk_$d.service"
+          done
+      }
+
+      trap cleanup EXIT
+    paths:
+      - "/win_c/Users/Andrei"
+      - "/win_d/Drivers"
+      - "/win_d/Other"
+      - "/win_d/Programs"
+      - "/win_d/src"
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--noatime"
+      - "--nobsdflags"
+      - "--exclude-caches"
+      - "--exclude '/win_c/Users/Andrei/AppData/Local/Packages/Spotify*'"
+      - "--exclude '/win_c/Users/Andrei/Downloads'"
+      - "--exclude '/win_d/src/valve-leak'"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-daily 4"
+      - "--keep-weekly 2"
+      - "--keep-monthly 3"

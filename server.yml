@@ -41,6 +41,9 @@
     - import_role: { name: samba }
       tags: ["samba"]
 
+    - import_role: { name: borg }
+      tags: ["borg"]
+
     - import_role: { name: sanoid }
       tags: ["sanoid"]
 

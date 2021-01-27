@@ -41,39 +41,6 @@ systemd_units:
         # Daily at 03:00
         oncalendar: "*-*-* 03:00:00"
 
-  - name: backup-remote
-    timer:
-      enabled: true
-      started: true
-      timer:
-        # Every 3 days at 04:00
-        oncalendar: "*-*-01/3 04:00:00"
-    service:
-      unit:
-        description: Borg backup important data to remote location
-      service:
-        environment:
-          - "CONTAINER_DATA={{ container_data }}"
-          - "BACKUP_USER={{ my_user }}"
-          - "BORG_PASS_FILE=/root/borg_remote.pass"
-          - "SSH_USER={{ my_user }}"
-          - "SSH_PORT={{ rtv_ssh_port }}"
-          - "SSH_HOST={{ rtv_ddns_domain }}"
-
-  - name: backup-root
-    timer:
-      enabled: true
-      started: true
-      timer:
-        # Every Friday at 22:00
-        oncalendar: "Fri *-*-* 22:00:00"
-    service:
-      unit:
-        description: Borg backup / to zpool
-      service:
-        environment:
-          - "BORG_REPO=/tank/backup/borg"
-
   - name: ngx-recompile-modules
     disabled: yes
     timer:
