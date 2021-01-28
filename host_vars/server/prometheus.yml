@@ -63,6 +63,14 @@ prometheus_scrape_configs:
           instance: "{{ desktop_label }}"
           __metrics_path__: /fah/metrics
 
+  - job_name: "mph"
+    scrape_interval: 120s
+    static_configs:
+      - targets: ["localhost:17766"]
+        labels:
+          instance: "{{ desktop_label }}"
+          __metrics_path__: /mph/metrics
+
   - job_name: "wmi"
     static_configs:
       - targets: ["localhost:17766"]
