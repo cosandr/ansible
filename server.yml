@@ -5,7 +5,7 @@
   hosts: server
   vars:
     cadvisor_port: "{{ ports.cadvisor }}"
-    cadvisor_version: "0.37.0"
+    cadvisor_version: "0.38.7"
     grafana_port: "{{ ports.grafana }}"
     grafana_version: "latest"
     nginx_exporter_version: "latest"
