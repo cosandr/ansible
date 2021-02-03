@@ -66,6 +66,9 @@ prometheus_scrape_configs:
   - job_name: "mph"
     scrape_interval: 120s
     static_configs:
+      - targets: ["localhost:6743"]
+        labels:
+          instance: "{{ server_label }}"
       - targets: ["localhost:17766"]
         labels:
           instance: "{{ desktop_label }}"
