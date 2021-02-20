@@ -20,6 +20,7 @@ borg_backups:
       export BORG_RELOCATED_REPO_ACCESS_IS_OK=yes
     paths:
       - "/"
+      - "/boot"
       - "/home"
       - "${BACKUP_USER_HOME}"
     create_args:

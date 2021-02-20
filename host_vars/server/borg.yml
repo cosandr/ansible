@@ -16,6 +16,8 @@ borg_backups:
     backup_name: "root"
     paths:
       - "/"
+      - "/boot"
+      - "/boot/efi"
       - "/srv"
       - "/var"
       - "/home"
