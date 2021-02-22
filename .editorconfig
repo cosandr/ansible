@@ -12,6 +12,10 @@ indent_size = 4
 indent_style = space
 indent_size = 2
 
+[*.json]
+indent_style = space
+indent_size = 2
+
 [*.{conf,conf.j2}]
 indent_style = space
 indent_size = 4

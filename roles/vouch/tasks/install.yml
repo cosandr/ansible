@@ -22,7 +22,7 @@
 - name: Copy binaries
   diff: no
   copy:
-    src: "{{ _vouch_tmp_dir }}/{{ _vouch_tmp_dir | basename }}"
+    src: "{{ _vouch_tmp_dir }}/{{ vouch_bin_name }}"
     dest: "{{ vouch_bin_dir }}/{{ vouch_bin_name }}"
     mode: 0755
     owner: root
