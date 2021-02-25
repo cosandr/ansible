@@ -3,6 +3,7 @@ tls_ca_file: origin_ca_rsa_root.pem
 desktop_label: desktop
 laptop_label: laptop
 server_label: "{{ server_hostname }}"
+prometheus_storage_retention: "365d"
 prometheus_web_listen_address: "0.0.0.0:{{ prometheus_port }}"
 prometheus_global:
   scrape_interval: 15s

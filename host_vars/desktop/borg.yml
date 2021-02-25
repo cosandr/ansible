@@ -1,8 +1,5 @@
 ---
 borg_server: no
-borg_auth_users:
-  - host: desktop
-    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCNmdSfKHim4BJlPkf40WmeFb75FPy5HpQOC6lAZO5V root@desktop"
 borg_backups:
   - name: "root"
     timer_description: "Backup root to server every 3 days at 20:00"
