@@ -44,7 +44,8 @@ samba_shares:
     comment: "Rust Storage"
     path: "/tank"
     writable: yes
-    "hide files": "/yes/"
+    "hide files": "yes/time-machine"
+    "veto files": "time-machine"
 
   www:
     comment: "Web Root"

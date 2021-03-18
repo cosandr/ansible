@@ -1,6 +1,6 @@
 ---
 borg_create_home: no
-borg_home: /tank/backup/borg
+borg_home: /home/backup
 borg_pool: "{{ borg_home }}/repos"
 borg_local_repo: yes
 borg_server: yes

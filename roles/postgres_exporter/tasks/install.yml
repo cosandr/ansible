@@ -29,8 +29,8 @@
 - name: download postgres_exporter binary to local folder
   become: false
   get_url:
-    url: "https://github.com/wrouesnel/postgres_exporter/releases/download/v{{ postgres_exporter_version }}/postgres_exporter_v{{ postgres_exporter_version }}_linux-{{ go_arch }}.tar.gz"
-    dest: "/tmp/postgres_exporter_v{{ postgres_exporter_version }}_linux-{{ go_arch }}.tar.gz"
+    url: "https://github.com/wrouesnel/postgres_exporter/releases/download/v{{ postgres_exporter_version }}/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5
@@ -42,15 +42,15 @@
 - name: unpack postgres_exporter binaries
   become: false
   unarchive:
-    src: "/tmp/postgres_exporter_v{{ postgres_exporter_version }}_linux-{{ go_arch }}.tar.gz"
+    src: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
     dest: "/tmp"
-    creates: "/tmp/postgres_exporter_v{{ postgres_exporter_version }}_linux-{{ go_arch }}/postgres_exporter"
+    creates: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}/postgres_exporter"
   delegate_to: localhost
   check_mode: false
 
 - name: propagate official postgres_exporter binary
   copy:
-    src: "/tmp/postgres_exporter_v{{ postgres_exporter_version }}_linux-{{ go_arch }}/postgres_exporter"
+    src: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}/postgres_exporter"
     dest: "{{ _postgres_exporter_binary_install_dir }}/postgres_exporter"
     mode: 0755
     owner: root

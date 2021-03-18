@@ -44,14 +44,14 @@
     - import_role: { name: borg }
       tags: ["borg"]
 
-    - import_role: { name: sanoid }
-      tags: ["sanoid"]
+#    - import_role: { name: sanoid }
+#      tags: ["sanoid"]
 
     - import_role: { name: fail2ban }
       tags: ["fail2ban"]
 
-    - import_role: { name: glances }
-      tags: ["glances"]
+#    - import_role: { name: glances }
+#      tags: ["glances"]
 
     - import_role: { name: nginx }
       tags: ["nginx", "web-server"]
