@@ -30,6 +30,7 @@
   when:
     - item.key != __samba_home_share
     - item.value.path is defined
+    - "'vfs objects' not in item.value"
 
 - name: "Print check paths"
   debug:

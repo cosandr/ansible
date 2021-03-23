@@ -44,10 +44,19 @@ samba_shares:
     comment: "Rust Storage"
     path: "/tank"
     writable: yes
-    "hide files": "yes/time-machine"
-    "veto files": "time-machine"
+    "hide files": "yes/timemachine"
+    "veto files": "timemachine"
 
   www:
     comment: "Web Root"
     path: "{{ web_root }}"
     writable: yes
+
+  timemachine:
+    comment: "Time Machine Backups"
+    path: "/tank/timemachine"
+    "read only": no
+    "valid users": "timemachine"
+    "vfs objects": "catia fruit streams_xattr"
+    "fruit:time machine": yes
+    "fruit:time machine max size": "300G"
