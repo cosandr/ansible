@@ -10,7 +10,7 @@
     nvidiaexporter_port: "{{ ports.nvidia_exporter }}"
   tasks:
     - import_role: { name: common }
-      tags: ["all", "common"]
+      tags: ["always", "common"]
 
     - name: Merge ports
       set_fact:
