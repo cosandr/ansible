@@ -42,10 +42,9 @@ systemd_units:
         oncalendar: "*-*-* 03:00:00"
 
   - name: ngx-recompile-modules
-    disabled: yes
     timer:
-      enabled: true
-      started: true
+      enabled: false
+      started: false
       timer:
         # Every day at 03:05
         oncalendar: "*-*-* 03:05:00"

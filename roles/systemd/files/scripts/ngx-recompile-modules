@@ -3,7 +3,8 @@
 import os
 import shutil
 import subprocess
-from io import BytesIO
+
+from typing import Tuple
 
 import requests
 
@@ -12,7 +13,7 @@ WORK_DIR = os.getenv('WORK_DIR', '/srv/general/nginx')
 NGX_MOD_PATH = os.getenv('NGX_MOD_PATH', '/usr/lib64/nginx/modules')
 
 
-def main() -> (list, bool):
+def main() -> Tuple[list, bool]:
     status_lines = []
     # Get current nginx version and args
     p = subprocess.run(['nginx', '-V'], capture_output=True, encoding='utf-8')
@@ -46,7 +47,7 @@ def main() -> (list, bool):
     dyn_mods = {
         'rtmp-module': {
             'file': 'ngx_rtmp_module.so',
-            'git': 'https://github.com/sergey-dryabzhinsky/nginx-rtmp-module.git',
+            'git': 'https://github.com/arut/nginx-rtmp-module.git',
             'branch': 'master'
         },
         'dav-ext-module': {
