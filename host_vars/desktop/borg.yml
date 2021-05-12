@@ -2,8 +2,8 @@
 borg_server: no
 borg_backups:
   - name: "root"
-    timer_description: "Backup root to server every 3 days at 20:00"
-    oncalendar: "*-*-01/3 20:00:00"
+    timer_description: "Backup root to server every 7 days at 20:00"
+    oncalendar: "*-*-01/7 20:00:00"
     passphrase: "{{ borg_desktop_passphrase }}"
     repo: "{{ borg_user }}@{{ server_local_ip }}:arch"
     backup_name: "{{ ansible_hostname }}"
