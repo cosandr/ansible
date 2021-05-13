@@ -1,0 +1,29 @@
+---
+
+btrbk_version: "latest"
+btrbk_config_file: "/etc/btrbk/btrbk.conf"
+btrbk_timer_override: "/etc/systemd/system/btrbk.timer.d/override.conf"
+timer_oncalendar: "hourly"
+timer_description: "{{ timer_oncalendar }}"
+timestamp_format: "long"
+snapshot_preserve_min: "latest"
+snapshot_preserve: "1h 2d 1w"
+target_preserve_min: "no"
+target_preserve: "7d 1m"
+btrbk_global_options: {}
+# btrbk_global_options:
+#   backend_remote: "btrfs-progs-sudo"
+#   ssh_user: "btrbk"
+#   snapshot_dir: "snapshots"
+
+volumes: []
+# volumes:
+#   - path: "/mnt/btrfs_root"
+#     options:
+#       snapshot_preserve: "3h 3d 1m"
+#       target: "/tank/snapshots"
+#     subvolumes:
+#       - path: root
+#       - path: home
+#         options:
+#           snapshot_preserve: "8h 5d 2m"

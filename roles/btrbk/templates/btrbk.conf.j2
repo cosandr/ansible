@@ -1,0 +1,30 @@
+{{ ansible_managed | comment }}
+
+timestamp_format      {{ timestamp_format }}
+
+snapshot_preserve_min {{ snapshot_preserve_min }}
+snapshot_preserve     {{ snapshot_preserve }}
+
+target_preserve_min   {{ target_preserve_min }}
+target_preserve       {{ target_preserve }}
+
+{% for k, v in btrbk_global_options.items() %}
+{{ k }} {{ v }}
+{% endfor %}
+{% for vol in volumes %}
+
+volume {{ vol.path }}
+{% if vol.options is defined %}
+{% for k, v in vol.options.items() %}
+    {{ k }} {{ v }}
+{% endfor %}
+{% endif %}
+{% for subvol in vol.subvolumes %}
+    subvolume {{ subvol.path }}
+{% if subvol.options is defined %}
+{% for sk, sv in subvol.options.items() %}
+        {{ sk }} {{ sv }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endfor %}

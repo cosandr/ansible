@@ -1,0 +1,25 @@
+---
+- name: Configure btrbk
+  template:
+    src: "btrbk.conf.j2"
+    dest: "{{ btrbk_config_file }}"
+    owner: "root"
+    group: "root"
+    mode: 0644
+
+- name: Configure btrbk timer override
+  template:
+    src: "timer_override.conf.j2"
+    dest: "{{ btrbk_timer_override }}"
+    owner: "root"
+    group: "root"
+    mode: 0644
+  when: timer_oncalendar is defined
+  notify: reload systemd
+
+- name: Enable btrbk timer
+  become: true
+  systemd:
+    name: btrbk.timer
+    state: started
+    enabled: true

@@ -1,0 +1,53 @@
+- block:
+  - name: Get latest release
+    uri:
+      url: "https://api.github.com/repos/digint/btrbk/tags?page=1&per_page=1"
+      method: GET
+      return_content: true
+      status_code: 200
+      body_format: json
+      validate_certs: true
+    register: _latest_release
+    until: _latest_release.status == 200
+    retries: 5
+    check_mode: false
+
+  - name: "Set node-exporter version to {{ _latest_release.json[0].name }}"
+    set_fact:
+      btrbk_version: "{{ _latest_release.json[0].name }}"
+  when:
+    - btrbk_version == "latest"
+
+- name: Download btrbk binary to local folder
+  get_url:
+    url: "https://api.github.com/repos/digint/btrbk/tarball/refs/tags/{{ btrbk_version }}"
+    dest: "/tmp/btrbk-{{ btrbk_version }}.tar.gz"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  delegate_to: localhost
+  check_mode: false
+
+- name: Create btrbk temp directory
+  file:
+    path: "/tmp/btrbk-{{ btrbk_version }}"
+    mode: 0755
+    state: directory
+  check_mode: false
+
+- name: Unpack btrbk binaries
+  unarchive:
+    src: "/tmp/btrbk-{{ btrbk_version }}.tar.gz"
+    dest: "/tmp/btrbk-{{ btrbk_version }}"
+    extra_opts:
+      - "--strip"
+      - "1"
+  delegate_to: localhost
+  check_mode: false
+
+- name: Install btrbk
+  become: true
+  community.general.make:
+    chdir: "/tmp/btrbk-{{ btrbk_version }}"
+    target: install

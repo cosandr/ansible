@@ -1,0 +1,35 @@
+---
+
+timestamp_format: "long"
+snapshot_preserve_min: "latest"
+snapshot_preserve: "2h 7d"
+target_preserve_min: "no"
+target_preserve: "7d 1m"
+btrbk_global_options:
+  snapshot_dir: "snapshots"
+
+volumes:
+  - path: "/mnt/btrfs_root"
+    options:
+      snapshot_preserve: "3h 3d 1m"
+      target: "/tank/snapshots/dresrv"
+    subvolumes:
+      - path: "root"
+      - path: "home"
+        options:
+          snapshot_preserve: "8h 5d 2m"
+      - path: "srv"
+      - path: "var"
+      - path: "srv/vm"
+        options:
+          snapshot_name: "srv_vm"
+          snapshot_preserve: "1h 1d 1w"
+  - path: "/tank"
+    options:
+      snapshot_preserve: "4h 3d 2w 1m"
+    subvolumes:
+      - path: "archive"
+      - path: "backup"
+      - path: "media"
+      - path: "media/photo"
+      - path: "yes"

@@ -1,0 +1,9 @@
+{{ ansible_managed | comment }}
+
+{% if timer_description is defined %}
+[Unit]
+Description=btrbk {{ timer_description }} backup
+{% endif %}
+
+[Timer]
+OnCalendar={{ timer_oncalendar }}

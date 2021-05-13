@@ -1,0 +1,11 @@
+---
+
+- name: Install btrbk using package manager
+  package:
+    name: btrbk
+    state: present
+  register: __btrbk_install
+  ignore_errors: true
+
+- include: install_from_source.yml
+  when: __btrbk_install.failed
