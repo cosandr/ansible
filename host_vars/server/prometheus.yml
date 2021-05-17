@@ -1,5 +1,4 @@
 ---
-tls_ca_file: origin_ca_rsa_root.pem
 desktop_label: desktop
 laptop_label: laptop
 server_label: "{{ server_hostname }}"
@@ -114,17 +113,15 @@ prometheus_scrape_configs:
     basic_auth:
       username: "{{ rtv_scrape_user }}"
       password: "{{ rtv_scrape_pass }}"
-    tls_config:
-      ca_file: "/etc/prometheus/tls/{{ tls_ca_file }}"
     static_configs:
-      - targets: ['{{ rtv_ddns_domain }}:7766']
+      - targets: ['prom.{{ vault_rtv_domain }}']
         labels:
           job: "cadvisor"
           instance: "RomeoTV"
-          __metrics_path__: /cadvisor/metrics
+          __metrics_path__: /cadvisor
 
-      - targets: ['{{ rtv_ddns_domain }}:7766']
+      - targets: ['prom.{{ vault_rtv_domain }}']
         labels:
           job: "node"
           instance: "RomeoTV"
-          __metrics_path__: /node/metrics
+          __metrics_path__: /node

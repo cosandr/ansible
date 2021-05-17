@@ -14,8 +14,6 @@ borg_remote_passphrase: "{{ vault_borg_remote_passphrase }}"
 borg_server_passphrase: "{{ vault_borg_server_passphrase }}"
 container_data: "/srv/containers"
 postgres_service_name: postgresql-13.service
-rsyno_dsm_domain: "{{ vault_rsyno_dsm_domain }}"
-rsyno_dsm_port: "{{ vault_rsyno_dsm_port }}"
 rtv_ddns_domain: "{{ vault_rtv_ddns_domain }}"
 rtv_domain: "{{ vault_rtv_domain }}"
 rtv_scrape_pass: "{{ vault_rtv_scrape_pass }}"
