@@ -1,3 +1,4 @@
+#!/usr/bin/env -S ansible-playbook
 ---
 - name: Server playbook
   gather_facts: true
