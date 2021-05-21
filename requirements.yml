@@ -1,0 +1,4 @@
+#!/usr/bin/env -S ansible-galaxy collection install -r
+---
+collections:
+- community.general
