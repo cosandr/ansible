@@ -25,6 +25,11 @@ After={{ service }}
 Requires={{ service }}
 {% endfor %}
 {% endif %}
+{% if val.extra is defined %}
+{% for k, v in val.extra.items() %}
+{{ k }}={{ v }}
+{% endfor %}
+{% endif %}
 {% endif %}
 
 [Timer]
@@ -38,6 +43,11 @@ OnBootSec={{ val.onbootsec }}
 {% endif %}
 {% if val.onunitactivesec is defined %}
 OnUnitActiveSec={{ val.onunitactivesec }}
+{% endif %}
+{% if val.extra is defined %}
+{% for k, v in val.extra.items() %}
+{{ k }}={{ v }}
+{% endfor %}
 {% endif %}
 
 [Install]
