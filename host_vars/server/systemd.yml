@@ -80,6 +80,31 @@ systemd_units:
           - "WORK_DIR=/srv/general/nginx"
           - "NGX_MOD_PATH={{ nginx_modules_path }}"
 
+  - name: nextcloud-mount
+    service:
+      unit:
+        description: Mount Nextcloud using rclone
+        after: [ "network.target", "docker.service" ]
+        requires: [ "network.target", "docker.service" ]
+      service:
+        type: notify
+        user: "{{ my_user }}"
+        group: "{{ my_user }}"
+        exec_start: [ "rclone mount --dir-cache-time=168h --syslog --poll-interval=1m --vfs-cache-mode=full nextcloud: /home/{{ my_user }}/Nextcloud" ]
+        extra:
+          ExecStartPre: "mkdir -p /home/{{ my_user }}/Nextcloud"
+          # SELinux might need custom policy
+          # allow init_t fusermount_exec_t:file { execute open read execute_no_trans map };
+          ExecStop: "/usr/bin/fusermount -uz /home/{{ my_user }}/Nextcloud"
+          Restart: "on-failure"
+          RestartSec: "5"
+          TimeoutStopSec: "100"
+    timer:
+      enabled: true
+      started: true
+      timer:
+        onbootsec: 15min
+
   - name: clear-recycle
     service: { unit: { description: Clear recycle bins } }
     timer:
