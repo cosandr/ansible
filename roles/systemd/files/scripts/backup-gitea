@@ -13,12 +13,15 @@ PERMS_GROUP=${PERMS_GROUP:-root}
 DATESTAMP=$(date +%Y%m%d_%H%M)
 FILENAME=gitea-${DATESTAMP}.zip
 
-# Create tmp folder and run backup
-sudo -u "$GIT_USER" mkdir -p "${TMPDIR}"
-cd "${TMPDIR}" || exit 1
-sudo -u "$GIT_USER" gitea dump -c "$GITEA_CONFIG"
-# Rename zip file
-mv "$(ls -t | head -n1)" "${FILENAME}"
+cleanup() {
+    rm -rf "${TMPDIR}"
+}
+
+trap cleanup EXIT
+
+set -e
+
+sudo -u "$GIT_USER" gitea -c "$GITEA_CONFIG" -w "$TMPDIR" dump -f "${TMPDIR}/${FILENAME}"
 
 # remove all backups except the $KEEP latests
 BACKUPS=$(find "${DIR}" -name "*.zip" | wc -l | sed 's/\ //g')
@@ -28,9 +31,7 @@ do
   BACKUPS=$(( BACKUPS - 1 ))
 done
 
-mv "${TMPDIR}/${FILENAME}" "${DIR}/${FILENAME}"
-chown "$PERMS_USER:$PERMS_GROUP" "${DIR}/${FILENAME}"
-chmod "$PERMS" "${DIR}/${FILENAME}"
+# Move and set permissions zip file
+install -o "$PERMS_USER" -g "$PERMS_GROUP" -m "$PERMS" "${TMPDIR}/${FILENAME}" "${DIR}/"
 
-echo "[${DATESTAMP}] Successfully dumped gitea data."
-rm -rf "${TMPDIR}"
+echo "Successfully dumped gitea data."
