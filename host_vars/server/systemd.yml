@@ -50,13 +50,9 @@ systemd_units:
         extra:
           ConditionPathExists: "{{ container_data }}/nextcloud/data/data/{{ my_email }}/files"
       service:
-        user: "{{ my_user }}"
-        group: "{{ my_user }}"
         exec_start:
-          - "rclone sync {{ container_data }}/nextcloud/data/data/{{ my_email }}/files gcrypt:Nextcloud"
-          - "rclone sync /tank/backup/gitea gcrypt:gitea"
-          - "rclone sync /tank/backup/luks_headers gcrypt:luks_headers"
-          - "rclone sync /tank/backup/pgsql gcrypt:pgsql"
+          - "rclone sync -v {{ container_data }}/nextcloud/data/data/{{ my_email }}/files gcrypt:Nextcloud"
+          - "rclone sync -v --exclude '{PS3-Backup/**,external-os/**,.snapshots/**}' /tank/backup gsecret:tank-backup"
     timer:
       enabled: true
       started: true
