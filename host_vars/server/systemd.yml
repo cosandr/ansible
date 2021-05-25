@@ -10,7 +10,7 @@ systemd_units:
         environment:
           - "DIR=/tank/backup/gitea/"
           - "TMPDIR=/tmp/giteabackup/"
-          - "KEEP=5"
+          - "KEEP=3"
           - "PERMS=640"
           - "PERMS_USER=root"
           - "PERMS_GROUP={{ my_user }}"
@@ -30,7 +30,7 @@ systemd_units:
       service:
         environment:
           - "DIR=/tank/backup/pgsql/"
-          - "KEEP=5"
+          - "KEEP=3"
           - "PERMS=640"
           - "PERMS_USER=root"
           - "PERMS_GROUP={{ my_user }}"
