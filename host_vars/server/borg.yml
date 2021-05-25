@@ -33,6 +33,8 @@ borg_backups:
       - "--exclude '/**/.snapshots'"
       - "--exclude 're:^(/dev|/proc|/sys|/tmp|/run)'"
       - "--exclude '/home/*/.cache'"
+      - "--exclude '/home/*/.ccache'"
+      - "--exclude '/home/{{ my_user }}/Nextcloud'"
     prune_args:
       - "--list"
       - "--show-rc"
@@ -66,6 +68,7 @@ borg_backups:
       - "--exclude '/**/.snapshots'"
       - "--exclude '/home/*/.cache'"
       - "--exclude '/home/*/.ccache'"
+      - "--exclude '/home/{{ my_user }}/Nextcloud'"
     prune_args:
       - "--list"
       - "--show-rc"
