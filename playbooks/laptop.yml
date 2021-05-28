@@ -1,31 +1,27 @@
 #!/usr/bin/env -S ansible-playbook
 ---
-- name: Desktop playbook
+- name: Override ansible_connection if needed
+  import_playbook: prep_local.yml
+  tags: ["always"]
+  
+- name: Laptop playbook
   gather_facts: true
   diff: yes
-  hosts: desktop
+  hosts: laptop
   vars:
     node_exporter_skip_install: false
+    node_exporter_no_sysusers: true
     node_exporter_version: "latest"
     node_exporter_port: "{{ ports.node_exporter }}"
-    nvidiaexporter_port: "{{ ports.nvidia_exporter }}"
+    node_exporter_collectors: []
   tasks:
     - import_role: { name: common }
-      tags: ["always", "common"]
+      tags: ["all", "common"]
 
     - name: Merge ports
       set_fact:
         ports: "{{ ports | combine(_ports, recursive=true) }}"
       tags: ["always"]
 
-    - import_role: { name: borg }
-      tags: ["borg"]
-
     - import_role: { name: node_exporter }
       tags: ["prometheus-stack", "node_exporter"]
-
-    - import_role: { name: btrbk }
-      tags: ["btrbk"]
-
-    # - import_role: { name: nvidia_exporter }
-    #   tags: ["prometheus-stack", "nvidia_exporter"]

@@ -1,0 +1,14 @@
+---
+- hosts: all
+  gather_facts: false
+  pre_tasks:
+    - name: Get localhost hostname
+      delegate_to: localhost
+      command: hostname
+      register: _local_hostname
+      check_mode: false
+
+    - name: Set local connection if needed
+      set_fact:
+        ansible_connection: local
+      when: _local_hostname.stdout == inventory_hostname

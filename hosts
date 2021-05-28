@@ -1,0 +1,7 @@
+[desktops]
+desktop ansible_host=desktop ansible_user=root ansible_python_interpreter=/usr/bin/python3
+; laptop  ansible_host=laptop ansible_user=root ansible_python_interpreter=/usr/bin/python3
+
+[servers]
+dresrv ansible_host=dresrv ansible_user=root ansible_python_interpreter=/usr/bin/python3
+drepi  ansible_host=drepi ansible_user=pi ansible_python_interpreter=/usr/bin/python3

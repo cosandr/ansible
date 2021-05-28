@@ -2,7 +2,7 @@
 
 declare -A file_map
 file_map[".secrets/all_vault.yml"]="group_vars/all/vault.yml"
-file_map[".secrets/server_vault.yml"]="host_vars/server/vault.yml"
+file_map[".secrets/dresrv_vault.yml"]="host_vars/dresrv/vault.yml"
 file_map[".secrets/desktop_vault.yml"]="host_vars/desktop/vault.yml"
 file_map[".secrets/laptop_vault.yml"]="host_vars/laptop/vault.yml"
 

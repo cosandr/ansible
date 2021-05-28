@@ -1,9 +1,12 @@
 #!/usr/bin/env -S ansible-playbook
 ---
+- name: Override ansible_connection if needed
+  import_playbook: prep_local.yml
+  tags: ["always"]
+
 - name: Server playbook
   gather_facts: true
-  diff: yes
-  hosts: server
+  hosts: dresrv
   vars:
     cadvisor_port: "{{ ports.cadvisor }}"
     cadvisor_version: "0.38.8"
