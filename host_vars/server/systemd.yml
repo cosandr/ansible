@@ -49,9 +49,11 @@ systemd_units:
         requires: [ "network.target" ]
         extra: |
           ConditionPathExists={{ container_data }}/nextcloud/data/data/{{ my_email }}/files
+          ConditionPathExists={{ container_data }}/syncthing/data
       service:
         exec_start:
           - "rclone sync -v {{ container_data }}/nextcloud/data/data/{{ my_email }}/files gcrypt:Nextcloud"
+          - "rclone sync -v {{ container_data }}/syncthing/data gsecret:syncthing"
           - "rclone sync -v --exclude '{PS3-Backup/**,external-os/**,.snapshots/**}' /tank/backup gsecret:tank-backup"
     timer:
       enabled: true
