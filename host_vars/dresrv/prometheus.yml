@@ -95,14 +95,14 @@ prometheus_scrape_configs:
   - job_name: 'postgres'
     scrape_interval: 60s
     static_configs:
-      - targets: ['localhost:{{ psqlexporter_port }}']
+      - targets: ['localhost:{{ postgres_exporter_port }}']
         labels:
           instance: "{{ server_label }}"
 
   - job_name: 'nginx'
     scrape_interval: 60s
     static_configs:
-      - targets: ['localhost:{{ nginxexporter_port }}']
+      - targets: ['localhost:{{ nginx_exporter_port }}']
         labels:
           instance: "{{ server_label }}"
 

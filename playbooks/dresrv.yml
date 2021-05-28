@@ -14,14 +14,14 @@
     grafana_version: "latest"
     nginx_exporter_version: "latest"
     nginx_rtmp_port: "{{ ports.rtmp }}"
-    nginxexporter_port: "{{ ports.nginx_exporter }}"
+    nginx_exporter_port: "{{ ports.nginx_exporter }}"
     node_exporter_version: "latest"
     node_exporter_port: "{{ ports.node_exporter }}"
     postgres_exporter_version: "latest"
     postgres_port: "{{ ports.postgres }}"
     prometheus_port: "{{ ports.prometheus }}"
     prometheus_version: "latest"
-    psqlexporter_port: "{{ ports.psql_exporter }}"
+    postgres_exporter_port: "{{ ports.psql_exporter }}"
   tasks:
     - import_role: { name: common }
       tags: ["always", "common"]

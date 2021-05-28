@@ -1,4 +1,4 @@
 ---
 nginx_exporter_no_sysusers: true
 nginx_exporter_scrape_uri: "http://127.0.0.1/{{ nginx_status_url }}"
-nginx_exporter_web_listen_address: "127.0.0.1:{{ nginxexporter_port }}"
+nginx_exporter_web_listen_address: "127.0.0.1:{{ nginx_exporter_port }}"
