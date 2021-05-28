@@ -16,7 +16,7 @@ grafana_smtp:
   from_address: "grafana@{{ server_domain }}"
 grafana_database:
   type: postgres
-  host: "localhost:{{ postgres_port }}"
+  host: "localhost:{{ ports.postgres | default('5432') }}"
   user: grafana
   password: "{{ grafana_psql_pass }}"
 grafana_datasources:

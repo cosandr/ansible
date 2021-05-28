@@ -18,7 +18,6 @@
     node_exporter_version: "latest"
     node_exporter_port: "{{ ports.node_exporter }}"
     postgres_exporter_version: "latest"
-    postgres_port: "{{ ports.postgres }}"
     prometheus_port: "{{ ports.prometheus }}"
     prometheus_version: "latest"
     postgres_exporter_port: "{{ ports.psql_exporter }}"
