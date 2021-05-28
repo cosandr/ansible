@@ -20,7 +20,6 @@ rtv_scrape_pass: "{{ vault_rtv_scrape_pass }}"
 rtv_scrape_user: "{{ vault_rtv_scrape_user }}"
 rtv_ssh_port: "{{ vault_rtv_ssh_port }}"
 rtv_syncthing_port: "{{ vault_rtv_syncthing_port }}"
-server_ddns_domain: "{{ vault_server_ddns_domain }}"
 server_domain: "dresrv.com"
 server_hostname: DreSRV
 smtp_host: "{{ vault_smtp_host }}"
