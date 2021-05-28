@@ -47,8 +47,8 @@ systemd_units:
         description: Backup important files to Google Drive
         after: [ "network.target" ]
         requires: [ "network.target" ]
-        extra:
-          ConditionPathExists: "{{ container_data }}/nextcloud/data/data/{{ my_email }}/files"
+        extra: |
+          ConditionPathExists={{ container_data }}/nextcloud/data/data/{{ my_email }}/files
       service:
         exec_start:
           - "rclone sync -v {{ container_data }}/nextcloud/data/data/{{ my_email }}/files gcrypt:Nextcloud"
@@ -77,6 +77,8 @@ systemd_units:
           - "NGX_MOD_PATH={{ nginx_modules_path }}"
 
   - name: nextcloud-mount
+    # SELinux might need custom policy
+    # allow init_t fusermount_exec_t:file { execute open read execute_no_trans map };
     service:
       unit:
         description: Mount Nextcloud using rclone
@@ -87,14 +89,12 @@ systemd_units:
         user: "{{ my_user }}"
         group: "{{ my_user }}"
         exec_start: [ "rclone mount --dir-cache-time=168h --syslog --poll-interval=1m --vfs-cache-mode=full nextcloud: /home/{{ my_user }}/Nextcloud" ]
-        extra:
-          ExecStartPre: "mkdir -p /home/{{ my_user }}/Nextcloud"
-          # SELinux might need custom policy
-          # allow init_t fusermount_exec_t:file { execute open read execute_no_trans map };
-          ExecStop: "/usr/bin/fusermount -uz /home/{{ my_user }}/Nextcloud"
-          Restart: "on-failure"
-          RestartSec: "5"
-          TimeoutStopSec: "100"
+        extra: |
+          ExecStartPre=mkdir -p /home/{{ my_user }}/Nextcloud
+          ExecStop=/usr/bin/fusermount -uz /home/{{ my_user }}/Nextcloud
+          Restart=on-failure
+          RestartSec=5
+          TimeoutStopSec=100
     timer:
       enabled: true
       started: true

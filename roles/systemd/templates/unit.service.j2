@@ -15,11 +15,7 @@ After={{ service }}
 Requires={{ service }}
 {% endfor %}
 {% endif %}
-{% if val.extra is defined %}
-{% for k, v in val.extra.items() %}
-{{ k }}={{ v }}
-{% endfor %}
-{% endif %}
+{% if val.extra is defined %}{{ val.extra }}{% endif %}
 {% endif %}
 
 [Service]
@@ -49,11 +45,7 @@ ExecStart={{ systemd_script_install_path }}/{{ item.name }}
 ExecStart={{ es }}
 {% endfor %}
 {% endif %}
-{% if val.extra is defined %}
-{% for k, v in val.extra.items() %}
-{{ k }}={{ v }}
-{% endfor %}
-{% endif %}
+{% if val.extra is defined %}{{ val.extra }}{% endif %}
 {% endif %}
 
 [Install]
@@ -62,4 +54,5 @@ WantedBy=multi-user.target
 {% else %}
 {% set val = item.service.install %}
 WantedBy={{ val.wantedby | default('multi-user.target') }}
+{% if val.extra is defined %}{{ val.extra }}{% endif %}
 {% endif %}

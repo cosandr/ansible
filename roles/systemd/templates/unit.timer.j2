@@ -25,11 +25,7 @@ After={{ service }}
 Requires={{ service }}
 {% endfor %}
 {% endif %}
-{% if val.extra is defined %}
-{% for k, v in val.extra.items() %}
-{{ k }}={{ v }}
-{% endfor %}
-{% endif %}
+{% if val.extra is defined %}{{ val.extra }}{% endif %}
 {% endif %}
 
 [Timer]
@@ -44,11 +40,7 @@ OnBootSec={{ val.onbootsec }}
 {% if val.onunitactivesec is defined %}
 OnUnitActiveSec={{ val.onunitactivesec }}
 {% endif %}
-{% if val.extra is defined %}
-{% for k, v in val.extra.items() %}
-{{ k }}={{ v }}
-{% endfor %}
-{% endif %}
+{% if val.extra is defined %}{{ val.extra }}{% endif %}
 
 [Install]
 {% if item.timer.install is not defined %}
@@ -56,4 +48,5 @@ WantedBy=timers.target
 {% else %}
 {% set val = item.timer.install %}
 WantedBy={{ val.wantedby | default('timers.target') }}
+{% if val.extra is defined %}{{ val.extra }}{% endif %}
 {% endif %}
