@@ -26,3 +26,6 @@ grafana_datasources:
     url: "http://localhost:{{ prometheus_port }}/"
     basicAuth: false
 grafana_dashboards: []
+
+grafana_plugins:
+  - grafana-piechart-panel
