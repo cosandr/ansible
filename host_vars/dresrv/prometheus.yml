@@ -1,6 +1,7 @@
 ---
 desktop_label: desktop
 laptop_label: laptop
+drepi_label: drepi
 server_label: "{{ server_hostname }}"
 prometheus_storage_retention: "365d"
 prometheus_web_listen_address: "0.0.0.0:{{ prometheus_port }}"
@@ -35,6 +36,17 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ laptop_label }}"
           __metrics_path__: /node/metrics
+      - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ node_exporter_port }}"]
+        labels:
+          instance: "{{ drepi_label }}"
+          __metrics_path__: /metrics
+
+  - job_name: "pihole"
+    static_configs:
+      - targets: ["{{ hostvars['drepi'].ansible_host }}:9617"]
+        labels:
+          instance: "{{ drepi_label }}"
+          __metrics_path__: /metrics
 
   - job_name: "aquaero"
     scrape_interval: 30s
