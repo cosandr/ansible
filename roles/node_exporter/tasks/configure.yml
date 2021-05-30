@@ -1,4 +1,18 @@
 ---
+- name: check for prometheus service
+  ignore_errors: true
+  check_mode: false
+  command: systemctl list-unit-files --type service -q 'prometheus.service'
+  register: __prom_check
+
+- name: set prometheus service fact
+  set_fact:
+    _have_prometheus_service: true
+  when:
+    - __prom_check is defined
+    - __prom_check.rc == 0
+    - '"prometheus.service" in __prom_check.stdout'
+
 - name: create or update systemd service unit
   template:
     src: node_exporter.service.j2
