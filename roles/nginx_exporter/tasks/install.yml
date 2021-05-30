@@ -21,7 +21,7 @@
       mode: 0644
       owner: root
       group: root
-  
+
   - name: restart systemd-sysusers
     become: true
     systemd:
@@ -51,7 +51,7 @@
       group: nginx_exporter
       createhome: false
 
-  when: 
+  when:
     - (nginx_exporter_no_sysusers) or (nginx_exporter_systemd_version | int < 215)
 
 - block:
@@ -91,8 +91,6 @@
       when:
         - "('linux-' + go_arch + '.tar.gz') in item"
   delegate_to: localhost
-  when:
-    - not nginx_exporter_version == "latest"
 
 - name: download nginx_exporter binary to local folder
   become: false

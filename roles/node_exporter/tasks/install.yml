@@ -21,7 +21,7 @@
       mode: 0644
       owner: root
       group: root
-  
+
   - name: restart node_exporter
     become: true
     systemd:
@@ -53,7 +53,7 @@
       createhome: false
       home: "{{ node_exporter_db_dir }}"
 
-  when: 
+  when:
     - (node_exporter_no_sysusers) or (node_exporter_systemd_version | int < 215)
 
 - name: create node_exporter data directory
@@ -81,10 +81,8 @@
         return_content: true
         status_code: 200
         body_format: json
-        validate_certs: false
-        user: "{{ lookup('env', 'GH_USER') | default(omit) }}"
-        password: "{{ lookup('env', 'GH_TOKEN') | default(omit) }}"
-      no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
+        validate_certs: true
+      no_log: false
       register: _latest_release
       until: _latest_release.status == 200
       retries: 5
@@ -93,25 +91,27 @@
     - name: "Set node-exporter version to {{ _latest_release.json.tag_name[1:] }}"
       set_fact:
         node_exporter_version: "{{ _latest_release.json.tag_name[1:] }}"
+
+    - name: Set node_exporter_version on remote host
+      set_fact:
+        node_exporter_version: "{{ hostvars['localhost']['node_exporter_version'] }}"
   when:
     - node_exporter_version == "latest"
 
-- block:
-    - name: "Get checksum list"
-      set_fact:
-        __node_exporter_checksums: "{{ lookup('url', 'https://github.com/prometheus/node_exporter/releases/download/v' + node_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
-      run_once: true
-      check_mode: false
-
-    - name: "Get checksum for {{ go_arch }} architecture"
-      set_fact:
-        __node_exporter_checksum: "{{ item.split(' ')[0] }}"
-      with_items: "{{ __node_exporter_checksums }}"
-      when:
-        - "('linux-' + go_arch + '.tar.gz') in item"
+- name: "Get checksum list"
+  set_fact:
+    __node_exporter_checksums: "{{ lookup('url', 'https://github.com/prometheus/node_exporter/releases/download/v' + node_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
+  run_once: true
+  check_mode: false
   delegate_to: localhost
+
+- name: "Get checksum for {{ go_arch }} architecture"
+  set_fact:
+    __node_exporter_checksum: "{{ item.split(' ')[0] }}"
+  with_items: "{{ __node_exporter_checksums }}"
   when:
-    - not node_exporter_version == "latest"
+    - "('linux-' + go_arch + '.tar.gz') in item"
+  delegate_to: localhost
 
 - name: download node_exporter binary to local folder
   become: false
