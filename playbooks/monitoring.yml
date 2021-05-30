@@ -1,0 +1,87 @@
+#!/usr/bin/env -S ansible-playbook
+---
+- name: Ensure local connection
+  import_playbook: prep_local.yml
+  tags: ["always"]
+
+- name: Prepare ports dict
+  hosts: all
+  gather_facts: false
+  roles:
+    - role: common
+      tags: ["always"]
+  post_tasks:
+    - name: Merge ports
+      set_fact:
+        ports: "{{ ports | combine(_ports, recursive=true) }}"
+      tags: ["always"]
+
+- name: Install and configure monitoring
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: prometheus
+      import_role:
+        name: prometheus
+      tags: ["prometheus"]
+      vars:
+        prometheus_port: "{{ ports.prometheus }}"
+        prometheus_version: "latest"
+      when:
+        - ports.prometheus is defined
+        # - inventory_hostname == "dresrv"
+
+    - name: grafana
+      import_role:
+        name: grafana
+      tags: ["grafana"]
+      vars:
+        grafana_port: "{{ ports.grafana }}"
+        grafana_version: "latest"
+      when:
+        - ports.grafana is defined
+        # - inventory_hostname == "dresrv"
+
+    - name: cadvisor
+      import_role:
+        name: cadvisor
+      tags: ["cadvisor"]
+      vars:
+        cadvisor_port: "{{ ports.cadvisor }}"
+        cadvisor_version: "0.38.8"
+      when:
+        - ports.cadvisor is defined
+        # - inventory_hostname == "dresrv"
+
+    - name: nginx_exporter
+      import_role:
+        name: nginx_exporter
+      tags: ["nginx_exporter"]
+      vars:
+        nginx_exporter_port: "{{ ports.nginx_exporter }}"
+        nginx_exporter_version: "latest"
+      when:
+        - ports.nginx_exporter is defined
+        # - inventory_hostname == "dresrv"
+
+    - name: node_exporter
+      import_role:
+        name: node_exporter
+      tags: ["node_exporter"]
+      vars:
+        node_exporter_port: "{{ ports.node_exporter }}"
+        node_exporter_version: "latest"
+        node_exporter_no_sysusers: true
+      when: ports.node_exporter is defined
+
+    - name: postgres_exporter
+      import_role:
+        name: postgres_exporter
+      tags: ["postgres_exporter"]
+      vars:
+        postgres_exporter_port: "{{ ports.psql_exporter }}"
+        postgres_exporter_version: "latest"
+      when:
+        - ports.postgres_exporter is defined
+        # - inventory_hostname == "dresrv"

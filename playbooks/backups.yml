@@ -1,0 +1,24 @@
+#!/usr/bin/env -S ansible-playbook
+---
+- import_playbook: prep_local.yml
+  tags: ["always"]
+
+- hosts: desktop, dresrv
+  gather_facts: false
+  roles:
+    - role: common
+      tags: ["always"]
+  post_tasks:
+    - name: Merge ports
+      set_fact:
+        ports: "{{ ports | combine(_ports, recursive=true) }}"
+      tags: ["always"]
+
+- hosts: desktop, dresrv
+  gather_facts: true
+  roles:
+    - role: borg
+      tags: ["borg"]
+
+    - role: btrbk
+      tags: ["btrbk"]
