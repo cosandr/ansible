@@ -1,0 +1,37 @@
+---
+
+- name: Ensure {{ motion_script_dir }} exists
+  file:
+    path: "{{ motion_script_dir }}"
+    mode: 0755
+    state: directory
+  check_mode: false
+
+- name: Copy scripts
+  become: true
+  copy:
+    src: "{{ item }}"
+    dest: "{{ motion_script_dir }}/{{ item }}"
+    mode: 0755
+    owner: root
+    group: root
+  with_items:
+    - "after-movie"
+    - "after-picture"
+
+- name: Ensure motion runs as daemon
+  become: true
+  lineinfile:
+    path: "{{ motion_sysconfig_file }}"
+    regexp: '^\s*start_motion_daemon'
+    line: "start_motion_daemon=yes"
+
+- name: Copy config file
+  become: true
+  template:
+    src: "motion.conf.j2"
+    dest: "{{ motion_config_file }}"
+    mode: 0644
+    owner: root
+    group: root
+  notify: restart motion

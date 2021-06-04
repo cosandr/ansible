@@ -1,0 +1,15 @@
+#!/usr/bin/env -S ansible-playbook
+---
+- name: Override ansible_connection if needed
+  import_playbook: prep_local.yml
+  tags: ["always"]
+
+- name: Raspberry Pi 4 playbook
+  gather_facts: true
+  hosts: drepi
+  tasks:
+    - import_role: { name: common }
+      tags: ["always"]
+
+    - import_role: { name: motion }
+      tags: ["motion"]

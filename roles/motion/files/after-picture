@@ -1,0 +1,29 @@
+#!/bin/bash
+
+SRC="$1"
+MNT_CHECK=${MNT_CHECK:-/mnt/motion}
+DST_DIR=${DST_DIR:-"$MNT_CHECK/snaps"}
+DAYS_KEEP=${DAYS_KEEP:-365}
+log_file="$DST_DIR/$(date +%Y-%m-%d).log"
+timestamp=$(date +%H:%M:%S)
+
+mkdir -p "$DST_DIR" || exit 1
+
+# Log to file
+exec >> "$log_file"
+exec 2>&1
+
+if [[ $# -lt 1 ]]; then
+    echo "$timestamp: no source file given"
+    exit 1
+fi
+
+if ! grep -q "$MNT_CHECK" /proc/mounts; then
+    echo "$timestamp: $MNT_CHECK is not mounted, cannot continue"
+    exit 1
+fi
+
+echo "$timestamp: deleting files older than $DAYS_KEEP days in $DST_DIR"
+find "$DST_DIR" -type f -name '*.jpg' -mtime "+${DAYS_KEEP}" -print -delete
+
+mv -v "$SRC" "$DST_DIR/"

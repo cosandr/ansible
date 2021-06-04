@@ -1,0 +1,4 @@
+{{ ansible_managed | comment }}
+{% for k, v in motion_config.items() %}
+{{ k }} {{ v }}
+{% endfor %}
