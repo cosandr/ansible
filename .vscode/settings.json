@@ -2,7 +2,5 @@
     "files.associations": {
         "**/*.yml": "yaml"
     },
-    "editor.tabSize": 2,
-    "editor.insertSpaces": true,
-    "editor.detectIndentation": false
+    "python.pythonPath": "/usr/bin/python3"
 }
