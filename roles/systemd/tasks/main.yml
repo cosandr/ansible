@@ -1,5 +1,17 @@
 ---
 
+- name: Copy script files
+  copy:
+    src: "files/scripts/{{ item }}"
+    dest: "{{ systemd_script_install_path }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0755
+  with_items: "{{ systemd_scripts }}"
+  loop_control:
+    label: "{{ item }}"
+  when: systemd_scripts | length > 0
+
 - include_tasks: "install-defined.yml"
 
 - include_tasks: "install-auto.yml"

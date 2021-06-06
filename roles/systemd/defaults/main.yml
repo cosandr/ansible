@@ -15,6 +15,8 @@ systemd_no_check_missing: false
 # useful when one gets disabled for example
 systemd_delete_old_scripts: true
 
+systemd_scripts: []
+
 # List of service definitions, see commented out example below
 systemd_units: []
 #   - name: complete-example
@@ -23,10 +25,10 @@ systemd_units: []
 #     # If service section is missing it will create a simple service file as below
 # # [Unit]
 # # Description=complete-example
-# # 
+# #
 # # [Service]
 # # ExecStart=/usr/local/bin/systemd/ansible/complete-example
-# # 
+# #
 # # [Install]
 # # WantedBy=multi-user.target
 #     service:

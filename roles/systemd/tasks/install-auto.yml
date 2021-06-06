@@ -89,7 +89,8 @@
         - systemd_installed_scripts is defined
         - systemd_installed_scripts | length > 0
         - item not in check_exec_auto
-    
+        - item not in systemd_scripts
+
     when: systemd_delete_old_scripts
 
   - name: Copy script files
@@ -159,7 +160,7 @@
       - item.name not in systemd_missing_scripts
       - item.name in check_exec_auto
 
-  - name: Create undefined timers 
+  - name: Create undefined timers
     template:
       src: templates/unit.timer.j2
       dest: "{{ systemd_unit_install_path }}/{{ item.name }}.timer"
