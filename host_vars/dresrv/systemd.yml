@@ -75,15 +75,23 @@ systemd_units:
           ConditionPathExists=/tank/media/motion
       service:
         type: forking
+        user: "motion"
+        group: "motion"
         environment:
           - "CONCAT_FILE=/tmp/motion-concat.txt"
           - "SRC_PATH=/tank/media/motion"
           - 'FFMPEG_ARGS="-c:v libx265 -x265-params crf=28 -preset:v faster -c:a aac -y"'
         exec_start:
-          - "/usr/bin/bash -c 'echo /usr/bin/ffmpeg -hide-banner -i $$CONCAT_FILE $$FFMPEG_ARGS $$SRC_PATH/$$(date -d yesterday +%%Y%%m%%d).mkv'"
+          - "/usr/bin/bash -c '/usr/bin/ffmpeg -hide-banner -i $$CONCAT_FILE $$FFMPEG_ARGS $$SRC_PATH/$$(date -d yesterday +%%Y%%m%%d).mkv'"
         extra: |
           ExecStartPre={{ systemd_script_install_path }}/gen-concat-motion
-          ExecStartPost=-rm -fv /tmp/motion-concat.txt
+          ExecStartPost=/usr/bin/bash -c 'for f in $$(cat $$CONCAT_FILE); do rm -fv "$$f"; done'
+          ExecStartPost=-/usr/bin/rm -fv $$CONCAT_FILE
+          ProtectSystem=strict
+          ProtectControlGroups=true
+          ProtectKernelTunables=true
+          PrivateDevices=true
+          ReadWritePaths=/tank/media/motion /tmp
     timer:
       enabled: true
       started: true
