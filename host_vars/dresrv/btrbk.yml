@@ -32,4 +32,9 @@ volumes:
       - path: "backup"
       - path: "media"
       - path: "media/photo"
+      - path: "media/motion"
+        options:
+          snapshot_preserve: "2d 1w"
       - path: "yes"
+        options:
+          snapshot_preserve: "2d 2w"
