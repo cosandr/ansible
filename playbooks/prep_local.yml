@@ -11,4 +11,4 @@
     - name: Set local connection if needed
       set_fact:
         ansible_connection: local
-      when: _local_hostname.stdout == inventory_hostname
+      when: _local_hostname.stdout | lower == inventory_hostname | lower
