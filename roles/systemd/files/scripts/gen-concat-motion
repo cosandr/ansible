@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+
+import re
+import os
+from datetime import datetime, timedelta
+
+def main():
+    concat_file = os.getenv('CONCAT_FILE')
+    src_path = os.getenv('SRC_PATH')
+    src_file_ext = os.getenv('SRC_FILE_EXT', ".mkv")
+    src_time_format = os.getenv('SRC_TIME_FORMAT', r"%Y%m%d-%H%M%S")
+    src_file_regex = os.getenv('SRC_FILE_REGEX', r'^(\d{8}-\d{6})-\d{2}$')
+    if not concat_file:
+        raise RuntimeError('CONCAT_FILE env var required')
+    if not src_path:
+        raise RuntimeError('SRC_PATH env var required')
+    if not os.path.exists(src_path):
+        raise RuntimeError("{} doesn't exist".format(src_path))
+    re_src = re.compile(src_file_regex)
+    yesterday = datetime.now().date() - timedelta(days=1)
+    start = datetime(year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=0, minute=0, second=0)
+    end = datetime(year=yesterday.year, month=yesterday.month, day=yesterday.day, hour=23, minute=59, second=59)
+    concat = []
+    for f in os.listdir(src_path):
+        name, ext = os.path.splitext(f)
+        if ext != src_file_ext:
+            print("wrong extension {}, expected {}".format(ext, src_file_ext))
+            continue
+        m = re_src.match(name)
+        if not m:
+            print("{} doesn't match regex".format(name))
+            continue
+        f_time = datetime.strptime(m.group(1), src_time_format)
+        if start < f_time < end:
+            concat.append(f)
+    if not concat:
+        print("no files to concat found")
+        exit(0)
+    print("concat {} files".format(len(concat)))
+    concat.sort()
+    with open(concat_file, 'w', encoding='utf-8') as fw:
+        fw.write('\n'.join(concat))
+
+if __name__ == '__main__':
+    main()

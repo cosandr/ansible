@@ -1,4 +1,7 @@
 ---
+systemd_scripts:
+  - "gen-concat-motion"
+
 systemd_units:
   - name: backup-gitea
     service:
@@ -61,6 +64,32 @@ systemd_units:
       timer:
         # Every day at 05:00
         oncalendar: "*-*-* 05:00:00"
+
+  - name: concat-motion
+    service:
+      unit:
+        description: Concat motion files from the last day
+        after: [ "tank.mount" ]
+        requires: [ "tank.mount" ]
+        extra: |
+          ConditionPathExists=/tank/media/motion
+      service:
+        type: forking
+        environment:
+          - "CONCAT_FILE=/tmp/motion-concat.txt"
+          - "SRC_PATH=/tank/media/motion"
+          - 'FFMPEG_ARGS="-c:v libx265 -x265-params crf=28 -preset:v faster -c:a aac -y"'
+        exec_start:
+          - "/usr/bin/bash -c 'echo /usr/bin/ffmpeg -hide-banner -i $$CONCAT_FILE $$FFMPEG_ARGS $$SRC_PATH/$$(date -d yesterday +%%Y%%m%%d).mkv'"
+        extra: |
+          ExecStartPre={{ systemd_script_install_path }}/gen-concat-motion
+          ExecStartPost=-rm -fv /tmp/motion-concat.txt
+    timer:
+      enabled: true
+      started: true
+      timer:
+        # Every day at 02:00
+        oncalendar: "*-*-* 02:00:00"
 
   - name: ngx-recompile-modules
     timer:
@@ -154,7 +183,7 @@ systemd_units:
       timer:
         # Every first day of the month at 03:00
         oncalendar: "*-*-01 03:00:00"
-    
+
   - name: btrfs-mail-scrub
     service:
       enabled: true
