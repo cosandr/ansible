@@ -1,5 +1,9 @@
 ---
 
+- name: Update motion config dict
+  set_fact:
+    motion_config: "{{ motion_default_config | combine(motion_config, recursive=true) }}"
+
 - name: Ensure {{ motion_script_dir }} exists
   file:
     path: "{{ motion_script_dir }}"
@@ -15,9 +19,8 @@
     mode: 0755
     owner: root
     group: root
-  with_items:
-    - "after-movie"
-    - "after-picture"
+  with_items: "{{ motion_scripts }}"
+  when: motion_scripts | length > 0
 
 - name: Ensure motion runs as daemon
   become: true
