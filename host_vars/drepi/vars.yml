@@ -1,3 +1,17 @@
 ---
 _ports: {}
 node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
+motion_scripts:
+  - "after-movie"
+  - "after-picture"
+motion_config:
+  emulate_motion: "on"
+  framerate: "1"
+  movie_codec: "mkv:libx265"
+  movie_max_time: "3600"
+  movie_quality: "60"
+  on_movie_end: "{{ motion_script_dir }}/after-movie %f"
+  on_picture_save: "{{ motion_script_dir }}/after-picture %f"
+  snapshot_interval: "7200"
+  stream_localhost: "off"
+  text_left: "ENTRANCE"
