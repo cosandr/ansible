@@ -75,7 +75,7 @@ systemd_units:
         extra: |
           ConditionPathExists=/tank/media/motion
       service:
-        type: forking
+        type: exec
         user: "motion"
         group: "motion"
         environment:
@@ -87,7 +87,7 @@ systemd_units:
         extra: |
           ExecStartPre={{ systemd_script_install_path }}/gen-concat-motion
           ExecStartPost={{ systemd_script_install_path }}/post-concat-motion
-          TimeoutStartSec=7200
+          ExecStartPost=-/usr/bin/bash -c 'rm -fv $$SRC_PATH/$$(date -d yesterday +%%Y-%%m-%%d).log'
           ProtectSystem=strict
           ProtectControlGroups=true
           ProtectKernelTunables=true
