@@ -1,6 +1,7 @@
 ---
 systemd_scripts:
   - "gen-concat-motion"
+  - "post-concat-motion"
 
 systemd_units:
   - name: backup-gitea
@@ -82,11 +83,11 @@ systemd_units:
           - "SRC_PATH=/tank/media/motion"
           - 'FFMPEG_ARGS="-c:v libx265 -x265-params crf=28 -preset:v faster -c:a aac -y"'
         exec_start:
-          - "/usr/bin/bash -c '/usr/bin/ffmpeg -hide-banner -i $$CONCAT_FILE $$FFMPEG_ARGS $$SRC_PATH/$$(date -d yesterday +%%Y%%m%%d).mkv'"
+          - "/usr/bin/bash -c '/usr/bin/ffmpeg -hide_banner -f concat -safe 0 -i $$CONCAT_FILE $$FFMPEG_ARGS $$SRC_PATH/$$(date -d yesterday +%%Y%%m%%d).mkv'"
         extra: |
           ExecStartPre={{ systemd_script_install_path }}/gen-concat-motion
-          ExecStartPost=/usr/bin/bash -c 'for f in $$(cat $$CONCAT_FILE); do rm -fv "$$f"; done'
-          ExecStartPost=-/usr/bin/rm -fv $$CONCAT_FILE
+          ExecStartPost={{ systemd_script_install_path }}/post-concat-motion
+          TimeoutStartSec=7200
           ProtectSystem=strict
           ProtectControlGroups=true
           ProtectKernelTunables=true

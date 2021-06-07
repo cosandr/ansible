@@ -32,7 +32,7 @@ def main():
             continue
         f_time = datetime.strptime(m.group(1), src_time_format)
         if start < f_time < end:
-            concat.append(f)
+            concat.append("file '{}'".format(os.path.join(src_path, f)))
     if not concat:
         print("no files to concat found")
         exit(0)
