@@ -75,7 +75,7 @@ systemd_units:
         extra: |
           ConditionPathExists=/tank/media/motion
       service:
-        type: exec
+        type: oneshot
         user: "motion"
         group: "motion"
         environment:
