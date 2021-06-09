@@ -41,6 +41,9 @@
     #     var: ports
     #   tags: ["always"]
 
+    - import_role: { name: gitlab }
+      tags: ["gitlab"]
+
     - import_role: { name: samba }
       tags: ["samba"]
 

@@ -1,0 +1,79 @@
+---
+
+gitlab_create_self_signed_cert: "false"
+gitlab_external_url: "https://gitlab.{{ server_domain }}"
+gitlab_db_name: "gitlabhq_production"
+gitlab_db_password: "{{ vault_gitlab_db_password }}"
+gitlab_db_user: "gitlab"
+gitlab_email_display_name: "GitLab"
+gitlab_email_enabled: "true"
+gitlab_email_from: "gitlab@{{ server_domain }}"
+gitlab_email_reply_to: "{{ smtp_user }}"
+gitlab_ldap_enabled: "false"
+gitlab_letsencrypt_enable: "false"
+gitlab_redirect_http_to_https: "false"
+gitlab_smtp_address: "{{ smtp_host }}"
+gitlab_smtp_authentication: "login"
+gitlab_smtp_domain: "{{ server_domain }}"
+gitlab_smtp_enable_starttls_auto: "true"
+gitlab_smtp_enable: "true"
+gitlab_smtp_password: "{{ smtp_pass }}"
+gitlab_smtp_port: "{{ smtp_port }}"
+gitlab_smtp_user_name: "{{ smtp_user }}"
+gitlab_nginx_listen_https: "false"
+gitlab_repository_env:
+  os: "el"
+  dist: "8"
+
+gitlab_extra_settings:
+  - postgresql:
+      - key: "enable"
+        value: "false"
+        type: plain
+  - prometheus:
+      - key: "enable"
+        value: "false"
+        type: plain
+  - grafana:
+      - key: "enable"
+        value: "false"
+        type: plain
+  - postgres_exporter:
+      - key: "enable"
+        value: "false"
+        type: plain
+  - node_exporter:
+      - key: "enable"
+        value: "false"
+        type: plain
+  - nginx:
+      - key: "enable"
+        value: "false"
+        type: plain
+  - web_server:
+      - key: "external_users"
+        value: "nginx"
+  - user:
+      - key: "username"
+        value: "gitlab"
+      - key: "group"
+        value: "gitlab"
+  - gitlab_workhorse:
+      - key: "enable"
+        value: "true"
+        type: plain
+      - key: "shutdown_timeout"
+        value: "10s"
+      - key: "listen_umask"
+        value: "000"
+      - key: "listen_addr"
+        value: "/var/opt/gitlab/gitlab-workhorse/sockets/socket"
+  - gitlab_rails:
+      - key: "db_adapter"
+        value: "postgresql"
+      - key: "db_encoding"
+        value: "unicode"
+      - key: "db_host"
+        value: "localhost"
+      - key: "db_password"
+        value: "{{ vault_gitlab_db_password }}"

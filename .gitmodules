@@ -7,3 +7,6 @@
 [submodule "roles/nginx"]
 	path = roles/nginx
 	url = git@github.com:cosandr/ansible-role-nginx.git
+[submodule "roles/gitlab"]
+	path = roles/gitlab
+	url = git@github.com:cosandr/ansible-role-gitlab.git
