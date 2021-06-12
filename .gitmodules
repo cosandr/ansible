@@ -10,3 +10,6 @@
 [submodule "roles/unattended-upgrades"]
 	path = roles/unattended-upgrades
 	url = https://github.com/jnv/ansible-role-unattended-upgrades
+[submodule "library/aur"]
+	path = library/aur
+	url = https://github.com/kewlfft/ansible-aur.git
