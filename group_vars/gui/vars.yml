@@ -1,0 +1,82 @@
+---
+pacman_packages:
+  - alacritty
+  - alsa-utils  # amixer
+  - arandr
+  - chromium
+  - docker
+  - docker-compose
+  - dunst
+  - feh
+  - file-roller
+  - firefox
+  - firewalld
+  - fzf
+  - gnome-calculator
+  - gnome-keyring
+  - gnome-themes-extra
+  - gnu-netcat
+  - go
+  - google-chrome
+  - gvfs-mtp
+  - i3-gaps
+  - iotop
+  - iproute2
+  - jq
+  - kitty
+  - libpulse  # pactl
+  - lm_sensors
+  - lxappearance
+  - ncdu
+  - net-tools  # route
+  - nextcloud-client
+  - noto-fonts-emoji
+  - ntfs-3g
+  - numlockx
+  - p7zip
+  - pacutils
+  - pavucontrol
+  - picom
+  - pipewire-alsa
+  - pipewire-pulse
+  - playerctl
+  - polybar
+  - procps-ng  # pgrep
+  - pyenv
+  - python-aiohttp
+  - python-websockets
+  - qt5ct
+  - redshift
+  - reflector
+  - remmina
+  - rofi
+  - scrot
+  - seahorse
+  - spotify
+  - sshfs
+  - thunar
+  - thunar-archive-plugin
+  - tmux
+  - ttf-fira-code
+  - ttf-font-awesome
+  - ttf-font-awesome-4
+  - ttf-nerd-fonts-symbols
+  - xclip
+  - xorg-xrandr
+  - xorg-xset
+
+aur_packages:
+  - adwaita-qt
+  - discord_arch_electron
+  - i3lock-color
+  - i3lock-fancy-rapid-git
+  - jetbrains-toolbox  # goland, pycharm
+  - kernel-modules-hook
+  - pyenv-virtualenv
+  - shellcheck-bin
+  - slack-desktop
+  - sublime-text-4
+  - tmuxinator
+  - ttf-font-awesome-4
+  - visual-studio-code-bin
+  - xidlehook

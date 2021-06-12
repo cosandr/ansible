@@ -3,3 +3,11 @@ _ports:
   nvidia_exporter: 9401
 node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
 borg_desktop_passphrase: "{{ vault_borg_desktop_passphrase }}"
+
+__pacman_packages:
+  - nvidia-docker
+  - nvtop
+  - obs-studio
+
+ignored_packages:
+  - chromium
