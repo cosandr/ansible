@@ -15,3 +15,6 @@ motion_config:
   snapshot_interval: "7200"
   stream_localhost: "off"
   text_left: "ENTRANCE"
+  movie_filename: "%Y%m%d-%H%M%S-%v"
+  picture_filename: "%Y%m%d-%H%M%S-%v"
+  snapshot_filename: "%Y%m%d-%H%M%S-%v-snapshot"
