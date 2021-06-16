@@ -39,7 +39,7 @@ samba_shares:
     comment: "SSD Storage"
     path: "/srv"
     writable: yes
-  
+
   tank:
     comment: "Rust Storage"
     path: "/tank"
@@ -60,3 +60,9 @@ samba_shares:
     "vfs objects": "catia fruit streams_xattr"
     "fruit:time machine": yes
     "fruit:time machine max size": "500G"
+
+  motion:
+    comment: "Motion Storage"
+    path: "/tank/media/motion"
+    "read only": no
+    "valid users": "motion"

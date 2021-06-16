@@ -5,6 +5,7 @@ file_map[".secrets/all_vault.yml"]="group_vars/all/vault.yml"
 file_map[".secrets/dresrv_vault.yml"]="host_vars/dresrv/vault.yml"
 file_map[".secrets/desktop_vault.yml"]="host_vars/desktop/vault.yml"
 file_map[".secrets/laptop_vault.yml"]="host_vars/laptop/vault.yml"
+file_map[".secrets/drepi_vault.yml"]="host_vars/drepi/vault.yml"
 
 for i in "${!file_map[@]}"; do
     enc="${file_map[$i]}"

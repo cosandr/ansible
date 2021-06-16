@@ -7,6 +7,37 @@
 - name: Raspberry Pi 4 playbook
   gather_facts: true
   hosts: drepi
+  vars:
+    motion_smb_cred_file: "/etc/samba/credentials/motion"
+  pre_tasks:
+    - block:
+      - name: Ensure smb credentials dir exists
+        file:
+          path: "{{ motion_smb_cred_file | dirname }}"
+          state: directory
+          owner: root
+          group: root
+          mode: 0700
+
+      - name: Add motion smb credentials
+        copy:
+          content: |
+            username=motion
+            password={{ motion_smb_pass }}
+          dest: "{{ motion_smb_cred_file }}"
+          owner: root
+          group: root
+          mode: 0600
+
+      - name: Mount motion share
+        mount:
+          path: /mnt/motion
+          src: "//{{ server_local_ip }}/motion"
+          fstype: cifs
+          state: mounted
+          opts: "credentials={{ motion_smb_cred_file }},nofail,uid=motion,gid=motion,file_mode=0640,dir_mode=0750"
+      become: true
+      tags: ["motion"]
   tasks:
     - import_role: { name: common }
       tags: ["always"]

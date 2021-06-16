@@ -1,6 +1,7 @@
 ---
 _ports: {}
 node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
+motion_smb_pass: "{{ vault_motion_smb_pass }}"
 motion_scripts:
   - "after-movie"
   - "after-picture"
