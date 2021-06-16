@@ -10,6 +10,7 @@
 
 - import_tasks: "add_vfs.yml"
   tags: ["samba"]
+  when: samba_add_vfs
 
 - import_tasks: "configure.yml"
   tags: ["samba"]

@@ -25,6 +25,8 @@ samba_shares: {}
   #   writable: yes
 
 
+samba_add_vfs: false
+
 ### Options below are only used for setting VFS object options ###
 
 # Name of the home directory share, probably 'homes'
