@@ -27,3 +27,8 @@ echo "$timestamp: deleting files older than $DAYS_KEEP days in $DST_DIR"
 find "$DST_DIR" -type f -name '*.jpg' -mtime "+${DAYS_KEEP}" -print -delete
 
 mv -v "$SRC" "$DST_DIR/"
+
+SRC_DIR="$(dirname "$SRC")"
+echo "$timestamp: moving orphans from $SRC_DIR"
+# https://unix.stackexchange.com/a/154828
+find "$SRC_DIR" -type f -name '*.jpg' -exec mv -v -t "$DST_DIR/" {} +

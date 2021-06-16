@@ -35,7 +35,7 @@
           src: "//{{ server_local_ip }}/motion"
           fstype: cifs
           state: mounted
-          opts: "credentials={{ motion_smb_cred_file }},nofail,uid=motion,gid=motion,file_mode=0640,dir_mode=0750"
+          opts: "credentials={{ motion_smb_cred_file }},nofail,uid=motion,gid=adm,file_mode=0640,dir_mode=0750"
       become: true
       tags: ["motion"]
   tasks:
