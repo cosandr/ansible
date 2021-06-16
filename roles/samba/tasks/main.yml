@@ -1,16 +1,13 @@
 ---
 - import_tasks: "preflight.yml"
-  tags: ["samba"]
 
 - import_tasks: "install.yml"
-  tags: ["samba"]
+  tags: ["install"]
   when:
     - not samba_skip_install
-    - "'skip_install' not in ansible_run_tags"
 
 - import_tasks: "add_vfs.yml"
-  tags: ["samba"]
   when: samba_add_vfs
 
 - import_tasks: "configure.yml"
-  tags: ["samba"]
+  tags: ["configure"]

@@ -1,16 +1,13 @@
 ---
 - include: install.yml
   become: true
-  tags:
-    - postgres_exporter_install
   when:
     - not postgres_exporter_skip_install
-    - "'skip_install' not in ansible_run_tags"
+  tags: ["install"]
 
 - include: configure.yml
   become: true
-  tags:
-    - postgres_exporter_configure
+  tags: ["configure"]
 
 - name: ensure postgres_exporter service is started and enabled
   become: true
@@ -19,5 +16,3 @@
     name: postgres_exporter
     state: started
     enabled: true
-  tags:
-    - postgres_exporter_run

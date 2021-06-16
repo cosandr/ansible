@@ -1,7 +1,8 @@
 ---
 - include: install.yml
   become: true
-  when: "'skip_install' not in ansible_run_tags"
+  tags: ["install"]
 
 - include: configure.yml
   become: true
+  tags: ["configure"]

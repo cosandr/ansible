@@ -1,16 +1,13 @@
 ---
 - include: install.yml
   become: true
-  tags:
-    - nginx_exporter_install
   when:
     - not nginx_exporter_skip_install
-    - "'skip_install' not in ansible_run_tags"
+  tags: ["install"]
 
 - include: configure.yml
   become: true
-  tags:
-    - nginx_exporter_configure
+  tags: ["configure"]
 
 - name: ensure nginx_exporter service is started and enabled
   become: true
@@ -19,5 +16,3 @@
     name: nginx_exporter
     state: started
     enabled: true
-  tags:
-    - nginx_exporter_run
