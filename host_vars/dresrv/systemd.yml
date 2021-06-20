@@ -87,7 +87,6 @@ systemd_units:
         extra: |
           ExecStartPre={{ systemd_script_install_path }}/gen-concat-motion
           ExecStartPost={{ systemd_script_install_path }}/post-concat-motion
-          ExecStartPost=-/usr/bin/bash -c 'rm -fv $$SRC_PATH/$$(date -d yesterday +%%Y-%%m-%%d).log'
           ProtectSystem=strict
           ProtectControlGroups=true
           ProtectKernelTunables=true

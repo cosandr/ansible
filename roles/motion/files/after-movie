@@ -3,6 +3,7 @@
 SRC="$1"
 DST_DIR=${DST_DIR:-/mnt/motion}
 DAYS_KEEP=${DAYS_KEEP:-7}
+LOG_DAYS_KEEP=${LOG_DAYS_KEEP:-2}
 log_file="$DST_DIR/$(date +%Y-%m-%d).log"
 timestamp=$(date +%H:%M:%S)
 
@@ -22,8 +23,11 @@ if ! grep -q "$DST_DIR" /proc/mounts; then
     exit 1
 fi
 
-echo "$timestamp: deleting files older than $DAYS_KEEP days in $DST_DIR"
+echo "$timestamp: deleting videos older than $DAYS_KEEP days in $DST_DIR"
 find "$DST_DIR" -type f -name '*.mkv' -mtime "+${DAYS_KEEP}" -print -delete
+
+echo "$timestamp: deleting logs older than $LOG_DAYS_KEEP days in $DST_DIR"
+find "$DST_DIR" -type f -name '*.log' -mtime "+${LOG_DAYS_KEEP}" -print -delete
 
 mv -v "$SRC" "$DST_DIR/"
 

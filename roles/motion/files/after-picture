@@ -4,6 +4,7 @@ SRC="$1"
 MNT_CHECK=${MNT_CHECK:-/mnt/motion}
 DST_DIR=${DST_DIR:-"$MNT_CHECK/snaps"}
 DAYS_KEEP=${DAYS_KEEP:-365}
+LOG_DAYS_KEEP=${LOG_DAYS_KEEP:-2}
 log_file="$DST_DIR/$(date +%Y-%m-%d).log"
 timestamp=$(date +%H:%M:%S)
 
@@ -23,8 +24,11 @@ if ! grep -q "$MNT_CHECK" /proc/mounts; then
     exit 1
 fi
 
-echo "$timestamp: deleting files older than $DAYS_KEEP days in $DST_DIR"
+echo "$timestamp: deleting snaps older than $DAYS_KEEP days in $DST_DIR"
 find "$DST_DIR" -type f -name '*.jpg' -mtime "+${DAYS_KEEP}" -print -delete
+
+echo "$timestamp: deleting logs older than $LOG_DAYS_KEEP days in $DST_DIR"
+find "$DST_DIR" -type f -name '*.log' -mtime "+${LOG_DAYS_KEEP}" -print -delete
 
 mv -v "$SRC" "$DST_DIR/"
 
