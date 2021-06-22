@@ -68,6 +68,9 @@
     - import_role: { name: systemd }
       tags: ["systemd"]
 
+    - import_role: { name: dnf_automatic }
+      tags: ["dnf_automatic"]
+
     - import_role: { name: cadvisor }
       tags: ["prometheus-stack", "cadvisor"]
 

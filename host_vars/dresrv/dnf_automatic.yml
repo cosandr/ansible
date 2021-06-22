@@ -1,0 +1,14 @@
+---
+
+dnf_automatic_timer_enabled: true
+dnf_automatic_upgrade_type: "default"
+dnf_automatic_apply_updates: true
+dnf_automatic_download_updates: true
+dnf_automatic_email_enabled: true
+dnf_automatic_email_from: "dnf@{{ server_domain }}"
+dnf_automatic_email_to: "{{ my_email }}"
+dnf_automatic_excludes:
+  - "kernel*"
+  - "docker*"
+  - "contaienr*"
+  - "systemd*"

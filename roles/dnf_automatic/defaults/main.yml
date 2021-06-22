@@ -1,0 +1,10 @@
+---
+
+dnf_automatic_timer_enabled: true
+dnf_automatic_upgrade_type: "security"
+dnf_automatic_apply_updates: false
+dnf_automatic_download_updates: true
+dnf_automatic_email_enabled: false
+dnf_automatic_email_from: "root@localhost"
+dnf_automatic_email_to: "root"
+dnf_automatic_excludes: []

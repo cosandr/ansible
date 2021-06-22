@@ -1,0 +1,45 @@
+[commands]
+#  What kind of upgrade to perform:
+# default                            = all available upgrades
+# security                           = only the security upgrades
+upgrade_type = {{ dnf_automatic_upgrade_type }}
+random_sleep = 0
+
+# Maximum time in seconds to wait until the system is on-line and able to
+# connect to remote repositories.
+network_online_timeout = 60
+
+# To just receive updates use dnf-automatic-notifyonly.timer
+
+# Whether updates should be downloaded when they are available, by
+# dnf-automatic.timer. notifyonly.timer, download.timer and
+# install.timer override this setting.
+download_updates = {{ dnf_automatic_download_updates | bool_to_yes }}
+
+# Whether updates should be applied when they are available, by
+# dnf-automatic.timer. notifyonly.timer, download.timer and
+# install.timer override this setting.
+apply_updates = {{ dnf_automatic_apply_updates | bool_to_yes }}
+
+
+[emitters]
+emit_via = stdio{% if dnf_automatic_email_enabled %},email{% endif %}
+
+{% if dnf_automatic_email_enabled %}
+[email]
+# The address to send email messages from.
+email_from = {{ dnf_automatic_email_from }}
+
+# List of addresses to send messages to.
+email_to = {{ dnf_automatic_email_to }}
+
+# Name of the host to connect to to send email messages.
+email_host = localhost
+{% endif %}
+
+[base]
+# This section overrides dnf.conf
+
+# Use this to filter DNF core messages
+debuglevel = 1
+excludepkgs = {{ dnf_automatic_excludes | join(',') }}
