@@ -3,6 +3,7 @@
 motion_script_dir: "/usr/local/bin"
 motion_config_file: "/etc/motion/motion.conf"
 motion_sysconfig_file: "/etc/default/motion"
+motion_is_rpi: false
 motion_config: {}
 motion_scripts: []
 motion_default_config:

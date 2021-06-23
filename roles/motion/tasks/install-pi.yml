@@ -1,0 +1,35 @@
+---
+- name: Get latest release
+  uri:
+    url: "https://api.github.com/repos/Motion-Project/motion/releases/latest"
+    method: GET
+    return_content: true
+    status_code: 200
+    body_format: json
+    validate_certs: false
+    user: "{{ lookup('env', 'GH_USER') | default(omit) }}"
+    password: "{{ lookup('env', 'GH_TOKEN') | default(omit) }}"
+  no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
+  register: _latest_release
+  until: _latest_release.status == 200
+  retries: 5
+  check_mode: false
+
+- name: find raspberry pi release
+  set_fact:
+    __motion_download_url: "{{ (_latest_release.json.assets |  selectattr('name', 'search', 'pi_') | list | first).browser_download_url }}"
+
+- name: download deb file
+  become: false
+  get_url:
+    url: "{{ __motion_download_url }}"
+    dest: "/tmp/motion.deb"
+  register: _download_deb
+  until: _download_deb is succeeded
+  retries: 5
+  delay: 2
+  check_mode: false
+
+- name: install package
+  apt:
+    deb: "/tmp/motion.deb"

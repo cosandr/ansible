@@ -1,10 +1,24 @@
 ---
 
+- include: install-pi.yml
+  become: true
+  when: motion_is_rpi
+  tags: ["install"]
+
+- name: install Motion
+  become: true
+  package:
+    name: motion
+    state: present
+  when: not motion_is_rpi
+  tags: ["install"]
+
 - name: Update motion config dict
   set_fact:
     motion_config: "{{ motion_default_config | combine(motion_config, recursive=true) }}"
 
 - name: Ensure {{ motion_script_dir }} exists
+  become: true
   file:
     path: "{{ motion_script_dir }}"
     mode: 0755
@@ -28,6 +42,8 @@
     path: "{{ motion_sysconfig_file }}"
     regexp: '^\s*start_motion_daemon'
     line: "start_motion_daemon=yes"
+    state: present
+    create: true
 
 - name: Copy config file
   become: true
