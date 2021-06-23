@@ -4,13 +4,305 @@
   import_playbook: prep_local.yml
   tags: ["always"]
 
+- name: SSH
+  hosts: drepi
+  gather_facts: false
+  vars:
+    ansible_ssh_pass: raspberry  # fresh install
+  handlers:
+    - name: restart sshd
+      service:
+        name: sshd
+        state: restarted
+  tasks:
+    # Set up ssh
+    # https://github.com/hannseman/ansible-raspbian
+    - name: add SSH keys
+      authorized_key:
+        user: "{{ ansible_user }}"
+        key: "{{ item }}"
+        state: present
+      with_items: "{{ ssh_authorized_keys }}"
+      tags: ["sshd"]
+
+    - name: set up sshd_config
+      become: true
+      lineinfile:
+        dest: "/etc/ssh/sshd_config"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+      with_items:
+        - regexp: "^#?StrictModes"
+          line: "StrictModes yes"
+        - regexp: "^#?X11Forwarding"
+          line: "X11Forwarding no"
+        - regexp: "^#?PermitRootLogin"
+          line: "PermitRootLogin no"
+        - regexp: "^#?PasswordAuthentication"
+          line: "PasswordAuthentication no"
+        - regexp: "^#?ChallengeResponseAuthentication"
+          line: "ChallengeResponseAuthentication no"
+        - regexp: "^#?UsePAM"
+          line: "UsePAM no"
+        - regexp: "^#?PermitEmptyPasswords"
+          line: "PermitEmptyPasswords no"
+      notify: restart sshd
+      tags: ["sshd"]
+
 - name: Raspberry Pi 4 playbook
   gather_facts: true
   hosts: drepi
   vars:
+    system_timezone: "Europe/Oslo"
+    system_locale: "en_US.UTF-8"
     motion_smb_cred_file: "/etc/samba/credentials/motion"
+  handlers:
+    - name: reload firewalld
+      become: true
+      service:
+        name: firewalld
+        state: reloaded
+
+    - name: reload ufw
+      become: true
+      ufw:
+        state: reloaded
+
+    - name: restart firewalld
+      become: true
+      service:
+        name: firewalld
+        state: restarted
+
+    - name: reboot
+      become: true
+      reboot: {}
+
+    - name: update-locale
+      command: "/usr/sbin/update-locale LANG={{ system_locale }}"
+
   pre_tasks:
+    - name: Ensure camera is enabled
+      become: true
+      lineinfile:
+        dest: "/boot/config.txt"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+      notify: reboot
+      with_items:
+        - regexp: "^#?start_x"
+          line: "start_x 1"
+        - regexp: "^#?gpu_mem"
+          line: "gpu_mem 128"
+      tags: ["motion"]
+
+    # NOTE: might need 'sudo rpi-update'
+    - name: Ensure kernel module is loaded at boot
+      become: true
+      lineinfile:
+        dest: "/etc/modules-load.d/modules.conf"
+        regexp: "^#?bcm2835-v4l2"
+        line: "bcm2835-v4l2"
+        state: present
+      notify: reboot
+      tags: ["motion"]
+  tasks:
+    # hostname
     - block:
+        - name: updating hostname {{ inventory_hostname }} (1/2)
+          hostname:
+            name: "{{ inventory_hostname }}"
+
+        - name: updating hostname {{ inventory_hostname }} (2/2)
+          copy:
+            content: "{{ inventory_hostname }}{{'\n'}}"
+            dest: /etc/hostname
+
+      tags: ["hostname"]
+      become: true
+
+    # locale
+    - block:
+      - name: set timezone
+        timezone:
+          name: "{{ system_timezone }}"
+
+      - name: ensure locale exists
+        locale_gen:
+          name: "{{ system_locale }}"
+          state: present
+        notify: update-locale
+
+      - name: set default system locale
+        debconf:
+          name: 'locales'
+          question: 'locales/default_environment_locale'
+          vtype: 'string'
+          value: "{{ system_locale }}"
+        notify: update-locale
+
+      tags: ["locale"]
+      become: true
+    # ufw
+    - block:
+      - name: install ufw
+        apt:
+          package: ufw
+          state: present
+        tags: ["install"]
+
+      - name: configure ufw defaults
+        ufw:
+          direction: "{{ item.direction }}"
+          policy: "{{ item.policy }}"
+        with_items:
+          - { direction: "incoming", policy: "deny" }
+          - { direction: "outgoing", policy: "allow" }
+        notify: reload ufw
+
+      - name: allow IGMP
+        blockinfile:
+          dest: /etc/ufw/before.rules
+          insertbefore: ^# don't delete the 'COMMIT' line or these rules won't be processed
+          block: |
+            # allow IGMP
+            -A ufw-before-input -p igmp -d 224.0.0.0/4 -j ACCEPT
+            -A ufw-before-output -p igmp -d 224.0.0.0/4 -j ACCEPT
+          state: present
+        notify: reload ufw
+
+      - name: add trusted sources
+        ufw:
+          direction: "in"
+          rule: "allow"
+          src: "{{ item }}"
+        with_items: "{{ ufw_trusted_sources | default([]) }}"
+
+      - name: allow some stuff from local network
+        ufw:
+          direction: "in"
+          rule: "allow"
+          src: "{{ ansible_default_ipv4.network }}/24"
+          port: "{{ item.port }}"
+          proto: "{{ item.proto }}"
+        with_items:
+          - { port: "22", proto: "tcp" }    # SSH
+          - { port: "8081", proto: "tcp" }  # Motion
+          - { port: "137", proto: "udp" }   # SMB client
+          - { port: "138", proto: "udp" }   # SMB client
+
+      - name: allow DHCPv6 client from local network
+        ufw:
+          direction: "in"
+          rule: "allow"
+          src: "fe80::/64"
+          port: "546"
+          proto: "udp"
+        when: ansible_default_ipv6 | bool
+
+      - name: enable ufw
+        ufw:
+          state: enabled
+
+      become: true
+      when: firewall_frontend == "ufw"
+      tags: ["ufw"]
+    # firewalld
+    - block:
+        - name: install firewalld and nftables
+          package:
+            name:
+              - firewalld
+              - nftables
+            state: present
+          tags: ["install"]
+
+        - name: configure firewalld to use nftables
+          lineinfile:
+            dest: "/etc/firewalld/firewalld.conf"
+            regexp: "^FirewallBackend"
+            line: "FirewallBackend=nftables"
+            state: present
+          notify: restart firewalld
+
+        - name: add interfaces to public zone
+          ansible.posix.firewalld:
+            zone: public
+            interface: "{{ item }}"
+            state: enabled
+            permanent: true
+          notify: reload firewalld
+          with_items:
+            - "eth0"
+            - "wlan0"
+
+        - name: ensure trusted is set to accept
+          ansible.posix.firewalld:
+            zone: trusted
+            target: "ACCEPT"
+            state: enabled
+            permanent: true
+          notify: reload firewalld
+
+        - name: add trusted sources
+          ansible.posix.firewalld:
+            zone: trusted
+            source: "{{ item }}"
+            state: enabled
+            permanent: true
+          notify: reload firewalld
+          with_items: "{{ firewalld_trusted_sources }}"
+
+        - name: add local network to home zone
+          ansible.posix.firewalld:
+            zone: home
+            source: "{{ ansible_default_ipv4.network }}/24"
+            state: enabled
+            permanent: true
+          notify: reload firewalld
+
+        - name: disallow ssh from public
+          ansible.posix.firewalld:
+            zone: public
+            service: ssh
+            state: disabled
+            permanent: true
+          notify: reload firewalld
+
+        - name: allow ssh from home
+          ansible.posix.firewalld:
+            zone: home
+            service: ssh
+            state: enabled
+            permanent: true
+          notify: reload firewalld
+
+        - name: start and enable firewalld
+          service:
+            name: firewalld
+            state: started
+            enabled: true
+
+      become: true
+      when: firewall_frontend == "firewalld"
+      tags: ["firewalld"]
+
+    - import_role: { name: common }
+      tags: ["always"]
+
+    - import_role: { name: motion }
+      tags: ["motion"]
+
+  post_tasks:
+    - block:
+      - name: Install smbclient
+        package:
+          name: smbclient
+          state: present
+        tags: ["install"]
+
       - name: Ensure smb credentials dir exists
         file:
           path: "{{ motion_smb_cred_file | dirname }}"
@@ -37,10 +329,4 @@
           state: mounted
           opts: "credentials={{ motion_smb_cred_file }},nofail,uid=motion,gid=adm,file_mode=0640,dir_mode=0750"
       become: true
-      tags: ["motion"]
-  tasks:
-    - import_role: { name: common }
-      tags: ["always"]
-
-    - import_role: { name: motion }
       tags: ["motion"]
