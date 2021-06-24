@@ -99,6 +99,25 @@ systemd_units:
         # Every day at 02:00
         oncalendar: "*-*-* 02:00:00"
 
+  - name: gitlab-gc
+    service:
+      unit:
+        description: Run GitLab registry garbage collector
+        after: [ "docker.service" ]
+        requires: [ "docker.service" ]
+      service:
+        type: simple
+        exec_start:
+          - "/usr/bin/docker exec -t -u root gitlab gitlab-ctl registry-garbage-collect -m"
+    timer:
+      enabled: true
+      started: true
+      unit:
+        description: Garbage collect GitLab registry every week
+      timer:
+        # Every 7 days at 03:15
+        oncalendar: "*-*-01/7 03:15:00"
+
   - name: ngx-recompile-modules
     timer:
       enabled: false
