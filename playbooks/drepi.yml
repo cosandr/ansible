@@ -93,9 +93,9 @@
       notify: reboot
       with_items:
         - regexp: "^#?start_x"
-          line: "start_x 1"
+          line: "start_x=1"
         - regexp: "^#?gpu_mem"
-          line: "gpu_mem 128"
+          line: "gpu_mem=128"
       tags: ["motion"]
 
     # NOTE: might need 'sudo rpi-update'

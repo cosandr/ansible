@@ -4,6 +4,7 @@ SRC="$1"
 DST_DIR=${DST_DIR:-/mnt/motion}
 DAYS_KEEP=${DAYS_KEEP:-7}
 LOG_DAYS_KEEP=${LOG_DAYS_KEEP:-2}
+MINIMUM_SIZE_MB=${MINIMUM_SIZE_MB:-50}
 log_file="$DST_DIR/$(date +%Y-%m-%d).log"
 timestamp=$(date +%H:%M:%S)
 
@@ -35,3 +36,6 @@ SRC_DIR="$(dirname "$SRC")"
 echo "$timestamp: moving orphans from $SRC_DIR"
 # https://unix.stackexchange.com/a/154828
 find "$SRC_DIR" -type f -name '*.mkv' -exec mv -v -t "$DST_DIR/" {} +
+
+echo "$timestamp: deleting files smaller than $MINIMUM_SIZE_MB MB"
+find "$DST_DIR" -type f -name '*.mkv' -size -"$MINIMUM_SIZE_MB"M -exec rm -v {} +
