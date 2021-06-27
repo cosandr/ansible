@@ -1,5 +1,9 @@
 ---
 _ports: {}
+smtp_host: "{{ vault_smtp_host }}"
+smtp_pass: "{{ vault_smtp_pass }}"
+smtp_port: "{{ vault_smtp_port }}"
+smtp_user: "{{ vault_smtp_user }}"
 node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
 node_exporter_collectors: []
 ssh_authorized_keys:
@@ -11,6 +15,13 @@ ufw_trusted_sources:
   - "{{ hostvars['dresrv'].ansible_host }}"
   - "{{ hostvars['desktop'].ansible_host }}"
   - "{{ hostvars['laptop'].ansible_host }}"
+
+unattended_mail: "{{ my_email }}"
+unattended_remove_unused_dependencies: true
+unattended_remove_new_unused_dependencies: true
+unattended_automatic_reboot: true
+unattended_origins_patterns:
+  - 'origin=Raspbian,codename=${distro_codename},label=Raspbian'
 motion_is_rpi: true
 motion_smb_pass: "{{ vault_motion_smb_pass }}"
 motion_scripts:
