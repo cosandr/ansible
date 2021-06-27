@@ -99,15 +99,15 @@
       tags: ["motion"]
 
     # NOTE: might need 'sudo rpi-update'
-    - name: Ensure kernel module is loaded at boot
-      become: true
-      lineinfile:
-        dest: "/etc/modules-load.d/modules.conf"
-        regexp: "^#?bcm2835-v4l2"
-        line: "bcm2835-v4l2"
-        state: present
-      notify: reboot
-      tags: ["motion"]
+    # - name: Ensure kernel module is loaded at boot
+    #   become: true
+    #   lineinfile:
+    #     dest: "/etc/modules-load.d/modules.conf"
+    #     regexp: "^#?bcm2835-v4l2"
+    #     line: "bcm2835-v4l2"
+    #     state: present
+    #   notify: reboot
+    #   tags: ["motion"]
   tasks:
     # hostname
     - block:
