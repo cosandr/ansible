@@ -10,5 +10,7 @@ dnf_automatic_email_to: "{{ my_email }}"
 dnf_automatic_excludes:
   - "kernel*"
   - "docker*"
-  - "contaienr*"
+  - "container*"
   - "systemd*"
+  - "postgresql*"
+  - "nginx*"
