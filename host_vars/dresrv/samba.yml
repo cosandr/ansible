@@ -64,5 +64,6 @@ samba_shares:
   motion:
     comment: "Motion Storage"
     path: "/tank/media/motion"
+    browseable: no
     "read only": no
     "valid users": "motion"
