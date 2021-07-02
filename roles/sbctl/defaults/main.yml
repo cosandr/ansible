@@ -1,0 +1,12 @@
+---
+
+esp_mount: "/boot"
+boot_mount: "{{ esp_mount }}"
+sbctl_cmdline: "/usr/share/secureboot/cmdline"
+efistub_splash: "/usr/share/systemd/bootctl/splash-arch.bmp"
+
+kernels:
+  - linux
+
+efi_labels:
+  linux: "Arch Linux"

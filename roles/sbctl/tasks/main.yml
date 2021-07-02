@@ -1,0 +1,65 @@
+---
+
+- name: Write kernel parameters to {{ sbctl_cmdline }}
+  become: true
+  copy:
+    dest: "{{ sbctl_cmdline }}"
+    owner: root
+    group: root
+    mode: 0644
+    content: "{{ kernel_params }}"
+
+- name: Install sbctl
+  become: true
+  pacman:
+    name: sbctl
+    state: present
+  tags: ["install"]
+
+- name: Create keys
+  become: true
+  command: "sbctl create-keys"
+  args:
+    creates: /usr/share/secureboot/GUID
+
+- name: Enroll keys
+  become: true
+  command: "sbctl enroll-keys"
+  notify: reboot
+
+- name: Ensure {{ esp_mount }}/EFI/Linux exists
+  become: true
+  file:
+    path: "{{ esp_mount }}/EFI/Linux"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Bundle kernels
+  become: true
+  command: >
+    sbctl bundle -s
+    -i {{ boot_mount }}/intel-ucode.img
+    -c {{ sbctl_cmdline }}
+    -l {{ efistub_splash }}
+    -k {{ boot_mount }}/vmlinuz-{{ item }}
+    -f {{ boot_mount }}/initramfs-{{ item }}.img
+    {{ esp_mount }}/EFI/Linux/{{ item }}.efi
+  args:
+    creates: "{{ esp_mount }}/EFI/Linux/{{ item }}.efi"
+  with_items: "{{ kernels }}"
+
+- name: Sign all
+  become: true
+  command: "sbctl sign-all -g"
+
+- name: Add entries in EFI
+  include_role:
+    name: "efibootmgr"
+  vars:
+    disk: "/dev/nvme0n1"
+    part: "1"
+    loader: "/EFI/Linux/{{ item }}.efi"
+    label: "{{ efi_labels.item | default(ansible_distribution + ' ' + item) }}"
+  with_items: "{{ kernels }}"
