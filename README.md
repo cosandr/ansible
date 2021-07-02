@@ -33,6 +33,8 @@ ansible-playbook -l server playbook.yml
 ansible-playbook playbook.yml --tags grafana
 # Run in vscode docker
 ansible-playbook -i hosts_local server.yml --tags nginx
+# Run with sudo remote user
+ansible-playbook -i hosts -K -e 'ansible_user=andrei' playbooks/laptop.yml --diff --check --tags laptop
 ```
 
 ## Hosts file example
