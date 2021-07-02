@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+{% for bat in batteries %}
+START_CHARGE_THRESH_{{ bat }}={{ tlp_start_charge }}
+STOP_CHARGE_THRESH_{{ bat }}={{ tlp_stop_charge }}
+{% endfor %}
+
+PCIE_ASPM_ON_AC={{ tlp_pcie_ac }}
+PCIE_ASPM_ON_BAT={{ tlp_pcie_bat }}
+{% if network_manager == "NetworkManager" %}
+DEVICES_TO_DISABLE_ON_LAN_CONNECT="{{ tlp_devices_lan_con | join(' ') }}"
+DEVICES_TO_ENABLE_ON_LAN_DISCONNECT="{{ tlp_tlp_devices_lan_dc | join(' ') }}"
+{% endif %}
+CPU_SCALING_GOVERNOR_ON_AC={{ tlp_cpu_governor_ac }}
+CPU_SCALING_GOVERNOR_ON_BAT={{ tlp_cpu_governor_bat }}

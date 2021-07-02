@@ -1,0 +1,13 @@
+{{ ansible_managed | comment }}
+Section "InputClass"
+    Identifier "touchpad"
+    MatchIsTouchpad "true"
+    MatchDriver "libinput"
+{% if touchpad_natural_scroll %}
+    Option "NaturalScrolling" "true"
+{% endif %}
+{% if touchpad_tap_to_click %}
+    Option "Tapping" "on"
+    Option "TappingButtonMap" "lrm"
+{% endif %}
+EndSection

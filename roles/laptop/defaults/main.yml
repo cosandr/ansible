@@ -1,0 +1,25 @@
+---
+
+batteries: ["BAT0"]
+
+network_manager: "systemd-networkd"
+
+touchpad_natural_scroll: true
+touchpad_tap_to_click: true
+
+tlp_start_charge: 80
+tlp_stop_charge: 90
+tlp_pcie_ac: "default"
+tlp_pcie_bat: "powersave"
+tlp_devices_lan_con:
+  - wifi
+  - wwan
+tlp_tlp_devices_lan_dc: "{{ tlp_devices_lan_con }}"
+
+tlp_cpu_governor_ac: "performance"
+tlp_cpu_governor_bat: "powersave"
+
+logind_power: "ignore"
+logind_suspend: "suspend"
+logind_hibernate: "hibernate"
+logind_lid_sw: "suspend"

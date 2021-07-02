@@ -1,0 +1,6 @@
+{{ ansible_managed | comment }}
+[Login]
+HandlePowerKey={{ logind_power }}
+HandleSuspendKey={{ logind_suspend }}
+HandleHibernateKey={{ logind_hibernate }}
+HandleLidSwitch={{ logind_lid_sw }}

@@ -1,0 +1,51 @@
+---
+
+- name: Copy touchpad config
+  become: true
+  template:
+    src: "30-touchpad.conf.j2"
+    dest: "/etc/X11/xorg.conf.d/30-touchpad.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when: touchpad_natural_scroll or touchpad_tap_to_click
+
+- name: Install tlp
+  package:
+    name: tlp
+    state: present
+
+- name: Install tlp-rdw
+  package:
+    name: tlp-rdw
+    state: present
+  when: network_manager == "NetworkManager"
+
+- name: Copy TLP config
+  become: true
+  template:
+    src: "tlp/20-custom.conf.j2"
+    dest: "/etc/tlp.d/20-custom.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart tlp
+
+- name: Ensure logind.conf.d exists
+  become: true
+  file:
+    path: "/etc/systemd/logind.conf.d"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy logind config
+  become: true
+  template:
+    src: "logind.conf.j2"
+    dest: "/etc/systemd/logind.conf.d/override.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload systemd
