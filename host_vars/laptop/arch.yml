@@ -1,0 +1,227 @@
+---
+
+pacman_packages:
+  - acpi_call-dkms
+  - alacritty
+  - alsa-utils
+  - ansible
+  - arandr
+  - autoconf
+  - automake
+  - base
+  - binutils
+  - bison
+  - bluez
+  - bluez-utils
+  - brightnessctl
+  - btrfs-progs
+  - chezmoi
+  - chromium
+  - docker
+  - docker-compose
+  - dunst
+  - efibootmgr
+  - ethtool
+  - fakeroot
+  - feh
+  - file
+  - file-roller
+  - findutils
+  - firefox
+  - firewalld
+  - flex
+  - fwupd
+  - fzf
+  - gawk
+  - gcc
+  - gettext
+  - git
+  - gnome-calculator
+  - gnome-keyring
+  - gnome-themes-extra
+  - gnu-netcat
+  - go
+  - grep
+  - groff
+  - gvfs-mtp
+  - gzip
+  - htop
+  - i3-gaps
+  - inetutils
+  - intel-gpu-tools
+  - intel-media-driver
+  - intel-ucode
+  - iotop
+  - iwd
+  - jq
+  - kitty
+  - libpulse
+  - libtool
+  - libva-intel-driver
+  - libva-utils
+  - linux-firmware
+  - linux-zen
+  - linux-zen-headers
+  - lxappearance
+  - m4
+  - make
+  - man-db
+  - mesa-demos
+  - ncdu
+  - net-tools
+  - nextcloud-client
+  - noto-fonts
+  - noto-fonts-emoji
+  - ntfs-3g
+  - numlockx
+  - nvidia-dkms
+  - nvidia-prime
+  - openssh
+  - otf-cascadia-code
+  - p7zip
+  - pacman
+  - pacman-contrib
+  - pacutils
+  - pamixer
+  - patch
+  - pavucontrol
+  - picom
+  - pipewire-alsa
+  - pipewire-pulse
+  - pkgconf
+  - playerctl
+  - powertop
+  - pyenv
+  - python-aiohttp
+  - python-websockets
+  - qt5ct
+  - redshift
+  - reflector
+  - remmina
+  - rofi
+  - sbctl
+  - scrot
+  - seahorse
+  - sed
+  - smartmontools
+  - sshfs
+  - sudo
+  - texinfo
+  - thunar
+  - thunar-archive-plugin
+  - tlp
+  - tlp-rdw
+  - tmux
+  - tp_smapi
+  - ttf-fira-code
+  - ttf-font-awesome
+  - ttf-nerd-fonts-symbols
+  - upower
+  - usbutils
+  - vim
+  - vlc
+  - which
+  - xclip
+  - xorg-xev
+  - xorg-xinit
+  - xorg-xinput
+  - xorg-xrandr
+  - xorg-xset
+  - zsh
+
+aur_packages:
+  - adwaita-qt
+  - discord_arch_electron
+  - go-check-updates-git
+  - google-chrome
+  - i3lock-color
+  - i3lock-fancy-rapid-git
+  - jetbrains-toolbox
+  - kernel-modules-hook
+  - paru-bin
+  - polybar
+  - pyenv-virtualenv
+  - ruby-erubis
+  - ruby-xdg
+  - shellcheck-bin
+  - slack-desktop
+  - spotify
+  - sublime-text-4
+  - tmuxinator
+  - ttf-font-awesome-4
+  - visual-studio-code-bin
+  - xidlehook
+
+enabled_services:
+  - systemd-timesyncd.service
+  - firewalld.service
+  - bluetooth.service
+  - sshd.service
+
+masked_services:
+  - systemd-rfkill.service
+  - systemd-rfkill.socket
+
+chezmoi_overrides:
+  polybar: |
+    declare -A MONITOR_MAP=( [eDP-1]=laptop [DP-2]=laptop-ext [DP-1]=laptop-ext-secondary )
+  xinitrc: |
+    TOUCHPAD_TAP=1
+    TOUCHPAD_NAME="Elan Touchpad"
+    GDK_SCALE=1
+    GDK_DPI_SCALE=1
+
+modprobe_config:
+  "nobeep.conf": "blacklist pcspkr"
+
+# systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0,7 /dev/nvme0n1p2
+
+kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ intel_iommu=on nmi_watchdog=0"
+
+systemd_boot_entries:
+  "arch-zen": |
+    title Arch Linux (Zen)
+    linux /vmlinuz-linux-zen
+    initrd /intel-ucode.img
+    initrd /initramfs-linux-zen.img
+    options {{ kernel_params }}
+
+crypttab_initramfs: |
+  root    UUID=9dc722d9-b6f2-4f7c-a411-ebeb4b206a6c   -   luks,discard,tpm2-device=auto
+
+# go-check-updates
+# git clone https://github.com/cosandr/go-check-updates
+# ./setup.sh build pacman
+# sudo pacman -U build/go-check-updates-git-v1.0.rc2.r6.g9af655b-1-any.pkg.tar.zst
+# sudo systemctl enable --now go-check-updates.socket
+
+sbctl_sign_files:
+  - "/boot/vmlinuz-linux"
+  - "/boot/vmlinuz-linux-zen"
+  - "/boot/EFI/BOOT/BOOTX64.EFI"
+  - "/boot/EFI/arch/fwupdx64.efi"
+  - "/boot/EFI/systemd/systemd-bootx64.efi"
+
+# ansible_form_factor: Notebook
+
+firewalld_interfaces:
+  - zone: public
+    interface: wlan0
+
+firewalld_remove_services:
+  - zone: public
+    service: ssh
+
+firewalld_add_sources:
+  - zone: home
+    source: "10.0.0.0/24"
+
+kernels:
+  - "linux"
+  - "linux-zen"
+
+efi_labels:
+  linux: "Arch Linux"
+  linux-zen: "Arch Linux Zen"
+
+mkinitcpio_no_fallback: "{{ kernels }}"

@@ -3,10 +3,9 @@
 - name: Override ansible_connection if needed
   import_playbook: prep_local.yml
   tags: ["always"]
-  
+
 - name: Laptop playbook
   gather_facts: true
-  diff: yes
   hosts: laptop
   vars:
     node_exporter_skip_install: false
@@ -16,7 +15,7 @@
     node_exporter_collectors: []
   tasks:
     - import_role: { name: common }
-      tags: ["all", "common"]
+      tags: ["all"]
 
     - name: Merge ports
       set_fact:
@@ -25,3 +24,15 @@
 
     - import_role: { name: node_exporter }
       tags: ["prometheus-stack", "node_exporter"]
+
+    - import_role: { name: laptop }
+      tags: ["laptop"]
+
+    - import_role: { name: arch-common }
+      tags: ["arch-common"]
+
+    - import_role: { name: sbctl }
+      tags: ["sbctl"]
+
+    - import_role: { name: spotify }
+      tags: ["spotify"]
