@@ -4,3 +4,8 @@
   systemd:
     daemon_reload: yes
   tags: [ "all" ]
+
+- name: reboot
+  become: true
+  reboot: {}
+  tags: [ "all" ]
