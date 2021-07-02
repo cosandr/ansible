@@ -1,0 +1,9 @@
+---
+
+- name: Import GPG key
+  command: "curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | gpg --import -"
+
+- name: Install spotify from AUR
+  aur:
+    name: spotify
+    state: present
