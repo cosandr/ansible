@@ -1,0 +1,73 @@
+---
+
+- name: "Set timezone"
+  become: true
+  file:
+    src: "/usr/share/zoneinfo/{{ sys_timezone }}"
+    dest: "/etc/localtime"
+    owner: root
+    group: root
+    state: link
+
+- name: "Sync hwclock"
+  become: true
+  command: "hwclock --systohc"
+  args:
+    creates: "/etc/adjtime"
+
+- name: Enable locales
+  become: true
+  lineinfile:
+    path: /etc/locale.gen
+    regexp: "^#?{{ item | regex_escape() }}"
+    line: "{{ item }}"
+  loop: "{{ sys_locales }}"
+
+- name: Generate locale
+  become: true
+  command: "locale-gen"
+  args:
+    creates: "/usr/lib/locale/locale-archive"
+
+- name: Set hostname
+  become: true
+  copy:
+    dest: "/etc/hostname"
+    owner: root
+    group: root
+    mode: 0644
+    content: "{{ inventory_hostname }}"
+
+- name: Configure systemd-networkd
+  include_role:
+    name: systemd_networkd
+  when: network_manager == "systemd-networkd"
+
+- name: Configure systemd-boot
+  include_role:
+    name: systemd_boot
+  when: boot_loader == "systemd-boot"
+
+- name: Disable fallback images
+  become: true
+  lineinfile:
+    path: "/etc/mkinitcpio.d/{{ item }}.preset"
+    regexp: "^PRESETS"
+    line: "PRESETS=('default')"
+  with_items: "{{ mkinitcpio_no_fallback }}"
+
+- name: Configure pacman
+  become: true
+  lineinfile:
+    path: "/etc/pacman.conf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items: "{{ pacman_config }}"
+
+- name: Configure makepkg
+  become: true
+  replace:
+    path: "/etc/makepkg.conf"
+    regexp: "{{ item.regexp }}"
+    replace: "{{ item.replace }}"
+  with_items: "{{ makepkg_config }}"

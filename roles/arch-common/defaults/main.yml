@@ -1,0 +1,34 @@
+---
+
+sys_timezone: "Europe/Oslo"
+
+sys_locales:
+  - "en_US.UTF-8"
+
+
+network_manager: "systemd-networkd"
+boot_loader: "systemd-boot"
+
+mkinitcpio_no_fallback: []
+
+makepkg_jobs: "{{ ansible_processor_vcpus | default('4') }}"
+makepkg_march: "native"
+makepkg_mtune: "native"
+
+makepkg_config:
+  - regexp: "^#MAKEFLAGS.*$"
+    replace: 'MAKEFLAGS="-j{{ makepkg_jobs }}"'
+  - regexp: '-march=\S+'
+    replace: "-march={{ makepkg_march }}"
+  - regexp: '-mtune=\S+'
+    replace: "-mtune={{ makepkg_mtune }}"
+
+pacman_parallel: 5
+
+pacman_config:
+  - regexp: "^#?Color"
+    line: "Color"
+  - regexp: "^#?VerbosePkgLists"
+    line: "VerbosePkgLists"
+  - regexp: "^#?ParallelDownloads"
+    line: "ParallelDownloads = {{ pacman_parallel }}"
