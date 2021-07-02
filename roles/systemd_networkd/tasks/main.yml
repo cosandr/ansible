@@ -1,0 +1,11 @@
+---
+
+- name: Copy networkd configs
+  become: true
+  template:
+    src: "conf.network.j2"
+    dest: "/etc/systemd/network/{{ item.name }}.network"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ networkd_configs }}"

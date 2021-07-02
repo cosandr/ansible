@@ -1,0 +1,9 @@
+---
+
+networkd_configs:
+  - name: wired
+    match: 'Name=en*'
+    network: 'DHCP=yes'
+  - name: wlan
+    match: 'Type=wlan'
+    network: 'DHCP=yes'

@@ -1,0 +1,6 @@
+{{ ansible_managed | comment }}
+[Match]
+{{ item.match }}
+
+[Network]
+{{ item.network | default('DHCP=yes')}}
