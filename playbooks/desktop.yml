@@ -30,5 +30,11 @@
     - import_role: { name: btrbk }
       tags: ["btrbk"]
 
+    - import_role: { name: arch-common }
+      tags: ["arch-common"]
+
+    - import_role: { name: spotify }
+      tags: ["spotify"]
+
     # - import_role: { name: nvidia_exporter }
     #   tags: ["prometheus-stack", "nvidia_exporter"]

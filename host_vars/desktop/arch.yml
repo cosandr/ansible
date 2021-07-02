@@ -1,0 +1,20 @@
+---
+
+kernels:
+  - "linux-lts"
+  - "linux-zen"
+
+mkinitcpio_no_fallback: "{{ kernels }}"
+
+network_manager: "systemd-networkd"
+networkd_configs:
+  - name: wired
+    match: 'Name=en*'
+    network: 'DHCP=yes'
+
+boot_loader: "refind"
+
+sys_locales:
+  - "en_US.UTF-8 UTF-8"
+  - "en_GB.UTF-8 UTF-8"
+  - "nb_NO.UTF-8 UTF-8"
