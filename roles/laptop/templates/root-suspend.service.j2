@@ -1,0 +1,10 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Local system suspend actions
+Before=sleep.target
+
+[Service]
+{{ root_suspend }}
+
+[Install]
+WantedBy=sleep.target

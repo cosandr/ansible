@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=User suspend actions
+Before=sleep.target
+
+[Service]
+User=%I
+{{ user_suspend }}
+
+[Install]
+WantedBy=sleep.target

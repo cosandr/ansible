@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=User resume actions
+After=suspend.target
+
+[Service]
+User=%I
+{{ user_resume }}
+
+[Install]
+WantedBy=suspend.target

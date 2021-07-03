@@ -5,3 +5,29 @@
   service:
     name: tlp
     state: restarted
+
+- name: enable user suspend
+  become: true
+  systemd:
+    name: "user-suspend@{{ item }}.service"
+    enabled: true
+  loop: "{{ user_suspend_users }}"
+
+- name: enable user resume
+  become: true
+  systemd:
+    name: "user-resume@{{ item }}.service"
+    enabled: true
+  loop: "{{ user_suspend_users }}"
+
+- name: enable root suspend
+  become: true
+  systemd:
+    name: "root-suspend.service"
+    enabled: true
+
+- name: enable root resume
+  become: true
+  systemd:
+    name: "root-resume.service"
+    enabled: true

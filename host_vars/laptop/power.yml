@@ -1,0 +1,19 @@
+---
+
+user_suspend: |
+  Type=simple
+  Environment=DISPLAY=:0
+  ExecStartPre=-/sbin/playerctl pause
+  ExecStart=/home/andrei/.local/bin/my-screenlock
+
+logind_config: |
+  HandlePowerKey=ignore
+  HandleSuspendKey=suspend-then-hibernate
+  HandleHibernateKey=hibernate
+  HandleLidSwitch=suspend-then-hibernate
+  HandleLidSwitchExternalPower=suspend
+  HandleLidSwitchDocked=lock
+  HandleRebootKey=ignore
+
+systemd_sleep: |
+  HibernateDelaySec=3h

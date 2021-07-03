@@ -38,3 +38,60 @@
     group: root
     mode: 0644
   notify: reload systemd
+
+# https://wiki.archlinux.org/title/Power_management#Sleep_hooks
+- name: Copy user suspend hook
+  become: true
+  template:
+    src: "user-suspend@.service.j2"
+    dest: "/etc/systemd/system/user-suspend@.service"
+    owner: root
+    group: root
+    mode: 0644
+    # validate: 'systemd-analyze verify %s'
+  notify:
+    - reload systemd
+    - enable user suspend
+  when: user_suspend
+
+- name: Copy root suspend hook
+  become: true
+  template:
+    src: "root-suspend.service.j2"
+    dest: "/etc/systemd/system/root-suspend.service"
+    owner: root
+    group: root
+    mode: 0644
+    # validate: 'systemd-analyze verify %s'
+  notify:
+    - reload systemd
+    - enable root suspend
+  when: root_suspend
+
+- name: Copy user resume hook
+  become: true
+  template:
+    src: "user-resume@.service.j2"
+    dest: "/etc/systemd/system/user-resume@.service"
+    owner: root
+    group: root
+    mode: 0644
+    # validate: 'systemd-analyze verify %s'
+  notify:
+    - reload systemd
+    - enable user resume
+  when: user_resume
+
+- name: Copy root resume hook
+  become: true
+  template:
+    src: "root-resume.service.j2"
+    dest: "/etc/systemd/system/root-resume.service"
+    owner: root
+    group: root
+    mode: 0644
+    # validate: 'systemd-analyze verify %s'
+  notify:
+    - reload systemd
+    - enable root resume
+  when: root_resume

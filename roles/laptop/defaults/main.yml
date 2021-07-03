@@ -1,5 +1,21 @@
 ---
 
+user_suspend_users:
+  - "{{ my_user | default('andrei') }}"
+
+user_suspend: |
+  Type=simple
+  Environment=DISPLAY=:0
+  ExecStartPre=-/sbin/playerctl pause
+  ExecStart=/sbin/i3lock --nofork
+
+root_suspend: |
+  Type=simple
+  ExecStart=-/usr/bin/pkill sshfs
+
+user_resume: ""
+root_resume: ""
+
 batteries: ["BAT0"]
 
 network_manager: "systemd-networkd"

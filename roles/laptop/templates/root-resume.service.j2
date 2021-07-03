@@ -1,0 +1,10 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Local system resume actions
+After=suspend.target
+
+[Service]
+{{ root_resume }}
+
+[Install]
+WantedBy=suspend.target
