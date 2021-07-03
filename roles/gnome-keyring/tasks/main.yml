@@ -1,0 +1,25 @@
+---
+
+- name: Install gnome-keyring and seahorse
+  become: true
+  package:
+    name:
+      - gnome-keyring
+      - seahorse
+    state: present
+
+- name: Setup PAM
+  become: true
+  lineinfile:
+    path: "/etc/pam.d/login"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    insertafter: "{{ item.after }}"
+    state: present
+  with_items:
+    - regexp: '^auth\s+optional\s+pam_gnome_keyring'
+      line: "auth       optional     pam_gnome_keyring.so"
+      after: '^auth\s+include'
+    - regexp: '^session\s+optional\s+pam_gnome_keyring'
+      line: "session    optional     pam_gnome_keyring.so auto_start"
+      after: '^session\s+include'

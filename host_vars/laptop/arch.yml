@@ -38,7 +38,6 @@ pacman_packages:
   - gettext
   - git
   - gnome-calculator
-  - gnome-keyring
   - gnome-themes-extra
   - gnu-netcat
   - go
@@ -105,7 +104,6 @@ pacman_packages:
   - rofi
   - sbctl
   - scrot
-  - seahorse
   - sed
   - smartmontools
   - sshfs
@@ -170,6 +168,8 @@ chezmoi_overrides:
   xinitrc: |
     GDK_SCALE=1
     GDK_DPI_SCALE=1
+  lock: |
+    idle_hook="none"
 
 modprobe_config:
   "nobeep.conf": "blacklist pcspkr"

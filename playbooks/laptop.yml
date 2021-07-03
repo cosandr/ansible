@@ -48,3 +48,6 @@
 
     - import_role: { name: xss-lock }
       tags: ["xss-lock"]
+
+    - import_role: { name: gnome-keyring }
+      tags: ["gnome-keyring"]

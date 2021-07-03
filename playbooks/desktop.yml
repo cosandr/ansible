@@ -45,5 +45,8 @@
     - import_role: { name: sudo }
       tags: ["sudo"]
 
+    - import_role: { name: gnome-keyring }
+      tags: ["gnome-keyring"]
+
     # - import_role: { name: nvidia_exporter }
     #   tags: ["prometheus-stack", "nvidia_exporter"]
