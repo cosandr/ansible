@@ -1,0 +1,20 @@
+---
+
+- name: Install sudo
+  become: true
+  pacman:
+    name: sudo
+    state: present
+
+- name: Write sudoers files
+  become: true
+  copy:
+    content: |
+      {{ ansible_managed | comment }}
+      {{ item.content }}
+    dest: "/etc/sudoers.d/{{ item.dest }}"
+    mode: 0440
+    owner: root
+    group: root
+    validate: 'visudo -cf %s'
+  loop: "{{ sudoers_files }}"

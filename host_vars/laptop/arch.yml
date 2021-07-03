@@ -174,6 +174,12 @@ chezmoi_overrides:
 modprobe_config:
   "nobeep.conf": "blacklist pcspkr"
 
+sudoers_files:
+  - dest: "10-wheel"
+    content: "%wheel ALL=(ALL) ALL"
+  - dest: "30-openconnect"
+    content: "{{ my_user }} ALL=(root) NOPASSWD: /usr/bin/openconnect"
+
 # systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0,7 /dev/nvme0n1p2
 
 kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ intel_iommu=on nmi_watchdog=0"

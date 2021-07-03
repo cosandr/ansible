@@ -38,6 +38,13 @@
     mode: 0644
     content: "{{ inventory_hostname }}"
 
+- name: "Setup sudo"
+  include_role:
+    name: sudo
+  vars:
+    sudoers_files: "{{ sudoers_files }}"
+  tags: ["sudo"]
+
 - name: Configure systemd-networkd
   include_role:
     name: systemd_networkd
