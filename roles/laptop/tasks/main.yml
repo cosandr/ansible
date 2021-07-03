@@ -1,15 +1,4 @@
 ---
-
-- name: Copy touchpad config
-  become: true
-  template:
-    src: "30-touchpad.conf.j2"
-    dest: "/etc/X11/xorg.conf.d/30-touchpad.conf"
-    owner: root
-    group: root
-    mode: 0644
-  when: touchpad_natural_scroll or touchpad_tap_to_click
-
 - name: Install tlp
   package:
     name: tlp

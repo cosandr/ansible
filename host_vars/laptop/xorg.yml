@@ -14,17 +14,13 @@ xorg_conf:
         VendorName     "NVIDIA Corporation"
         Option         "Coolbits" "28"
     EndSection
+  "30-touchpad": |
+    Section "InputClass"
+        Identifier "touchpad"
+        MatchIsTouchpad "true"
+        MatchDriver "libinput"
+        Option "NaturalScrolling" "true"
+        Option "Tapping" "on"
+        Option "TappingButtonMap" "lrm"
+    EndSection
 
-kernels:
-  - "linux-lts"
-  - "linux-zen"
-
-mkinitcpio_no_fallback: "{{ kernels }}"
-
-network_manager: "systemd-networkd"
-networkd_configs:
-  - name: wired
-    match: 'Name=en*'
-    network: 'DHCP=yes'
-
-boot_loader: "refind"

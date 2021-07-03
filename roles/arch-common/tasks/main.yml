@@ -69,3 +69,16 @@
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
   with_items: "{{ makepkg_config }}"
+
+- name: Configure xorg
+  become: true
+  copy:
+    dest: "/etc/X11/xorg.conf.d/{{ item.key }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      {{ ansible_managed | comment }}
+      {{ item.value }}
+  with_dict: "{{ xorg_conf }}"
+  tags: ["xorg"]

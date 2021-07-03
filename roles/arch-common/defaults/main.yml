@@ -1,5 +1,13 @@
 ---
 
+xorg_conf:
+  "10-monitor": |
+    Section "ServerFlags"
+        Option "StandbyTime" "10"
+        Option "SuspendTime" "10"
+        Option "OffTime" "10"
+    EndSection
+
 sudoers_files:
   - dest: "10-wheel"
     content: "%wheel ALL=(ALL) ALL"

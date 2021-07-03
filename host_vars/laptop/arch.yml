@@ -166,8 +166,6 @@ chezmoi_overrides:
   polybar: |
     declare -A MONITOR_MAP=( [eDP-1]=laptop [DP-2]=laptop-ext [DP-1]=laptop-ext-secondary )
   xinitrc: |
-    TOUCHPAD_TAP=1
-    TOUCHPAD_NAME="Elan Touchpad"
     GDK_SCALE=1
     GDK_DPI_SCALE=1
 
