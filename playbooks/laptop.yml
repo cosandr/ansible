@@ -45,3 +45,6 @@
 
     - import_role: { name: sudo }
       tags: ["sudo"]
+
+    - import_role: { name: xss-lock }
+      tags: ["xss-lock"]
