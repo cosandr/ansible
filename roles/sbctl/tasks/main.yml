@@ -25,6 +25,9 @@
 - name: Enroll keys
   become: true
   command: "sbctl enroll-keys"
+  args:
+    # https://github.com/Foxboron/sbctl/blob/32ac2678342aab8233ee887ea73cc781e907f86a/util.go#L73
+    creates: "/sys/firmware/efi/efivars/db-d719b2cb-3d3a-4596-a3bc-dad00e67656f"
   notify: reboot
 
 - name: Ensure {{ esp_mount }}/EFI/Linux exists
@@ -61,5 +64,5 @@
     disk: "/dev/nvme0n1"
     part: "1"
     loader: "/EFI/Linux/{{ item }}.efi"
-    label: "{{ efi_labels.item | default(ansible_distribution + ' ' + item) }}"
+    label: "{{ efi_labels[item] | default(ansible_distribution + ' ' + item) }}"
   with_items: "{{ kernels }}"
