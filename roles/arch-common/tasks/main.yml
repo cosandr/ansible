@@ -8,12 +8,14 @@
     owner: root
     group: root
     state: link
+  tags: ["time"]
 
 - name: "Sync hwclock"
   become: true
   command: "hwclock --systohc"
   args:
     creates: "/etc/adjtime"
+  tags: ["time"]
 
 - name: Set hostname
   become: true
@@ -23,36 +25,29 @@
     group: root
     mode: 0644
     content: "{{ inventory_hostname }}"
+  tags: ["hostname"]
 
 - name: "Set locales"
   include_role:
     name: locale_conf
+    apply:
+      tags: "locale"
   tags: ["locale"]
 
 - name: "Setup sudo"
   include_role:
     name: sudo
-  vars:
-    sudoers_files: "{{ sudoers_files }}"
+    apply:
+      tags: "sudo"
   tags: ["sudo"]
 
 - name: Configure systemd-networkd
   include_role:
     name: systemd_networkd
+    apply:
+      tags: "systemd-networkd"
   when: network_manager == "systemd-networkd"
-
-# - name: Configure systemd-boot
-#   include_role:
-#     name: systemd_boot
-#   when: boot_loader == "systemd-boot"
-
-- name: Disable fallback images
-  become: true
-  lineinfile:
-    path: "/etc/mkinitcpio.d/{{ item }}.preset"
-    regexp: "^PRESETS"
-    line: "PRESETS=('default')"
-  with_items: "{{ mkinitcpio_no_fallback }}"
+  tags: ["systemd-networkd"]
 
 - name: Configure pacman
   become: true
@@ -61,6 +56,7 @@
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
   with_items: "{{ pacman_config }}"
+  tags: ["pacman"]
 
 - name: Configure makepkg
   become: true
@@ -69,6 +65,12 @@
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
   with_items: "{{ makepkg_config }}"
+  tags: ["makepkg"]
+
+# - name: Configure systemd-boot
+#   include_role:
+#     name: systemd_boot
+#   when: boot_loader == "systemd-boot"
 
 - name: Configure xorg
   become: true
@@ -82,3 +84,12 @@
       {{ item.value }}
   with_dict: "{{ xorg_conf }}"
   tags: ["xorg"]
+
+- name: Disable fallback images
+  become: true
+  lineinfile:
+    path: "/etc/mkinitcpio.d/{{ item }}.preset"
+    regexp: "^PRESETS"
+    line: "PRESETS=('default')"
+  with_items: "{{ mkinitcpio_no_fallback }}"
+  tags: ["mkinitcpio"]

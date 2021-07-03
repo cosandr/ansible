@@ -9,3 +9,13 @@
     group: root
     mode: 0644
   loop: "{{ networkd_configs }}"
+  notify: restart systemd-networkd
+
+- name: Enable and start systemd-networkd/resolved
+  systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - "systemd-networkd.service"
+    - "systemd-resolved.service"
