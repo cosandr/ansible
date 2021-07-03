@@ -2,10 +2,18 @@
 - name: reload systemd
   become: true
   systemd:
-    daemon_reload: yes
-  tags: [ "all" ]
+    daemon_reload: true
+  tags: ["all"]
+
+- name: reload systemd user
+  become: true
+  become_user: "{{ systemd_user | default(my_user) | default('andrei') }}"
+  systemd:
+    daemon_reload: true
+    scope: user
+  tags: ["all"]
 
 - name: reboot
   become: true
   reboot: {}
-  tags: [ "all" ]
+  tags: ["all"]
