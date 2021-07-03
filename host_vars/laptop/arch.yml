@@ -1,7 +1,8 @@
 ---
 
 pacman_packages:
-  - acpi_call-dkms
+  - acpi_call
+  - acpi_call-lts
   - alacritty
   - alsa-utils
   - ansible
@@ -60,8 +61,10 @@ pacman_packages:
   - libva-intel-driver
   - libva-utils
   - linux-firmware
-  - linux-zen
-  - linux-zen-headers
+  - linux
+  - linux-headers
+  - linux-lts
+  - linux-lts-headers
   - lxappearance
   - m4
   - make
@@ -74,7 +77,8 @@ pacman_packages:
   - noto-fonts-emoji
   - ntfs-3g
   - numlockx
-  - nvidia-dkms
+  - nvidia
+  - nvidia-lts
   - nvidia-prime
   - openssh
   - otf-cascadia-code
@@ -110,9 +114,7 @@ pacman_packages:
   - thunar
   - thunar-archive-plugin
   - tlp
-  - tlp-rdw
   - tmux
-  - tp_smapi
   - ttf-fira-code
   - ttf-font-awesome
   - ttf-nerd-fonts-symbols
@@ -173,9 +175,13 @@ modprobe_config:
   "nobeep.conf": "blacklist pcspkr"
 
 
+# Update key
+# sudo systemd-cryptenroll /dev/nvme0n1p2 --wipe-slot=tpm2
+# sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2
 # systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0,7 /dev/nvme0n1p2
+# systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0,7 /dev/nvme0n1p3
 
-kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ intel_iommu=on nmi_watchdog=0"
+kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ intel_iommu=on nmi_watchdog=0 resume=/dev/mapper/swap"
 
 systemd_boot_entries:
   "arch-zen": |
@@ -185,8 +191,15 @@ systemd_boot_entries:
     initrd /initramfs-linux-zen.img
     options {{ kernel_params }}
 
+crypttab: ""
+
 crypttab_initramfs: |
   root    UUID=9dc722d9-b6f2-4f7c-a411-ebeb4b206a6c   -   luks,discard,tpm2-device=auto
+  swap    UUID=25e20493-f787-4c19-b8db-0f4a45c7a64c   -   luks,discard,tpm2-device=auto,nofail
+
+
+fstab: |
+  /dev/mapper/swap    none        swap        defaults,nofail,x-systemd.device-timeout=5     0 0
 
 # go-check-updates
 # git clone https://github.com/cosandr/go-check-updates
@@ -217,10 +230,10 @@ firewalld_add_sources:
 
 kernels:
   - "linux"
-  - "linux-zen"
+  - "linux-lts"
 
 efi_labels:
   linux: "Arch Linux"
-  linux-zen: "Arch Linux Zen"
+  linux-lts: "Arch Linux LTS"
 
 mkinitcpio_no_fallback: "{{ kernels }}"
