@@ -36,5 +36,8 @@
     - import_role: { name: spotify }
       tags: ["spotify"]
 
+    - import_role: { name: discord }
+      tags: ["discord"]
+
     # - import_role: { name: nvidia_exporter }
     #   tags: ["prometheus-stack", "nvidia_exporter"]

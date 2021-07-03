@@ -1,0 +1,14 @@
+---
+
+- name: Create user
+  become: true
+  user:
+    name: "{{ aur_build_user }}"
+
+- name: Allow AUR user passwordless pacman
+  include_role:
+    name: sudo
+  vars:
+    sudoers_files:
+      - dest: "20-{{ aur_build_user }}"
+        content: "{{ aur_build_user }} ALL=(ALL) NOPASSWD:/sbin/pacman"

@@ -3,6 +3,7 @@
 sudoers_files:
   - dest: "10-wheel"
     content: "%wheel ALL=(ALL) ALL"
+
 sys_timezone: "Europe/Oslo"
 
 network_manager: "systemd-networkd"

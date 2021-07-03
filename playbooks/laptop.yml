@@ -36,3 +36,6 @@
 
     - import_role: { name: spotify }
       tags: ["spotify"]
+
+    - import_role: { name: discord }
+      tags: ["discord"]
