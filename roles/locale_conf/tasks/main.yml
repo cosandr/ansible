@@ -1,0 +1,19 @@
+---
+
+- name: Enable locales
+  become: true
+  replace:
+    path: /etc/locale.gen
+    regexp: '^#?({{ item | regex_escape() }}.*)$'
+    replace: '\1'
+  loop: "{{ locale_gen }}"
+  notify: generate locales
+
+- name: Configure locale.conf
+  become: true
+  template:
+    src: "locale.conf.j2"
+    dest: "/etc/locale.conf"
+    owner: root
+    group: root
+    mode: 0644

@@ -1,0 +1,4 @@
+{{ ansible_managed | comment }}
+{% for k, v in locale_conf.items() %}
+{{ k }}={{ v }}
+{% endfor %}
