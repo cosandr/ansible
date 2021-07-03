@@ -1,0 +1,4 @@
+---
+
+xsession_wants:
+  - "xss-lock.service"
