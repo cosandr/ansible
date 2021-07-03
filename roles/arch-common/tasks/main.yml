@@ -15,20 +15,6 @@
   args:
     creates: "/etc/adjtime"
 
-- name: Enable locales
-  become: true
-  lineinfile:
-    path: /etc/locale.gen
-    regexp: "^#?{{ item | regex_escape() }}"
-    line: "{{ item }}"
-  loop: "{{ sys_locales }}"
-
-- name: Generate locale
-  become: true
-  command: "locale-gen"
-  args:
-    creates: "/usr/lib/locale/locale-archive"
-
 - name: Set hostname
   become: true
   copy:
@@ -37,6 +23,11 @@
     group: root
     mode: 0644
     content: "{{ inventory_hostname }}"
+
+- name: "Set locales"
+  include_role:
+    name: locale_conf
+  tags: ["locale"]
 
 - name: "Setup sudo"
   include_role:
@@ -50,10 +41,10 @@
     name: systemd_networkd
   when: network_manager == "systemd-networkd"
 
-- name: Configure systemd-boot
-  include_role:
-    name: systemd_boot
-  when: boot_loader == "systemd-boot"
+# - name: Configure systemd-boot
+#   include_role:
+#     name: systemd_boot
+#   when: boot_loader == "systemd-boot"
 
 - name: Disable fallback images
   become: true
