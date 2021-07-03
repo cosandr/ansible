@@ -2,10 +2,6 @@
 
 sys_timezone: "Europe/Oslo"
 
-sys_locales:
-  - "en_US.UTF-8"
-
-
 network_manager: "systemd-networkd"
 boot_loader: "systemd-boot"
 
