@@ -35,7 +35,11 @@ tlp_tlp_devices_lan_dc: "{{ tlp_devices_lan_con }}"
 tlp_cpu_governor_ac: "performance"
 tlp_cpu_governor_bat: "powersave"
 
-logind_power: "ignore"
-logind_suspend: "suspend"
-logind_hibernate: "hibernate"
-logind_lid_sw: "suspend"
+logind_config: |
+  HandlePowerKey=ignore
+  HandleSuspendKey=suspend
+  HandleHibernateKey=hibernate
+  HandleLidSwitch=suspend
+  HandleLidSwitchExternalPower=suspend
+  HandleLidSwitchDocked=ignore
+  HandleRebootKey=ignore
