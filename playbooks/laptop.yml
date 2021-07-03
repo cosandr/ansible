@@ -40,5 +40,8 @@
     - import_role: { name: discord }
       tags: ["discord"]
 
+    - import_role: { name: sshd }
+      tags: ["sshd"]
+
     - import_role: { name: sudo }
       tags: ["sudo"]

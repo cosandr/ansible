@@ -50,6 +50,9 @@
     - import_role: { name: btrbk }
       tags: ["btrbk"]
 
+    - import_role: { name: sshd }
+      tags: ["sshd"]
+
     - import_role: { name: sudo }
       tags: ["sudo"]
 

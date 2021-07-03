@@ -1,0 +1,26 @@
+---
+
+- name: Install OpenSSH server
+  become: true
+  package:
+    name: "{{ _sshd_pkg }}"
+    state: present
+  tags: ["install"]
+
+- name: Set up sshd_config
+  become: true
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items: "{{ sshd_config }} "
+  notify: reload sshd
+
+- name: Set up extra sshd config
+  become: true
+  blockinfile:
+    path: "/etc/ssh/sshd_config"
+    block: "{{ sshd_extra_config }}"
+  when: sshd_extra_config | length > 0
+  notify: reload sshd

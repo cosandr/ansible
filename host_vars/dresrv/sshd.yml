@@ -1,0 +1,21 @@
+---
+
+sshd_extra_config: |
+  Match Address {{ hostvars['desktop'].ansible_host }}
+      PermitRootLogin prohibit-password
+
+  Match Address {{ hostvars['laptop'].ansible_host }}
+      PermitRootLogin prohibit-password
+
+  Match User {{ my_user }}
+    StreamLocalBindUnlink yes
+    AllowTcpForwarding yes
+
+  # useradd -m -s /bin/false prom-tunnel
+  Match User prom-tunnel
+      AllowAgentForwarding no
+      AllowTcpForwarding yes
+      GatewayPorts yes
+      PermitTunnel no
+      X11Forwarding no
+      PermitOpen localhost:17766 localhost:27766 localhost:8100
