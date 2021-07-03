@@ -7,6 +7,15 @@
     group: "root"
     mode: 0644
 
+- name: Configure sudo
+  become: true
+  import_role:
+    name: sudo
+  vars:
+    sudoers_files:
+      - dest: "btrbk"
+        content: "btrbk ALL= NOPASSWD: /sbin/btrfs, /usr/bin/readlink, /usr/bin/test"
+
 - name: Configure btrbk timer override
   template:
     src: "timer_override.conf.j2"

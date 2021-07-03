@@ -2,7 +2,7 @@
 
 - name: Install sudo
   become: true
-  pacman:
+  package:
     name: sudo
     state: present
 

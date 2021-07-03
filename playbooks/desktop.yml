@@ -39,5 +39,9 @@
     - import_role: { name: discord }
       tags: ["discord"]
 
+
+    - import_role: { name: sudo }
+      tags: ["sudo"]
+
     # - import_role: { name: nvidia_exporter }
     #   tags: ["prometheus-stack", "nvidia_exporter"]

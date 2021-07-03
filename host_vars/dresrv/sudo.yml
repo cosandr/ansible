@@ -1,0 +1,7 @@
+---
+
+sudoers_files:
+  - dest: "10-wheel"
+    content: "%wheel ALL=(ALL) ALL"
+  - dest: "30-podman"
+    content: "{{ my_user }} ALL=(root) NOPASSWD: /usr/bin/podman"
