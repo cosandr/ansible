@@ -7,13 +7,6 @@ xorg_conf:
         Option "SuspendTime" "10"
         Option "OffTime" "10"
     EndSection
-  "20-nvidia": |
-    Section "Device"
-        Identifier     "Device0"
-        Driver         "nvidia"
-        VendorName     "NVIDIA Corporation"
-        Option         "Coolbits" "28"
-    EndSection
   "30-touchpad": |
     Section "InputClass"
         Identifier "touchpad"
@@ -23,4 +16,3 @@ xorg_conf:
         Option "Tapping" "on"
         Option "TappingButtonMap" "lrm"
     EndSection
-
