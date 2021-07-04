@@ -6,48 +6,33 @@
 
 - hosts: gui
   gather_facts: true
-  tasks:
-    - name: Merge pacman packages
-      set_fact:
-        pacman_packages: "{{ pacman_packages + __pacman_packages }}"
-      when:
-        - pacman_packages is defined
-        - __pacman_packages is defined
+  roles:
+    - role: common
       tags: ["always"]
 
-    - name: Merge aur packages
-      set_fact:
-        aur_packages: "{{ aur_packages + __aur_packages }}"
-      when:
-        - aur_packages is defined
-        - __aur_packages is defined
-      tags: ["always"]
+    - role: arch-common
+      tags: ["arch-common"]
 
-    - name: Update system
-      become: true
-      pacman:
-        update_cache: true
-        upgrade: true
-        extra_args: "--ignore {{ ignored_packages | join(',') }}"
+    - role: sbctl
+      tags: ["sbctl"]
 
-    - name: Install Pacman packages
-      become: true
-      pacman:
-        name: "{{ pacman_packages }}"
-        state: present
-      when:
-        - pacman_packages is defined
-        - pacman_packages | length > 0
+    - role: spotify
+      tags: ["spotify"]
 
-    - name: Install paru
-      aur:
-        name: paru
-        state: present
+    - role: discord
+      tags: ["discord"]
 
-    - name: Install AUR packages
-      aur:
-        name: "{{ aur_packages }}"
-        state: present
-      when:
-        - aur_packages is defined
-        - aur_packages | length > 0
+    - role: sshd
+      tags: ["sshd"]
+
+    - role: sudo
+      tags: ["sudo"]
+
+    - role: xss-lock
+      tags: ["xss-lock"]
+
+    - role: gnome-keyring
+      tags: ["gnome-keyring"]
+
+    - role: chezmoi
+      tags: ["chezmoi"]
