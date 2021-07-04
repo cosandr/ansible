@@ -162,15 +162,6 @@ masked_services:
   - systemd-rfkill.service
   - systemd-rfkill.socket
 
-chezmoi_overrides:
-  polybar: |
-    declare -A MONITOR_MAP=( [eDP-1]=laptop [DP-2]=laptop-ext [DP-1]=laptop-ext-secondary )
-  xinitrc: |
-    GDK_SCALE=1
-    GDK_DPI_SCALE=1
-  lock: |
-    idle_hook="none"
-
 modprobe_config:
   "nobeep.conf": "blacklist pcspkr"
 

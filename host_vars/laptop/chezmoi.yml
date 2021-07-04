@@ -1,0 +1,17 @@
+---
+
+chezmoi_overrides:
+  polybar: |
+    MONITOR_MAP["eDP-1"]=laptop
+    MONITOR_MAP["DP-2"]=laptop-ext
+    MONITOR_MAP["DP-1"]=laptop-ext-secondary
+  xinitrc: |
+    QT_AUTO_SCREEN_SCALE_FACTOR="0"
+    MOZ_X11_EGL="1"
+  lock: |
+    idle_hook="none"
+  xorg_3: |
+    DPI=144
+    MONITOR_MAP["DP-2"]="--primary"
+    MONITOR_MAP["DP-1"]="--left-of DP-2"
+    MONITOR_MAP["eDP-1"]="--right-of DP-2"
