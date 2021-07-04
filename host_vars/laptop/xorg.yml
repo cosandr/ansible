@@ -2,6 +2,10 @@
 
 xorg_conf:
   "10-monitor": |
+    Section "Monitor"
+        Identifier "eDP-1"
+        Option "DPMS" "true"
+    EndSection
     Section "ServerFlags"
         Option "StandbyTime" "10"
         Option "SuspendTime" "10"
