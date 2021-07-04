@@ -10,6 +10,7 @@ pacman_packages:
   - autoconf
   - automake
   - base
+  - bat
   - binutils
   - bison
   - bluez

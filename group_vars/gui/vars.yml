@@ -1,4 +1,9 @@
 ---
+
+systemd_user: "{{ my_user | default('andrei') }}"
+systemd_user_conf: "/home/{{ systemd_user }}/.config/systemd/user"
+systemd_user_override: "/home/{{ systemd_user }}/.config/override"
+
 pacman_packages:
   - alacritty
   - alsa-utils  # amixer
@@ -35,6 +40,7 @@ pacman_packages:
   - numlockx
   - p7zip
   - pacutils
+  - pamixer
   - pavucontrol
   - picom
   - pipewire-alsa
