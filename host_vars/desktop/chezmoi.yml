@@ -5,13 +5,13 @@
 
 chezmoi_overrides:
   i3: |
-    #ws_opts["1"]="work"
-    #ws_opts["2"]="work"
-    ws_opts["2"]="no-discord"
+    #WS["1"]="work"
+    #WS["2"]="work"
+    WS["2"]="no-discord"
   xorg: |
     DPI=144
-    MONITOR_MAP["DP-4"]="--primary --rate 120"
-    MONITOR_MAP["DP-2"]="--above DP-4"
+    MONITOR_MAP["DP-4"]="--primary --mode 3840x2160 --rate 120"
+    MONITOR_MAP["DP-0"]="--above DP-4"
     MONITOR_MAP["HDMI-0"]="--off"
   xinitrc: |
     QT_AUTO_SCREEN_SCALE_FACTOR="0"
