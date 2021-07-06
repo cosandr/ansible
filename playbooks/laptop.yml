@@ -1,53 +1,53 @@
 #!/usr/bin/env -S ansible-playbook
 ---
-- name: Override ansible_connection if needed
-  import_playbook: prep_local.yml
-  tags: ["always"]
+- hosts: laptop
+  gather_facts: false
+  roles:
+    - role: common
+      tags: ["always"]
 
 - name: Laptop playbook
   gather_facts: true
   hosts: laptop
-  vars:
-    node_exporter_skip_install: false
-    node_exporter_no_sysusers: true
-    node_exporter_version: "latest"
-    node_exporter_port: "{{ ports.node_exporter }}"
-    node_exporter_collectors: []
-  tasks:
-    - import_role: { name: common }
-      tags: ["all"]
-
+  pre_tasks:
     - name: Merge ports
       set_fact:
         ports: "{{ ports | combine(_ports, recursive=true) }}"
       tags: ["always"]
+  roles:
+    - role: node_exporter
+      vars:
+        node_exporter_skip_install: false
+        node_exporter_no_sysusers: true
+        node_exporter_version: "latest"
+        node_exporter_port: "{{ ports.node_exporter }}"
+        node_exporter_collectors: []
 
-    - import_role: { name: node_exporter }
       tags: ["prometheus-stack", "node_exporter"]
 
-    - import_role: { name: laptop }
+    - role: laptop
       tags: ["laptop"]
 
-    - import_role: { name: arch-common }
+    - role: arch-common
       tags: ["arch-common"]
 
-    - import_role: { name: sbctl }
+    - role: sbctl
       tags: ["sbctl"]
 
-    - import_role: { name: spotify }
+    - role: spotify
       tags: ["spotify"]
 
-    - import_role: { name: discord }
+    - role: discord
       tags: ["discord"]
 
-    - import_role: { name: sshd }
+    - role: sshd
       tags: ["sshd"]
 
-    - import_role: { name: sudo }
+    - role: sudo
       tags: ["sudo"]
 
-    - import_role: { name: xss-lock }
+    - role: xss-lock
       tags: ["xss-lock"]
 
-    - import_role: { name: gnome-keyring }
+    - role: gnome-keyring
       tags: ["gnome-keyring"]

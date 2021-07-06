@@ -1,12 +1,25 @@
 #!/usr/bin/env -S ansible-playbook
 ---
-- name: Override ansible_connection if needed
-  import_playbook: prep_local.yml
-  tags: ["always"]
+- hosts: dresrv
+  gather_facts: false
+  roles:
+    - role: common
+      tags: ["always"]
 
 - name: Server playbook
   gather_facts: true
   hosts: dresrv
+  pre_tasks:
+    - name: Merge ports
+      set_fact:
+        ports: "{{ ports | combine(_ports, recursive=true) }}"
+      tags: ["always"]
+
+    - name: Merge Docker ports
+      set_fact:
+        ports: "{{ ports | combine(ansible_local.docker.ports, recursive=true) }}"
+      when: ansible_local.docker is defined and ansible_local.docker.ports is defined
+      tags: ["always"]
   vars:
     cadvisor_port: "{{ ports.cadvisor }}"
     cadvisor_version: "0.38.8"
@@ -21,76 +34,57 @@
     prometheus_port: "{{ ports.prometheus }}"
     prometheus_version: "latest"
     postgres_exporter_port: "{{ ports.psql_exporter }}"
-  tasks:
-    - import_role: { name: common }
-      tags: ["always", "common"]
-
-    - name: Merge ports
-      set_fact:
-        ports: "{{ ports | combine(_ports, recursive=true) }}"
-      tags: ["always"]
-
-    - name: Merge Docker ports
-      set_fact:
-        ports: "{{ ports | combine(ansible_local.docker.ports, recursive=true) }}"
-      when: ansible_local.docker is defined and ansible_local.docker.ports is defined
-      tags: ["always"]
-
-    # - name: "Ports"
-    #   debug:
-    #     var: ports
-    #   tags: ["always"]
-
-    - import_role: { name: samba }
+  roles:
+    - role: samba
       tags: ["samba"]
 
-    - import_role: { name: borg }
+    - role: borg
       tags: ["borg"]
 
-    - import_role: { name: btrbk }
+    - role: btrbk
       tags: ["btrbk"]
 
-    - import_role: { name: sshd }
+    - role: sshd
       tags: ["sshd"]
 
-    - import_role: { name: sudo }
+    - role: sudo
       tags: ["sudo"]
 
-#    - import_role: { name: sanoid }
+#    - role: sanoid
 #      tags: ["sanoid"]
 
-    - import_role: { name: fail2ban }
+    - role: fail2ban
       tags: ["fail2ban"]
 
-#    - import_role: { name: glances }
+#    - role: glances
 #      tags: ["glances"]
 
-    - import_role: { name: nginx }
+    - role: nginx
       tags: ["nginx", "web-server"]
 
-    - import_role: { name: vouch }
+    - role: vouch
       tags: ["vouch", "web-server"]
 
-    - import_role: { name: systemd }
+    - role: systemd
       tags: ["systemd"]
 
-    - import_role: { name: dnf_automatic }
+    - role: dnf_automatic
       tags: ["dnf_automatic"]
 
-    - import_role: { name: cadvisor }
+    - role: cadvisor
       tags: ["prometheus-stack", "cadvisor"]
 
-    - import_role: { name: prometheus }
+    - role: prometheus
       tags: ["prometheus-stack", "prometheus"]
 
-    - import_role: { name: grafana }
+    - role: grafana
       tags: ["prometheus-stack", "grafana"]
 
-    - import_role: { name: nginx_exporter }
+    - role: nginx_exporter
       tags: ["prometheus-stack", "nginx_exporter"]
 
-    - import_role: { name: node_exporter }
+    - role: node_exporter
       tags: ["prometheus-stack", "node_exporter"]
 
-    - import_role: { name: postgres_exporter }
+    - role: postgres_exporter
       tags: ["prometheus-stack", "postgres_exporter"]

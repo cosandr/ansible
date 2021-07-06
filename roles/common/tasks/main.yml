@@ -1,0 +1,13 @@
+---
+
+- name: Get localhost hostname
+  delegate_to: localhost
+  command: hostname
+  register: _local_hostname
+  check_mode: false
+  ignore_errors: true
+
+- name: Set local connection if needed
+  set_fact:
+    ansible_connection: local
+  when: _local_hostname.stdout | lower == inventory_hostname | lower

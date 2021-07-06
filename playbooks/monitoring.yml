@@ -1,25 +1,19 @@
 #!/usr/bin/env -S ansible-playbook
 ---
-- name: Ensure local connection
-  import_playbook: prep_local.yml
-  tags: ["always"]
-
-- name: Prepare ports dict
-  hosts: all
+- hosts: all
   gather_facts: false
   roles:
     - role: common
-      tags: ["always"]
-  post_tasks:
-    - name: Merge ports
-      set_fact:
-        ports: "{{ ports | combine(_ports, recursive=true) }}"
       tags: ["always"]
 
 - name: Install and configure monitoring
   hosts: all
   gather_facts: true
-
+  pre_tasks:
+    - name: Merge ports
+      set_fact:
+        ports: "{{ ports | combine(_ports, recursive=true) }}"
+      tags: ["always"]
   tasks:
     - name: prometheus
       import_role:
