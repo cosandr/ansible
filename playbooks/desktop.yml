@@ -41,6 +41,9 @@
     - role: sshd
       tags: ["sshd"]
 
+    - role: xorg
+      tags: ["xorg"]
+
     - role: sudo
       tags: ["sudo"]
 

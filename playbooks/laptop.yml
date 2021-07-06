@@ -49,5 +49,8 @@
     - role: xss-lock
       tags: ["xss-lock"]
 
+    - role: xorg
+      tags: ["xorg"]
+
     - role: gnome-keyring
       tags: ["gnome-keyring"]

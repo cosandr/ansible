@@ -1,7 +1,7 @@
 ---
 
-xorg_conf:
-  "10-monitor": |
+xorg_conf_d:
+  "10-monitor.conf": |
     Section "Monitor"
         Identifier "eDP-1"
         Option "DPMS" "true"
@@ -11,7 +11,7 @@ xorg_conf:
         Option "SuspendTime" "10"
         Option "OffTime" "10"
     EndSection
-  "30-touchpad": |
+  "30-touchpad.conf": |
     Section "InputClass"
         Identifier "touchpad"
         MatchIsTouchpad "true"
@@ -19,4 +19,25 @@ xorg_conf:
         Option "NaturalScrolling" "true"
         Option "Tapping" "on"
         Option "TappingButtonMap" "lrm"
+    EndSection
+  "10-nvidia-drm-outputclass.conf.opt": |
+    Section "OutputClass"
+        Identifier "intel"
+        MatchDriver "i915"
+        Driver "modesetting"
+    EndSection
+
+    Section "Screen"
+      Identifier "iGPU"
+      Device "iGPU"
+    EndSection
+
+    Section "OutputClass"
+        Identifier "nvidia"
+        MatchDriver "nvidia-drm"
+        Driver "nvidia"
+        Option "AllowEmptyInitialConfiguration"
+        Option "PrimaryGPU" "yes"
+        ModulePath "/usr/lib/nvidia/xorg"
+        ModulePath "/usr/lib/xorg/modules"
     EndSection

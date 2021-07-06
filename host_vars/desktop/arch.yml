@@ -1,13 +1,13 @@
 ---
 
-xorg_conf:
-  "10-monitor": |
+xorg_conf_d:
+  "10-monitor.conf": |
     Section "ServerFlags"
         Option "StandbyTime" "10"
         Option "SuspendTime" "10"
         Option "OffTime" "10"
     EndSection
-  "20-nvidia": |
+  "20-nvidia.conf": |
     Section "Device"
         Identifier     "Device0"
         Driver         "nvidia"

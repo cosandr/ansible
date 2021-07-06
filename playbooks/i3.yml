@@ -27,6 +27,9 @@
     - role: sudo
       tags: ["sudo"]
 
+    - role: xorg
+      tags: ["xorg"]
+
     - role: xss-lock
       tags: ["xss-lock"]
 

@@ -1,0 +1,31 @@
+---
+
+xorg_packages:
+  - xorg-fonts-encodings
+  - xorg-server
+  - xorg-server-common
+  - xorg-setxkbmap
+  - xorg-xauth
+  - xorg-xev
+  - xorg-xinit
+  - xorg-xinput
+  - xorg-xkbcomp
+  - xorg-xmodmap
+  - xorg-xprop
+  - xorg-xrandr
+  - xorg-xrdb
+  - xorg-xset
+  - xorgproto
+
+xorg_conf_d: {}
+# xorg_conf_d:
+#   "10-monitor": |
+#     Section "Monitor"
+#         Identifier "eDP-1"
+#         Option "DPMS" "true"
+#     EndSection
+#     Section "ServerFlags"
+#         Option "StandbyTime" "10"
+#         Option "SuspendTime" "10"
+#         Option "OffTime" "10"
+#     EndSection

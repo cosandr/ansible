@@ -1,0 +1,19 @@
+---
+
+- name: Install xorg packages
+  become: true
+  pacman:
+    name: "{{ xorg_packages }}"
+    state: present
+
+- name: Configure xorg
+  become: true
+  copy:
+    dest: "/etc/X11/xorg.conf.d/{{ item.key }}"
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      {{ ansible_managed | comment }}
+      {{ item.value }}
+  with_dict: "{{ xorg_conf_d }}"
