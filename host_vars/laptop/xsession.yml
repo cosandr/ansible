@@ -1,4 +1,19 @@
 ---
 
 xsession_wants:
-  - "xss-lock.service"
+  - xidlehook.service
+  # - "xss-lock.service"
+
+xidlehook_cmd: |
+  /usr/bin/xidlehook \
+      --not-when-fullscreen \
+      --not-when-audio \
+      --timer 590 \
+        'brightnessctl -q --save; brightnessctl -q set 10%' \
+        'brightnessctl -q --restore' \
+      --timer 10 \
+        'brightnessctl -q --restore; ${HOME}/.local/bin/my-screenlock' \
+        '' \
+      --timer 1200 \
+        'systemctl suspend' \
+        ''

@@ -1,10 +1,21 @@
 ---
 
 chezmoi_overrides:
+  i3: |
+    # Restore only if we have more than 1 display
+    if [[ $(xrandr --listactivemonitors | grep -oP '^Monitors: \K\d+') -gt 1 ]]; then
+      WS["1"]="work"
+      WS["2"]="laptop"
+      WS["3"]="laptop"
+    else
+      WS["1"]="laptop"
+    fi
   polybar: |
+    MONITOR_MAP["eDP-1-1"]=laptop
     MONITOR_MAP["eDP-1"]=laptop
-    MONITOR_MAP["DP-2"]=laptop-ext
+    MONITOR_MAP["DP-0"]=laptop-ext
     MONITOR_MAP["DP-1"]=laptop-ext-secondary
+    DPI_MAP["eDP-1-1"]='96'
   xinitrc: |
     QT_AUTO_SCREEN_SCALE_FACTOR="0"
     MOZ_X11_EGL="1"
@@ -12,6 +23,6 @@ chezmoi_overrides:
     idle_hook="none"
   xorg_3: |
     DPI=144
-    MONITOR_MAP["DP-2"]="--primary"
-    MONITOR_MAP["DP-1"]="--left-of DP-2"
-    MONITOR_MAP["eDP-1"]="--right-of DP-2"
+    MONITOR_MAP["DP-0"]="--primary --mode 3840x2160"
+    MONITOR_MAP["DP-1"]="--left-of DP-0 --mode 3840x2160"
+    MONITOR_MAP["eDP-1-1"]="--right-of DP-0 --mode 1920x1080 --setprovideroutputsource modesetting NVIDIA-0"

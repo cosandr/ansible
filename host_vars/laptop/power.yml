@@ -4,7 +4,12 @@ user_suspend: |
   Type=simple
   Environment=DISPLAY=:0
   ExecStartPre=-/sbin/playerctl pause
+  ExecStartPre=-/usr/bin/systemctl --user stop ws-proxy.service
   ExecStart=/home/andrei/.local/bin/my-screenlock
+
+user_resume: |
+  Type=simple
+  ExecStart=/usr/bin/systemctl --user start ws-proxy.service
 
 logind_config: |
   HandlePowerKey=ignore
@@ -12,7 +17,7 @@ logind_config: |
   HandleHibernateKey=hibernate
   HandleLidSwitch=suspend-then-hibernate
   HandleLidSwitchExternalPower=suspend
-  HandleLidSwitchDocked=lock
+  HandleLidSwitchDocked=ignore
   HandleRebootKey=ignore
 
 systemd_sleep: |

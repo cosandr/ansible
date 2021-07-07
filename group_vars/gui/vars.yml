@@ -42,6 +42,7 @@ pacman_packages:
   - pacutils
   - pamixer
   - pavucontrol
+  - perl-anyevent-i3
   - picom
   - pipewire-alsa
   - pipewire-pulse
