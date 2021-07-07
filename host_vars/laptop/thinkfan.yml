@@ -1,0 +1,14 @@
+---
+
+thinkfan_config:
+  sensors:
+    - hwmon: /sys/class/hwmon
+      name: coretemp
+      indices: [1]
+    - nvml: "01:00.0"
+  fans:
+    - tpacpi: /proc/acpi/ibm/fan
+  levels:
+    - [0, 0, 50]
+    - [1, 45, 75]
+    - ["level auto", 70, 255]

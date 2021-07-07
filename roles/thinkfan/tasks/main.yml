@@ -1,0 +1,32 @@
+---
+
+- name: Install thinkfan
+  become: true
+  package:
+    name: thinkfan
+
+- name: Ensure fan control is enabled
+  become: true
+  copy:
+    content: "options thinkpad_acpi fan_control=1"
+    dest: "/etc/modprobe.d/thinkfan.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload thinkpad_acpi
+
+- name: Copy configuration
+  become: true
+  copy:
+    content: "{{ thinkfan_config | to_yaml }}"
+    dest: "/etc/thinkfan.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart thinkfan
+
+- name: Enable thinkfan service
+  become: true
+  service:
+    name: thinkfan
+    enabled: true

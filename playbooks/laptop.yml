@@ -54,3 +54,7 @@
 
     - role: gnome-keyring
       tags: ["gnome-keyring"]
+
+    - role: thinkfan
+      tags: ["thinkfan"]
+
