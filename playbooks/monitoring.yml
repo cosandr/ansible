@@ -1,18 +1,21 @@
 #!/usr/bin/env -S ansible-playbook
 ---
-- hosts: all
-  gather_facts: false
-  roles:
-    - role: common
-      tags: ["always"]
-
 - name: Install and configure monitoring
   hosts: all
   gather_facts: true
   pre_tasks:
+    - name: Run common role
+      import_role:
+        name: common
+      tags: ["always"]
+
     - name: Merge ports
       set_fact:
         ports: "{{ ports | combine(_ports, recursive=true) }}"
+      tags: ["always"]
+
+    - name: Gather facts
+      setup:
       tags: ["always"]
   tasks:
     - name: prometheus

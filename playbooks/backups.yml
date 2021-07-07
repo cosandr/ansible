@@ -2,16 +2,19 @@
 ---
 - hosts: desktop, dresrv
   gather_facts: false
-  roles:
-    - role: common
+  pre_tasks:
+    - name: Run common role
+      import_role:
+        name: common
       tags: ["always"]
 
-- hosts: desktop, dresrv
-  gather_facts: true
-  pre_tasks:
     - name: Merge ports
       set_fact:
         ports: "{{ ports | combine(_ports, recursive=true) }}"
+      tags: ["always"]
+
+    - name: Gather facts
+      setup:
       tags: ["always"]
   roles:
     - role: borg

@@ -2,12 +2,20 @@
 ---
 - hosts: gui
   gather_facts: false
-  roles:
-    - role: common
+  pre_tasks:
+    - name: Run common role
+      import_role:
+        name: common
       tags: ["always"]
 
-- hosts: gui
-  gather_facts: true
+    - name: Merge ports
+      set_fact:
+        ports: "{{ ports | combine(_ports, recursive=true) }}"
+      tags: ["always"]
+
+    - name: Gather facts
+      setup:
+      tags: ["always"]
   roles:
     - role: arch-common
       tags: ["arch-common"]
