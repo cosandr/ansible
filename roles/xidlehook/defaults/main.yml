@@ -1,0 +1,12 @@
+---
+
+xidlehook_cmd: |
+  xidlehook \
+      --not-when-fullscreen \
+      --not-when-audio \
+      --timer 590 \
+      'xset dpms force off' \
+      '' \
+      --timer 10 \
+      '/usr/bin/i3lock' \
+      ''

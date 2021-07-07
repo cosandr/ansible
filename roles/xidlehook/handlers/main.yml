@@ -1,0 +1,10 @@
+---
+
+- name: enable and start xidlehook
+  become: true
+  become_user: "{{ my_user }}"
+  systemd:
+    name: xidlehook.service
+    state: started
+    enabled: true
+    scope: user

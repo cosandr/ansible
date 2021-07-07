@@ -1,0 +1,32 @@
+---
+
+- name: Install xidlehook
+  become: true
+  become_user: "{{ aur_build_user }}"
+  aur:
+    name: xidlehook
+    state: present
+
+# https://cewood.xyz/posts/my-i3-setup/
+- name: Create user service for xidlehook
+  become: true
+  become_user: "{{ my_user }}"
+  copy:
+    dest: "/home/{{ my_user }}/.config/systemd/user/xidlehook.service"
+    owner: "{{ my_user }}"
+    group: "{{ my_user }}"
+    mode: 0644
+    content: |
+      [Unit]
+      Description=xidlehook
+      PartOf=graphical-session.target
+
+      [Service]
+      Type=simple
+      ExecStart={{ xidlehook_cmd }}
+
+      [Install]
+      WantedBy=xsession.target
+  notify:
+    - reload systemd user
+    - enable and start xidlehook
