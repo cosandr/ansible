@@ -31,6 +31,9 @@
     - role: arch-common
       tags: ["arch-common"]
 
+    - role: chezmoi
+      tags: ["chezmoi"]
+
     - role: sbctl
       tags: ["sbctl"]
 
@@ -46,11 +49,17 @@
     - role: sudo
       tags: ["sudo"]
 
-    - role: xss-lock
-      tags: ["xss-lock"]
+    # - role: xss-lock
+    #   tags: ["xss-lock"]
 
     - role: xorg
       tags: ["xorg"]
+
+    - role: xidlehook
+      tags: ["xidlehook"]
+
+    # - role: xsession
+    #   tags: ["xsession"]
 
     - role: gnome-keyring
       tags: ["gnome-keyring"]
