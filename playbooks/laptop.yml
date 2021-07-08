@@ -70,3 +70,6 @@
     - role: thinkfan
       tags: ["thinkfan"]
 
+    - role: ddcutil
+      tags: ["ddcutil"]
+

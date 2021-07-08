@@ -1,0 +1,30 @@
+---
+
+- name: Install ddcutil
+  become: true
+  package:
+    name: ddcutil
+    state: present
+
+- name: Make sure i2c-dev is loaded at boot
+  become: true
+  copy:
+    dest: "/etc/modules-load.d/i2c.conf"
+    content: "i2c-dev\n"
+    owner: root
+    group: root
+    mode: 0644
+  notify: load i2c-dev
+
+- name: Allow wheel to control monitors
+  become: true
+  copy:
+    dest: "/etc/udev/rules.d/45-ddcutil-i2c.rules"
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      KERNEL=="i2c-[0-9]*", GROUP="wheel", MODE="0660", PROGRAM="/usr/bin/ddcutil --bus=%n getvcp 0x10"
+  notify:
+    - reload udev
+    - trigger udev

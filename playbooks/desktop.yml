@@ -53,5 +53,8 @@
     - role: gnome-keyring
       tags: ["gnome-keyring"]
 
+    - role: ddcutil
+      tags: ["ddcutil"]
+
     # - role: nvidia_exporter
     #   tags: ["prometheus-stack", "nvidia_exporter"]

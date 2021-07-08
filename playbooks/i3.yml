@@ -46,3 +46,6 @@
 
     - role: chezmoi
       tags: ["chezmoi"]
+
+    - role: ddcutil
+      tags: ["ddcutil"]
