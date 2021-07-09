@@ -2,13 +2,15 @@
 
 - name: Copy networkd configs
   become: true
-  template:
-    src: "conf.network.j2"
-    dest: "/etc/systemd/network/{{ item.name }}.network"
+  copy:
+    dest: "/etc/systemd/network/{{ item.key }}.network"
     owner: root
     group: root
     mode: 0644
-  loop: "{{ networkd_configs }}"
+    content: |
+      {{ ansible_managed | comment }}
+      {{ item.value }}
+  with_dict: "{{ networkd_config }}"
   notify: restart systemd-networkd
 
 - name: Enable and start systemd-networkd/resolved

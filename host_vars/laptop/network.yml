@@ -7,9 +7,15 @@ networkd_config:
 
       [Network]
       DHCP=yes
+
+      [Route]
+      Metric=0
   - wlan: |
       [Match]
       Type=wlan
 
       [Network]
       DHCP=yes
+
+      [Route]
+      Metric=50

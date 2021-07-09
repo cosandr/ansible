@@ -22,9 +22,12 @@ kernels:
 mkinitcpio_no_fallback: "{{ kernels }}"
 
 network_manager: "systemd-networkd"
-networkd_configs:
-  - name: wired
-    match: 'Name=en*'
-    network: 'DHCP=yes'
+networkd_config:
+  - wired: |
+      [Match]
+      Name=en*
+
+      [Network]
+      DHCP=yes
 
 boot_loader: "refind"
