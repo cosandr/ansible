@@ -81,7 +81,15 @@
       reboot: {}
 
     - name: update-locale
+      become: true
       command: "/usr/sbin/update-locale LANG={{ system_locale }}"
+
+    - name: enable and start daily reboot timer
+      become: true
+      systemd:
+        name: sched-reboot.timer
+        state: started
+        enabled: true
 
   pre_tasks:
     - name: Run common role
@@ -385,3 +393,24 @@
         when: sasl_password.changed
       become: true
       tags: ["unattended-upgrades"]
+    - name: Create daily reboot timer
+      become: true
+      copy:
+        dest: "/etc/systemd/system/sched-reboot.timer"
+        owner: root
+        group: root
+        mode: 0644
+        content: |
+          [Unit]
+          Description=Reboot Daily around 03:00
+          [Timer]
+          RandomizedDelaySec=10m
+          OnCalendar=*-*-* 03:00:00
+          Unit=reboot.target
+
+          [Install]
+          WantedBy=timers.target
+      notify:
+        - reload systemd
+        - enable and start daily reboot timer
+      tags: ["scheduled-reboot"]
