@@ -31,9 +31,9 @@ motion_default_config:
   daemon: "on"
   despeckle_filter: "EedDl"
   emulate_motion: "off"
-  event_gap: "100"    # 20s
+  event_gap: "0"
   pre_capture: "5"    # 1s
-  post_capture: "300" # 60s
+  post_capture: "50"  # 10s
   minimum_motion_frames: "10"
   framerate: "5"
   width: "1600"

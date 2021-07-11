@@ -1,41 +1,48 @@
 #!/bin/bash
 
-SRC="$1"
 DST_DIR=${DST_DIR:-/mnt/motion}
 DAYS_KEEP=${DAYS_KEEP:-7}
 LOG_DAYS_KEEP=${LOG_DAYS_KEEP:-2}
 MINIMUM_SIZE_MB=${MINIMUM_SIZE_MB:-50}
 log_file="$DST_DIR/$(date +%Y-%m-%d).log"
-timestamp=$(date +%H:%M:%S)
-
-mkdir -p "$DST_DIR" || exit 1
 
 # Log to file
 exec >> "$log_file"
 exec 2>&1
 
+echo "########## BEGIN $(date +%H:%M:%S) ##########"
+
+trap 'echo "########## END $(date +%H:%M:%S) ##########"' EXIT
+
 if [[ $# -lt 1 ]]; then
-    echo "$timestamp: no source file given"
+    echo "no source file given"
     exit 1
 fi
+
+SRC_DIR="$(dirname "$1")"
+
+echo "deleting files smaller than $MINIMUM_SIZE_MB MB"
+find "$SRC_DIR" -type f -name '*.mkv' -size -"$MINIMUM_SIZE_MB"M -exec rm -v {} +
+
+echo "deleting videos older than $DAYS_KEEP days in $SRC_DIR"
+find "$SRC_DIR" -type f -name '*.mkv' -mtime "+${DAYS_KEEP}" -print -delete
+
+echo "deleting logs older than $LOG_DAYS_KEEP days in $SRC_DIR"
+find "$SRC_DIR" -type f -name '*.log' -mtime "+${LOG_DAYS_KEEP}" -print -delete
 
 if ! grep -q "$DST_DIR" /proc/mounts; then
-    echo "$timestamp: $DST_DIR is not mounted, cannot continue"
+    echo "$DST_DIR is not mounted, cannot continue"
     exit 1
 fi
 
-echo "$timestamp: deleting videos older than $DAYS_KEEP days in $DST_DIR"
+mkdir -p "$DST_DIR" || exit 1
+
+echo "moving videos from $SRC_DIR"
+# https://unix.stackexchange.com/a/2504
+rsync -avh --remove-source-files --include='*.mkv' --exclude='*' "$SRC_DIR/" "$DST_DIR/"
+
+echo "deleting videos older than $DAYS_KEEP days in $DST_DIR"
 find "$DST_DIR" -type f -name '*.mkv' -mtime "+${DAYS_KEEP}" -print -delete
 
-echo "$timestamp: deleting logs older than $LOG_DAYS_KEEP days in $DST_DIR"
+echo "deleting logs older than $LOG_DAYS_KEEP days in $DST_DIR"
 find "$DST_DIR" -type f -name '*.log' -mtime "+${LOG_DAYS_KEEP}" -print -delete
-
-mv -v "$SRC" "$DST_DIR/"
-
-SRC_DIR="$(dirname "$SRC")"
-echo "$timestamp: moving orphans from $SRC_DIR"
-# https://unix.stackexchange.com/a/154828
-find "$SRC_DIR" -type f -name '*.mkv' -exec mv -v -t "$DST_DIR/" {} +
-
-echo "$timestamp: deleting files smaller than $MINIMUM_SIZE_MB MB"
-find "$DST_DIR" -type f -name '*.mkv' -size -"$MINIMUM_SIZE_MB"M -exec rm -v {} +
