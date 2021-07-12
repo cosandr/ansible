@@ -4,12 +4,15 @@ user_suspend: |
   Type=simple
   Environment=DISPLAY=:0
   ExecStartPre=-/sbin/playerctl pause
-  ExecStartPre=-/usr/bin/systemctl --user stop ws-proxy.service
-  ExecStart=/home/andrei/.local/bin/my-screenlock
+  ExecStartPre=-/usr/bin/systemctl --user stop ws-wait-online.service
+  ExecStartPre=-/usr/bin/systemctl --user stop dresrv-wait-online.service
+  # Only lock if not locked already
+  ExecStart=/bin/sh -c 'pgrep -u andrei -x my-screenlock || /home/andrei/.local/bin/my-screenlock'
 
 user_resume: |
-  Type=simple
-  ExecStart=/usr/bin/systemctl --user start ws-proxy.service
+  Type=oneshot
+  ExecStart=/usr/bin/systemctl --user start ws-wait-online.service
+  ExecStart=/usr/bin/systemctl --user start dresrv-wait-online.service
 
 logind_config: |
   HandlePowerKey=ignore

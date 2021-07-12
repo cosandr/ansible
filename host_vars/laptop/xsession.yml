@@ -2,7 +2,7 @@
 
 xsession_wants:
   - xidlehook.service
-  # - "xss-lock.service"
+  - xsettingsd.service
 
 xidlehook_cmd: |
   /usr/bin/xidlehook \
@@ -12,8 +12,8 @@ xidlehook_cmd: |
         'brightnessctl -q --save; brightnessctl -q set 10%' \
         'brightnessctl -q --restore' \
       --timer 10 \
-        'brightnessctl -q --restore; ${HOME}/.local/bin/my-screenlock' \
+        'brightnessctl -q --restore; pgrep -u andrei -x my-screenlock || ${HOME}/.local/bin/my-screenlock' \
         '' \
       --timer 1200 \
-        'systemctl suspend' \
+        'grep -q 1 /sys/class/power_supply/AC/online || systemctl suspend' \
         ''
