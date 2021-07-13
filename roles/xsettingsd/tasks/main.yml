@@ -1,0 +1,27 @@
+---
+
+- name: Install xsettingsd
+  become: true
+  pacman:
+    name: xsettingsd
+    state: present
+  tags: ["install"]
+
+- name: Ensure config dir exists
+  file:
+    path: "{{ xsettingsd_conf_file | dirname }}"
+    state: directory
+    owner: "{{ xsettingsd_user }}"
+    group: "{{ xsettingsd_user }}"
+    mode: 0755
+
+- name: Copy config file
+  copy:
+    dest: "{{ xsettingsd_conf_file }}"
+    owner: "{{ xsettingsd_user }}"
+    group: "{{ xsettingsd_user }}"
+    mode: 0644
+    content: "{{ xsettingsd_conf }}"
+  notify:
+    - reload systemd user
+    - enable and start xsettingsd

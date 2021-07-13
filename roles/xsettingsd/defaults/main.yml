@@ -1,0 +1,11 @@
+---
+
+xsettingsd_user: "{{ my_user | default('andrei') }}"
+xsettingsd_conf_file: "/home/{{ xsettingsd_user }}/.config/xsettingsd/xsettingsd.conf"
+
+xsettingsd_conf: |
+  Xft/Hinting 1
+  Xft/HintStyle "hintslight"
+  Xft/Antialias 1
+  Xft/RGBA "rgb"
+  Net/ThemeName "Adwaita"

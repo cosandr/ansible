@@ -1,0 +1,10 @@
+---
+
+- name: enable and start xsettingsd
+  become: true
+  become_user: "{{ xsettingsd_user }}"
+  systemd:
+    name: xsettingsd.service
+    state: started
+    enabled: true
+    scope: user
