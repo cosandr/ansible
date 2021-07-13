@@ -32,10 +32,10 @@ motion_default_config:
   despeckle_filter: "EedDl"
   emulate_motion: "off"
   event_gap: "0"
-  pre_capture: "5"    # 1s
-  post_capture: "50"  # 10s
-  minimum_motion_frames: "10"
-  framerate: "5"
+  pre_capture: "4"    # 1s
+  post_capture: "20"  # 10s
+  minimum_motion_frames: "8"
+  framerate: "2"
   width: "1600"
   height: "1200"
   log_level: "6"
@@ -56,7 +56,7 @@ motion_default_config:
   stream_maxrate: "2"
   stream_port: "8081"
   stream_quality: "80"
-  # threshold: "1500"
+  threshold: "3000"
   threshold_tune: "1"
   target_dir: "/var/lib/motion"
   text_left: "ENTRANCE"
