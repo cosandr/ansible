@@ -1,0 +1,87 @@
+---
+
+- name: Install dracut-network
+  package:
+    name: dracut-network
+    state: present
+  tags: ["install"]
+
+- name: Clone dracut-sshd
+  delegate_to: localhost
+  git:
+    dest: /tmp/dracut-sshd
+    repo: "https://github.com/gsauthof/dracut-sshd"
+    version: "master"
+    force: true
+  check_mode: false
+  tags: ["install"]
+
+- name: Copy 46sshd
+  copy:
+    src: /tmp/dracut-sshd/46sshd
+    dest: /usr/lib/dracut/modules.d
+    owner: root
+    group: root
+    mode: 0755
+  notify: dracut regenerate all
+  tags: ["install"]
+
+- block:
+    - name: Create config dir
+      file:
+        path: /etc/dracut-sshd
+        state: directory
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: Copy dracut SSH keys
+      copy:
+        dest: /etc/dracut-sshd/authorized_keys
+        owner: root
+        group: root
+        mode: 0600
+        content: "{{ dracut_ssh_authorized_keys }}"
+      notify: dracut regenerate all
+  when: dracut_ssh_authorized_keys | length > 0
+
+- name: Configure Dracut SSHD port
+  copy:
+    dest: /etc/sysconfig/dracut-sshd
+    owner: root
+    group: root
+    mode: 0644
+    content: "SSHD_OPTS=\"-p {{ dracut_ssh_port }}\"\n"
+  notify: dracut regenerate all
+
+- name: Generate Dracut RSA host key
+  command: ssh-keygen -q -t rsa -f /etc/ssh/dracut_ssh_host_rsa_key -C "" -N ""
+  args:
+    creates: /etc/ssh/dracut_ssh_host_rsa_key
+  notify: dracut regenerate all
+
+- name: Ensure wired network config exists
+  copy:
+    dest: /etc/systemd/network/wired.network
+    owner: root
+    group: root
+    mode: 0644
+    force: false
+    content: |
+      [Match]
+      Name=e*
+
+      [Network]
+      DHCP=ipv4
+  notify: dracut regenerate all
+
+- name: Enable Dracut network
+  copy:
+    dest: /etc/dracut.conf.d/90-networkd.conf
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      install_items+=" /etc/systemd/network/wired.network "
+      add_dracutmodules+=" systemd-networkd "
+  notify: dracut regenerate all

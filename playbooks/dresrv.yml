@@ -74,6 +74,9 @@
     - role: dnf_automatic
       tags: ["dnf_automatic"]
 
+    - role: dracut-sshd
+      tags: ["dracut-sshd"]
+
     - role: cadvisor
       tags: ["prometheus-stack", "cadvisor"]
 

@@ -1,0 +1,4 @@
+---
+
+- name: dracut regenerate all
+  command: dracut --force --regenerate-all
