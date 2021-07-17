@@ -11,4 +11,4 @@ mbp     ansible_host=10.0.0.6 ansible_user=root ansible_python_interpreter=/usr/
 
 [servers]
 dresrv  ansible_host=10.0.0.2 ansible_user=root ansible_python_interpreter=/usr/bin/python3
-drepi   ansible_host=10.0.0.9 ansible_user=pi ansible_python_interpreter=/usr/bin/python3
+drepi   ansible_host=10.0.0.3 ansible_user=pi ansible_python_interpreter=/usr/bin/python3
