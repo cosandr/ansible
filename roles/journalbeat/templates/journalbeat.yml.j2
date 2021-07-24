@@ -1,0 +1,18 @@
+{{ ansible_managed | comment }}
+
+journalbeat.inputs:
+{{ journalbeat_inputs | to_yaml }}
+
+output.elasticsearch:
+  hosts: {{ journalbeat_es_hosts | to_yaml }}
+{% if journalbeat_api_key | length > 0 %}
+  api_key: "{{ journalbeat_api_key }}"
+{% elif journalbeat_es_username | length > 0 %}
+  username: "{{ journalbeat_es_username }}"
+  password: "{{ journalbeat_es_password }}"
+{% endif %}
+logging.level: {{ journalbeat_log_level }}
+
+{% if journalbeat_extra is defined %}
+{{ journalbeat_extra | to_yaml }}
+{% endif %}

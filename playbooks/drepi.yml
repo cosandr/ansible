@@ -314,6 +314,10 @@
       become: true
       tags: ["unattended-upgrades"]
 
+    - import_role: { name: journalbeat }
+      become: true
+      tags: ["journalbeat"]
+
   post_tasks:
     - block:
       - name: Install smbclient

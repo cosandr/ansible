@@ -1,0 +1,3 @@
+---
+
+__journalbeat_package_name: "https://artifacts.elastic.co/downloads/beats/journalbeat/journalbeat-{{ journalbeat_version }}-amd64.deb"
