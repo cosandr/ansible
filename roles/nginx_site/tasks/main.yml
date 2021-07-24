@@ -1,0 +1,27 @@
+---
+
+- name: copy upstreams.conf
+  template:
+    src: "upstreams.conf.j2"
+    dest: "{{ nginx_upstreams_file }}"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: ensure Prometheus location exists
+  file:
+    path: "{{ nginx_prom_conf_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: add Prometheus location configs
+  copy:
+    dest: "{{ nginx_prom_conf_dir }}/{{ item.key}}.conf"
+    content: "{{ item.value }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_dict: "{{ nginx_site_configs }}"
+  notify: restart nginx

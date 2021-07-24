@@ -1,0 +1,30 @@
+#!/usr/bin/env -S ansible-playbook
+---
+- name: Romsto playbook
+  gather_facts: false
+  hosts: romsto
+  pre_tasks:
+    - name: Run common role
+      import_role:
+        name: common
+      tags: ["always"]
+
+    - name: Gather facts
+      setup:
+      tags: ["always"]
+  roles:
+    # - role: node_exporter
+    #   vars:
+    #     node_exporter_skip_install: false
+    #     node_exporter_no_sysusers: true
+    #     node_exporter_version: "latest"
+    #     node_exporter_port: "{{ ports.node_exporter }}"
+    #     node_exporter_collectors: []
+
+    #   tags: ["prometheus-stack", "node_exporter"]
+
+    - role: nginx_site
+      tags: ["nginx_site"]
+
+    - role: filebeat
+      tags: ["filebeat"]

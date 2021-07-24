@@ -7,8 +7,8 @@ desktop ansible_host=10.0.0.4 ansible_user=root ansible_python_interpreter=/usr/
 
 [laptops]
 laptop  ansible_host=10.0.0.5 ansible_user=root ansible_python_interpreter=/usr/bin/python3
-mbp     ansible_host=10.0.0.6 ansible_user=root ansible_python_interpreter=/usr/bin/python3
 
 [servers]
-dresrv  ansible_host=10.0.0.2 ansible_user=root ansible_python_interpreter=/usr/bin/python3
-drepi   ansible_host=10.0.0.3 ansible_user=pi ansible_python_interpreter=/usr/bin/python3
+dresrv ansible_host=10.0.0.2 ansible_user=root ansible_python_interpreter=/usr/bin/python3
+drepi  ansible_host=10.0.0.3 ansible_user=pi   ansible_python_interpreter=/usr/bin/python3
+romsto ansible_host=romsto   ansible_user=root ansible_python_interpreter=/usr/bin/python3

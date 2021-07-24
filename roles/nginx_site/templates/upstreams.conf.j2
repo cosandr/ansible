@@ -1,0 +1,6 @@
+{% for name, server in nginx_upstreams.items() %}
+upstream {{ name }} {
+    server {{ server }};
+    keepalive 24;
+}
+{% endfor %}
