@@ -1,9 +1,6 @@
 ---
 my_user: andrei
 my_email: "{{ vault_my_email }}"
-server_ddns_domain: "{{ vault_server_ddns_domain }}"
-server_ssh_port: "{{ vault_server_ssh_port }}"
-server_local_ip: 10.0.0.2
 ports:
   node_exporter: 9100
 

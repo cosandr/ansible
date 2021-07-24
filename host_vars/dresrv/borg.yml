@@ -45,10 +45,10 @@ borg_backups:
     timer_description: "Backup to remote location every 3 days at 04:00"
     oncalendar: "*-*-01/3 04:00:00"
     passphrase: "{{ borg_remote_passphrase }}"
-    repo: "ssh://{{ my_user }}@{{ rtv_ddns_domain }}:{{ rtv_ssh_port }}/mnt/user/backup/borg_andrei"
+    repo: "ssh://{{ my_user }}@{{ hostvars.romsto.ddns_domain }}:{{ hostvars.romsto.ssh_port }}/mnt/user/backup/borg_andrei"
     backup_name: "{{ ansible_hostname }}"
     pre_run: |
-      if ! ssh -q -o "BatchMode=yes" {{ my_user }}@{{ rtv_ddns_domain }} -p {{ rtv_ssh_port }} exit &>/dev/null
+      if ! ssh -q -o "BatchMode=yes" {{ my_user }}@{{ hostvars.romsto.ddns_domain }} -p {{ hostvars.romsto.ssh_port }} exit &>/dev/null
       then
           echo "Cannot SSH into remote server"
           exit 1

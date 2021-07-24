@@ -1,49 +1,9 @@
 ---
-jump_host: "{{ vault_jump_host }}"
-jump_user: "{{ vault_jump_user }}"
-jump_port: "{{ vault_jump_port }}"
-ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q {{ jump_user }}@{{ jump_host }} -p {{ jump_port }}"'
+ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q {{ vault_jump_user }}@{{ vault_jump_host }} -p {{ vault_jump_port }}"'
 
-nginx_nginx_reload_command: "docker restart nginx"
-nginx_upstreams_file: "/mnt/user/docker/nginx/conf.d/upstreams.conf"
-# include /etc/nginx/conf.d/prom.conf.d/*.conf;
-nginx_prom_conf_dir: "/mnt/user/docker/nginx/conf.d/prom.conf.d"
-nginx_upstreams:
-  node_exporter: "127.0.0.1:9100"
-  cadvisor: "127.0.0.1:9101"
-  syncthing: "127.0.0.1:8384"
-  transmission: "127.0.0.1:9091"
-  aria2: "127.0.0.1:6800"
-  nextcloud: "127.0.0.1:25683"
-  smartctl: "127.0.0.1:9102"
-nginx_site_configs:
-  cadvisor: |
-    location /cadvisor {
-        auth_basic             "Cadvisor";
-        auth_basic_user_file   /etc/nginx/.htpasswd;
-        proxy_set_header       Host $host;
-        proxy_set_header       X-Real-IP $remote_addr;
-        proxy_set_header       X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header       X-Forwarded-Proto $scheme;
-        proxy_pass             http://cadvisor/metrics;
-    }
-  node: |
-    location /node {
-        auth_basic             "Node Exporter";
-        auth_basic_user_file   /etc/nginx/.htpasswd;
-        proxy_set_header       Host $host;
-        proxy_set_header       X-Real-IP $remote_addr;
-        proxy_set_header       X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header       X-Forwarded-Proto $scheme;
-        proxy_pass             http://node_exporter/metrics;
-    }
-  smartctl: |
-    location /smartctl {
-        auth_basic             "Smartctl Exporter";
-        auth_basic_user_file   /etc/nginx/.htpasswd;
-        proxy_set_header       Host $host;
-        proxy_set_header       X-Real-IP $remote_addr;
-        proxy_set_header       X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header       X-Forwarded-Proto $scheme;
-        proxy_pass             http://smartctl/metrics;
-    }
+ddns_domain: "{{ vault_ddns_domain }}"
+domain: "{{ vault_domain }}"
+scrape_pass: "{{ vault_scrape_pass }}"
+scrape_user: "{{ vault_scrape_user }}"
+ssh_port: "{{ vault_ssh_port }}"
+syncthing_port: "{{ vault_syncthing_port }}"

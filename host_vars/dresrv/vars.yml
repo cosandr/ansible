@@ -10,18 +10,14 @@ _ports:
   psql_exporter: 9187
   rtmp: 1935
   vouch: 8682
+
+domain: "{{ vault_domain }}"
+ddns_domain: "{{ vault_ddns_domain }}"
+ssh_port: "{{ vault_ssh_port }}"
 borg_remote_passphrase: "{{ vault_borg_remote_passphrase }}"
 borg_server_passphrase: "{{ vault_borg_server_passphrase }}"
 container_data: "/srv/containers"
 postgres_service_name: postgresql-13.service
-rtv_ddns_domain: "{{ vault_rtv_ddns_domain }}"
-rtv_domain: "{{ vault_rtv_domain }}"
-rtv_scrape_pass: "{{ vault_rtv_scrape_pass }}"
-rtv_scrape_user: "{{ vault_rtv_scrape_user }}"
-rtv_ssh_port: "{{ vault_rtv_ssh_port }}"
-rtv_syncthing_port: "{{ vault_rtv_syncthing_port }}"
-server_domain: "dresrv.com"
-server_hostname: DreSRV
 smtp_host: "{{ vault_smtp_host }}"
 smtp_pass: "{{ vault_smtp_pass }}"
 smtp_port: "{{ vault_smtp_port }}"

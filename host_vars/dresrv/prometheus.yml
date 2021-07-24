@@ -1,8 +1,8 @@
 ---
-desktop_label: desktop
-laptop_label: laptop
-drepi_label: drepi
-server_label: "{{ server_hostname }}"
+desktop_label: "{{ hostvars.desktop.inventory_hostname }}"
+laptop_label: "{{ hostvars.laptop.inventory_hostname }}"
+drepi_label: "{{ hostvars.drepi.inventory_hostname }}"
+server_label: "{{ hostvars.dresrv.inventory_hostname }}"
 prometheus_storage_retention: "365d"
 prometheus_web_listen_address: "0.0.0.0:{{ prometheus_port }}"
 prometheus_global:
@@ -123,16 +123,16 @@ prometheus_scrape_configs:
     scrape_interval: 30s
     scrape_timeout: 20s
     basic_auth:
-      username: "{{ rtv_scrape_user }}"
-      password: "{{ rtv_scrape_pass }}"
+      username: "{{ hostvars.romsto.scrape_user }}"
+      password: "{{ hostvars.romsto.scrape_pass }}"
     static_configs:
-      - targets: ['prom.{{ vault_rtv_domain }}']
+      - targets: ['prom.{{ hostvars.romsto.domain }}']
         labels:
           job: "cadvisor"
           instance: "RomeoTV"
           __metrics_path__: /cadvisor
 
-      - targets: ['prom.{{ vault_rtv_domain }}']
+      - targets: ['prom.{{ hostvars.romsto.domain }}']
         labels:
           job: "node"
           instance: "RomeoTV"

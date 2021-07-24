@@ -5,7 +5,7 @@ vouch_listen_port: "{{ ports.vouch }}"
 vouch_user: "{{ nginx_user }}"
 
 vouch_domains:
-  - "{{ server_domain }}"
+  - "{{ domain }}"
 vouch_whitelist: "{{ vault_vouch_github_whitelist }}"
 
 vouch_oauth:
