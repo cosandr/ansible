@@ -1,0 +1,21 @@
+---
+
+filebeat_config:
+  filebeat.inputs:
+    - type: syslog
+      format: rfc3164
+      protocol.udp:
+        host: "127.0.0.1:9000"
+
+    - type: log
+      paths:
+        - /var/log/syslog
+
+  filebeat.autodiscover:
+    providers:
+      - type: docker
+        hints.enabled: true
+
+  output.elasticsearch:
+    hosts: "{{ vault_es_hosts }}"
+    api_key: "{{ vault_filebeat_key }}"
