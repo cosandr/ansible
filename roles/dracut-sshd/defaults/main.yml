@@ -2,3 +2,4 @@
 
 dracut_ssh_authorized_keys: ""
 dracut_ssh_port: "2222"
+dracut_ssh_networkd: true

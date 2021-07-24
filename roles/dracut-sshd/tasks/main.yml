@@ -73,6 +73,7 @@
 
       [Network]
       DHCP=ipv4
+  when: dracut_ssh_networkd
   notify: dracut regenerate all
 
 - name: Enable Dracut network
@@ -84,4 +85,20 @@
     content: |
       install_items+=" /etc/systemd/network/wired.network "
       add_dracutmodules+=" systemd-networkd "
+  when: dracut_ssh_networkd
   notify: dracut regenerate all
+
+- name: Enable Dracut network
+  copy:
+    dest: /etc/dracut.conf.d/90-network.conf
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      add_dracutmodules+=" network network-legacy "
+      omit_dracutmodules+=" network-manager "
+  when: not dracut_ssh_networkd
+  notify: dracut regenerate all
+
+# TODO: need to add rd.neednet=1 ip=dhcp to /etc/default/grub
+# grub2-mkconfig -o /boot/efi/EFI/fedora/grub.cfg

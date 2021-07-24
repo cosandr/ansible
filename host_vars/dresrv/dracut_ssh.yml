@@ -1,5 +1,5 @@
 ---
-
+dracut_ssh_networkd: false
 dracut_ssh_authorized_keys: |
   no-port-forwarding,no-agent-forwarding,no-X11-forwarding,command="/usr/bin/systemd-tty-ask-password-agent --watch" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOg9fiCqlSj0Xm/+rA02ecxnDYecKEnhYol6WUrM29UA andrei@desktop
   no-port-forwarding,no-agent-forwarding,no-X11-forwarding,command="/usr/bin/systemd-tty-ask-password-agent --watch" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDCHMjI/tkb21/PtXRfj8VBsqGJn9TkP0+XDkw7LZ+5x andrei@laptop
