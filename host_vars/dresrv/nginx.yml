@@ -1,8 +1,8 @@
 ---
 nginx_access_log_options: "main buffer=16k flush=2m"
 nginx_error_log_options: "warn"
-nginx_http_ssl_certificate: "/etc/pki/tls/private/{{ domain }}.key"
-nginx_http_ssl_certificate_key: "/etc/pki/tls/certs/{{ domain }}.crt"
+nginx_http_ssl_certificate: "/etc/pki/tls/certs/{{ domain }}.crt"
+nginx_http_ssl_certificate_key: "/etc/pki/tls/private/{{ domain }}.key"
 nginx_load_modules: ["ngx_http_dav_ext_module", "ngx_rtmp_module"]
 nginx_remove_default_vhost: true
 nginx_server_tokens: "off"

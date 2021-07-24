@@ -10,6 +10,7 @@ sshd_extra_config: |
   Match User {{ my_user }}
     StreamLocalBindUnlink yes
     AllowTcpForwarding yes
+    X11Forwarding yes
 
   # useradd -m -s /bin/false prom-tunnel
   Match User prom-tunnel
