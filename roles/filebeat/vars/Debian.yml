@@ -1,0 +1,3 @@
+---
+
+__filebeat_package_name: "https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{ filebeat_version }}-amd64.deb"

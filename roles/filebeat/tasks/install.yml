@@ -1,0 +1,56 @@
+---
+
+- name: Install with apt
+  apt:
+    deb: "{{ __filebeat_package_name }}"
+  when:
+    - __filebeat_package_name is defined
+    - ansible_pkg_mgr == 'apt'
+
+- name: Install with DNF
+  dnf:
+    name: "{{ __filebeat_package_name }}"
+    state: present
+  when:
+    - __filebeat_package_name is defined
+    - ansible_pkg_mgr == 'dnf'
+
+- block:
+    - name: Install with Pacman
+      pacman:
+        name: "{{ __filebeat_package_name }}"
+        state: present
+  when:
+    - __filebeat_package_name is defined
+    - ansible_pkg_mgr == 'pacman'
+
+- block:
+    - name: Download and extract archive
+      unarchive:
+        src: "{{ __filebeat_download }}"
+        dest: "/tmp"
+        remote_src: true
+        creates: "/tmp/filebeat-{{ filebeat_version }}-linux-x86_64"
+
+    - name: Copy to home dir
+      copy:
+        src: "/tmp/filebeat-{{ filebeat_version }}-linux-x86_64/"
+        dest: "{{ filebeat_home_path }}"
+        remote_src: true
+        owner: root
+        group: root
+        mode: 0755
+
+  when:
+    - __filebeat_package_name is not defined
+    - __filebeat_download is defined
+
+- name: Copy sysv service
+  template:
+    src: rc.filebeat.j2
+    dest: "{{ sysv_path }}/rc.filebeat"
+    owner: root
+    group: root
+    mode: 0755
+  tags: ["service"]
+  when: __is_sysv

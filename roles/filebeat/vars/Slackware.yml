@@ -1,0 +1,4 @@
+---
+
+__filebeat_download: "https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{ filebeat_version }}-linux-x86_64.tar.gz"
+__is_sysv: true
