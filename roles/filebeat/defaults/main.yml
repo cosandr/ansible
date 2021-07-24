@@ -7,7 +7,7 @@ filebeat_home_path: "/usr/share/filebeat"
 filebeat_log_path: "/var/log/filebeat"
 __filebeat_exec: >
   {{ filebeat_home_path }}/filebeat
-  --path.config {{ filebeat_config_path }}/filebeat.yml
+  --path.config {{ filebeat_config_path }}
   --path.home {{ filebeat_home_path }}
   --path.logs {{ filebeat_log_path }}
   -c filebeat.yml
