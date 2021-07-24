@@ -53,7 +53,6 @@ server ansible_host=10.1.0.2 ansible_user=root ansible_python_interpreter=/usr/b
 [ports]
 bitwarden_notifications=3012
 bitwarden=8343
-glances=61208
 monitorix=8080
 nextcloud=25683
 portainer=9000

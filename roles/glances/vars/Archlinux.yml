@@ -1,7 +1,0 @@
----
-
-__glances_packages:
-  - glances
-  - python-py-cpuinfo
-  - python-netifaces
-  - python-bottle
