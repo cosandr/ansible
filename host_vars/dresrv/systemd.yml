@@ -83,7 +83,7 @@ systemd_units:
           - "SRC_PATH=/tank/media/motion"
           - 'FFMPEG_ARGS="-c:v libx265 -x265-params crf=28 -preset:v faster -c:a aac -y -r {{ hostvars.drepi.motion_default_config.framerate }}"'
         exec_start:
-          - "/usr/bin/bash -c '/usr/bin/ffmpeg -hide_banner -f concat -safe 0 -i $$CONCAT_FILE $$FFMPEG_ARGS $$SRC_PATH/$$(date -d yesterday +%%Y%%m%%d).mkv'"
+          - "/usr/bin/bash -c '[ ! -f $$CONCAT_FILE ] && exit 0 || /usr/bin/ffmpeg -hide_banner -f concat -safe 0 -i $$CONCAT_FILE $$FFMPEG_ARGS $$SRC_PATH/$$(date -d yesterday +%%Y%%m%%d).mkv'"
         extra: |
           ExecStartPre={{ systemd_script_install_path }}/gen-concat-motion
           ExecStartPost={{ systemd_script_install_path }}/post-concat-motion

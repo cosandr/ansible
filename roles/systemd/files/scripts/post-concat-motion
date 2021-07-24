@@ -8,7 +8,8 @@ def main():
     if not concat_file:
         raise RuntimeError('CONCAT_FILE env var required')
     if not os.path.exists(concat_file):
-        raise RuntimeError("{} not found".format(concat_file))
+        print("No such file: {}".format(concat_file))
+        return
     re_concat = re.compile(r"file '(\S+)'")
     with open(concat_file, 'r', encoding='utf-8') as fr:
         for l in fr:
