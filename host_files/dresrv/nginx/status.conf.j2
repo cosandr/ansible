@@ -1,0 +1,15 @@
+{{ ansible_managed | comment }}
+server {
+    listen 127.0.0.1:80;
+
+    location /{{ nginx_status_url }} {
+        stub_status on;
+        access_log off;
+        allow 127.0.0.1;
+        {# # Allow all internal IPs as well, mostly for containers/VMs
+{% for item in ansible_all_ipv4_addresses %}
+        allow {{ item | regex_replace('(.*)\\.\\d+$', '\\1.0') }}/24;
+{% endfor %} #}
+        deny all;
+    }
+}

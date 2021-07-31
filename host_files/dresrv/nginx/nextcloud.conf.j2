@@ -1,0 +1,60 @@
+{{ ansible_managed | comment }}
+{% if nginx_upstreams | selectattr('name', 'search', 'nextcloud') %}
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name cloud.{{ domain }};
+
+    ssl_certificate {{ nginx_ssl_cert_main }};
+    ssl_certificate_key {{ nginx_ssl_key_main }};
+
+    access_log {{ nginx_sites_logs }}/access-cloud.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-cloud.{{ domain }}.log {{ nginx_error_log_options }};
+
+    client_max_body_size 0;
+
+    location / {
+        add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload;" always;
+
+        # Timeout if the real server is dead
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
+
+        # Proxy Connection Settings
+        proxy_buffers 32 4k;
+        proxy_connect_timeout 240;
+        proxy_headers_hash_bucket_size 128;
+        proxy_headers_hash_max_size 1024;
+        proxy_http_version 1.1;
+        proxy_read_timeout 240;
+        proxy_redirect  http://  $scheme://;
+        proxy_send_timeout 240;
+
+        # Proxy Cache and Cookie Settings
+        proxy_cache_bypass $cookie_session;
+        #proxy_cookie_path / "/; Secure"; # enable at your own risk, may break certain apps
+        proxy_no_cache $cookie_session;
+
+        # Proxy Header Settings
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Early-Data $ssl_early_data;
+        proxy_set_header Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-Ssl on;
+        proxy_set_header X-Real-IP $remote_addr;
+        set $upstream_app nextcloud;
+        set $upstream_proto https;
+        proxy_pass $upstream_proto://$upstream_app;
+
+        proxy_max_temp_file_size 2048m;
+    }
+
+    location ^~ /.well-known {
+        location = /.well-known/carddav     { return 301 $scheme://$host/remote.php/dav; }
+        location = /.well-known/caldav      { return 301 $scheme://$host/remote.php/dav; }
+        location ^~ /.well-known            { return 301 $scheme://$host/index.php$uri; }
+    }
+}
+{% endif %}

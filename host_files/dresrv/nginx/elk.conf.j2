@@ -1,0 +1,98 @@
+{{ ansible_managed | comment }}
+
+# Redirect HTTP to HTTPS
+server {
+    listen 80;
+    listen [::]:80;
+    server_name elastic.{{ domain }}
+                beats.{{ domain }}
+                kibana.{{ domain }}
+                logstash.{{ domain }};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name elastic.{{ domain }};
+
+    ssl_certificate {{ nginx_ssl_cert_main }};
+    ssl_certificate_key {{ nginx_ssl_key_main }};
+
+    access_log {{ nginx_sites_logs }}/access-elastic.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-elastic.{{ domain }}.log {{ nginx_error_log_options }};
+
+    location / {
+        proxy_set_header  Host $host;
+        proxy_set_header  X-Real-IP $remote_addr;
+        proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Proto $scheme;
+        proxy_pass        http://elasticsearch;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name beats.{{ domain }};
+
+    ssl_certificate {{ nginx_ssl_cert_main }};
+    ssl_certificate_key {{ nginx_ssl_key_main }};
+
+    access_log {{ nginx_sites_logs }}/access-beats.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-beats.{{ domain }}.log {{ nginx_error_log_options }};
+
+    auth_basic "Restricted";
+    auth_basic_user_file  /etc/nginx/elk.htaccess;
+
+    location / {
+        proxy_set_header  Host $host;
+        proxy_set_header  X-Real-IP $remote_addr;
+        proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Proto $scheme;
+        proxy_pass        http://beats/;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name logstash.{{ domain }};
+
+    ssl_certificate {{ nginx_ssl_cert_main }};
+    ssl_certificate_key {{ nginx_ssl_key_main }};
+
+    access_log {{ nginx_sites_logs }}/access-logstash.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-logstash.{{ domain }}.log {{ nginx_error_log_options }};
+
+    auth_basic "Restricted";
+    auth_basic_user_file  /etc/nginx/elk.htaccess;
+
+    location / {
+        proxy_set_header  Host $host;
+        proxy_set_header  X-Real-IP $remote_addr;
+        proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Proto $scheme;
+        proxy_pass        http://logstash/;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name kibana.{{ domain }};
+
+    ssl_certificate {{ nginx_ssl_cert_main }};
+    ssl_certificate_key {{ nginx_ssl_key_main }};
+
+    access_log {{ nginx_sites_logs }}/access-kibana.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-kibana.{{ domain }}.log {{ nginx_error_log_options }};
+
+    location / {
+        proxy_set_header  Host $host;
+        proxy_set_header  X-Real-IP $remote_addr;
+        proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header  X-Forwarded-Proto $scheme;
+        proxy_pass        http://kibana/;
+    }
+}

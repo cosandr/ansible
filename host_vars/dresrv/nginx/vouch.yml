@@ -1,0 +1,17 @@
+---
+
+nginx_vouch_conf: |
+  proxy_pass http://vouch/validate;
+  proxy_set_header Host $http_host;
+  # no need to send the POST body
+  proxy_pass_request_body off;
+
+  proxy_set_header Content-Length "";
+  proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-Proto $scheme;
+
+  # these return values are passed to the @error401 call
+  auth_request_set $auth_resp_jwt $upstream_http_x_vouch_jwt;
+  auth_request_set $auth_resp_err $upstream_http_x_vouch_err;
+  auth_request_set $auth_resp_failcount $upstream_http_x_vouch_failcount;

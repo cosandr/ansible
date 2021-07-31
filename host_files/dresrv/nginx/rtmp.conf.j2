@@ -1,0 +1,22 @@
+{{ ansible_managed | comment }}
+rtmp {
+    server {
+        listen {{ nginx_rtmp_port }};
+        chunk_size 1000;
+        # Only allow local direct connections
+        allow play {{ ansible_default_ipv4.network }}/24;
+        allow publish {{ ansible_default_ipv4.network }}/24;
+        deny play all;
+        deny publish all;
+
+        access_log {{ nginx_sites_logs }}/access-rtmp.log;
+
+        application hls {
+            live on;
+            hls on;
+            hls_path {{ web_root }}/main/stream/hls;
+            hls_fragment 1s;
+            hls_playlist_length 4s;
+        }
+    }
+}

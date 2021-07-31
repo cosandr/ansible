@@ -23,13 +23,62 @@
         ports: "{{ ports | combine(ansible_local.docker.ports, recursive=true) }}"
       when: ansible_local.docker is defined and ansible_local.docker.ports is defined
       tags: ["always"]
+
+    - name: Ensure site log dir exists
+      file:
+        path: "{{ nginx_sites_logs }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      tags: ["nginx"]
+
+    - name: Install rtmp config
+      template:
+        src: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/rtmp.conf.j2"
+        dest: "/etc/nginx/rtmp.conf"
+        owner: root
+        group: root
+        mode: 0644
+      tags: ["nginx"]
+
+    - name: Get Cloudflare IPv4 addresses
+      check_mode: false
+      uri:
+        url: https://www.cloudflare.com/ips-v4
+        return_content: true
+      register: __cf_ipv4
+      tags: ["nginx", "cloudflare"]
+
+    - name: Get Cloudflare IPv6 addresses
+      check_mode: false
+      uri:
+        url: https://www.cloudflare.com/ips-v6
+        return_content: true
+      register: __cf_ipv6
+      tags: ["nginx", "cloudflare"]
+
+    - name: Copy Cloudflare config
+      copy:
+        owner: root
+        group: root
+        mode: 0644
+        dest: "{{ nginx_cloudflare_real_ips }}"
+        content: |
+          {% for a in __cf_ipv4.content | split %}
+          set_real_ip_from {{ a }};
+          {% endfor %}
+          {% for a in __cf_ipv6.content | split %}
+          set_real_ip_from {{ a }};
+          {% endfor %}
+          real_ip_header CF-Connecting-IP;
+      tags: ["nginx", "cloudflare"]
   vars:
     cadvisor_port: "{{ ports.cadvisor }}"
     cadvisor_version: "0.40.0"
     grafana_port: "{{ ports.grafana }}"
     grafana_version: "latest"
     nginx_exporter_version: "latest"
-    nginx_rtmp_port: "{{ ports.rtmp }}"
     nginx_exporter_port: "{{ ports.nginx_exporter }}"
     node_exporter_version: "latest"
     node_exporter_port: "{{ ports.node_exporter }}"

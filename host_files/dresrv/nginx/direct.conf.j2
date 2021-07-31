@@ -1,0 +1,42 @@
+{{ ansible_managed | comment }}
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{ ddns_domain }};
+
+    root {{ web_root }}/direct;
+
+    access_log {{ nginx_sites_logs }}/access-{{ ddns_domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-{{ ddns_domain }}.log {{ nginx_error_log_options }};
+
+    location /adminer {
+        index index.php;
+        try_files $uri $uri/ /index.php?$args;
+        allow {{ ansible_default_ipv4.network }}/24;
+        deny all;
+    }
+
+{% if nginx_upstreams | selectattr('name', 'search', 'motion') %}
+    location /motion/ {
+        proxy_pass http://motion/;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        allow {{ ansible_default_ipv4.network }}/24;
+        deny all;
+    }
+{% endif %}
+    location ~ \.php$ {
+        include /etc/nginx/fastcgi_params;
+        fastcgi_pass php-fpm;
+        # fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+
+    location /pip {
+        alias {{ pip_wheel_dir | default(web_root + '/pip') }};
+        autoindex on;
+    }
+}

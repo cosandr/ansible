@@ -1,0 +1,23 @@
+{{ ansible_managed | comment }}
+{% if nginx_upstreams | selectattr('name', 'search', 'registry') %}
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name registry.{{ domain }};
+
+    ssl_certificate {{ nginx_ssl_cert_main }};
+    ssl_certificate_key {{ nginx_ssl_key_main }};
+
+    client_max_body_size 0;
+    access_log {{ nginx_sites_logs }}/access-registry.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-registry.{{ domain }}.log {{ nginx_error_log_options }};
+
+    location / {
+        proxy_set_header        Host $host;
+        proxy_set_header        X-Real-IP $remote_addr;
+        proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header        X-Forwarded-Proto $scheme;
+        proxy_pass              http://registry/;
+    }
+}
+{% endif %}

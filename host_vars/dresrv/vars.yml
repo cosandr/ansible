@@ -8,7 +8,6 @@ _ports:
   postgres: 5432
   prometheus: 9092
   psql_exporter: 9187
-  rtmp: 1935
   vouch: 8682
 
 domain: "{{ vault_domain }}"
