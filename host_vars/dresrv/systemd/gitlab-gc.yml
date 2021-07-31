@@ -1,0 +1,32 @@
+---
+
+__sd_gitlab_gc:
+  name: gitlab-gc
+  service:
+    content: |
+      [Unit]
+      Description=Run GitLab registry garbage collector
+      After=docker.service
+      Requires=docker.service
+
+      [Service]
+      Type=simple
+      ExecStart=/usr/bin/docker exec -t -u root gitlab gitlab-ctl registry-garbage-collect -m
+
+      [Install]
+      WantedBy=multi-user.target
+
+  # Every 7 days at 03:15
+  timer:
+    enabled: true
+    state: started
+    content: |
+      [Unit]
+      Description=Garbage collect GitLab registry every week
+
+      [Timer]
+      Persistent=yes
+      OnCalendar=*-*-01/7 03:15:00
+
+      [Install]
+      WantedBy=timers.target

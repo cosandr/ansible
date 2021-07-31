@@ -1,0 +1,59 @@
+---
+
+__sd_update_cloudflare:
+  name: update-cloudflare
+  service:
+    content: |
+      [Unit]
+      Description=Update Cloudflare real IP database
+
+      [Service]
+      Type=oneshot
+      Environment=FILENAME={{ nginx_cloudflare_real_ips }}
+      ExecStart={{ systemd_script_install_path }}/update-cloudflare
+
+      [Install]
+      WantedBy=multi-user.target
+
+  # Every day at 02:30
+  timer:
+    enabled: true
+    state: started
+    content: |
+      [Unit]
+      Description=Update Cloudflare real IP database timer
+
+      [Timer]
+      Persistent=yes
+      OnCalendar=*-*-* 02:30:00
+
+      [Install]
+      WantedBy=timers.target
+
+  scripts:
+    - dest: "{{ systemd_script_install_path }}/update-cloudflare"
+      content: |
+        #!/bin/bash
+
+        FILENAME=${FILENAME:-/etc/nginx/cloudflare.conf}
+
+        echo "#Cloudflare ip addresses" > "$FILENAME";
+        echo "" >> "$FILENAME";
+
+        echo "# - IPv4" >> "$FILENAME";
+        for i in $(curl --silent https://www.cloudflare.com/ips-v4); do
+          echo "set_real_ip_from $i;" >> "$FILENAME";
+        done
+
+        echo "" >> "$FILENAME";
+        echo "# - IPv6" >> "$FILENAME";
+        for i in $(curl --silent https://www.cloudflare.com/ips-v6); do
+          echo "set_real_ip_from $i;" >> "$FILENAME";
+        done
+
+        echo "" >> "$FILENAME";
+        echo "real_ip_header CF-Connecting-IP;" >> "$FILENAME";
+
+        # test configuration and restart nginx
+        # reload sometimes results in core dump for some reason
+        nginx -t && systemctl restart nginx

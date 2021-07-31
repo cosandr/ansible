@@ -1,0 +1,69 @@
+---
+
+__sd_update_gitea:
+  name: update-gitea
+  service:
+    content: |
+      [Unit]
+      Description=Update Gitea
+
+      [Service]
+      Type=oneshot
+      Environment=BIN_PATH=/usr/local/bin/gitea
+      ExecStart={{ systemd_script_install_path }}/update-gitea
+
+      [Install]
+      WantedBy=multi-user.target
+
+  # Every 7 days at 03:45
+  timer:
+    enabled: true
+    state: started
+    content: |
+      [Unit]
+      Description=Update Gitea timer
+
+      [Timer]
+      Persistent=yes
+      OnCalendar=*-*-01/7 03:45:00
+
+      [Install]
+      WantedBy=timers.target
+
+  scripts:
+    - dest: "{{ systemd_script_install_path }}/update-gitea"
+      content: |
+        #!/bin/bash
+
+        BIN_PATH=${BIN_PATH:-/usr/local/bin/gitea}
+
+        # Find latest version from GitHub
+        latest_tag=$(curl --silent "https://api.github.com/repos/go-gitea/gitea/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+        latest_ver=${latest_tag:1}
+        download_url="https://github.com/go-gitea/gitea/releases/latest/download/gitea-${latest_ver}-linux-amd64"
+
+        gitea_ver="None"
+        if [[ -f $BIN_PATH ]]; then
+            # Gitea version 1.10.0 built with GNU Make 4.1, go1.13.4 : bindata, sqlite, sqlite_unlock_notify
+            gitea_ver=$($BIN_PATH --version | awk '{print $3}')
+        fi
+
+        if [ "$latest_ver" == "$gitea_ver" ]; then
+            echo "No update needed."
+        else
+            echo "Updating from $gitea_ver to $latest_ver"
+            wget -qO "/tmp/gitea" "$download_url"
+            if [ $? -ne 0 ]; then
+                echo "Could not download Gitea $latest_tag"
+                echo "Download URL $download_url"
+                exit 1
+            else
+                systemctl stop gitea.service
+                install -m 755 /tmp/gitea "$BIN_PATH"
+                if selinuxenabled; then
+                    restorecon -v "$BIN_PATH"
+                fi
+                systemctl start gitea.service
+                echo "Gitea upgrade complete."
+            fi
+        fi

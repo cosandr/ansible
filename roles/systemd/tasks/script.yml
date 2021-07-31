@@ -1,0 +1,15 @@
+---
+
+- name: Install scripts
+  copy:
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0755') }}"
+    content: "{{ item.content }}"
+  loop: "{{ unit_item.scripts }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  when:
+    - item.dest is defined
+    - item.content is defined

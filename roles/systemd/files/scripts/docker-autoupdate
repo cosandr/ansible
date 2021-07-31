@@ -1,6 +1,0 @@
-#!/bin/bash
-
-CONTAINER_DATA=${CONTAINER_DATA:-/srv/containers}
-
- cd "$CONTAINER_DATA" || exit 1
- ./update.sh

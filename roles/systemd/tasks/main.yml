@@ -1,17 +1,53 @@
 ---
-
-- name: Copy script files
-  copy:
-    src: "files/scripts/{{ item }}"
-    dest: "{{ systemd_script_install_path }}/{{ item }}"
+- name: Ensure {{ systemd_script_install_path }} exists
+  file:
+    path: "{{ systemd_script_install_path }}"
+    state: directory
     owner: root
     group: root
     mode: 0755
-  with_items: "{{ systemd_scripts }}"
+  tags: ["install"]
+
+- name: Install scripts
+  include_tasks: "script.yml"
+  loop: "{{ systemd_units }}"
   loop_control:
-    label: "{{ item }}"
-  when: systemd_scripts | length > 0
+    loop_var: "unit_item"
+    label: "{{ unit_item.name }}"
+  when:
+    - unit_item.scripts is defined
+  tags: ["install"]
 
-- include_tasks: "install-defined.yml"
+- name: Install units
+  copy:
+    dest: "{{ systemd_unit_install_path }}/{{ item[0].name }}.{{ item[1] }}"
+    owner: "{{ item[0][item[1]].owner | default('root') }}"
+    group: "{{ item[0][item[1]].group | default('root') }}"
+    mode: 0644
+    content: |
+      {{ ansible_managed | comment }}
+      {{ item[0][item[1]].content }}
+  notify: reload systemd
+  loop: "{{ systemd_units | product(['service', 'timer']) | list }}"
+  loop_control:
+    label: "{{ item[0].name }}.{{ item[1] }}"
+  when:
+    - item[0][item[1]] is defined
+    - item[0][item[1]].content is defined
+  tags: ["install"]
 
-- include_tasks: "install-auto.yml"
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Set unit state
+  systemd:
+    name: "{{ item[0].name }}.{{ item[1] }}"
+    state: "{{ item[0][item[1]].state | default('stopped') }}"
+    enabled: "{{ item[0][item[1]].enabled | default(false) }}"
+  loop: "{{ systemd_units | product(['service', 'timer']) | list }}"
+  loop_control:
+    label: "{{ item[0].name }}.{{ item[1] }} - {{ item[0][item[1]].state | default('stopped') }} - {{ item[0][item[1]].enabled | default(false) }}"
+  when:
+    - item[0][item[1]] is defined
+    - item[0][item[1]].state is defined or item[0][item[1]].enabled is defined
+  tags: ["configure"]

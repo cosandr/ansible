@@ -1,0 +1,79 @@
+---
+
+__sd_backup_gitea:
+  name: backup-gitea
+  service:
+    content: |
+      [Unit]
+      Description=Gitea backup
+      After={{ postgres_service_name }} gitea.service
+      Requires={{ postgres_service_name }} gitea.service
+
+      [Service]
+      Type=oneshot
+      Environment=DIR=/tank/backup/gitea/
+      Environment=TMPDIR=/tmp/giteabackup/
+      Environment=KEEP=3
+      Environment=PERMS=640
+      Environment=PERMS_USER=root
+      Environment=PERMS_GROUP={{ my_user }}
+      ExecStart={{ systemd_script_install_path }}/backup-gitea
+
+      [Install]
+      WantedBy=multi-user.target
+
+  # Daily at 03:30
+  timer:
+    enabled: true
+    state: started
+    content: |
+      [Unit]
+      Description=Scheduled Gitea backup
+
+      [Timer]
+      Persistent=yes
+      OnCalendar=*-*-* 03:30:00
+
+      [Install]
+      WantedBy=timers.target
+
+  scripts:
+    - dest: "{{ systemd_script_install_path }}/backup-gitea"
+      content: |
+        #!/bin/bash
+
+        DIR=${DIR:-/tank/backup/gitea}
+        TMPDIR=${TMPDIR:-/tmp/giteabackup}
+        KEEP=${KEEP:-5}
+
+        GIT_USER=${GIT_USER:-git}
+        GITEA_CONFIG=${GITEA_CONFIG:-/etc/gitea/app.ini}
+        PERMS=${PERMS:-640}
+        PERMS_USER=${PERMS_USER:-root}
+        PERMS_GROUP=${PERMS_GROUP:-root}
+
+        DATESTAMP=$(date +%Y%m%d_%H%M)
+        FILENAME=gitea-${DATESTAMP}.zip
+
+        cleanup() {
+            rm -rf "${TMPDIR}"
+        }
+
+        trap cleanup EXIT
+
+        set -e
+
+        sudo -u "$GIT_USER" gitea -c "$GITEA_CONFIG" -w "$TMPDIR" dump -f "${TMPDIR}/${FILENAME}"
+
+        # remove all backups except the $KEEP latests
+        BACKUPS=$(find "${DIR}" -name "*.zip" | wc -l | sed 's/\ //g')
+        while [ "$BACKUPS" -ge "$KEEP" ]
+        do
+          ls -tr1 "${DIR}"/*.zip | head -n 1 | xargs rm -f
+          BACKUPS=$(( BACKUPS - 1 ))
+        done
+
+        # Move and set permissions zip file
+        install -o "$PERMS_USER" -g "$PERMS_GROUP" -m "$PERMS" "${TMPDIR}/${FILENAME}" "${DIR}/"
+
+        echo "Successfully dumped gitea data."

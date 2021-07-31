@@ -1,0 +1,34 @@
+---
+
+__sd_docker_auto_update:
+  name: docker-auto-update
+  service:
+    content: |
+      [Unit]
+      Description=Update all Docker containers
+      After=network-online.target docker.service
+      Requires=network-online.target docker.service
+
+      [Service]
+      Type=simple
+      WorkingDirectory={{ container_data }}
+      Environment=BUSY=1
+      Environment=BUILD=1
+      Environment=PULL=1
+      ExecStart=/usr/bin/bash run-all.sh
+
+  # Every day at 05:00
+  timer:
+    enabled: true
+    state: started
+    content: |
+      [Unit]
+      Description=Update Docker containers daily
+
+      [Timer]
+      Persistent=yes
+      OnBootSec=2m
+      OnCalendar=*-*-* 05:00:00
+
+      [Install]
+      WantedBy=timers.target

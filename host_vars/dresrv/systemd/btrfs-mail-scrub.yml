@@ -1,0 +1,28 @@
+---
+
+__sd_btrfs_mail_scrub:
+  name: btrfs-mail-scrub
+  service:
+    enabled: true
+    content: |
+      [Unit]
+      Description=Email BTRFS scrub results
+      After=btrfs-scrub.service
+
+      [Service]
+      Type=simple
+      ExecStart={{ systemd_script_install_path }}/btrfs-mail-scrub
+
+      [Install]
+      WantedBy=btrfs-scrub.service
+
+  scripts:
+    - dest: "{{ systemd_script_install_path }}/btrfs-mail-scrub"
+      content: |
+        #!/bin/bash
+
+        tmp="# /\n$(btrfs scrub status /)\n"
+        for d in /dev/mapper/tank_disk*; do
+          tmp+="\n# $d\n$(btrfs scrub status $d)\n"
+        done
+        echo -e "$tmp" | mail -s "btrfs scrub results" {{ my_email }}
