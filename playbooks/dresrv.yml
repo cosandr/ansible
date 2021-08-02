@@ -35,7 +35,7 @@
 
     - name: Install rtmp config
       template:
-        src: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/rtmp.conf.j2"
+        src: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/rtmp.conf.j2"
         dest: "/etc/nginx/rtmp.conf"
         owner: root
         group: root
