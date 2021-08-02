@@ -33,3 +33,4 @@
 - name: install package
   apt:
     deb: "/tmp/motion.deb"
+    update_cache: true
