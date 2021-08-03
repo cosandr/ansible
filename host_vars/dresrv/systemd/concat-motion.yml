@@ -11,7 +11,7 @@ __sd_concat_motion:
       ConditionPathExists=/tank/media/motion
 
       [Service]
-      Type=simple
+      Type=oneshot
       User=motion
       Group=motion
       Environment=CONCAT_FILE=/tmp/motion-concat.txt
