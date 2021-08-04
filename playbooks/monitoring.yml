@@ -2,7 +2,7 @@
 ---
 - name: Install and configure monitoring
   hosts: all
-  gather_facts: true
+  gather_facts: false
   pre_tasks:
     - name: Run common role
       import_role:
@@ -46,7 +46,7 @@
       tags: ["cadvisor"]
       vars:
         cadvisor_port: "{{ ports.cadvisor }}"
-        cadvisor_version: "0.38.8"
+        cadvisor_version: "0.40.0"
       when:
         - ports.cadvisor is defined
         # - inventory_hostname == "dresrv"
