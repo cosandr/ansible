@@ -89,14 +89,14 @@
         __nginx_exporter_checksum: "{{ item.split(' ')[0] }}"
       with_items: "{{ __nginx_exporter_checksums }}"
       when:
-        - "('linux-' + go_arch + '.tar.gz') in item"
+        - "('linux_' + go_arch + '.tar.gz') in item"
   delegate_to: localhost
 
 - name: download nginx_exporter binary to local folder
   become: false
   get_url:
-    url: "https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v{{ nginx_exporter_version }}/nginx-prometheus-exporter-{{ nginx_exporter_version }}-linux-{{ go_arch }}.tar.gz"
-    dest: "/tmp/nginx-prometheus-exporter-{{ nginx_exporter_version }}-linux-{{ go_arch }}.tar.gz"
+    url: "https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v{{ nginx_exporter_version }}/nginx-prometheus-exporter_{{ nginx_exporter_version }}_linux_{{ go_arch }}.tar.gz"
+    dest: "/tmp/nginx-prometheus-exporter_{{ nginx_exporter_version }}_linux_{{ go_arch }}.tar.gz"
     checksum: "sha256:{{ __nginx_exporter_checksum }}"
   register: _download_archive
   until: _download_archive is succeeded
@@ -109,7 +109,7 @@
 - name: unpack nginx_exporter binary
   become: false
   unarchive:
-    src: "/tmp/nginx-prometheus-exporter-{{ nginx_exporter_version }}-linux-{{ go_arch }}.tar.gz"
+    src: "/tmp/nginx-prometheus-exporter_{{ nginx_exporter_version }}_linux_{{ go_arch }}.tar.gz"
     dest: "/tmp"
     creates: "/tmp/nginx-prometheus-exporter"
   delegate_to: localhost
