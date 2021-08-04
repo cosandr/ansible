@@ -13,8 +13,6 @@ _ports:
 domain: "{{ vault_domain }}"
 ddns_domain: "{{ vault_ddns_domain }}"
 ssh_port: "{{ vault_ssh_port }}"
-borg_remote_passphrase: "{{ vault_borg_remote_passphrase }}"
-borg_server_passphrase: "{{ vault_borg_server_passphrase }}"
 container_data: "/srv/containers"
 postgres_service_name: postgresql-13.service
 smtp_host: "{{ vault_smtp_host }}"

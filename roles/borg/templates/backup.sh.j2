@@ -11,6 +11,13 @@ export BORG_REMOTE_PATH="{{ item.remote_path }}"
 {% if item.pre_run is defined %}
 {{ item.pre_run }}
 {% endif %}
+{% if item.post_run is defined %}
+post_run() {
+    {{ item.post_run }}
+}
+trap post_run EXIT
+{% endif %}
+
 # Check paths
 declare -a backup_paths=()
 declare -a check_paths=(

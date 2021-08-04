@@ -1,4 +1,8 @@
 ---
+borg_remote_passphrase: "{{ vault_borg_remote_passphrase }}"
+borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
+borg_server_passphrase: "{{ vault_borg_server_passphrase }}"
+
 borg_create_home: no
 borg_home: /home/backup
 borg_pool: "{{ borg_home }}/repos"
@@ -23,7 +27,6 @@ borg_backups:
       - "/srv"
       - "/var"
       - "/home"
-      - "/root"
     create_args:
       - "--stats"
       - "--show-rc"
@@ -41,37 +44,100 @@ borg_backups:
       - "--keep-daily 2"
       - "--keep-weekly 2"
       - "--keep-monthly 6"
-  - name: "remote"
-    timer_description: "Backup to remote location every 3 days at 04:00"
-    oncalendar: "*-*-01/3 04:00:00"
+  - name: "remote-root"
+    timer_description: "Backup root to remote location every 7 days at 04:00"
+    oncalendar: "*-*-01/7 04:00:00"
     passphrase: "{{ borg_remote_passphrase }}"
-    repo: "ssh://{{ my_user }}@{{ hostvars.romsto.ddns_domain }}:{{ hostvars.romsto.ssh_port }}/mnt/user/backup/borg_andrei"
-    backup_name: "{{ ansible_hostname }}"
+    repo: "ssh://{{ my_user }}@{{ hostvars.romsto.ddns_domain }}:{{ hostvars.romsto.ssh_port }}/mnt/user/backup/borg/{{ ansible_hostname }}/root"
+    backup_name: "root"
     pre_run: |
       if ! ssh -q -o "BatchMode=yes" {{ my_user }}@{{ hostvars.romsto.ddns_domain }} -p {{ hostvars.romsto.ssh_port }} exit &>/dev/null
       then
           echo "Cannot SSH into remote server"
           exit 1
       fi
-      BACKUP_USER_HOME=$(getent passwd {{ my_user }} | cut -d : -f 6)
+      # Take snapshots
+      snap_paths=(
+        "/"
+        "/srv"
+        "/var"
+        "/home"
+        "/srv/vm"
+      )
+      mkdir -p /.snapshots/borg_tmp
+      cd /.snapshots/borg_tmp
+      for p in "${snap_paths[@]}"; do
+          [[ $p == / ]] && snap_name="root" || snap_name="$(basename "$p")"
+          btrfs subvolume snapshot -r "$p" "$snap_name"
+      done
+    post_run: |
+      cd /
+      for p in /.snapshots/borg_tmp/*; do
+          btrfs subvolume delete "$p"
+      done
+      rmdir /.snapshots/borg_tmp
     paths:
-      - "/tank/backup/pgsql"
-      - "/tank/backup/gitea"
-      - "{{ container_data }}/bitwarden/data"
-      - "{{ container_data }}/nextcloud/data"
-      - "${BACKUP_USER_HOME}"
+      - "."
+      - "/boot"
+      - "/boot/efi"
     create_args:
       - "--stats"
       - "--show-rc"
       - "--compression auto,zstd"
       - "--exclude-caches"
-      - "--exclude '/**/.snapshots'"
-      - "--exclude '/home/*/.cache'"
-      - "--exclude '/home/*/.ccache'"
-      - "--exclude '/home/{{ my_user }}/Nextcloud'"
+      - "--exclude '**/.snapshots'"
+      - "--exclude 'home/*/.cache'"
+      - "--exclude 'home/*/.ccache'"
+      - "--remote-ratelimit 20000"
     prune_args:
       - "--list"
       - "--show-rc"
-      - "--keep-daily 2"
-      - "--keep-weekly 2"
+      - "--keep-weekly 3"
       - "--keep-monthly 6"
+  - name: "remote-tank"
+    timer_description: "Backup tank to remote location every 30 days"
+    oncalendar: "*-*-01/30 00:00:00"
+    passphrase: "{{ borg_remote_tank_passphrase }}"
+    repo: "ssh://{{ my_user }}@{{ hostvars.romsto.ddns_domain }}:{{ hostvars.romsto.ssh_port }}/mnt/user/backup/borg/{{ ansible_hostname }}/tank"
+    backup_name: "tank"
+    pre_run: |
+      if ! ssh -q -o "BatchMode=yes" {{ my_user }}@{{ hostvars.romsto.ddns_domain }} -p {{ hostvars.romsto.ssh_port }} exit &>/dev/null
+      then
+          echo "Cannot SSH into remote server"
+          exit 1
+      fi
+      # Take snapshots
+      snap_paths=(
+        "/tank/archive"
+        "/tank/backup"
+        "/tank/games"
+        "/tank/media"
+        "/tank/media/motion"
+        "/tank/media/photo"
+        "/tank/yes"
+      )
+      mkdir -p /tank/snapshots/borg_tmp
+      cd /tank/snapshots/borg_tmp
+      for p in "${snap_paths[@]}"; do
+          btrfs subvolume snapshot -r "$p" "$(basename "$p")"
+      done
+    post_run: |
+      cd /
+      for p in /tank/snapshots/borg_tmp/*; do
+          btrfs subvolume delete "$p"
+      done
+      rmdir /tank/snapshots/borg_tmp
+    paths:
+      - "."
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--exclude-caches"
+      - "--exclude '**/.snapshots'"
+      - "--remote-ratelimit 10000"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-monthly 3"
+      - "--keep-yearly 2"
