@@ -78,7 +78,8 @@
     notify: reload systemd
     loop_control:
       label: "{{item.name}}"
-  
+    when: item.no_timer is not defined or not item.no_timer
+
   - name: Enable and start timers
     service:
       name: "backup-{{ item.name }}.timer"
@@ -87,5 +88,6 @@
     with_items: "{{ borg_backups }}"
     loop_control:
       label: "{{item.name}}"
+    when: item.no_timer is not defined or not item.no_timer
 
   when: borg_backups | length > 0
