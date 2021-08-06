@@ -34,6 +34,9 @@
     - role: arch-common
       tags: ["arch-common"]
 
+    - role: borg
+      tags: ["borg"]
+
     - role: chezmoi
       tags: ["chezmoi"]
 

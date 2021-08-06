@@ -1,0 +1,44 @@
+---
+borg_server: no
+borg_home: "/mnt/extdata"
+borg_disk_uuid: "431d4679-0ea4-41b6-9639-9458e8280c81"
+borg_backups:
+  - name: "root"
+    no_timer: true
+    passphrase: "{{ borg_laptop_passphrase }}"
+    repo: "{{ borg_home }}/borg/{{ ansible_hostname }}"
+    backup_name: "{{ ansible_hostname }}"
+    pre_run: |
+      if [[ ! -b /dev/disk/by-uuid/{{ borg_disk_uuid }} ]]; then
+        echo "Disk not available"
+        exit 0
+      fi
+      set -e
+      if ! grep -q '{{ borg_home }}' /proc/mounts; then
+        mkdir -p {{ borg_home }}
+        mount /dev/disk/by-uuid/{{ borg_disk_uuid }} {{ borg_home }}
+      fi
+      mkdir -p {{ borg_home }}/borg/{{ ansible_hostname }}
+      set +e
+    post_run:
+      umount {{ borg_home }}
+    paths:
+      - "/"
+      - "/boot"
+      - "/home/{{ my_user }}"
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--one-file-system"
+      - "--exclude-caches"
+      - "--exclude 're:^(/dev|/proc|/sys|/tmp|/run)'"
+      - "--exclude '/home/*/.cache'"
+      - "--exclude '/home/*/.local/share/baloo'"
+      - "--exclude '/home/*/.local/share/containers'"
+      - "--exclude '/**/.snapshots'"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-weekly 2"
+      - "--keep-monthly 3"
