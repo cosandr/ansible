@@ -5,9 +5,14 @@
 
 chezmoi_overrides:
   i3: |
-    #WS["1"]="work"
-    #WS["2"]="work"
-    WS["2"]="no-discord"
+    _day=$(date +%a)
+    _hour=$(date +%H)
+    if [[ $_day = "Tue" || $_day = "Thu" ]] && [[ $_hour -ge 8 && $_hour -le 16 ]]; then
+        WS["1"]="work"
+        WS["2"]="work"
+    else
+        WS["2"]="no-discord"
+    fi
   xorg: |
     DPI=144
     MONITOR_MAP["DP-4"]="--primary --mode 3840x2160 --rate 120"

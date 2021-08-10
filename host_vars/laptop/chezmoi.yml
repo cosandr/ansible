@@ -2,17 +2,32 @@
 
 chezmoi_overrides:
   i3: |
-    # Restore only if we have more than 1 display
+    # Restore based on connected displays
     mon=$(xrandr --query | grep -oP '\S+\s+connected' | cut -d' ' -f1)
+    _hour=$(date +%H)
+    [[ $_hour -ge 8 && $_hour -le 17 ]] && workhours=1 || workhours=0
     if [[ $mon =~ DP-2 && $mon =~ HDMI-0 ]]; then
-      WS["1"]="work"
-      WS["2"]="work"
+      if [[ $workhours -eq 1 ]]; then
+        WS["1"]="work"
+        WS["2"]="work"
+      else
+        WS["2"]="no-discord"
+      fi
     elif [[ $mon =~ DP-0 && $mon =~ DP-1 ]]; then
-      WS["1"]="work"
-      WS["2"]="laptop-ext"
-      WS["3"]="laptop-ext"
+      if [[ $workhours -eq 1 ]]; then
+        WS["1"]="work"
+        WS["2"]="laptop-ext"
+        WS["3"]="laptop-ext"
+      else
+        WS["2"]="no-discord"
+      fi
     else
-      WS["1"]="laptop"
+      if [[ $workhours -eq 1 ]]; then
+        WS["1"]="work"
+        WS["2"]="laptop-ext"
+      else
+        WS["1"]="laptop"
+      fi
     fi
   polybar: |
     MONITOR_MAP["eDP-1-1"]="laptop"
