@@ -38,6 +38,9 @@
     - role: spotify
       tags: ["spotify"]
 
+    - role: chezmoi
+      tags: ["chezmoi"]
+
     - role: discord
       tags: ["discord"]
 
