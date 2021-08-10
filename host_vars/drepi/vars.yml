@@ -8,7 +8,7 @@ node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
 node_exporter_collectors: []
 ssh_authorized_keys:
   - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOg9fiCqlSj0Xm/+rA02ecxnDYecKEnhYol6WUrM29UA andrei@desktop"
-  - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJHwHNoM1fLrOPsuOboxUdfgPy/VscU50yjebHEIqwo7 andrei@macbook"
+  - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDCHMjI/tkb21/PtXRfj8VBsqGJn9TkP0+XDkw7LZ+5x andrei@laptop"
 firewalld_trusted_sources: "{{ vault_firewalld_trusted_sources }}"
 firewall_frontend: "ufw"
 ufw_trusted_sources:
