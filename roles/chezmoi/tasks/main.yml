@@ -10,9 +10,9 @@
 - name: Copy overrides
   copy:
     content: "{{ item.value }}"
-    dest: "{{ systemd_user_override }}/{{ item.key }}"
-    owner: "{{ systemd_user }}"
-    group: "{{ systemd_user }}"
+    dest: "{{ chezmoi_user_override }}/{{ item.key }}"
+    owner: "{{ chezmoi_user }}"
+    group: "{{ chezmoi_user }}"
     mode: 0644
     force: "{{ chezmoi_overwrite }}"
   with_dict: "{{ chezmoi_overrides }}"
