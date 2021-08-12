@@ -71,5 +71,8 @@
     - role: ufw
       tags: ["ufw"]
 
+    - role: fail2ban
+      tags: ["fail2ban"]
+
     - role: unattended-upgrades
       tags: ["unattended-upgrades"]
