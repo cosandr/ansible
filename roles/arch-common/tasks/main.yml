@@ -17,14 +17,11 @@
     creates: "/etc/adjtime"
   tags: ["time"]
 
-- name: Set hostname
-  become: true
-  copy:
-    dest: "/etc/hostname"
-    owner: root
-    group: root
-    mode: 0644
-    content: "{{ inventory_hostname }}"
+- name: "Set hostname"
+  include_role:
+    name: hostname
+    apply:
+      tags: "hostname"
   tags: ["hostname"]
 
 - name: "Set locales"

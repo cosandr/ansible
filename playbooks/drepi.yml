@@ -94,20 +94,6 @@
     #   notify: reboot
     #   tags: ["motion"]
   tasks:
-    # hostname
-    - block:
-        - name: updating hostname {{ inventory_hostname }} (1/2)
-          hostname:
-            name: "{{ inventory_hostname }}"
-
-        - name: updating hostname {{ inventory_hostname }} (2/2)
-          copy:
-            content: "{{ inventory_hostname }}{{'\n'}}"
-            dest: /etc/hostname
-
-      tags: ["hostname"]
-      become: true
-
     # locale
     - block:
       - name: set timezone
@@ -211,6 +197,10 @@
       tags: ["firewalld"]
 
   roles:
+    - role: hostname
+      become: true
+      tags: ["hostname"]
+
     - role: ufw
       become: true
       when: firewall_frontend == "ufw"

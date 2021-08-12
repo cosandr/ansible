@@ -64,5 +64,12 @@
       tags: ["always"]
 
   roles:
+    - role: hostname
+      become: true
+      tags: ["hostname"]
+
     - role: ufw
       tags: ["ufw"]
+
+    - role: unattended-upgrades
+      tags: ["unattended-upgrades"]
