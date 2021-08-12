@@ -5,16 +5,6 @@
   gather_facts: false
   vars:
     ansible_ssh_pass: raspberry  # fresh install
-  handlers:
-    - name: restart sshd
-      service:
-        name: sshd
-        state: restarted
-  pre_tasks:
-    - name: Run common role
-      import_role:
-        name: common
-      tags: ["always"]
   tasks:
     # Set up ssh
     # https://github.com/hannseman/ansible-raspbian
@@ -24,31 +14,13 @@
         key: "{{ item }}"
         state: present
       with_items: "{{ ssh_authorized_keys }}"
-      tags: ["sshd"]
+      tags: ["ssh"]
 
-    - name: set up sshd_config
+  roles:
+    - role: sshd
+      vars:
+        _sshd_pkg: "openssh-server"
       become: true
-      lineinfile:
-        dest: "/etc/ssh/sshd_config"
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
-        state: present
-      with_items:
-        - regexp: "^#?StrictModes"
-          line: "StrictModes yes"
-        - regexp: "^#?X11Forwarding"
-          line: "X11Forwarding no"
-        - regexp: "^#?PermitRootLogin"
-          line: "PermitRootLogin no"
-        - regexp: "^#?PasswordAuthentication"
-          line: "PasswordAuthentication no"
-        - regexp: "^#?ChallengeResponseAuthentication"
-          line: "ChallengeResponseAuthentication no"
-        - regexp: "^#?UsePAM"
-          line: "UsePAM no"
-        - regexp: "^#?PermitEmptyPasswords"
-          line: "PermitEmptyPasswords no"
-      notify: restart sshd
       tags: ["sshd"]
 
 - name: Raspberry Pi 4 playbook
