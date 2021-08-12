@@ -1,0 +1,8 @@
+---
+
+ansible_host: "{{ vault_ansible_host }}"
+ansible_user: "{{ vault_ansible_user }}"
+ipv6_address: "{{ vault_ipv6_address }}"
+ipv6_gw: "{{ vault_ipv6_gw }}"
+
+ssh_authorized_keys: "{{ hostvars.drepi.ssh_authorized_keys }}"

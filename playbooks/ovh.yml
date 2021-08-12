@@ -1,0 +1,79 @@
+---
+
+- name: SSH
+  hosts: ovh
+  gather_facts: false
+  handlers:
+    - name: restart sshd
+      become: true
+      service:
+        name: sshd
+        state: restarted
+  pre_tasks:
+    - name: Run common role
+      import_role:
+        name: common
+      tags: ["always"]
+  tasks:
+    - name: add SSH keys
+      authorized_key:
+        user: "{{ ansible_user }}"
+        key: "{{ item }}"
+        state: present
+      with_items: "{{ ssh_authorized_keys }}"
+      tags: ["sshd"]
+
+    - name: set up sshd_config
+      become: true
+      lineinfile:
+        dest: "/etc/ssh/sshd_config"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+      with_items:
+        - regexp: "^#?StrictModes"
+          line: "StrictModes yes"
+        - regexp: "^#?X11Forwarding"
+          line: "X11Forwarding no"
+        - regexp: "^#?PermitRootLogin"
+          line: "PermitRootLogin no"
+        - regexp: "^#?PasswordAuthentication"
+          line: "PasswordAuthentication no"
+        - regexp: "^#?ChallengeResponseAuthentication"
+          line: "ChallengeResponseAuthentication no"
+        - regexp: "^#?UsePAM"
+          line: "UsePAM yes"
+        - regexp: "^#?PermitEmptyPasswords"
+          line: "PermitEmptyPasswords no"
+      notify: restart sshd
+      tags: ["sshd"]
+
+- name: Network
+  hosts: ovh
+  gather_facts: false
+  become: true
+  handlers:
+    - name: restart networking
+      service:
+        name: networking
+        state: restarted
+  tasks:
+    - name: Copy IPv6 config
+      copy:
+        dest: /etc/network/interfaces.d/51-cloud-init-ipv6.cfg
+        owner: root
+        group: root
+        mode: 0644
+        content: |
+          auto eth0
+          iface eth0 inet6 static
+          mtu 1500
+          address {{ ipv6_address }}
+          netmask 128
+          post-up /sbin/ip -6 route add {{ ipv6_gw }} dev eth0
+          post-up /sbin/ip -6 route add default via {{ ipv6_gw }} dev eth0
+          pre-down /sbin/ip -6 route del default via {{ ipv6_gw }} dev eth0
+          pre-down /sbin/ip -6 route del {{ ipv6_gw }} dev eth0
+      notify: restart networking
+      tags: ["networking"]
+
