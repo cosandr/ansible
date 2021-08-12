@@ -1,0 +1,99 @@
+---
+
+- name: install ufw
+  package:
+    package: ufw
+    state: present
+  tags: ["install"]
+
+# https://stackoverflow.com/questions/52291149/ansible-to-get-the-netmask-in-cidr
+- name: Set network/prefix fact (IPv4)
+  set_fact:
+    ipv4_network: "{{ ip4 | ipaddr('network/prefix') }}"
+  vars:
+    ip4: "{{ ansible_default_ipv4.address }}/{{ ansible_default_ipv4.netmask }}"
+
+- name: Set network/prefix fact (IPv6)
+  set_fact:
+    ipv6_network: "{{ ip6 | ipaddr('network/prefix') }}"
+  vars:
+    ip6: "{{ ansible_default_ipv6.address }}/{{ ansible_default_ipv6.prefix }}"
+  when:
+    - ansible_default_ipv6 is defined
+    - ansible_default_ipv6.address is defined
+
+- name: Configure ufw defaults
+  ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+  loop:
+    - {direction: "incoming", policy: "deny"}
+    - {direction: "outgoing", policy: "allow"}
+  notify: reload ufw
+
+- name: Allow IGMP
+  blockinfile:
+    dest: /etc/ufw/before.rules
+    insertbefore: ^# don't delete the 'COMMIT' line or these rules won't be processed
+    block: |
+      # allow IGMP
+      -A ufw-before-input -p igmp -d 224.0.0.0/4 -j ACCEPT
+      -A ufw-before-output -p igmp -d 224.0.0.0/4 -j ACCEPT
+    state: present
+  notify: reload ufw
+
+- name: Add trusted sources
+  ufw:
+    direction: "in"
+    rule: "allow"
+    src: "{{ item }}"
+  with_items: "{{ ufw_trusted_sources }}"
+  notify: reload ufw
+
+- name: Add local network rules (IPv4)
+  ufw:
+    direction: "in"
+    rule: "allow"
+    src: "{{ ipv4_network }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  loop: "{{ ufw_local_rules }}"
+  notify: reload ufw
+
+- name: Add local network rules (IPv6)
+  ufw:
+    direction: "in"
+    rule: "allow"
+    src: "{{ ipv6_network }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  loop: "{{ ufw_local_rules }}"
+  notify: reload ufw
+  when: ipv6_network is defined
+
+- name: Add custom rules
+  ufw:
+    direction: "{{ item.direction | default('in') }}"
+    rule: "{{ item.rule | default('allow') }}"
+    src: "{{ item.src | default('any') }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  loop: "{{ ufw_custom_rules }}"
+
+- name: Allow DHCPv6 client from local network
+  ufw:
+    direction: "in"
+    rule: "allow"
+    src: "fe80::/64"
+    port: "546"
+    proto: "udp"
+  when:
+    - ansible_default_ipv6 is defined
+    - ansible_default_ipv6.address is defined
+    - ufw_allow_dhcpv6
+  notify: reload ufw
+
+- name: Enable ufw
+  ufw:
+    state: enabled
+  tags: ["enable"]
