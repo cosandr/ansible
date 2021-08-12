@@ -1,0 +1,13 @@
+---
+
+fail2ban_ignoreself: "true"
+fail2ban_bantime: "1d"
+fail2ban_findtime: "5m"
+fail2ban_maxretry: "5"
+fail2ban_ignoreip:
+  - "127.0.0.1/8"
+  - "::1"
+  - "{{ ansible_default_ipv4.network }}/24"
+fail2ban_sshd_extra: {}
+  # maxretry: 2
+  # bantime: 8h

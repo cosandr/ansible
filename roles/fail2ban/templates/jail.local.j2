@@ -1,33 +1,28 @@
 [DEFAULT]
+ignoreself = {{ fail2ban_ignoreself }}
+ignoreip = {{ fail2ban_ignoreip | join(' ') }}
 
-ignoreself = true
-ignoreip = 127.0.0.1/8 ::1 {{ ansible_facts.default_ipv4.network }}/24
-
-bantime  = 1d
-findtime  = 5m
-maxretry = 5
+bantime  = {{ fail2ban_bantime }}
+findtime  = {{ fail2ban_findtime  }}
+maxretry = {{ fail2ban_maxretry  }}
 
 backend = systemd
 
-
 [sshd]
-
 enabled  = true
-port     = ssh
 logpath  = %(sshd_log)s
 backend  = %(sshd_backend)s
-maxretry = 2
-bantime  = 8h
+{% for k, v in fail2ban_sshd_extra.items() %}
+{{ k }} = {{ v }}
+{% endfor %}
 
 {% if ansible_selinux.status == 'enabled' %}
 [selinux-ssh]
 enabled  = true
-port     = ssh
 logpath  = %(auditd_log)s
 
 {% endif %}
 [nginx-http-auth]
-
 enabled	= true
 port    = http,https
 logpath = %(nginx_error_log)s

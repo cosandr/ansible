@@ -1,6 +1,9 @@
 - name: Install fail2ban
   package:
     name: fail2ban
+    state: present
+  notify: enable and start fail2ban
+  tags: ["install"]
 
 - block:
   - name: Copy bitwarden filter
@@ -10,6 +13,7 @@
       owner: root
       group: root
       mode: 0644
+    notify: restart fail2ban
 
   - name: Copy bitwarden jail
     template:
@@ -18,11 +22,12 @@
       owner: root
       group: root
       mode: 0644
-  
+    notify: restart fail2ban
+
   when:
+    - ports is defined
     - ports.bitwarden is defined
     - ports.bitwarden_notifications is defined
-
 
 - name: Copy global jail
   template:
@@ -31,3 +36,4 @@
     owner: root
     group: root
     mode: 0644
+  notify: restart fail2ban

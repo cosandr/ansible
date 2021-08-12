@@ -1,0 +1,12 @@
+---
+
+- name: enable and start fail2ban
+  service:
+    name: fail2ban
+    state: started
+    enabled: true
+
+- name: restart fail2ban
+  service:
+    name: fail2ban
+    state: restart
