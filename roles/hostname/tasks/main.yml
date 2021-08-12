@@ -1,0 +1,13 @@
+---
+
+- name: Set hostname (1/2)
+  hostname:
+    name: "{{ hostname }}"
+
+- name: Set hostname (2/2)
+  copy:
+    content: "{{ hostname }}{{'\n'}}"
+    dest: /etc/hostname
+    owner: root
+    group: root
+    mode: 0644
