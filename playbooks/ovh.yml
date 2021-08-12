@@ -63,6 +63,31 @@
       setup:
       tags: ["always"]
 
+  tasks:
+    - name: Set some shell settings
+      copy:
+        dest: "/etc/profile.d/99-custom.sh"
+        content: |
+          export EDITOR=vim
+          alias ll='ls -lh'
+          alias la='ll -a'
+        owner: root
+        group: root
+        mode: 0644
+      tags: ["shell"]
+
+    - name: Configure /etc/hosts
+      lineinfile:
+        dest: "/etc/hosts"
+        regexp: '^127\.0\.1\.1'
+        line: "127.0.1.1 {{ hosts | join(' ') }}"
+        state: present
+      vars:
+        hosts:
+          - "{{ inventory_hostname }}"
+          - "deez.no"
+      tags: ["hosts"]
+
   roles:
     - role: hostname
       become: true
