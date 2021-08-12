@@ -37,11 +37,6 @@
         name: firewalld
         state: reloaded
 
-    - name: reload ufw
-      become: true
-      ufw:
-        state: reloaded
-
     - name: restart firewalld
       become: true
       service:
@@ -135,70 +130,6 @@
 
       tags: ["locale"]
       become: true
-    # ufw
-    - block:
-      - name: install ufw
-        apt:
-          package: ufw
-          state: present
-        tags: ["install"]
-
-      - name: configure ufw defaults
-        ufw:
-          direction: "{{ item.direction }}"
-          policy: "{{ item.policy }}"
-        with_items:
-          - { direction: "incoming", policy: "deny" }
-          - { direction: "outgoing", policy: "allow" }
-        notify: reload ufw
-
-      - name: allow IGMP
-        blockinfile:
-          dest: /etc/ufw/before.rules
-          insertbefore: ^# don't delete the 'COMMIT' line or these rules won't be processed
-          block: |
-            # allow IGMP
-            -A ufw-before-input -p igmp -d 224.0.0.0/4 -j ACCEPT
-            -A ufw-before-output -p igmp -d 224.0.0.0/4 -j ACCEPT
-          state: present
-        notify: reload ufw
-
-      - name: add trusted sources
-        ufw:
-          direction: "in"
-          rule: "allow"
-          src: "{{ item }}"
-        with_items: "{{ ufw_trusted_sources | default([]) }}"
-
-      - name: allow some stuff from local network
-        ufw:
-          direction: "in"
-          rule: "allow"
-          src: "{{ ansible_default_ipv4.network }}/24"
-          port: "{{ item.port }}"
-          proto: "{{ item.proto }}"
-        with_items:
-          - { port: "22", proto: "tcp" }    # SSH
-          - { port: "8081", proto: "tcp" }  # Motion
-          - { port: "137", proto: "udp" }   # SMB client
-          - { port: "138", proto: "udp" }   # SMB client
-
-      - name: allow DHCPv6 client from local network
-        ufw:
-          direction: "in"
-          rule: "allow"
-          src: "fe80::/64"
-          port: "546"
-          proto: "udp"
-        when: ansible_default_ipv6 | bool
-
-      - name: enable ufw
-        ufw:
-          state: enabled
-
-      become: true
-      when: firewall_frontend == "ufw"
-      tags: ["ufw"]
     # firewalld
     - block:
         - name: install firewalld and nftables
@@ -279,14 +210,19 @@
       when: firewall_frontend == "firewalld"
       tags: ["firewalld"]
 
-    - import_role: { name: motion }
+  roles:
+    - role: ufw
+      become: true
+      when: firewall_frontend == "ufw"
+      tags: ["ufw"]
+
+    - role: motion
       tags: ["motion"]
 
-    - import_role: { name: unattended-upgrades }
-      become: true
+    - role: unattended-upgrades
       tags: ["unattended-upgrades"]
 
-    - import_role: { name: journalbeat }
+    - role: journalbeat
       become: true
       tags: ["journalbeat"]
 

@@ -48,3 +48,21 @@
       notify: restart networking
       tags: ["networking"]
 
+- name: Roles
+  hosts: ovh
+  become: true
+  gather_facts: false
+  pre_tasks:
+    - name: Run common role
+      become: false
+      import_role:
+        name: common
+      tags: ["always"]
+
+    - name: Gather facts
+      setup:
+      tags: ["always"]
+
+  roles:
+    - role: ufw
+      tags: ["ufw"]

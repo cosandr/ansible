@@ -1,0 +1,10 @@
+---
+
+ufw_allow_dhcpv6: false
+ufw_custom_rules:
+  - port: 22
+    proto: tcp
+  - port: 80
+    proto: tcp
+  - port: 443
+    proto: tcp

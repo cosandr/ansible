@@ -1,0 +1,7 @@
+---
+
+ufw_local_rules:
+    - { port: "22", proto: "tcp" }    # SSH
+    - { port: "8081", proto: "tcp" }  # Motion
+    - { port: "137", proto: "udp" }   # SMB client
+    - { port: "138", proto: "udp" }   # SMB client
