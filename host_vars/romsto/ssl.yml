@@ -1,0 +1,19 @@
+---
+
+__subject_alt_name:
+  - "DNS:{{ domain }}"
+  - "DNS:{{ ddns_domain }}"
+
+ca_path: "/etc/ssl/{{ my_user }}-ca.crt"
+self_signed_ssl:
+  # - name: node
+  #   dest: "/etc/ssl/selfsigned"
+  #   subject_alt_name: "{{ __subject_alt_name }}"
+  # - name: cadvisor
+  #   dest: "/etc/ssl/selfsigned"
+  #   subject_alt_name: "{{ __subject_alt_name }}"
+  - name: filebeat
+    dest: "/etc/filebeat"
+    size: 2048
+    format: "pkcs8"
+    subject_alt_name: "{{ __subject_alt_name }}"

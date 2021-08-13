@@ -20,6 +20,7 @@
               - "{{ filebeat_config_path }}"
               - "{{ filebeat_home_path }}"
               - "{{ sysv_path }}/rc.filebeat"
+              - "{{ ca_path }}"
             dest: /boot/filebeat.tar.gz
 
         - name: Setup filebeat on boot

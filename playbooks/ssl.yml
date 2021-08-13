@@ -1,0 +1,188 @@
+---
+
+# https://milliams.com/posts/2020/ansible-certificate-authority/
+# Install cryptography python library
+- hosts: all
+  # Only gather facts for relevant hosts
+  gather_facts: false
+  vars:
+    host_cert_path: "{{ inventory_dir }}/files/{{ inventory_hostname }}/elk_ssl"
+  pre_tasks:
+    - block:
+        - name: Search for encrypted private keys
+          delegate_to: localhost
+          find:
+            paths: "{{ inventory_dir }}/files"
+            recurse: true
+            patterns: '*.key,*.csr'
+            contains: '^\$ANSIBLE_VAULT'
+          register: __dec_files
+          tags: ["always"]
+
+        - name: Decrypt files
+          run_once: true
+          delegate_to: localhost
+          command: ansible-vault decrypt {{ item.path }}
+          args:
+            chdir: "{{ inventory_dir }}"
+          register: __decrypt
+          changed_when: __decrypt.rc == 0
+          loop: "{{ __dec_files.files }}"
+          loop_control:
+            label: "{{ item.path }}"
+          tags: ["always"]
+
+        - name: Create certs dir
+          file:
+            path: "{{ cert_path }}"
+            state: directory
+            mode: 0700
+
+        - name: Generate CA
+          shell: >
+            openssl req -new -x509
+            -days 3650
+            -extensions v3_ca
+            -subj "/C=NO/O=Home/CN={{ my_user }}/E={{ my_email }}"
+            -passout stdin
+            -keyout {{ cert_path }}/ca.key
+            -out {{ cert_path }}/ca.crt
+          args:
+            stdin: "{{ ca_pass }}"
+            creates: "{{ cert_path }}/ca.key"
+
+        ### Invalid CA certificate error
+        # - name: Create CA key
+        #   openssl_privatekey:
+        #     path: "{{ cert_path }}/ca.key"
+        #     passphrase: "{{ ca_pass }}"
+        #     select_crypto_backend: cryptography
+        #     cipher: auto
+
+        # - name: Create the CA CSR
+        #   openssl_csr:
+        #     path: "{{ cert_path }}/ca.csr"
+        #     privatekey_path: "{{ cert_path }}/ca.key"
+        #     privatekey_passphrase: "{{ ca_pass }}"
+        #     common_name: "{{ my_user }}-mon-ca"
+
+        # - name: Sign the CA CSR
+        #   openssl_certificate:
+        #     path: "{{ cert_path }}/ca.crt"
+        #     csr_path: "{{ cert_path }}/ca.csr"
+        #     privatekey_path: "{{ cert_path }}/ca.key"
+        #     privatekey_passphrase: "{{ ca_pass }}"
+        #     extended_key_usage: "1.3.6.1.4.1.311.80.1"
+        #     provider: selfsigned
+      delegate_to: localhost
+      run_once: true
+
+    - name: Gather hostname
+      setup:
+        filter:
+          - 'ansible_hostname'
+      tags: ["always"]
+      when: self_signed_ssl is defined
+
+    - name: Create host cert dir
+      delegate_to: localhost
+      check_mode: false
+      file:
+        path: "{{ host_cert_path }}"
+        state: directory
+        mode: 0700
+      when: self_signed_ssl is defined
+  post_tasks:
+    - name: Search for unencrypted private keys
+      delegate_to: localhost
+      find:
+        paths: "{{ inventory_dir }}/files"
+        recurse: true
+        patterns: '*.key,*.csr'
+        contains: '^-----BEGIN.*-----$'
+      register: __enc_files
+      tags: ["always"]
+
+    - name: Encrypt files
+      run_once: true
+      delegate_to: localhost
+      command: ansible-vault encrypt {{ item.path }}
+      args:
+        chdir: "{{ inventory_dir }}"
+      register: __encrypt
+      changed_when: __encrypt.rc == 0
+      loop: "{{ __enc_files.files }}"
+      loop_control:
+        label: "{{ item.path }}"
+      tags: ["always"]
+
+  tasks:
+    - block:
+        - name: Create host private key
+          delegate_to: localhost
+          openssl_privatekey:
+            path: "{{ host_cert_path }}/{{ item.name }}.key"
+            size: "{{ item.size | default(4096) }}"
+            format: "{{ item.format | default('auto_ignore') }}"
+          loop: "{{ self_signed_ssl }}"
+          loop_control:
+            label: "{{ inventory_hostname }}-{{ item.name }}"
+
+        - name: Create host CSR
+          delegate_to: localhost
+          openssl_csr:
+            path: "{{ host_cert_path }}/{{ item.name }}.csr"
+            privatekey_path: "{{ host_cert_path }}/{{ item.name }}.key"
+            common_name: "{{ ansible_hostname }}"
+            subject_alt_name: "{{ item.subject_alt_name }}"
+          loop: "{{ self_signed_ssl }}"
+          loop_control:
+            label: "{{ inventory_hostname }}-{{ item.name }}"
+
+        - name: Sign host CSR
+          delegate_to: localhost
+          openssl_certificate:
+            path: "{{ host_cert_path }}/{{ item.name }}.crt"
+            csr_path: "{{ host_cert_path }}/{{ item.name }}.csr"
+            provider: ownca
+            ownca_path: "{{ cert_path }}/ca.crt"
+            ownca_privatekey_path: "{{ cert_path }}/ca.key"
+            ownca_privatekey_passphrase: "{{ ca_pass }}"
+          loop: "{{ self_signed_ssl }}"
+          loop_control:
+            label: "{{ inventory_hostname }}-{{ item.name }}"
+
+        - name: Copy CA to host
+          copy:
+            src: "{{ cert_path }}/ca.crt"
+            dest: "{{ ca_path }}"
+            owner: "{{ ca_owner | default('root') }}"
+            group: "{{ ca_group | default('root') }}"
+            mode: 0644
+          tags: ["install"]
+
+        - name: Copy certs to host
+          copy:
+            src: "{{ host_cert_path }}/{{ item.name }}.crt"
+            dest: "{{ item.dest }}/{{ item.name }}.crt"
+            owner: "{{ item.owner | default('root') }}"
+            group: "{{ item.group | default('root') }}"
+            mode: 0644
+          loop: "{{ self_signed_ssl }}"
+          loop_control:
+            label: "{{ inventory_hostname }}-{{ item.name }}"
+          tags: ["install"]
+
+        - name: Copy keys to host
+          copy:
+            src: "{{ host_cert_path }}/{{ item.name }}.key"
+            dest: "{{ item.dest }}/{{ item.name }}.key"
+            owner: "{{ item.owner | default('root') }}"
+            group: "{{ item.group | default('root') }}"
+            mode: 0640
+          loop: "{{ self_signed_ssl }}"
+          loop_control:
+            label: "{{ inventory_hostname }}-{{ item.name }}"
+          tags: ["install"]
+
+      when: self_signed_ssl is defined
