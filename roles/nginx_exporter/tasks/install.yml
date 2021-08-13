@@ -10,10 +10,6 @@
     nginx_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
 
 - block:
-  - name: use systemd-sysusers
-    debug:
-      msg: "Systemd version {{ nginx_exporter_systemd_version }} OK for sysusers"
-
   - name: copy nginx_exporter sysusers file
     template:
       src: nginx_exporter.sysusers.j2
@@ -21,22 +17,20 @@
       mode: 0644
       owner: root
       group: root
+    register: __sysusers
 
   - name: restart systemd-sysusers
     become: true
     systemd:
-      name: systemd-sysusers
+      name: systemd-sysusers.service
       state: restarted
+    when: __sysusers.changed
 
   when:
     - not nginx_exporter_no_sysusers
     - nginx_exporter_systemd_version | int >= 215
 
 - block:
-  - name: use systemd-sysusers
-    debug:
-      msg: "Systemd version {{ nginx_exporter_systemd_version }} too low for sysusers"
-
   - name: create nginx_exporter system group
     group:
       name: nginx_exporter

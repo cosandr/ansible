@@ -10,10 +10,6 @@
     node_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
 
 - block:
-  - name: use systemd-sysusers
-    debug:
-      msg: "Systemd version {{ node_exporter_systemd_version }} OK for sysusers"
-
   - name: copy node_exporter sysusers file
     template:
       src: node_exporter.sysusers.j2
@@ -21,23 +17,20 @@
       mode: 0644
       owner: root
       group: root
+    register: __sysusers
 
-  - name: restart node_exporter
+  - name: restart systemd-sysusers
     become: true
     systemd:
-      daemon_reload: true
-      name: node_exporter
+      name: systemd-sysusers.service
       state: restarted
+    when: __sysusers.changed
 
   when:
     - not node_exporter_no_sysusers
     - node_exporter_systemd_version | int >= 215
 
 - block:
-  - name: use systemd-sysusers
-    debug:
-      msg: "Systemd version {{ node_exporter_systemd_version }} too low for sysusers"
-
   - name: create node_exporter system group
     group:
       name: node_exporter
