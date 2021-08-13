@@ -10,6 +10,8 @@ filebeat_config:
       paths: ['/var/log/syslog']
       tags: ['syslog']
 
-  output.elasticsearch:
-    hosts: "{{ vault_es_hosts }}"
-    api_key: "{{ vault_filebeat_key }}"
+  output.logstash:
+    hosts: ["{{ hostvars.dresrv.ddns_domain }}:5044"]
+    ssl.certificate_authorities: ["{{ ca_path }}"]
+    ssl.certificate: "/etc/filebeat/filebeat.crt"
+    ssl.key: "/etc/filebeat/filebeat.key"

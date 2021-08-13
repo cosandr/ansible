@@ -3,46 +3,46 @@
 nginx_vhosts:
   - filename: admin.conf
     server_name: admin
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/admin.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/admin.conf.j2"
   - filename: bw.conf
     server_name: bw
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/bw.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/bw.conf.j2"
   - filename: direct.conf
     server_name: direct
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/direct.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/direct.conf.j2"
   - filename: elk.conf
     server_name: elk
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/elk.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/elk.conf.j2"
   - filename: gitea.conf
     server_name: gitea
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/gitea.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/gitea.conf.j2"
   - filename: gitlab.conf
     server_name: gitlab
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/gitlab.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/gitlab.conf.j2"
   - filename: jellyfin.conf
     server_name: jellyfin
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/jellyfin.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/jellyfin.conf.j2"
   - filename: login.conf
     server_name: login
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/login.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/login.conf.j2"
   - filename: main.conf
     server_name: main
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/main.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/main.conf.j2"
   - filename: nextcloud.conf
     server_name: nextcloud
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/nextcloud.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/nextcloud.conf.j2"
   - filename: registry.conf
     server_name: registry
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/registry.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/registry.conf.j2"
   - filename: standard-notes.conf
     server_name: standard-notes
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/standard-notes.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/standard-notes.conf.j2"
   - filename: status.conf
     server_name: status
-    template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/status.conf.j2"
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/status.conf.j2"
   # - filename: nextcloud-baremetal.conf
-  #   template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/nextcloud-baremetal.conf.j2"
+  #   template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/nextcloud-baremetal.conf.j2"
   # - filename: nextcloud-official.conf
-  #   template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/nextcloud-official.conf.j2"
+  #   template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/nextcloud-official.conf.j2"
   # - filename: webdav.conf
-  #   template: "{{ inventory_dir }}/host_files/{{ inventory_hostname }}/nginx/webdav.conf.j2"
+  #   template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/webdav.conf.j2"

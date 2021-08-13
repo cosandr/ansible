@@ -1,0 +1,21 @@
+---
+
+__subject_alt_name:
+  - "DNS:{{ domain }}"
+  - "DNS:{{ ddns_domain }}"
+
+ca_path: "{{ container_data }}/elk/certs/ca.crt"
+self_signed_ssl:
+  # - name: node
+  #   dest: "/etc/ssl/selfsigned"
+  #   subject_alt_name: "{{ __subject_alt_name }}"
+  # - name: cadvisor
+  #   dest: "/etc/ssl/selfsigned"
+  #   subject_alt_name: "{{ __subject_alt_name }}"
+  - name: logstash_beats
+    size: 2048
+    format: "pkcs8"
+    owner: "{{ my_user }}"
+    group: "{{ my_user }}"
+    dest: "{{ container_data }}/elk/certs"
+    subject_alt_name: "{{ __subject_alt_name }}"
