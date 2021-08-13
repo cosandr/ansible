@@ -1,6 +1,4 @@
 ---
-node_exporter_collectors:
-  - btrfs
 node_exporter_no_collectors:
   - mdadm
   - zfs
