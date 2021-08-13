@@ -85,7 +85,7 @@
       vars:
         hosts:
           - "{{ inventory_hostname }}"
-          - "deez.no"
+          - "{{ domain }}"
       tags: ["hosts"]
 
   roles:
@@ -94,10 +94,17 @@
       tags: ["hostname"]
 
     - role: ufw
+      become: true
       tags: ["ufw"]
 
     - role: fail2ban
+      become: true
       tags: ["fail2ban"]
 
     - role: unattended-upgrades
+      become: true
       tags: ["unattended-upgrades"]
+
+    - role: node_exporter
+      become: true
+      tags: ["node_exporter"]

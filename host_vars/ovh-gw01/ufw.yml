@@ -8,3 +8,8 @@ ufw_custom_rules:
     proto: tcp
   - port: 443
     proto: tcp
+  - port: "{{ wireguard_port }}"
+    proto: udp
+  - port: "{{ node_exporter_port }}"
+    proto: tcp
+    src: "{{ hostvars.dresrv.wireguard_ip }}"
