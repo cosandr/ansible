@@ -153,6 +153,7 @@
             label: "{{ inventory_hostname }}-{{ item.name }}"
 
         - name: Copy CA to host
+          become: true
           copy:
             src: "{{ cert_path }}/ca.crt"
             dest: "{{ ca_path }}"
@@ -162,6 +163,7 @@
           tags: ["install"]
 
         - name: Copy certs to host
+          become: true
           copy:
             src: "{{ host_cert_path }}/{{ item.name }}.crt"
             dest: "{{ item.dest }}/{{ item.name }}.crt"
@@ -174,6 +176,7 @@
           tags: ["install"]
 
         - name: Copy keys to host
+          become: true
           copy:
             src: "{{ host_cert_path }}/{{ item.name }}.key"
             dest: "{{ item.dest }}/{{ item.name }}.key"
