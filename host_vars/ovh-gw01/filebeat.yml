@@ -1,0 +1,17 @@
+---
+
+filebeat_config:
+  filebeat.inputs:
+    - type: docker
+      containers.ids: '*'
+      tags: ['docker']
+
+    - type: log
+      paths: ['/var/log/syslog']
+      tags: ['syslog']
+
+  output.logstash:
+    hosts: ["{{ hostvars.dresrv.wireguard_ip }}:5044"]
+    ssl.certificate_authorities: ["{{ ca_path }}"]
+    ssl.certificate: "/etc/filebeat/filebeat.crt"
+    ssl.key: "/etc/filebeat/filebeat.key"

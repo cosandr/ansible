@@ -108,3 +108,7 @@
     - role: node_exporter
       become: true
       tags: ["node_exporter"]
+
+    - role: filebeat
+      become: true
+      tags: ["filebeat"]
