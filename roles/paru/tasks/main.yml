@@ -1,0 +1,28 @@
+---
+
+- name: Clone from AUR
+  git:
+    dest: /tmp/aur-{{ aur_name }}
+    repo: "{{ aur_repo }}"
+    version: "master"
+    force: true
+  check_mode: false
+  tags: ["install"]
+
+- name: Build and install
+  become: true
+  become_user: "{{ aur_build_user }}"
+  aur:
+    name: "{{ aur_name }}"
+    state: latest
+    use: makepkg
+    local_pkgbuild: "/tmp/aur-{{ aur_name }}"
+  tags: ["install"]
+
+- name: Configure
+  become: true
+  lineinfile:
+    path: "/etc/paru.conf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items: "{{ paru_config }}"

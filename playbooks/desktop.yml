@@ -44,6 +44,9 @@
     - role: discord
       tags: ["discord"]
 
+    - role: paru
+      tags: ["paru"]
+
     - role: sshd
       tags: ["sshd"]
 

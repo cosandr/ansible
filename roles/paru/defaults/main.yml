@@ -1,0 +1,11 @@
+---
+
+aur_name: "paru"
+aur_repo: "https://aur.archlinux.org/{{ aur_name }}.git"
+paru_config:
+  - regexp: "^#?CombinedUpgrade"
+    line: "CombinedUpgrade"
+  - regexp: "^#?BatchInstall"
+    line: "BatchInstall"
+  - regexp: "^#?NewsOnUpgrade"
+    line: "NewsOnUpgrade"
