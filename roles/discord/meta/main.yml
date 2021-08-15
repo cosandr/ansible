@@ -1,3 +1,4 @@
 ---
 dependencies:
   - role: prep_aur
+    tags: ["install"]
