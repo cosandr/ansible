@@ -50,6 +50,8 @@
       tags: ["discord"]
 
     - role: paru
+      vars:
+        aur_name: paru-bin
       tags: ["paru"]
 
     - role: sshd
