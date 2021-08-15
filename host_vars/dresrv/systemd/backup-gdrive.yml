@@ -6,10 +6,11 @@ __sd_backup_gdrive:
     content: |
       [Unit]
       Description=Backup important files to Google Drive
-      After=network-online.target
-      Requires=network-online.target
+      After=network-online.target tank.mount
+      Requires=network-online.target tank.mount
       ConditionPathExists={{ container_data }}/nextcloud/data/data/{{ my_email }}/files
       ConditionPathExists={{ container_data }}/syncthing/data
+      ConditionPathExists=/tank/backup
 
       [Service]
       Type=oneshot

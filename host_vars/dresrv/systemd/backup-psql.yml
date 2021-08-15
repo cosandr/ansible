@@ -6,8 +6,8 @@ __sd_backup_psql:
     content: |
       [Unit]
       Description=PostgreSQL backup
-      After={{ postgres_service_name }}
-      Requires={{ postgres_service_name }}
+      After={{ postgres_service_name }} tank.mount
+      Requires={{ postgres_service_name }} tank.mount
 
       [Service]
       Type=oneshot
