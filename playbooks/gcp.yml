@@ -1,0 +1,60 @@
+---
+
+
+- hosts: ovh
+  gather_facts: false
+  vars:
+    records:
+      - type: A
+        target: "{{ ansible_host }}"
+      - type: AAAA
+        target: "{{ ipv6_address }}"
+  tasks:
+    - name: Create managed zone
+      delegate_to: localhost
+      google.cloud.gcp_dns_managed_zone:
+        name: "{{ item.replace('.', '-') }}"
+        description: "{{ item }}"
+        dns_name: "{{ item }}."
+        dnssec_config:
+          state: "on"
+        auth_kind: "serviceaccount"
+        project: "{{ gcp_project }}"
+        service_account_contents: "{{ gcp_service_account_contents }}"
+        state: present
+      loop: "{{ domains }}"
+      register: managed_zones
+
+    - name: Add A and AAAA record sets
+      delegate_to: localhost
+      google.cloud.gcp_dns_resource_record_set:
+        name: "{{ item[0].dnsName }}"
+        managed_zone: "{{ item[0] }}"
+        type: "{{ item[1].type }}"
+        ttl: 600
+        target:
+          - "{{ item[1].target }}"
+        auth_kind: "serviceaccount"
+        project: "{{ gcp_project }}"
+        service_account_contents: "{{ gcp_service_account_contents }}"
+        state: present
+      loop: "{{ managed_zones.results | product(records) | list }}"
+      loop_control:
+        label: "{{ item[0].dnsName }} - {{ item[1].type }} - {{ item[1].target }}"
+
+    - name: Add wildcard CNAME record sets
+      delegate_to: localhost
+      google.cloud.gcp_dns_resource_record_set:
+        name: "*.{{ item.dnsName }}"
+        managed_zone: "{{ item }}"
+        type: "CNAME"
+        ttl: 600
+        target:
+          - "{{ item.dnsName }}"
+        auth_kind: "serviceaccount"
+        project: "{{ gcp_project }}"
+        service_account_contents: "{{ gcp_service_account_contents }}"
+        state: present
+      loop: "{{ managed_zones.results }}"
+      loop_control:
+        label: "{{ item.dnsName }}"

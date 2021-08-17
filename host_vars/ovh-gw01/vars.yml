@@ -1,9 +1,13 @@
 ---
 
-domain: "{{ vault_domain }}"
+
+domains: "{{ vault_domains }}"
+domain: "{{ domains | first  }}"
 ansible_host: "{{ vault_ansible_host }}"
 ansible_user: "{{ vault_ansible_user }}"
 ipv6_address: "{{ vault_ipv6_address }}"
 ipv6_gw: "{{ vault_ipv6_gw }}"
+gcp_project: "{{ vault_gcp_project }}"
+gcp_service_account_contents: "{{ vault_gcp_service_account_contents }}"
 
 ssh_authorized_keys: "{{ hostvars.drepi.ssh_authorized_keys }}"

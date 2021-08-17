@@ -1,5 +1,12 @@
 # Ansible
 
+## GCP
+
+See [Ansible guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html) for more details.
+Requires `requests google-auth` to be installed for the Python interpreter.
+
+Create service account with DNS Administrator role.
+
 ## Vault
 
 Encrypt stuff:
