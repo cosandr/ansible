@@ -10,9 +10,9 @@ borg_local_repo: yes
 borg_server: yes
 borg_auth_users:
   - host: desktop
-    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCNmdSfKHim4BJlPkf40WmeFb75FPy5HpQOC6lAZO5V root@desktop"
+    key: "{{ hostvars.desktop.ssh_keys.root }}"
   - host: rtv
-    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOcilf7C2/8vH1LnCjHT3LJyN+c+Ig511llnzA4VNh+T root@rtv"
+    key: "{{ hostvars.romsto.ssh_keys.root }}"
 borg_backups:
   - name: "root"
     timer_description: "Backup root every Friday at 22:00"
