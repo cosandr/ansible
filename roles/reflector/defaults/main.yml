@@ -1,0 +1,9 @@
+---
+
+reflector_timer: "weekly"
+reflector_config: |
+  --save /etc/pacman.d/mirrorlist
+  --country Norway,Sweden,Denmark
+  --protocol https
+  --latest 5
+  --sort score

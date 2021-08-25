@@ -32,6 +32,9 @@
     - role: btrbk
       tags: ["btrbk"]
 
+    - role: reflector
+      tags: ["reflector"]
+
     - role: arch-common
       tags: ["arch-common"]
 
