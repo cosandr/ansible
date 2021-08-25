@@ -15,15 +15,18 @@ pacman_packages:
   - bison
   - bluez
   - bluez-utils
+  - borg
   - brightnessctl
   - btrfs-progs
   - chezmoi
   - chromium
+  - deluge-gtk
   - docker
   - docker-compose
   - dunst
   - efibootmgr
   - ethtool
+  - evince
   - fakeroot
   - feh
   - file
@@ -45,6 +48,8 @@ pacman_packages:
   - grep
   - groff
   - gvfs-mtp
+  - gvfs-smb
+  - gvfs-nfs
   - gzip
   - htop
   - i3-gaps
@@ -53,6 +58,7 @@ pacman_packages:
   - intel-media-driver
   - intel-ucode
   - iotop
+  - ipython
   - iwd
   - jq
   - kitty
@@ -152,6 +158,7 @@ aur_packages:
   - ttf-font-awesome-4
   - visual-studio-code-bin
   - xidlehook
+  - webex-bin
 
 enabled_services:
   - systemd-timesyncd.service

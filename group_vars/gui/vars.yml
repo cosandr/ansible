@@ -12,6 +12,7 @@ pacman_packages:
   - docker
   - docker-compose
   - dunst
+  - evince
   - feh
   - file-roller
   - firefox
