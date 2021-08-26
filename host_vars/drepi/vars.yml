@@ -46,7 +46,7 @@ motion_default_config:
   movie_max_time: "300"
   movie_output: "on"
   movie_quality: "80"
-  on_movie_end: "MINIMUM_SIZE_MB=10 {{ motion_script_dir }}/after-movie %f"
+  on_movie_end: "MINIMUM_SIZE_MB=10 DAYS_KEEP=20 {{ motion_script_dir }}/after-movie %f"
   on_picture_save: "{{ motion_script_dir }}/after-picture %f"
   setup_mode: "off"
   snapshot_filename: "%Y%m%d-%H%M%S-snapshot"
