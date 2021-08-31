@@ -120,11 +120,14 @@
     - role: dracut-sshd
       tags: ["dracut-sshd"]
 
-    - role: cadvisor
-      tags: ["prometheus-stack", "cadvisor"]
+    - role: alertmanager
+      tags: ["prometheus-stack", "alertmanager"]
 
     - role: prometheus
       tags: ["prometheus-stack", "prometheus"]
+
+    - role: cadvisor
+      tags: ["prometheus-stack", "cadvisor"]
 
     - role: grafana
       tags: ["prometheus-stack", "grafana"]

@@ -1,0 +1,19 @@
+---
+
+alertmanager_version: latest
+alertmanager_web_listen_address: "0.0.0.0:9093"
+alertmanager_slack_api_url: "{{ vault_alertmanager_slack_api_url }}"
+alertmanager_receivers:
+  - name: discord
+    slack_configs:
+      - send_resolved: true
+        fields:
+          - title: '{% raw %}{{ .CommonAnnotations.summary }}{% endraw %}'
+            value: '{% raw %}{{ .CommonAnnotations.description }}{% endraw %}'
+            short: false
+alertmanager_route:
+  group_by: ['name']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 3h
+  receiver: discord

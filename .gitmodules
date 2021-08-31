@@ -16,3 +16,6 @@
 [submodule "roles/wireguard"]
 	path = roles/wireguard
 	url = https://github.com/githubixx/ansible-role-wireguard
+[submodule "roles/alertmanager"]
+	path = roles/alertmanager
+	url = git@github.com:cosandr/ansible-alertmanager.git
