@@ -5,7 +5,8 @@ smtp_pass: "{{ vault_smtp_pass }}"
 smtp_port: "{{ vault_smtp_port }}"
 smtp_user: "{{ vault_smtp_user }}"
 node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
-node_exporter_collectors: []
+node_exporter_collectors:
+  - systemd
 ssh_authorized_keys:
   - "{{ hostvars.desktop.ssh_keys.andrei }}"
   - "{{ hostvars.laptop.ssh_keys.andrei }}"

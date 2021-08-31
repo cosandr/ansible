@@ -2,3 +2,5 @@
 
 node_exporter_port: 9100
 node_exporter_web_listen_address: "{{ wireguard_ip }}:{{ node_exporter_port }}"
+node_exporter_collectors:
+  - systemd
