@@ -29,6 +29,8 @@
     # https://github.com/Foxboron/sbctl/blob/32ac2678342aab8233ee887ea73cc781e907f86a/util.go#L73
     creates: "/sys/firmware/efi/efivars/db-d719b2cb-3d3a-4596-a3bc-dad00e67656f"
   notify: reboot
+  when: sbctl_enroll
+  tags: ["enroll"]
 
 - name: Ensure {{ esp_mount }}/EFI/Linux exists
   become: true
@@ -43,7 +45,7 @@
   become: true
   command: >
     sbctl bundle -s
-    -i {{ boot_mount }}/intel-ucode.img
+    -i {{ boot_mount }}/{{ sbctl_ucode }}
     -c {{ sbctl_cmdline }}
     -l {{ efistub_splash }}
     -k {{ boot_mount }}/vmlinuz-{{ item }}

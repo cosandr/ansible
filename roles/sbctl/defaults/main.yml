@@ -2,7 +2,9 @@
 
 esp_mount: "/boot"
 boot_mount: "{{ esp_mount }}"
+sbctl_ucode: "intel-ucode.img"
 sbctl_cmdline: "/usr/share/secureboot/cmdline"
+sbctl_enroll: true
 efistub_splash: "/usr/share/systemd/bootctl/splash-arch.bmp"
 
 kernels:
