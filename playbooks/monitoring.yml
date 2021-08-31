@@ -12,6 +12,7 @@
     - name: Merge ports
       set_fact:
         ports: "{{ ports | combine(_ports, recursive=true) }}"
+      when: _ports is defined
       tags: ["always"]
 
     - name: Gather facts
@@ -19,6 +20,7 @@
       tags: ["always"]
   tasks:
     - name: prometheus
+      become: true
       import_role:
         name: prometheus
       tags: ["prometheus"]
@@ -30,6 +32,7 @@
         # - inventory_hostname == "dresrv"
 
     - name: grafana
+      become: true
       import_role:
         name: grafana
       tags: ["grafana"]
@@ -41,6 +44,7 @@
         # - inventory_hostname == "dresrv"
 
     - name: cadvisor
+      become: true
       import_role:
         name: cadvisor
       tags: ["cadvisor"]
@@ -52,6 +56,7 @@
         # - inventory_hostname == "dresrv"
 
     - name: nginx_exporter
+      become: true
       import_role:
         name: nginx_exporter
       tags: ["nginx_exporter"]
@@ -63,6 +68,7 @@
         # - inventory_hostname == "dresrv"
 
     - name: node_exporter
+      become: true
       import_role:
         name: node_exporter
       tags: ["node_exporter"]
@@ -70,9 +76,10 @@
         node_exporter_port: "{{ ports.node_exporter }}"
         node_exporter_version: "latest"
         node_exporter_no_sysusers: true
-      when: ports.node_exporter is defined
+      when: ports.node_exporter is defined or node_exporter_web_listen_address is defined
 
     - name: postgres_exporter
+      become: true
       import_role:
         name: postgres_exporter
       tags: ["postgres_exporter"]
