@@ -44,13 +44,6 @@ prometheus_scrape_configs:
           instance: "{{ drepi_label }}"
           __metrics_path__: /metrics
 
-  - job_name: "pihole"
-    static_configs:
-      - targets: ["{{ hostvars['drepi'].ansible_host }}:9617"]
-        labels:
-          instance: "{{ drepi_label }}"
-          __metrics_path__: /metrics
-
   - job_name: "aquaero"
     scrape_interval: 30s
     static_configs:
