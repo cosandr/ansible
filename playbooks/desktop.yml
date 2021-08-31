@@ -59,6 +59,9 @@
     - role: sudo
       tags: ["sudo"]
 
+    - role: sbctl
+      tags: ["sbctl"]
+
     - role: gnome-keyring
       tags: ["gnome-keyring"]
 

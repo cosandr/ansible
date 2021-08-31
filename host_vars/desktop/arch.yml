@@ -19,6 +19,14 @@ kernels:
   - "linux-lts"
   - "linux-zen"
 
+sbctl_enroll: false
+sbctl_ucode: "amd-ucode.img"
+kernel_params: "root=/dev/mapper/root rootflags=subvol=@ nmi_watchdog=0 nvidia-drm.modeset=1 systemd.unified_cgroup_hierarchy=0"
+
+efi_labels:
+  linux-zen: "Arch Linux Zen"
+  linux-lts: "Arch Linux LTS"
+
 mkinitcpio_no_fallback: "{{ kernels }}"
 
 network_manager: "systemd-networkd"
