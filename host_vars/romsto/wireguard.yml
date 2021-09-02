@@ -1,0 +1,14 @@
+---
+wireguard_port: "51820"
+wireguard_interface: "wg0"
+wireguard_address: "172.16.1.6/24"
+wireguard_endpoint: "{{ ddns_domain }}"
+wireguard_persistent_keepalive: "30"
+wireguard_postup:
+  - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} started'
+  - iptables -t nat -A POSTROUTING -s "{{ wireguard_address | ipaddr('network/prefix') }}" -o br0 -j MASQUERADE
+wireguard_postdown:
+  - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} stopped'
+  - iptables -t nat -D POSTROUTING -s "{{ wireguard_address | ipaddr('network/prefix') }}" -o br0 -j MASQUERADE
+
+wireguard_ip: "{{ wireguard_address.split('/')[0] }}"

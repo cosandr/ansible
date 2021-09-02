@@ -1,6 +1,6 @@
 ---
 
-- hosts: ovh, dresrv
+- hosts: ovh, dresrv, romsto
   gather_facts: false
   pre_tasks:
     - name: Run common role
