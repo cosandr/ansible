@@ -3,6 +3,16 @@
 - name: Romsto playbook
   gather_facts: false
   hosts: romsto
+  vars:
+    data_disk:
+      dev: "/dev/disk/by-label/datassd01"
+      path: "/mnt/disks/datassd01"
+      script: "/boot/config/plugins/user.scripts/scripts/0-mount-datassd/script"
+    persistent_disk:
+      dev: "/dev/disk/by-label/pstore"
+      path: "/pstore"
+    swap_disk: "/dev/disk/by-uuid/eee1d5fb-be1e-4344-a1c7-9a3d3d990b53"
+    ssd_mount_opts: "space_cache=v2,compress-force=zstd,relatime,ssd,discard=async"
   pre_tasks:
     - name: Run common role
       import_role:
@@ -12,26 +22,53 @@
     - name: Gather facts
       setup:
       tags: ["always"]
-  post_tasks:
-    - block:
-        - name: Compress filebeat
-          archive:
-            path:
-              - "{{ filebeat_config_path }}"
-              - "{{ filebeat_home_path }}"
-              - "{{ sysv_path }}/rc.filebeat"
-              - "{{ ca_path }}"
-            dest: /boot/filebeat.tar.gz
+  tasks:
+    - name: Setup extra SSD
+      blockinfile:
+        path: /boot/config/go
+        insertbefore: '^# BEGIN filebeat$'
+        marker: "# {mark} datassd"
+        block: |
+          # Enable swap partition
+          swapon -d {{ swap_disk }}
 
-        - name: Setup filebeat on boot
-          blockinfile:
-            path: /boot/config/go
-            marker: "# {mark} filebeat"
-            block: |
-              tar zxf /boot/filebeat.tar.gz -C /
-              install -o root -g root -dm755 {{ filebeat_log_path }}
-              {{ sysv_path }}/rc.filebeat start
-      tags: ["filebeat"]
+          # Mount persistent data partition
+          mkdir -p {{ persistent_disk.path }}
+          mount -o {{ ssd_mount_opts }} {{ persistent_disk.dev }} {{ persistent_disk.path }}
+
+          # Mount unassigned data partition
+          mkdir -p {{ data_disk.path }}
+          mount -o {{ ssd_mount_opts }} {{ data_disk.dev }} {{ data_disk.path }}
+      tags: ["go", "datassd"]
+
+    - name: Ensure user script dir exists
+      file:
+        path: "{{ data_disk.script | dirname }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0700
+      tags: ["datassd"]
+
+    - name: Ensure data SSD is mounted on array start
+      copy:
+        dest: "{{ data_disk.script }}"
+        owner: root
+        group: root
+        mode: 0700
+        content: |
+          #!/bin/bash
+
+          #name=0-mount-datassd
+          #description=Ensure {{ data_disk.path | basename }} is mounted
+          #arrayStarted=true
+          #noParity=true
+
+          if ! grep -q '{{ data_disk.path | regex_escape() }}' /proc/mounts; then
+            mkdir -p {{ data_disk.path }}
+            mount -o {{ ssd_mount_opts }} {{ data_disk.dev }} {{ data_disk.path }}
+          fi
+      tags: ["datassd"]
   roles:
     # - role: node_exporter
     #   vars:
@@ -48,3 +85,23 @@
 
     - role: filebeat
       tags: ["filebeat"]
+  post_tasks:
+    - block:
+        - name: Compress filebeat
+          archive:
+            path:
+              - "{{ filebeat_config_path }}"
+              - "{{ filebeat_home_path }}"
+              - "{{ sysv_path }}/rc.filebeat"
+              - "{{ ca_path }}"
+            dest: /pstore/filebeat.tar.gz
+
+        - name: Setup filebeat on boot
+          blockinfile:
+            path: /boot/config/go
+            marker: "# {mark} filebeat"
+            block: |
+              tar zxf /pstore/filebeat.tar.gz -C /
+              install -o root -g root -dm755 {{ filebeat_log_path }}
+              {{ sysv_path }}/rc.filebeat start
+          tags: ["filebeat", "go"]
