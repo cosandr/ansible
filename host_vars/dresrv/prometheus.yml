@@ -144,14 +144,6 @@ prometheus_scrape_configs:
           instance: "RomeoTV"
           __metrics_path__: /node
 prometheus_alert_rules:
-  - alert: Watchdog
-    expr: vector(1)
-    for: 10m
-    labels:
-      severity: warning
-    annotations:
-      description: "This is an alert meant to ensure that the entire alerting pipeline is functional.\nThis alert is always firing, therefore it should always be firing in Alertmanager\nand always fire against a receiver. There are integrations with various notification\nmechanisms that send a notification when this alert is not firing. For example the\n\"DeadMansSnitch\" integration in PagerDuty."
-      summary: 'Ensure entire alerting pipeline is functional'
   - alert: HostOutOfMemory
     expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
     for: 2m
@@ -180,8 +172,7 @@ prometheus_alert_rules:
     labels:
       severity: critical
     annotations:
-      description: '{% raw %}{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes.{% endraw %}'
-      summary: '{% raw %}Instance {{ $labels.instance }} down{% endraw %}'
+      summary: '{% raw %}Job {{ $labels.job }} on {{ $labels.instance }} down{% endraw %}'
   - alert: NodeFilesystemSpaceFillingUp
     annotations:
       description: '{% raw %}Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available space left and is filling up.{% endraw %}'
