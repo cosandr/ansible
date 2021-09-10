@@ -2,7 +2,8 @@
 wireguard_port: "51820"
 wireguard_interface: "wg0"
 wireguard_address: "172.16.1.6/24"
-wireguard_endpoint: "{{ ddns_domain }}"
+# wireguard_endpoint: "{{ ddns_domain }}"
+wireguard_endpoint: ""
 wireguard_persistent_keepalive: "30"
 wireguard_postup:
   - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} started'
