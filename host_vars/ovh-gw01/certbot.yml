@@ -1,0 +1,4 @@
+---
+
+certbot_email: "{{ vault_certbot_email }}"
+cerbot_gcp_service_account_contents: "{{ vault_cerbot_gcp_service_account_contents }}"
