@@ -1,0 +1,17 @@
+---
+
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: enable and start renew timer
+  systemd:
+    name: certbot-renew.timer
+    enabled: true
+    state: started
+
+- name: enable and start update timer
+  systemd:
+    name: certbot-update.timer
+    enabled: true
+    state: started

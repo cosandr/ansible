@@ -1,0 +1,9 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Upgrade certbot
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+ExecStartPre={{ certbot_venv_path }}/bin/pip install --upgrade pip setuptools wheel
+ExecStart={{ certbot_venv_path }}/bin/pip install --upgrade {{ (certbot_pkgs + certbot_extra_pkgs) | join(' ') }}

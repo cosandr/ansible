@@ -1,0 +1,106 @@
+---
+
+- name: Install prerequisites
+  apt:
+    name:
+      - python3
+      - python3-venv
+      - libaugeas0
+    update_cache: true
+    state: present
+  when: ansible_os_family == 'Debian'
+  tags: ["install"]
+
+- name: Install prerequisites
+  dnf:
+    name:
+      - python3
+      - augeas-libs
+    state: present
+  when: ansible_os_family == 'RedHat'
+  tags: ["install"]
+
+- name: Setup venv
+  pip:
+    name:
+      - pip
+      - setuptools
+      - wheel
+    umask: "0077"
+    state: latest
+    virtualenv: "{{ certbot_venv_path }}"
+    virtualenv_command: /usr/bin/python3 -m venv
+  tags: ["install"]
+
+- name: Install certbot
+  pip:
+    name: "{{ certbot_pkgs + certbot_extra_pkgs }}"
+    umask: "0077"
+    virtualenv: "{{ certbot_venv_path }}"
+  tags: ["install"]
+
+- name: Ensure bin link exists
+  file:
+    src: "{{ certbot_venv_path }}/bin/certbot"
+    dest: /usr/bin/certbot
+    state: link
+  tags: ["install"]
+
+- name: Install services
+  template:
+    src: "certbot-{{ item }}.service.j2"
+    dest: "/etc/systemd/system/certbot-{{ item }}.service"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - "renew"
+    - "update"
+  notify:
+    - reload systemd
+  tags: ["install"]
+
+- name: Install renew timer
+  template:
+    src: "certbot-{{ item }}.timer.j2"
+    dest: "/etc/systemd/system/certbot-{{ item }}.timer"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - "renew"
+    - "update"
+  notify:
+    - reload systemd
+    - "enable and start {{ item }} timer"
+  tags: ["install"]
+
+- name: Configure certbot
+  copy:
+    dest: "/etc/letsencrypt/cli.ini"
+    owner: root
+    group: root
+    mode: 0600
+    content: |
+      rsa-key-size = 4096
+      email = {{ certbot_email }}
+      agree-tos = true
+  when: certbot_email | length > 0
+
+- name: Add credentials
+  copy:
+    dest: "{{ certbot_credentials_path }}"
+    owner: root
+    group: root
+    mode: 0600
+    content: "{{ certbot_credentials_content }}"
+  when: certbot_credentials_content | length > 0
+
+- name: Get certificates
+  command: "{{ certbot_generate_command }} -d '{{ item }}'"
+  register: output
+  changed_when:
+    - output.rc == 0
+    - "'Certificate not yet due for renewal; no action taken.' not in output.stdout"
+  loop: "{{ certbot_domains }}"
+  tags: ["fetch"]

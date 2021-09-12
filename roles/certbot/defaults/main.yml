@@ -1,0 +1,11 @@
+---
+
+certbot_email: ""
+certbot_venv_path: "/opt/certbot"
+certbot_pkgs: ["certbot"]
+certbot_extra_pkgs: []
+certbot_credentials_path: "/etc/letsencrypt/credentials.ini"
+certbot_credentials_content: ""
+certbot_generate_command: ""  # excluding -d
+certbot_domains: []
+  # - "example.com,*.example.com"
