@@ -154,21 +154,21 @@ prometheus_alert_rules:
       description: '{% raw %}Node memory is filling up ({{ $value }} left){% endraw %}'
   - alert: ContainerKilled
     expr: time() - container_last_seen > 60
-    for: 0m
+    for: 10m
     labels:
       severity: warning
     annotations:
-      summary: '{% raw %}{{ $labels.name }} container dead on {{ $labels.instance }}{% endraw %}'
+      summary: '{% raw %}{{ $labels.name }} container dead{% endraw %}'
   - alert: HostSystemdServiceCrashed
     expr: node_systemd_unit_state{state="failed"} == 1
-    for: 0m
+    for: 5m
     labels:
       severity: warning
     annotations:
       summary: '{% raw %}{{ $labels.name }} systemd service {{ $labels.state }} on {{ $labels.instance }}{% endraw %}'
   - alert: InstanceDown
     expr: 'up{instance!="{{ desktop_label }}",instance!="{{ laptop_label }}",job!="mph"} == 0'
-    for: 5m
+    for: 10m
     labels:
       severity: critical
     annotations:
