@@ -90,118 +90,22 @@
 
   roles:
     - role: hostname
-      become: true
       tags: ["hostname"]
 
     - role: ufw
-      become: true
       tags: ["ufw"]
 
     - role: fail2ban
-      become: true
       tags: ["fail2ban"]
 
     - role: unattended-upgrades
-      become: true
       tags: ["unattended-upgrades"]
 
     - role: node_exporter
-      become: true
       tags: ["node_exporter"]
 
     - role: filebeat
-      become: true
       tags: ["filebeat"]
 
-
-# Create service account according to https://certbot-dns-google.readthedocs.io/en/stable/
-# For GCP go to https://console.developers.google.com/iam-admin/serviceaccounts
-- name: Certbot
-  hosts: ovh
-  become: true
-  gather_facts: false
-  tasks:
-    - name: Install snapd
-      apt:
-        name: snapd
-        state: present
-      register: __snapd_installed
-      tags: ["install", "certbot"]
-
-    - name: Ensure snapd is up to date
-      shell: snap install core; snap refresh core
-      when: __snapd_installed.changed
-      tags: ["install", "certbot"]
-
-    - name: Install certbot
-      snap:
-        name: certbot
-        classic: true
-        state: present
-      register: __certbot_installed
-      tags: ["install", "certbot"]
-
-    - name: Ensure certbot is trusted
-      command: snap set certbot trust-plugin-with-root=ok
-      when: __certbot_installed.changed
-      tags: ["install", "certbot"]
-
-    - name: Install certbot plugins
-      snap:
-        name: certbot-dns-google
-        classic: true
-        state: present
-      tags: ["install", "certbot"]
-
-    - name: Ensure bin link exists
-      file:
-        src: /snap/bin/certbot
-        dest: /usr/bin/certbot
-        state: link
-      tags: ["install", "certbot"]
-
-    - name: Create certbot config dir
-      file:
-        path: "/etc/certbot"
-        state: directory
-        owner: root
-        group: root
-        mode: 0700
-      tags: ["certbot"]
-
-    - name: Copy GCP certbot credentials
-      copy:
-        dest: "/etc/certbot/google.json"
-        owner: root
-        group: root
-        mode: 0600
-        content: "{{ cerbot_gcp_service_account_contents }}"
-      tags: ["certbot"]
-
-    - name: Configure certbot
-      copy:
-        dest: "/etc/letsencrypt/cli.ini"
-        owner: root
-        group: root
-        mode: 0600
-        content: |
-          rsa-key-size = 4096
-          email = {{ certbot_email }}
-          agree-tos = true
-      tags: ["certbot"]
-
-    - name: Get certificates
-      command: >
-        certbot certonly
-        --dns-google
-        --dns-google-credentials /etc/certbot/google.json
-        -d '{{ item }},*.{{ item }}'
-        -n
-        --keep
-        --expand
-      register: output
-      changed_when:
-        - output.rc == 0
-        - "'Certificate not yet due for renewal; no action taken.' not in output.stdout"
-      loop: "{{ domains }}"
+    - role: certbot
       tags: ["certbot"]

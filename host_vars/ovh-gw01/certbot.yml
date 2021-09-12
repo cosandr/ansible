@@ -1,4 +1,22 @@
 ---
 
+certbot_extra_pkgs: ["certbot-dns-domeneshop"]
 certbot_email: "{{ vault_certbot_email }}"
-cerbot_gcp_service_account_contents: "{{ vault_cerbot_gcp_service_account_contents }}"
+certbot_domains:
+  - "{{ domains[0] }},*.{{ domains[0] }},*.netmaker.{{ domains[0] }}"
+  - "{{ domains[1] }},*.{{ domains[1] }}"
+  - "{{ domains[2] }},*.{{ domains[2] }}"
+  - "{{ domains[3] }},*.{{ domains[3] }}"
+certbot_credentials_path: "/etc/letsencrypt/ds.ini"
+certbot_credentials_content: |
+  dns_domeneshop_client_token={{ domeneshop_token }}
+  dns_domeneshop_client_secret={{ domeneshop_secret }}
+
+certbot_generate_command: >
+  certbot certonly
+  --authenticator dns-domeneshop
+  --dns-domeneshop-credentials {{ certbot_credentials_path }}
+  --dns-domeneshop-propagation-seconds 120
+  -n
+  --keep
+  --expand
