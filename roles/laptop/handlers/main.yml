@@ -1,11 +1,5 @@
 ---
 
-- name: restart tlp
-  become: true
-  service:
-    name: tlp
-    state: restarted
-
 - name: enable user suspend
   become: true
   systemd:

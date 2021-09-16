@@ -1,0 +1,22 @@
+---
+
+- name: Install tlp
+  package:
+    name: tlp
+    state: present
+
+- name: Install tlp-rdw
+  package:
+    name: tlp-rdw
+    state: present
+  when: network_manager == "NetworkManager"
+
+- name: Copy TLP config
+  become: true
+  template:
+    src: "20-custom.conf.j2"
+    dest: "/etc/tlp.d/20-custom.conf"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart tlp
