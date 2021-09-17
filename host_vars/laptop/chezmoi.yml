@@ -5,15 +5,15 @@ chezmoi_overrides:
     # Restore based on connected displays
     mon=$(xrandr --query | grep -oP '\S+\s+connected' | cut -d' ' -f1)
     _hour=$(date +%H)
-    [[ $_hour -ge 8 && $_hour -le 17 ]] && workhours=1 || workhours=0
-    if [[ $mon =~ DP-2 && $mon =~ HDMI-0 ]]; then
+    [[ $_hour -ge 8 && $_hour -lt 17 ]] && workhours=1 || workhours=0
+    if [[ $mon =~ DP-3 && $mon =~ HDMI-1 ]]; then
       if [[ $workhours -eq 1 ]]; then
         WS["1"]="work"
         WS["2"]="work"
       else
         WS["2"]="no-discord"
       fi
-    elif [[ $mon =~ DP-0 && $mon =~ DP-1 ]]; then
+    elif [[ $mon =~ DP-2 && $mon =~ HDMI-1 ]]; then
       if [[ $workhours -eq 1 ]]; then
         WS["1"]="work"
         WS["2"]="laptop-ext"
@@ -30,28 +30,31 @@ chezmoi_overrides:
       fi
     fi
   polybar: |
-    MONITOR_MAP["eDP-1-1"]="laptop"
     MONITOR_MAP["eDP-1"]="laptop"
-    MONITOR_MAP["DP-0"]="laptop-ext"
-    MONITOR_MAP["DP-1"]="laptop-ext-secondary"
-    MONITOR_MAP["DP-2"]="laptop-ext"
-    MONITOR_MAP["HDMI-0"]="laptop-ext-secondary"
-    DPI_MAP["eDP-1-1"]="96"
+    MONITOR_MAP["DP-3-2"]="laptop-ext"
+    MONITOR_MAP["HDMI-1"]="laptop-ext-secondary"
+    DPI_MAP["eDP-1"]="192"
   xinitrc: |
     QT_AUTO_SCREEN_SCALE_FACTOR="1"
-    QT_QPA_PLATFORMTHEME="gtk2"
+    QT_QPA_PLATFORMTHEME="qt5ct"
     MOZ_X11_EGL="1"
+    xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Accel Speed' 0.4
+    xinput set-prop 'TPPS/2 Elan TrackPoint' 'libinput Accel Speed' -0.5
   lock: |
     idle_hook="none"
+    LOCKER="sxlock"
+    OPTS="-i ~/.wallpaper -t"
+  xorg: |
+    DPI=192
   xorg_3: |
     DPI=144
     mon=$(xrandr --query | grep -oP '\S+\s+connected' | cut -d' ' -f1)
-    if [[ $mon =~ DP-2 && $mon =~ HDMI-0 ]]; then
-      MONITOR_MAP["DP-2"]="--primary --mode 3840x2160 --rate 120 --setprovideroutputsource modesetting NVIDIA-0"
-      MONITOR_MAP["HDMI-0"]="--above DP-2 --mode 3840x2160"
-      MONITOR_MAP["eDP-1-1"]="--off"
-    elif [[ $mon =~ DP-0 && $mon =~ DP-1 ]]; then
-      MONITOR_MAP["DP-0"]="--primary --mode 3840x2160 --setprovideroutputsource modesetting NVIDIA-0"
-      MONITOR_MAP["DP-1"]="--left-of DP-0 --mode 3840x2160"
-      MONITOR_MAP["eDP-1-1"]="--right-of DP-0 --mode 1920x1080"
+    if [[ $mon =~ DP-3 && $mon =~ HDMI-1 ]]; then
+      MONITOR_MAP["DP-3"]="--primary --mode 3840x2160 --rate 120"
+      MONITOR_MAP["HDMI-1"]="--above DP-3 --mode 3840x2160"
+      MONITOR_MAP["eDP-1"]="--left-of DP-3 --mode 3840x2160"
+    elif [[ $mon =~ DP-2 && $mon =~ HDMI-1 ]]; then
+      MONITOR_MAP["DP-2"]="--primary --mode 3840x2160"
+      MONITOR_MAP["HDMI-1"]="--left-of DP-2 --mode 3840x2160"
+      MONITOR_MAP["eDP-1"]="--right-of DP-2 --mode 3840x2160"
     fi

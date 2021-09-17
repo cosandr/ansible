@@ -3,6 +3,7 @@
 user_suspend: |
   Type=simple
   Environment=DISPLAY=:0
+  Environment=SYSTEMD_SUSPEND=1
   ExecStartPre=-/sbin/playerctl pause
   ExecStartPre=-/usr/bin/systemctl --user stop ws-wait-online.service
   ExecStartPre=-/usr/bin/systemctl --user stop dresrv-wait-online.service

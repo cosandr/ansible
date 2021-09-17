@@ -6,6 +6,7 @@ pacman_packages:
   - alacritty
   - alsa-utils
   - ansible
+  - ansible-lint
   - arandr
   - autoconf
   - automake
@@ -83,9 +84,6 @@ pacman_packages:
   - noto-fonts-emoji
   - ntfs-3g
   - numlockx
-  - nvidia
-  - nvidia-lts
-  - nvidia-prime
   - openssh
   - otf-cascadia-code
   - p7zip
@@ -113,6 +111,8 @@ pacman_packages:
   - scrot
   - sed
   - smartmontools
+  - sof-firmware
+  - python-llfuse  # borg mount
   - sshfs
   - sudo
   - texinfo
@@ -139,7 +139,6 @@ pacman_packages:
 aur_packages:
   - adwaita-qt
   - discord_arch_electron
-  - go-check-updates-git
   - google-chrome
   - i3lock-color
   - i3lock-fancy-rapid-git

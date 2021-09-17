@@ -5,7 +5,6 @@ thinkfan_config:
     - hwmon: /sys/class/hwmon
       name: coretemp
       indices: [1]
-    - nvml: "01:00.0"
   fans:
     - tpacpi: /proc/acpi/ibm/fan
   levels:
