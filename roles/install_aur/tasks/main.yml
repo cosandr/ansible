@@ -1,0 +1,8 @@
+---
+
+- name: Build and install
+  become: true
+  become_user: "{{ aur_build_user }}"
+  aur:
+    name: "{{ aur_packages }}"
+    state: present

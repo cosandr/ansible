@@ -5,6 +5,8 @@
   package:
     name: sudo
     state: present
+  when: sudo_install | bool
+  tags: ["install"]
 
 - name: Write sudoers files
   become: true

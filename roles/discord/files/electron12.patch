@@ -1,8 +1,0 @@
-14c14
-< depends=('electron')
----
-> depends=('electron12')
-49c49
-<   echo "exec electron /usr/lib/$_pkgname/app.asar \$@" >> "$srcdir"/$_pkgname
----
->   echo "exec electron12 /usr/lib/$_pkgname/app.asar \$@" >> "$srcdir"/$_pkgname

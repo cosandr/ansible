@@ -1,6 +1,0 @@
----
-
-aur_name: "discord_arch_electron"
-aur_repo: "https://aur.archlinux.org/{{ aur_name }}.git"
-patches:
-  - electron12.patch

@@ -9,6 +9,7 @@
   include_role:
     name: sudo
   vars:
+    sudo_install: false
     sudoers_files:
       - dest: "20-{{ aur_build_user }}"
         content: "{{ aur_build_user }} ALL=(ALL) NOPASSWD:/sbin/pacman"

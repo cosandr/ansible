@@ -1,13 +1,44 @@
 ---
 
+i3_packages:
+  - arandr
+  - brightnessctl
+  - dunst
+  - evince
+  - feh
+  - file-roller
+  - gnome-calculator
+  - gnome-themes-extra
+  - gvfs-mtp
+  - gvfs-nfs
+  - gvfs-smb
+  - i3-gaps
+  - lxappearance
+  - numlockx
+  - pamixer
+  - pavucontrol
+  - picom
+  - playerctl
+  - qt5ct
+  - redshift
+  - rofi
+  - scrot
+  - thunar
+  - thunar-archive-plugin
+  - xclip
+  - xorg-xev
+  - xorg-xinit
+  - xorg-xinput
+  - xorg-xrandr
+  - xorg-xset
+
+
 pacman_packages:
-  - acpi_call
-  - acpi_call-lts
+  - acpi_call-dkms
   - alacritty
   - alsa-utils
   - ansible
   - ansible-lint
-  - arandr
   - autoconf
   - automake
   - base
@@ -17,21 +48,15 @@ pacman_packages:
   - bluez
   - bluez-utils
   - borg
-  - brightnessctl
   - btrfs-progs
   - chezmoi
-  - chromium
   - deluge-gtk
   - docker
   - docker-compose
-  - dunst
   - efibootmgr
   - ethtool
-  - evince
   - fakeroot
-  - feh
   - file
-  - file-roller
   - findutils
   - firefox
   - firewalld
@@ -42,18 +67,12 @@ pacman_packages:
   - gcc
   - gettext
   - git
-  - gnome-calculator
-  - gnome-themes-extra
   - gnu-netcat
   - go
   - grep
   - groff
-  - gvfs-mtp
-  - gvfs-smb
-  - gvfs-nfs
   - gzip
   - htop
-  - i3-gaps
   - inetutils
   - intel-gpu-tools
   - intel-media-driver
@@ -67,12 +86,11 @@ pacman_packages:
   - libtool
   - libva-intel-driver
   - libva-utils
-  - linux-firmware
   - linux
+  - linux-firmware
   - linux-headers
   - linux-lts
   - linux-lts-headers
-  - lxappearance
   - m4
   - make
   - man-db
@@ -83,32 +101,22 @@ pacman_packages:
   - noto-fonts
   - noto-fonts-emoji
   - ntfs-3g
-  - numlockx
   - openssh
   - otf-cascadia-code
   - p7zip
-  - pacman
   - pacman-contrib
   - pacutils
-  - pamixer
   - patch
-  - pavucontrol
-  - picom
   - pipewire-alsa
   - pipewire-pulse
   - pkgconf
-  - playerctl
   - powertop
   - pyenv
   - python-aiohttp
   - python-websockets
-  - qt5ct
-  - redshift
   - reflector
   - remmina
-  - rofi
   - sbctl
-  - scrot
   - sed
   - smartmontools
   - sof-firmware
@@ -116,9 +124,6 @@ pacman_packages:
   - sshfs
   - sudo
   - texinfo
-  - thunar
-  - thunar-archive-plugin
-  - tlp
   - tmux
   - ttf-fira-code
   - ttf-font-awesome
@@ -128,36 +133,31 @@ pacman_packages:
   - vim
   - vlc
   - which
-  - xclip
-  - xorg-xev
-  - xorg-xinit
-  - xorg-xinput
-  - xorg-xrandr
-  - xorg-xset
   - zsh
 
 aur_packages:
-  - adwaita-qt
   - discord_arch_electron
   - google-chrome
-  - i3lock-color
-  - i3lock-fancy-rapid-git
   - jetbrains-toolbox
   - kernel-modules-hook
   - paru-bin
-  - polybar
   - pyenv-virtualenv
-  - ruby-erubis
-  - ruby-xdg
   - shellcheck-bin
   - slack-desktop
-  - spotify
+  # - spotify
   - sublime-text-4
   - tmuxinator
   - ttf-font-awesome-4
   - visual-studio-code-bin
-  - xidlehook
   - webex-bin
+
+i3_aur_packages:
+  - adwaita-qt
+  - i3lock-color
+  - i3lock-fancy-rapid-git
+  - polybar
+  - xidlehook
+
 
 enabled_services:
   - systemd-timesyncd.service

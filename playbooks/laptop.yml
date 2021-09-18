@@ -49,8 +49,8 @@
     - role: spotify
       tags: ["spotify"]
 
-    - role: discord
-      tags: ["discord"]
+    - role: install_aur
+      tags: ["aur"]
 
     - role: paru
       vars:

@@ -2,8 +2,10 @@
 
 - name: Install thinkfan
   become: true
-  package:
+  become_user: "{{ my_user }}"
+  aur:
     name: thinkfan
+  tags: ["install"]
 
 - name: Ensure fan control is enabled
   become: true

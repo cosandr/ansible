@@ -1,3 +1,4 @@
 ---
 ansible_managed: "Ansible managed"
+sudo_install: true
 sudoers_files: []

@@ -1,9 +1,13 @@
 ---
 
 - name: Import GPG key
+  become: true
+  become_user: "{{ aur_build_user }}"
   shell: "curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | gpg --import -"
 
 - name: Install spotify from AUR
+  become: true
+  become_user: "{{ aur_build_user }}"
   aur:
     name: spotify
     state: present
