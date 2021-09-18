@@ -1,0 +1,32 @@
+---
+
+- name: Install VS Code from AUR
+  become: true
+  become_user: "{{ aur_build_user }}"
+  aur:
+    name: "{{ vscode_aur_package_name }}"
+    state: present
+  when: ansible_distribution == 'Archlinux'
+
+- block:
+    - name: Install key
+      become: true
+      apt_key:
+        url: 'https://packages.microsoft.com/keys/microsoft.asc'
+        state: present
+
+    - name: Install repository
+      become: true
+      apt_repository:
+        repo: 'deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main'
+        filename: vscode
+        state: present
+
+    - name: Install VS Code
+      become: true
+      apt:
+        name: code
+        update_cache: true
+        state: present
+
+  when: ansible_os_family == 'Debian'

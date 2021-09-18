@@ -107,8 +107,6 @@ pacman_packages:
   - pacman-contrib
   - pacutils
   - patch
-  - pipewire-alsa
-  - pipewire-pulse
   - pkgconf
   - powertop
   - pyenv
@@ -136,19 +134,14 @@ pacman_packages:
   - zsh
 
 aur_packages:
-  - discord_arch_electron
-  - google-chrome
   - jetbrains-toolbox
   - kernel-modules-hook
   - paru-bin
   - pyenv-virtualenv
   - shellcheck-bin
-  - slack-desktop
-  # - spotify
   - sublime-text-4
   - tmuxinator
   - ttf-font-awesome-4
-  - visual-studio-code-bin
   - webex-bin
 
 i3_aur_packages:

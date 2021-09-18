@@ -1,0 +1,33 @@
+---
+
+- name: Install Google Chrome from AUR
+  become: true
+  become_user: "{{ aur_build_user }}"
+  aur:
+    name: "{{ chrome_aur_package_name }}"
+    state: present
+  when: ansible_distribution == 'Archlinux'
+
+# https://github.com/mlangry/ansible-role-google-chrome/blob/master/tasks/main.yml
+- block:
+    - name: Install key
+      become: true
+      apt_key:
+        url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
+        state: present
+
+    - name: Install repository
+      become: true
+      apt_repository:
+        repo: 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main'
+        filename: chrome
+        state: present
+
+    - name: Install Google Chrome
+      become: true
+      apt:
+        name: google-chrome-stable
+        update_cache: true
+        state: present
+
+  when: ansible_os_family == 'Debian'

@@ -1,0 +1,16 @@
+---
+
+- name: Install discord from AUR
+  become: true
+  become_user: "{{ aur_build_user }}"
+  aur:
+    name: "{{ discord_aur_package_name }}"
+    state: present
+  when: ansible_distribution == 'Archlinux'
+
+- name: Install Discord
+  become: true
+  apt:
+    deb: https://discord.com/api/download?platform=linux&format=deb
+    state: present
+  when: ansible_os_family == 'Debian'

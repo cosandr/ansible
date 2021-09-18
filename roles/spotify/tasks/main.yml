@@ -1,13 +1,38 @@
 ---
 
-- name: Import GPG key
-  become: true
-  become_user: "{{ aur_build_user }}"
-  shell: "curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | gpg --import -"
+- block:
+    - name: Import GPG key
+      become: true
+      become_user: "{{ aur_build_user }}"
+      shell: "curl -sS https://download.spotify.com/debian/pubkey_0D811D58.gpg | gpg --import -"
 
-- name: Install spotify from AUR
-  become: true
-  become_user: "{{ aur_build_user }}"
-  aur:
-    name: spotify
-    state: present
+    - name: Install spotify from AUR
+      become: true
+      become_user: "{{ aur_build_user }}"
+      aur:
+        name: spotify
+        state: present
+  when: ansible_distribution == 'Archlinux'
+
+- block:
+    - name: Install key
+      become: true
+      apt_key:
+        url: 'https://download.spotify.com/debian/pubkey_0D811D58.gpg'
+        state: present
+
+    - name: Install repository
+      become: true
+      apt_repository:
+        repo: 'deb http://repository.spotify.com stable non-free'
+        filename: spotify
+        state: present
+
+    - name: Install spotify
+      become: true
+      apt:
+        name: spotify-client
+        update_cache: true
+        state: present
+
+  when: ansible_os_family == 'Debian'

@@ -1,7 +1,5 @@
 ---
 
-_sshd_pkg: "openssh"
-
 sshd_config:
   - regexp: "^#?StrictModes"
     line: "StrictModes yes"

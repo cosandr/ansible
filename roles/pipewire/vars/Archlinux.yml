@@ -1,0 +1,7 @@
+---
+
+__pipewire_packages:
+  - pipewire
+  - pipewire-alsa
+  - pipewire-media-session
+  - pipewire-pulse

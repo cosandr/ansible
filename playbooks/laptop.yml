@@ -29,32 +29,49 @@
       tags: ["prometheus-stack", "node_exporter"]
 
     - role: laptop
+      vars:
+        install_suspend_hooks: "{{ ansible_distribution == 'Archlinux' }}"
       tags: ["laptop"]
 
     - role: arch-common
+      when: ansible_distribution == 'Archlinux'
       tags: ["arch-common"]
 
     - role: borg
       tags: ["borg"]
 
     - role: reflector
+      when: ansible_distribution == 'Archlinux'
       tags: ["reflector"]
 
     - role: chezmoi
       tags: ["chezmoi"]
 
     - role: sbctl
+      when: ansible_distribution == 'Archlinux'
       tags: ["sbctl"]
 
     - role: spotify
       tags: ["spotify"]
 
+    - role: discord
+      tags: ["discord"]
+
+    - role: vscode
+      tags: ["vscode"]
+
+    - role: ufw
+      when: ansible_os_family == 'Debian'
+      tags: ["ufw"]
+
     - role: install_aur
+      when: ansible_distribution == 'Archlinux'
       tags: ["aur"]
 
     - role: paru
       vars:
         aur_name: paru-bin
+      when: ansible_distribution == 'Archlinux'
       tags: ["paru"]
 
     - role: sshd
@@ -63,6 +80,12 @@
     - role: sudo
       tags: ["sudo"]
 
+    - role: pipewire
+      tags: ["pipewire"]
+
+    - role: google-chrome
+      tags: ["google-chrome"]
+
     - role: tlp
       tags: ["tlp"]
 
@@ -70,15 +93,18 @@
     #   tags: ["xss-lock"]
 
     - role: xorg
+      when: ansible_distribution == 'Archlinux'
       tags: ["xorg"]
 
     - role: xidlehook
+      when: ansible_distribution == 'Archlinux'
       tags: ["xidlehook"]
 
     # - role: xsession
     #   tags: ["xsession"]
 
     - role: gnome-keyring
+      when: ansible_distribution == 'Archlinux'
       tags: ["gnome-keyring"]
 
     - role: thinkfan

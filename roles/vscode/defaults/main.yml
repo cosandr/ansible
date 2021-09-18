@@ -1,0 +1,4 @@
+---
+
+aur_build_user: builder
+vscode_aur_package_name: "visual-studio-code-bin"

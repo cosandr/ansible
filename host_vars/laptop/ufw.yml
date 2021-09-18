@@ -1,0 +1,9 @@
+---
+
+ufw_local_rules:
+  - { port: "22", proto: "tcp" }    # SSH
+
+ufw_custom_rules:
+  # Network printers
+  - port: 5353
+    proto: udp

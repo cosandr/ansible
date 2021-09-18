@@ -1,0 +1,36 @@
+---
+
+- name: disable pulseaudio
+  become: true
+  become_user: "{{ my_user }}"
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+    scope: user
+  loop:
+    - pulseaudio.socket
+    - pulseaudio.service
+
+- name: mask pulseaudio
+  become: true
+  become_user: "{{ my_user }}"
+  systemd:
+    name: "pulseaudio.service"
+    masked: true
+    scope: user
+
+- name: enable and start pipewire
+  become: true
+  become_user: "{{ my_user }}"
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+    scope: user
+  loop:
+    - pipewire.socket
+    - pipewire.service
+    - pipewire-pulse.socket
+    - pipewire-pulse.service
+    - pipewire-media-session.service

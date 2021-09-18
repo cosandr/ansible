@@ -1,0 +1,16 @@
+---
+
+- name: Install Slack from AUR
+  become: true
+  become_user: "{{ aur_build_user }}"
+  aur:
+    name: "{{ slack_aur_package_name }}"
+    state: present
+  when: ansible_distribution == 'Archlinux'
+
+- name: Install Slack
+  apt:
+    deb: "https://downloads.slack-edge.com/releases/linux/{{ slack_version }}/prod/x64/slack-desktop-{{ slack_version }}-amd64.deb"
+    state: present
+  when: ansible_os_family == 'Debian'
+  tags: ["slack"]

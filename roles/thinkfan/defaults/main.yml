@@ -1,5 +1,6 @@
 ---
 
+thinkfan_config_file: /etc/thinkfan.conf
 # https://github.com/vmatare/thinkfan/blob/master/examples/thinkfan.yaml
 thinkfan_config:
   sensors:

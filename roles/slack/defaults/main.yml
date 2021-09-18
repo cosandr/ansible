@@ -1,0 +1,5 @@
+---
+
+slack_version: "4.19.2"
+aur_build_user: builder
+slack_aur_package_name: "slack-electron"

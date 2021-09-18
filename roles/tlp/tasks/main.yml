@@ -1,15 +1,33 @@
 ---
 
+- name: Install acpi_call
+  become: true
+  pacman:
+    name: acpi_call-dkms
+    state: present
+  when: ansible_distribution == 'Archlinux'
+  tags: ["install"]
+
+- name: Install acpi-call (apt)
+  become: true
+  apt:
+    name: acpi-call-dkms
+    state: present
+  when: ansible_os_family == 'Debian'
+  tags: ["install"]
+
 - name: Install tlp
   package:
     name: tlp
     state: present
+  tags: ["install"]
 
 - name: Install tlp-rdw
   package:
     name: tlp-rdw
     state: present
   when: network_manager == "NetworkManager"
+  tags: ["install"]
 
 - name: Copy TLP config
   become: true

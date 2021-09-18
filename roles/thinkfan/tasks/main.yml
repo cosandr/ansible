@@ -1,11 +1,25 @@
 ---
 
-- name: Install thinkfan
+- name: Install thinkfan (aur)
   become: true
   become_user: "{{ my_user }}"
   aur:
     name: thinkfan
+  when: ansible_distribution == 'Archlinux'
   tags: ["install"]
+
+- name: Install thinkfan (apt)
+  become: true
+  apt:
+    name: thinkfan
+    state: present
+  when: ansible_os_family == 'Debian'
+  tags: ["install"]
+
+- name: Set config path (Debian)
+  set_fact:
+    thinkfan_config_file: /etc/thinkfan.yaml
+  when: ansible_os_family == 'Debian'
 
 - name: Ensure fan control is enabled
   become: true
@@ -21,7 +35,7 @@
   become: true
   copy:
     content: "{{ thinkfan_config | to_yaml }}"
-    dest: "/etc/thinkfan.conf"
+    dest: "{{ thinkfan_config_file }}"
     owner: root
     group: root
     mode: 0644

@@ -1,0 +1,4 @@
+---
+
+aur_build_user: builder
+chrome_aur_package_name: "google-chrome"

@@ -7,6 +7,7 @@
     owner: root
     group: root
     mode: 0755
+  tags: ["logind"]
 
 - name: Copy logind config
   become: true
@@ -17,6 +18,7 @@
     group: root
     mode: 0644
   notify: reload systemd
+  tags: ["logind"]
 
 # https://wiki.archlinux.org/title/Power_management#Sleep_hooks
 - name: Copy user suspend hook
@@ -31,7 +33,9 @@
   notify:
     - reload systemd
     - enable user suspend
-  when: user_suspend
+  when:
+    - install_suspend_hooks
+    - user_suspend
 
 - name: Copy root suspend hook
   become: true
@@ -45,7 +49,9 @@
   notify:
     - reload systemd
     - enable root suspend
-  when: root_suspend
+  when:
+    - install_suspend_hooks
+    - root_suspend
 
 - name: Copy user resume hook
   become: true
@@ -59,7 +65,9 @@
   notify:
     - reload systemd
     - enable user resume
-  when: user_resume
+  when:
+    - install_suspend_hooks
+    - user_resume
 
 - name: Copy root resume hook
   become: true
@@ -73,4 +81,6 @@
   notify:
     - reload systemd
     - enable root resume
-  when: root_resume
+  when:
+    - install_suspend_hooks
+    - root_resume

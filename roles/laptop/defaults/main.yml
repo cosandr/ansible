@@ -1,5 +1,7 @@
 ---
 
+install_suspend_hooks: true
+
 user_suspend_users:
   - "{{ my_user | default('andrei') }}"
 
