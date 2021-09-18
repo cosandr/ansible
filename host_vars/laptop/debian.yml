@@ -1,0 +1,25 @@
+---
+
+# https://github.com/pyenv/pyenv-installer
+# ansible laptop -m apt -a 'name={{ apt_packages }} state=present'
+apt_packages:
+  - ansible
+  - ansible-lint
+  - bat
+  - fonts-cascadia-code
+  - fonts-firacode
+  - fwupd
+  - git
+  - htop
+  - intel-gpu-tools
+  - iotop
+  - ipython3
+  - jq
+  # - kitty  # old, install manually https://sw.kovidgoyal.net/kitty/binary/
+  - ncdu
+  - powertop
+  - sshfs
+  - sshpass
+  - tmux
+  - vim
+  - zsh

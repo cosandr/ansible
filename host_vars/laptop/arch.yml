@@ -32,7 +32,7 @@ i3_packages:
   - xorg-xrandr
   - xorg-xset
 
-
+# ansible laptop -m pacman -a 'name={{ pacman_packages }} state=present'
 pacman_packages:
   - acpi_call-dkms
   - alacritty
@@ -47,9 +47,7 @@ pacman_packages:
   - bison
   - bluez
   - bluez-utils
-  - borg
   - btrfs-progs
-  - chezmoi
   - deluge-gtk
   - docker
   - docker-compose
@@ -120,6 +118,7 @@ pacman_packages:
   - sof-firmware
   - python-llfuse  # borg mount
   - sshfs
+  - sshpass
   - sudo
   - texinfo
   - tmux
