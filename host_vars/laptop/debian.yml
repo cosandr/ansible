@@ -1,5 +1,33 @@
 ---
 
+apt_i3_packages:
+  - arandr
+  - brightnessctl
+  - dunst
+  - evince
+  - feh
+  - file-roller
+  - gnome-calculator
+  - gnome-themes-extra
+  - gvfs-mtp
+  - gvfs-nfs
+  - gvfs-smb
+  - i3-gaps
+  - lxappearance
+  - numlockx
+  - pamixer
+  - pavucontrol
+  - picom
+  - playerctl
+  - qt5ct
+  - redshift
+  - rofi
+  - scrot
+  - thunar
+  - thunar-archive-plugin
+  - xclip
+  - x11-utils
+
 # https://github.com/pyenv/pyenv-installer
 # ansible laptop -m apt -a 'name={{ apt_packages }} state=present'
 apt_packages:
@@ -7,8 +35,10 @@ apt_packages:
   - ansible-lint
   - bat
   - fonts-cascadia-code
+  - fonts-font-awesome
   - fonts-firacode
   - fwupd
+  - fzf
   - git
   - htop
   - intel-gpu-tools

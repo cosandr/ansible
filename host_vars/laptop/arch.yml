@@ -1,6 +1,6 @@
 ---
 
-i3_packages:
+pacman_i3_packages:
   - arandr
   - brightnessctl
   - dunst
