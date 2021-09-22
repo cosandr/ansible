@@ -93,7 +93,6 @@
     #   tags: ["xss-lock"]
 
     - role: xorg
-      when: ansible_distribution == 'Archlinux'
       tags: ["xorg"]
 
     - role: xidlehook

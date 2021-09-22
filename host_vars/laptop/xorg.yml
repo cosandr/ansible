@@ -19,5 +19,5 @@ xorg_conf_d:
         Option "NaturalScrolling" "true"
         Option "Tapping" "on"
         Option "TappingButtonMap" "lrm"
-        Option "Accel Speed" 0.4
+        Option "Accel Speed" "0.4"
     EndSection

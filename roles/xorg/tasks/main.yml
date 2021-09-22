@@ -5,6 +5,8 @@
   pacman:
     name: "{{ xorg_packages }}"
     state: present
+  when: ansible_distribution == 'Archlinux'
+  tags: ["install"]
 
 - name: Configure xorg
   become: true
