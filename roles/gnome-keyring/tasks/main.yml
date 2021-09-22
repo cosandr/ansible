@@ -7,6 +7,15 @@
       - gnome-keyring
       - seahorse
     state: present
+  tags: ["install"]
+
+- name: Install gnome-keyring-pam
+  become: true
+  dnf:
+    name: gnome-keyring-pam
+    state: present
+  when: ansible_os_family == 'RedHat'
+  tags: ["install"]
 
 - name: Setup PAM
   become: true
