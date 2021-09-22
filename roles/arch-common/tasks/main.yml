@@ -17,35 +17,6 @@
     creates: "/etc/adjtime"
   tags: ["time"]
 
-- name: "Set hostname"
-  include_role:
-    name: hostname
-    apply:
-      tags: "hostname"
-  tags: ["hostname"]
-
-- name: "Set locales"
-  include_role:
-    name: locale_conf
-    apply:
-      tags: "locale"
-  tags: ["locale"]
-
-- name: "Setup sudo"
-  include_role:
-    name: sudo
-    apply:
-      tags: "sudo"
-  tags: ["sudo"]
-
-- name: Configure systemd-networkd
-  include_role:
-    name: systemd_networkd
-    apply:
-      tags: "systemd-networkd"
-  when: network_manager == "systemd-networkd"
-  tags: ["systemd-networkd"]
-
 - name: Configure pacman
   become: true
   lineinfile:

@@ -38,6 +38,20 @@
     - role: arch-common
       tags: ["arch-common"]
 
+    - role: locale_conf
+      when: ansible_os_family != 'RedHat'
+      tags: ["locale"]
+
+    - role: sudo
+      tags: ["sudo"]
+
+    - role: hostname
+      tags: ["hostname"]
+
+    - role: systemd_networkd
+      when: network_manager == "systemd-networkd"
+      tags: ["systemd-networkd"]
+
     - role: spotify
       tags: ["spotify"]
 
