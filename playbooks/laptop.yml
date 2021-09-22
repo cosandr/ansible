@@ -17,6 +17,22 @@
     - name: Gather facts
       setup:
       tags: ["always"]
+  tasks:
+    - name: Enable resume dracut module
+      become: true
+      copy:
+        dest: /etc/dracut.conf.d/resume.conf
+        owner: root
+        group: root
+        mode: 0644
+        content: |
+          add_dracutmodules+=" resume "
+      notify: dracut regenerate
+      tags: ["hibernate"]
+  handlers:
+    - name: dracut regenerate
+      become: true
+      command: dracut -f --regenerate-all
   roles:
     - role: node_exporter
       vars:
