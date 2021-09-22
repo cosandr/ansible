@@ -9,24 +9,24 @@ apt_i3_packages:
   - file-roller
   - gnome-calculator
   - gnome-themes-extra
-  - gvfs-mtp
-  - gvfs-nfs
-  - gvfs-smb
-  - i3-gaps
+  - gvfs-backends
+  - i3
+  - iwd
   - lxappearance
   - numlockx
-  - pamixer
   - pavucontrol
   - picom
   - playerctl
+  - python3-aiohttp
+  - python3-websockets
   - qt5ct
   - redshift
   - rofi
   - scrot
   - thunar
   - thunar-archive-plugin
-  - xclip
   - x11-utils
+  - xclip
 
 # https://github.com/pyenv/pyenv-installer
 # ansible laptop -m apt -a 'name={{ apt_packages }} state=present'
@@ -35,21 +35,23 @@ apt_packages:
   - ansible-lint
   - bat
   - fonts-cascadia-code
-  - fonts-font-awesome
   - fonts-firacode
+  - fonts-font-awesome
   - fwupd
   - fzf
   - git
+  - golang-go
   - htop
   - intel-gpu-tools
   - iotop
   - ipython3
   - jq
-  # - kitty  # old, install manually https://sw.kovidgoyal.net/kitty/binary/
   - ncdu
   - powertop
   - sshfs
   - sshpass
   - tmux
+  - tmuxinator
   - vim
   - zsh
+  # - kitty  # old, install manually https://sw.kovidgoyal.net/kitty/binary/

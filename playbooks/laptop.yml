@@ -29,8 +29,6 @@
       tags: ["prometheus-stack", "node_exporter"]
 
     - role: laptop
-      vars:
-        install_suspend_hooks: "{{ ansible_distribution == 'Archlinux' }}"
       tags: ["laptop"]
 
     - role: arch-common
@@ -103,7 +101,6 @@
     #   tags: ["xsession"]
 
     - role: gnome-keyring
-      when: ansible_distribution == 'Archlinux'
       tags: ["gnome-keyring"]
 
     - role: thinkfan
