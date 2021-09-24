@@ -90,6 +90,7 @@ dnf_packages:
   - libtool
   - libva-intel-hybrid-driver
   - libva-utils
+  - lm_sensors
   - m4
   - make
   - man-db

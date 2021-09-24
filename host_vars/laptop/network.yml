@@ -5,6 +5,9 @@ networkd_config:
       [Match]
       Name=en*
 
+      [Link]
+      RequiredForOnline=no
+
       [Network]
       DHCP=yes
       IPForward=yes
