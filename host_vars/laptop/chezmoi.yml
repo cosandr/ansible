@@ -41,11 +41,13 @@ chezmoi_overrides:
     xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Accel Speed' 0.4
     xinput set-prop 'TPPS/2 Elan TrackPoint' 'libinput Accel Speed' -0.5
   lock: |
-    idle_hook="none"
+    idle_hook="xidlehook_lock_screen_on"
     LOCKER="sxlock"
     OPTS="-i ~/.wallpaper -t"
   xorg: |
     DPI=192
+  xorg_2: |
+    DPI=144
   xorg_3: |
     DPI=144
     mon=$(xrandr --query | grep -oP '\S+\s+connected' | cut -d' ' -f1)

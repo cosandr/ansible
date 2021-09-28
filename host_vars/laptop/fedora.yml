@@ -108,6 +108,7 @@ dnf_packages:
   - pulseaudio-libs
   - python3-aiohttp
   - python3-ipython
+  - python3-netaddr
   - python3-llfuse  # borg mount
   - python3-websockets
   - remmina

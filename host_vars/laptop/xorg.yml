@@ -6,11 +6,6 @@ xorg_conf_d:
         Identifier "eDP-1"
         Option "DPMS" "true"
     EndSection
-    Section "ServerFlags"
-        Option "StandbyTime" "10"
-        Option "SuspendTime" "10"
-        Option "OffTime" "10"
-    EndSection
   "30-touchpad.conf": |
     Section "InputClass"
         Identifier "touchpad"

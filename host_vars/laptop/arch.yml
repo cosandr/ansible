@@ -109,6 +109,7 @@ pacman_packages:
   - powertop
   - pyenv
   - python-aiohttp
+  - python-netaddr
   - python-websockets
   - reflector
   - remmina
