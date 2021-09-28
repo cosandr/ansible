@@ -2,7 +2,7 @@
 ---
 - name: SSH
   hosts: drepi
-  gather_facts: false
+  gather_facts: true
   vars:
     ansible_ssh_pass: raspberry  # fresh install
   tasks:
@@ -25,6 +25,7 @@
 
 - name: Raspberry Pi 4 playbook
   gather_facts: false
+  become: true
   hosts: drepi
   vars:
     system_timezone: "Europe/Oslo"

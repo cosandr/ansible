@@ -2,5 +2,6 @@
 __pycache__
 *.retry
 *.pyc
+.cache/
 
 playbooks/test.yml
