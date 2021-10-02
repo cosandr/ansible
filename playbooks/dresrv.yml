@@ -120,6 +120,9 @@
     - role: dracut-sshd
       tags: ["dracut-sshd"]
 
+    - role: netclient
+      tags: ["netclient"]
+
     - role: alertmanager
       tags: ["prometheus-stack", "alertmanager"]
 

@@ -82,5 +82,8 @@
     - role: ddcutil
       tags: ["ddcutil"]
 
+    - role: netclient
+      tags: ["netclient"]
+
     # - role: nvidia_exporter
     #   tags: ["prometheus-stack", "nvidia_exporter"]

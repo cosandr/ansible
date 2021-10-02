@@ -131,6 +131,9 @@
     - role: nginx
       tags: ["nginx"]
 
+    - role: netclient
+      tags: ["netclient"]
+
     - role: geerlingguy.docker
       tags: ["docker"]
 
