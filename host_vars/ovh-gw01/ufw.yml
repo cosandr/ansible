@@ -17,3 +17,10 @@ ufw_custom_rules:
   - port: "{{ node_exporter_port }}"
     proto: tcp
     src: "{{ hostvars.dresrv.wireguard_ip }}"
+  # netmaker
+  - port: 51821
+    proto: udp
+  - port: 51822
+    proto: udp
+  - port: 51823
+    proto: udp
