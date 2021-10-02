@@ -109,3 +109,16 @@
 
     - role: certbot
       tags: ["certbot"]
+
+    - role: nginx
+      tags: ["nginx"]
+
+  post_tasks:
+    - name: Download dhparam
+      get_url:
+        url: https://ssl-config.mozilla.org/ffdhe2048.txt
+        dest: "{{ nginx_dhparam }}"
+        mode: 0644
+        owner: root
+        group: root
+      tags: ["nginx"]
