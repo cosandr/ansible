@@ -1,0 +1,10 @@
+---
+_netclient_bin_map:
+  i386: '-32'
+  x86_64: ''
+  aarch64: '-arm64'
+  armv7l: '-arm7'
+  armv6l: '-arm6'
+
+netclient_arch: "{{ _netclient_bin_map[ansible_architecture] | default(ansible_architecture) }}"
+_netclient_binary_install_dir: '/usr/local/bin'

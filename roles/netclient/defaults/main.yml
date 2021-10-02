@@ -1,0 +1,8 @@
+---
+netclient_version: "latest"
+
+netclient_home: "/etc/netclient"
+netclient_timer_interval: "hourly"
+netclient_daemon: true
+
+netclient_skip_install: false

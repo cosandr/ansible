@@ -1,0 +1,13 @@
+---
+
+- name: Copy service and timer
+  template:
+    src: "netclient.{{ item }}.j2"
+    dest: "/etc/systemd/system/netclient.{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - service
+    - timer
+  notify: reload systemd

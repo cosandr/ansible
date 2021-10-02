@@ -1,0 +1,12 @@
+---
+
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: enable and start netclient timer
+  systemd:
+    name: netclient.timer
+    enabled: true
+    state: started
+  when: netclient_daemon

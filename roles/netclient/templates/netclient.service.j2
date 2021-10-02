@@ -1,0 +1,10 @@
+[Unit]
+Description=Network Check
+Wants=netclient.timer
+
+[Service]
+Type=simple
+ExecStart={{ netclient_home }}/netclient checkin -n all
+
+[Install]
+WantedBy=multi-user.target

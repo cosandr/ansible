@@ -1,0 +1,11 @@
+---
+- include: install.yml
+  become: true
+  when:
+    - not netclient_skip_install
+  tags: ["install"]
+
+- include: configure.yml
+  become: true
+  when: netclient_daemon
+  tags: ["configure"]
