@@ -1,0 +1,6 @@
+---
+
+nginx_vhosts:
+  - filename: netmaker.conf
+    server_name: netmaker
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/netmaker.conf.j2"

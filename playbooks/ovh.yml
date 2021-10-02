@@ -88,6 +88,24 @@
           - "{{ domain }}"
       tags: ["hosts"]
 
+    - name: Ensure netmaker home dir exists
+      file:
+        path: "{{ netmaker_home_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0750
+      tags: ["netmaker"]
+
+    - name: Copy compose file
+      copy:
+        content: "{{ netmaker_compose_file | to_yaml }}"
+        dest: "{{ netmaker_home_dir }}/docker-compose.yml"
+        owner: root
+        group: root
+        mode: 0640
+      tags: ["netmaker"]
+
   roles:
     - role: hostname
       tags: ["hostname"]
