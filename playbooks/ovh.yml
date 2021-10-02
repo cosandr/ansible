@@ -113,6 +113,9 @@
     - role: nginx
       tags: ["nginx"]
 
+    - role: geerlingguy.docker
+      tags: ["docker"]
+
   post_tasks:
     - name: Download dhparam
       get_url:

@@ -3,5 +3,6 @@ __pycache__
 *.retry
 *.pyc
 .cache/
+roles/geerlingguy.*
 
 playbooks/test.yml
