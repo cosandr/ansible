@@ -1,7 +1,6 @@
 ---
 
-- name: Install acpi_call
-  become: true
+- name: Install acpi_call (pacman)
   pacman:
     name: acpi_call-dkms
     state: present
@@ -9,12 +8,29 @@
   tags: ["install"]
 
 - name: Install acpi-call (apt)
-  become: true
   apt:
     name: acpi-call-dkms
     state: present
   when: ansible_os_family == 'Debian'
   tags: ["install"]
+
+- block:
+    - name: Import TLP RPM key
+      rpm_key:
+        state: present
+        key: "https://repo.linrunner.de/fedora/tlp/repos/RPM-GPG-KEY-tlp-fedora-{{ ansible_distribution_version }}-primary"
+
+    - name: Install TLP repo (Fedora)
+      dnf:
+        name: "https://repo.linrunner.de/fedora/tlp/repos/releases/tlp-release.fc{{ ansible_distribution_version }}.noarch.rpm"
+        state: present
+
+    - name: Install acpi-call (dnf)
+      dnf:
+        name: akmod-acpi_call
+        state: present
+  tags: ["install"]
+  when: ansible_distribution == 'Fedora'
 
 - name: Install tlp
   package:
@@ -30,7 +46,6 @@
   tags: ["install"]
 
 - name: Copy TLP config
-  become: true
   template:
     src: "20-custom.conf.j2"
     dest: "/etc/tlp.d/20-custom.conf"
