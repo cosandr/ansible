@@ -5,6 +5,7 @@ dnf_i3_packages:
   - brightnessctl
   - dunst
   - evince
+  - eog
   - feh
   - file-roller
   - gnome-calculator
@@ -13,6 +14,7 @@ dnf_i3_packages:
   - gvfs-nfs
   - gvfs-smb
   - i3-gaps
+  - libheif
   - lxappearance
   - numlockx
   # - pamixer
