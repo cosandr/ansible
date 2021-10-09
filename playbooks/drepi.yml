@@ -258,6 +258,7 @@
           name:
             - bsd-mailx
             - postfix
+            - libsasl2-modules
           state: present
 
       # NOTE: manually run dpgk-reconfigure postfix
@@ -295,7 +296,8 @@
         command: "/usr/sbin/postmap /etc/postfix/sasl_passwd"
         when: sasl_password.changed
       become: true
-      tags: ["unattended-upgrades"]
+      tags: ["postfix"]
+
     - name: Create daily reboot timer
       become: true
       copy:
