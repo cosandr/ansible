@@ -5,15 +5,15 @@ user_suspend: |
   Environment=DISPLAY=:0
   Environment=SYSTEMD_SUSPEND=1
   ExecStartPre=-/usr/bin/playerctl pause
-  ExecStartPre=-/usr/bin/systemctl --user stop ws-wait-online.service
-  ExecStartPre=-/usr/bin/systemctl --user stop dresrv-wait-online.service
+  ExecStartPre=-/bin/sh -c 'export XDG_RUNTIME_DIR=/run/user/$$(id -u); systemctl --user stop ws-wait-online.service'
+  ExecStartPre=-/bin/sh -c 'export XDG_RUNTIME_DIR=/run/user/$$(id -u); systemctl --user stop dresrv-wait-online.service'
   # Only lock if not locked already
   ExecStart=/bin/sh -c 'pgrep -u andrei -x my-screenlock || /home/andrei/.local/bin/my-screenlock'
 
 user_resume: |
   Type=oneshot
-  ExecStart=/usr/bin/systemctl --user start ws-wait-online.service
-  ExecStart=/usr/bin/systemctl --user start dresrv-wait-online.service
+  ExecStart=-/bin/sh -c 'export XDG_RUNTIME_DIR=/run/user/$$(id -u); systemctl --user start ws-wait-online.service'
+  ExecStart=-/bin/sh -c 'export XDG_RUNTIME_DIR=/run/user/$$(id -u); systemctl --user start dresrv-wait-online.service'
 
 logind_config: |
   HandlePowerKey=ignore
