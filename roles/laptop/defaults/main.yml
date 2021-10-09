@@ -26,3 +26,5 @@ logind_config: |
   HandleLidSwitchExternalPower=suspend
   HandleLidSwitchDocked=ignore
   HandleRebootKey=ignore
+
+systemd_sleep_config: ""

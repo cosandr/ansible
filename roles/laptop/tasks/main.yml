@@ -7,6 +7,7 @@
     owner: root
     group: root
     mode: 0755
+  when: logind_config | length > 0
   tags: ["logind"]
 
 - name: Copy logind config
@@ -17,8 +18,32 @@
     owner: root
     group: root
     mode: 0644
+  when: logind_config | length > 0
   notify: reload systemd
   tags: ["logind"]
+
+- name: Ensure sleep.conf.d exists
+  become: true
+  file:
+    path: "/etc/systemd/sleep.conf.d"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: systemd_sleep_config | length > 0
+  tags: ["sleep"]
+
+- name: Copy systemd sleep config
+  become: true
+  template:
+    src: "sleep.conf.j2"
+    dest: "/etc/systemd/sleep.conf.d/override.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when: systemd_sleep_config | length > 0
+  notify: reload systemd
+  tags: ["sleep"]
 
 # https://wiki.archlinux.org/title/Power_management#Sleep_hooks
 - name: Copy user suspend hook
@@ -35,7 +60,7 @@
     - enable user suspend
   when:
     - install_suspend_hooks
-    - user_suspend
+    - user_suspend | length > 0
 
 - name: Copy root suspend hook
   become: true
@@ -51,7 +76,7 @@
     - enable root suspend
   when:
     - install_suspend_hooks
-    - root_suspend
+    - root_suspend | length > 0
 
 - name: Copy user resume hook
   become: true
@@ -67,7 +92,7 @@
     - enable user resume
   when:
     - install_suspend_hooks
-    - user_resume
+    - user_resume | length > 0
 
 - name: Copy root resume hook
   become: true
@@ -83,4 +108,4 @@
     - enable root resume
   when:
     - install_suspend_hooks
-    - root_resume
+    - root_resume | length > 0
