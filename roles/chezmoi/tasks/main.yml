@@ -25,3 +25,5 @@
     mode: 0644
     force: "{{ chezmoi_overwrite }}"
   with_dict: "{{ chezmoi_overrides }}"
+  loop_control:
+    label: "{{ item.key }}"
