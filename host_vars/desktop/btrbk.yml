@@ -3,18 +3,12 @@
 timestamp_format: "long"
 snapshot_preserve_min: "latest"
 snapshot_preserve: "1h 2d 1w"
-target_preserve_min: "no"
-target_preserve: "7d 1m"
 btrbk_global_options:
   backend_remote: "btrfs-progs-sudo"
-  ssh_user: "btrbk"
-  ssh_identity: "/root/.ssh/id_ed25519"
   snapshot_dir: "@snapshots"
 
 volumes:
   - path: "/mnt/btrfs_root"
-    options:
-      target: "ssh://DreSRV/tank/snapshots/desktop"
     subvolumes:
       - path: "@"
       - path: "@home/andrei"

@@ -101,32 +101,18 @@ borg_backups:
     repo: "ssh://{{ my_user }}@{{ hostvars.romsto.ddns_domain }}:{{ hostvars.romsto.ssh_port }}/mnt/user/backup/borg/{{ ansible_hostname }}/tank"
     backup_name: "tank"
     pre_run: |
+      if ! grep -q '/tank' /proc/mounts; then
+          echo "/tank is not mounted, cannot continue"
+          exit 1
+      fi
       if ! ssh -q -o "BatchMode=yes" {{ my_user }}@{{ hostvars.romsto.ddns_domain }} -p {{ hostvars.romsto.ssh_port }} exit &>/dev/null
       then
           echo "Cannot SSH into remote server"
           exit 1
       fi
-      # Take snapshots
-      snap_paths=(
-        "/tank/archive"
-        "/tank/backup"
-        "/tank/games"
-        "/tank/media"
-        "/tank/media/motion"
-        "/tank/media/photo"
-        "/tank/yes"
-      )
-      mkdir -p /tank/snapshots/borg_tmp
-      cd /tank/snapshots/borg_tmp
-      for p in "${snap_paths[@]}"; do
-          btrfs subvolume snapshot -r "$p" "$(basename "$p")"
-      done
+      cd /tank
     post_run: |
       cd /
-      for p in /tank/snapshots/borg_tmp/*; do
-          btrfs subvolume delete "$p"
-      done
-      rmdir /tank/snapshots/borg_tmp
     paths:
       - "."
     create_args:

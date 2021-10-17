@@ -21,8 +21,4 @@ __sd_btrfs_mail_scrub:
       content: |
         #!/bin/bash
 
-        tmp="# /\n$(btrfs scrub status /)\n"
-        for d in /dev/mapper/tank_disk*; do
-          tmp+="\n# $d\n$(btrfs scrub status $d)\n"
-        done
-        echo -e "$tmp" | mail -s "btrfs scrub results" {{ my_email }}
+        echo -e "# /\n$(btrfs scrub status /)" | mail -s "btrfs scrub results" {{ my_email }}
