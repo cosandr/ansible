@@ -1,16 +1,106 @@
 ---
 
+networkd_netdevs:
+  - enp42s0.10: |
+      [NetDev]
+      Name=enp42s0.10
+      Kind=vlan
+
+      [VLAN]
+      Id=10
+  - enp42s0.50: |
+      [NetDev]
+      Name=enp42s0.50
+      Kind=vlan
+
+      [VLAN]
+      Id=50
+  - enp42s0.100: |
+      [NetDev]
+      Name=enp42s0.100
+      Kind=vlan
+
+      [VLAN]
+      Id=100
+  - enp42s0.192: |
+      [NetDev]
+      Name=enp42s0.192
+      Kind=vlan
+
+      [VLAN]
+      Id=192
+  - enp42s0.420: |
+      [NetDev]
+      Name=enp42s0.420
+      Kind=vlan
+
+      [VLAN]
+      Id=420
+
 networkd_config:
-  - wired: |
+  - enp42s0: |
       [Match]
-      Name=en*
+      Name=enp42s0
+
+      [Network]
+      VLAN=enp42s0.10
+      VLAN=enp42s0.50
+      VLAN=enp42s0.100
+      VLAN=enp42s0.192
+      VLAN=enp42s0.420
+  - enp42s0.10: |
+      [Match]
+      Name=enp42s0.10
+
+      [Network]
+      DHCP=ipv4
+      LinkLocalAddressing=no
+      IPv6AcceptRA=no
+
+      [DHCP]
+      RouteMetric=1032
+  - enp42s0.50: |
+      [Match]
+      Name=enp42s0.50
+
+      [Network]
+      DHCP=ipv4
+      LinkLocalAddressing=no
+      IPv6AcceptRA=no
+
+      [DHCP]
+      RouteMetric=1030
+  - enp42s0.100: |
+      [Match]
+      Name=enp42s0.100
+
+      [Network]
+      DHCP=ipv4
+      LinkLocalAddressing=no
+      IPv6AcceptRA=no
+
+      [DHCP]
+      RouteMetric=1031
+  - enp42s0.192: |
+      [Match]
+      Name=enp42s0.192
 
       [Network]
       DHCP=yes
-      IPForward=yes
 
       [DHCP]
       RouteMetric=1024
+  - enp42s0.420: |
+      [Match]
+      Name=enp42s0.420
+
+      [Network]
+      DHCP=ipv4
+      LinkLocalAddressing=no
+      IPv6AcceptRA=no
+
+      [DHCP]
+      RouteMetric=1500
   - wlan: |
       [Match]
       Type=wlan
