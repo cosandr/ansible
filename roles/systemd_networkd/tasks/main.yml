@@ -13,6 +13,19 @@
   with_dict: "{{ networkd_config }}"
   notify: restart systemd-networkd
 
+- name: Copy networkd netdevs
+  become: true
+  copy:
+    dest: "/etc/systemd/network/{{ item.key }}.netdev"
+    owner: root
+    group: root
+    mode: 0644
+    content: |
+      {{ ansible_managed | comment }}
+      {{ item.value }}
+  with_dict: "{{ networkd_netdevs }}"
+  notify: restart systemd-networkd
+
 - name: Enable and start systemd-networkd/resolved
   systemd:
     name: "{{ item }}"

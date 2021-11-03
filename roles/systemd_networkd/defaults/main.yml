@@ -1,5 +1,6 @@
 ---
 
+networkd_netdevs: []
 networkd_config:
   - wired: |
       [Match]
