@@ -1,37 +1,37 @@
 ---
 
 networkd_netdevs:
-  - enp42s0.10: |
+  - vlan10: |
       [NetDev]
-      Name=enp42s0.10
+      Name=vlan10
       Kind=vlan
 
       [VLAN]
       Id=10
-  - enp42s0.50: |
+  - vlan50: |
       [NetDev]
-      Name=enp42s0.50
+      Name=vlan50
       Kind=vlan
 
       [VLAN]
       Id=50
-  - enp42s0.100: |
+  - vlan100: |
       [NetDev]
-      Name=enp42s0.100
+      Name=vlan100
       Kind=vlan
 
       [VLAN]
       Id=100
-  - enp42s0.192: |
+  - vlan192: |
       [NetDev]
-      Name=enp42s0.192
+      Name=vlan192
       Kind=vlan
 
       [VLAN]
       Id=192
-  - enp42s0.420: |
+  - vlan420: |
       [NetDev]
-      Name=enp42s0.420
+      Name=vlan420
       Kind=vlan
 
       [VLAN]
@@ -43,14 +43,14 @@ networkd_config:
       Name=enp42s0
 
       [Network]
-      VLAN=enp42s0.10
-      VLAN=enp42s0.50
-      VLAN=enp42s0.100
-      VLAN=enp42s0.192
-      VLAN=enp42s0.420
-  - enp42s0.10: |
+      VLAN=vlan10
+      VLAN=vlan50
+      VLAN=vlan100
+      VLAN=vlan192
+      VLAN=vlan420
+  - vlan10: |
       [Match]
-      Name=enp42s0.10
+      Name=vlan10
 
       [Network]
       DHCP=ipv4
@@ -59,9 +59,9 @@ networkd_config:
 
       [DHCP]
       RouteMetric=1032
-  - enp42s0.50: |
+  - vlan50: |
       [Match]
-      Name=enp42s0.50
+      Name=vlan50
 
       [Network]
       DHCP=ipv4
@@ -70,9 +70,9 @@ networkd_config:
 
       [DHCP]
       RouteMetric=1030
-  - enp42s0.100: |
+  - vlan100: |
       [Match]
-      Name=enp42s0.100
+      Name=vlan100
 
       [Network]
       DHCP=ipv4
@@ -81,18 +81,18 @@ networkd_config:
 
       [DHCP]
       RouteMetric=1031
-  - enp42s0.192: |
+  - vlan192: |
       [Match]
-      Name=enp42s0.192
+      Name=vlan192
 
       [Network]
       DHCP=yes
 
       [DHCP]
       RouteMetric=1024
-  - enp42s0.420: |
+  - vlan420: |
       [Match]
-      Name=enp42s0.420
+      Name=vlan420
 
       [Network]
       DHCP=ipv4
