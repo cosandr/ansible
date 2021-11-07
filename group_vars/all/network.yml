@@ -1,0 +1,18 @@
+---
+
+home_net:
+  vm:
+    cidr: "10.0.10.0/24"
+    vlan: 10
+  general:
+    cidr: "10.0.50.0/24"
+    vlan: 50
+  mgmt:
+    cidr: "10.0.100.0/24"
+    vlan: 100
+  public:
+    cidr: "10.0.192.0/24"
+    vlan: 192
+  legacy:
+    cidr: "10.0.0.0/24"
+    vlan: 420

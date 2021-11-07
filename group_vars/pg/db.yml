@@ -1,0 +1,23 @@
+---
+
+postgresql_databases:
+  - name: discord
+    owner: postgres
+
+  - name: discord_public
+    owner: postgres
+
+  - name: gitea
+    owner: gitea
+
+  - name: gitlabhq_production
+    owner: gitlab
+
+  - name: grafana
+    owner: grafana
+
+  - name: nextcloud
+    owner: nextcloud
+
+  - name: web
+    owner: postgres

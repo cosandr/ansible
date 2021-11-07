@@ -1,0 +1,23 @@
+---
+
+postgresql_users:
+  - name: postgres
+    password: "{{ vault_postgresql_passwords.postgres }}"
+
+  - name: discord
+
+  - name: discord_public
+
+  - name: gitea
+
+  - name: gitlab
+
+  - name: grafana
+
+  - name: nextcloud
+
+  - name: sharpbot
+
+  - name: uuid_gen
+
+  - name: web

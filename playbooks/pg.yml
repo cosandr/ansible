@@ -1,0 +1,189 @@
+---
+
+- hosts: truenas
+  gather_facts: false
+  roles:
+    - role: truenas_nfs
+      delegate_to: localhost
+      vars:
+        truenas_update_nfs: false
+        truenas_sharing:
+          - type: nfs
+            config:
+              paths: ["/mnt/tank/backup/pgsql"]
+              hosts: "{{ groups['pg'] | map('extract', hostvars, 'ansible_host') }}"
+              alldirs: true
+              ro: false
+              quiet: false
+              maproot_user: root
+              maproot_group: wheel
+              enabled: true
+
+- hosts: pg
+  gather_facts: true
+  pre_tasks:
+    - name: Setup data disk
+      include_role:
+        name: setup_disk
+      vars:
+        disk:
+          dev: "/dev/sdb"
+          vols:
+            - name: pgsql
+              path: "/var/lib/pgsql"
+              shrink: false
+              size: "100%FREE"
+      tags: ["disk"]
+
+    - name: Mount NFS share
+      mount:
+        src: "{{ home_net.vm.cidr | ipaddr('2') | ipaddr('address') }}:/mnt/tank/backup/pgsql"
+        path: "/mnt/backup-pgsql"
+        opts: "vers=4"
+        state: mounted
+        fstype: nfs
+      tags: ["nfs"]
+
+    - name: Install PGSQL rpm key
+      rpm_key:
+        key: "https://apt.postgresql.org/pub/repos/yum/RPM-GPG-KEY-PGDG"
+        state: present
+      tags: ["install"]
+
+    - name: Install PGSQL repo
+      dnf:
+        name: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+        state: present
+      tags: ["install"]
+
+    - name: Disable default PGSQL module
+      ini_file:
+        path: /etc/dnf/modules.d/postgresql.module
+        section: postgresql
+        option: state
+        value: disabled
+        no_extra_spaces: false
+        owner: root
+        group: root
+        mode: 0644
+      tags: ["install"]
+
+    - block:
+        - name: Disable some default services
+          firewalld:
+            zone: "{{ item.zone }}"
+            service: "{{ item.service }}"
+            permanent: true
+            state: disabled
+          loop:
+            - zone: public
+              service: cockpit
+            - zone: internal
+              service: cockpit
+            - zone: internal
+              service: samba-client
+            - zone: internal
+              service: samba-client
+          notify: reload firewalld
+
+        - name: Add home networks to internal zone
+          firewalld:
+            zone: internal
+            source: "{{ item.cidr }}"
+            permanent: true
+            state: enabled
+          loop: "{{ home_net.values() }}"
+          loop_control:
+            label: "{{ item.cidr }}"
+          notify: reload firewalld
+
+        - name: Add postgresql to internal zone
+          firewalld:
+            zone: internal
+            service: postgresql
+            permanent: true
+            state: enabled
+          notify: reload firewalld
+
+      tags: ["firewalld"]
+
+  roles:
+    - role: geerlingguy.postgresql
+      tags: ["pg"]
+
+  post_tasks:
+    - name: Install RPM requirements
+      dnf:
+        name:
+          - python3-cryptography
+          - openssl
+        state: present
+      tags: ["ssl", "install"]
+
+    - name: Generate CA
+      shell: >
+        openssl req -new -x509
+        -days 3650
+        -extensions v3_ca
+        -subj "/C=NO/O=Home/CN={{ inventory_hostname }}/E={{ my_email }}"
+        -nodes
+        -keyout /etc/pki/tls/private/pg-ca.key
+        -out /etc/pki/tls/certs/pg-ca.crt
+      args:
+        creates: "/etc/pki/tls/private/pg-ca.key"
+      notify: restart postgresql
+      tags: ["ssl"]
+
+    - name: Generate postgresql PK
+      openssl_privatekey:
+        path: "{{ postgresql_config_path }}/server.key"
+        size: 4096
+        owner: "root"
+        group: "postgres"
+        mode: 0640
+      notify: restart postgresql
+      tags: ["ssl"]
+
+    - name: Generate postgresql CSR
+      openssl_csr:
+        path: "/etc/pki/tls/misc/postgres.csr"
+        privatekey_path: "{{ postgresql_config_path }}/server.key"
+        common_name: "{{ ansible_hostname }}"
+        subject_alt_name:
+          - "DNS:{{ ansible_host }}"
+        owner: "root"
+        group: "root"
+        mode: 0600
+      tags: ["ssl"]
+
+    - name: Sign postgresql CSR
+      openssl_certificate:
+        path: "{{ postgresql_config_path }}/server.crt"
+        csr_path: "/etc/pki/tls/misc/postgres.csr"
+        provider: ownca
+        ownca_path: "/etc/pki/tls/certs/pg-ca.crt"
+        ownca_privatekey_path: "/etc/pki/tls/private/pg-ca.key"
+      notify: restart postgresql
+      tags: ["ssl"]
+
+    - name: Copy CA to pgsql
+      copy:
+        src: "/etc/pki/tls/certs/pg-ca.crt"
+        remote_src: true
+        owner: postgres
+        group: postgres
+        dest: "{{ postgresql_config_path }}/root.crt"
+        mode: 0644
+      notify: restart postgresql
+      tags: ["ssl"]
+
+  handlers:
+    - name: restart postgresql
+      service:
+        name: "{{ postgresql_daemon }}"
+        state: restarted
+
+    - name: reload firewalld
+      service:
+        name: firewalld
+        state: reloaded

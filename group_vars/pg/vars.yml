@@ -1,0 +1,22 @@
+---
+
+ansible_user: root
+ansible_python_interpreter: /usr/bin/python3
+
+postgresql_version: 13
+postgresql_daemon: "postgresql-{{ postgresql_version }}"
+postgresql_bin_path: "/usr/pgsql-{{ postgresql_version }}/bin"
+postgresql_data_dir: "/var/lib/pgsql/{{ postgresql_version }}/data"
+postgresql_config_path: "/var/lib/pgsql/{{ postgresql_version }}/data"
+postgresql_packages:
+  - postgresql13
+  - postgresql13-server
+  - postgresql13-contrib
+
+postgresql_global_config_options:
+  - option: listen_addresses
+    value: '{{ ["localhost", ansible_host] | join(",") }}'
+  - option: ssl
+    value: 'on'
+  - option: ssl_ca_file
+    value: 'root.crt'
