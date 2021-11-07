@@ -1,0 +1,25 @@
+---
+- name: Create filesystem
+  filesystem:
+    fstype: "{{ disk.fstype | default('ext4') }}"
+    opts: "{{ disk.mkfs_opts | default(omit) }}"
+    dev: "{{ disk.dev }}"
+
+- name: Set mountpoint permissions
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ disk.owner | default('root') }}"
+    group: "{{ disk.group | default('root') }}"
+    mode: "{{ disk.mode | default('0755') }}"
+  loop: "{{ disk.vols }}"
+  when: disk.path is defined
+
+- name: Mount filesystem
+  mount:
+    path: "{{ disk.path }}"
+    src: "{{ disk.dev }}"
+    fstype: "{{ disk.fstype | default('ext4') }}"
+    opts: "{{ disk.opts | default(omit) }}"
+    state: mounted
+  when: disk.path is defined

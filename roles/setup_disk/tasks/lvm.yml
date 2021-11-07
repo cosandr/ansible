@@ -1,0 +1,49 @@
+---
+
+- name: Install LVM
+  package:
+    name: lvm2
+    state: present
+
+- name: Create LVG
+  lvg:
+    vg: "data"
+    pvs: "{{ disk.dev }}"
+    pesize: "32"
+    state: present
+
+- name: Create LVOLs
+  lvol:
+    vg: data
+    lv: "{{ item.name }}"
+    size: "{{ item.size | default('100%VG') }}"
+    shrink: "{{ item.shrink | default(true) }}"
+    state: present
+  loop: "{{ disk.vols }}"
+
+- name: Create filesystems
+  filesystem:
+    fstype: "{{ item.fstype | default('ext4') }}"
+    dev: "/dev/mapper/data-{{ item.name }}"
+    opts: "{{ item.mkfs_opts | default(omit) }}"
+  loop: "{{ disk.vols }}"
+
+- name: Set mountpoint permissions
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop: "{{ disk.vols }}"
+  when: item.path is defined
+
+- name: Mount filesystems
+  mount:
+    path: "{{ item.path }}"
+    src: "/dev/mapper/data-{{ item.name }}"
+    fstype: "{{ item.fstype | default('ext4') }}"
+    opts: "{{ item.opts | default(omit) }}"
+    state: mounted
+  loop: "{{ disk.vols }}"
+  when: item.path is defined
