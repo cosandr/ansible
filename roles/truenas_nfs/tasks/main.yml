@@ -55,6 +55,7 @@
     body_format: json
     body: "{{ item }}"
   with_items: "{{ truenas_sharing_config['nfs']['update_nfs_shares'] }}"
+  when: truenas_update_nfs
 
 - name: Deleting NFS shares
   uri:

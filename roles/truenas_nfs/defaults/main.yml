@@ -3,6 +3,7 @@
 truenas_api_url: "http://{{ ansible_host }}/api/v2.0"
 truenas_api_key: ""
 truenas_validate_certs: false
+truenas_update_nfs: true
 truenas_sharing: []
   # - type: smb
   #   name: testds
