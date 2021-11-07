@@ -1,5 +1,39 @@
 # Ansible
 
+## VMware
+
+[Ansible docs](https://docs.ansible.com/ansible/latest/collections/community/vmware/vmware_vm_inventory_inventory.html)
+
+```sh
+pip install -U --user pyvmomi git+https://github.com/vmware/vsphere-automation-sdk-python.git
+```
+
+Run with ansible with `-i home.vmware.yml`, e.g:
+
+```sh
+ansible-playbook -i home.vmware.yml playbooks/pg.yml
+```
+
+Example dynamic inventory
+
+```yml
+plugin: vmware_vm_inventory
+strict: False
+hostname: ""
+username: "administrator@vsphere.local"
+password: ""
+validate_certs: False
+with_tags: False
+hostnames:
+  - config.name
+filters:
+  - not config.template
+keyed_groups:
+  - key: tag_category.ansible_group
+    prefix: ""
+    separator: ""
+```
+
 ## GCP
 
 See [Ansible guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html) for more details.
