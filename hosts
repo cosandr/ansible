@@ -6,15 +6,16 @@ desktops
 laptops
 
 [desktops]
-desktop ansible_host=10.0.0.4 ansible_user=root
+desktop ansible_host=10.0.50.4 ansible_user=root
 
 [laptops]
-laptop  ansible_host=10.0.0.5 ansible_user=root
+laptop  ansible_host=10.0.192.5 ansible_user=root
 
 [servers]
-dresrv ansible_host=10.0.0.2 ansible_user=root
-drepi  ansible_host=10.0.0.3 ansible_user=pi
-romsto ansible_host=10.1.0.6 ansible_user=root
+dresrv ansible_host=10.0.50.22 ansible_user=root
+drepi  ansible_host=10.0.0.3   ansible_user=pi
+romsto ansible_host=10.1.0.6   ansible_user=root
+truenas ansible_host=10.0.10.2 ansible_user=root ansible_python_interpreter=/usr/local/bin/python3
 
 [servers:children]
 ovh

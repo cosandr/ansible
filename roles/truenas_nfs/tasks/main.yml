@@ -1,0 +1,68 @@
+---
+
+- name: Get NFS shares
+  check_mode: false
+  uri:
+    url: "{{ truenas_api_url }}/sharing/nfs"
+    validate_certs: "{{ truenas_validate_certs }}"
+    method: GET
+    return_content: true
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Accept: "application/json"
+      Content-Type: "application/json"
+  register: truenas_nfs
+
+- name: Get SMB shares
+  check_mode: false
+  uri:
+    url: "{{ truenas_api_url }}/sharing/smb"
+    validate_certs: "{{ truenas_validate_certs }}"
+    method: GET
+    return_content: true
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Accept: "application/json"
+      Content-Type: "application/json"
+  register: truenas_smb
+
+- name: Setting Fact For Sharing Config
+  set_fact:
+    truenas_sharing_config: "{{ lookup('template', 'sharing_config.yml.j2') }}"
+
+- name: Create NFS shares
+  uri:
+    url: "{{ truenas_api_url }}/sharing/nfs"
+    validate_certs: "{{ truenas_validate_certs }}"
+    method: POST
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body_format: json
+    body: "{{ item }}"
+  with_items: "{{ truenas_sharing_config['nfs']['create_nfs_shares'] }}"
+
+- name: Update NFS shares
+  uri:
+    url: "{{ truenas_api_url }}/sharing/nfs/id/{{ item.id }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+    method: PUT
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body_format: json
+    body: "{{ item }}"
+  with_items: "{{ truenas_sharing_config['nfs']['update_nfs_shares'] }}"
+
+- name: Deleting NFS shares
+  uri:
+    url: "{{ truenas_api_url }}/sharing/nfs/id/{{ item }}"
+    validate_certs: "{{ truenas_validate_certs }}"
+    method: DELETE
+    headers:
+      Authorization: "Bearer {{ truenas_api_key }}"
+      Accept: "application/json"
+      Content-Type: "application/json"
+  with_items: "{{ truenas_sharing_config['nfs']['delete_nfs_shares'] }}"
