@@ -16,7 +16,7 @@ grafana_smtp:
   from_address: "grafana@{{ domain }}"
 grafana_database:
   type: postgres
-  host: "localhost:{{ ports.postgres | default('5432') }}"
+  host: "{{ hostvars['pg01'].ansible_host }}:5432"
   user: grafana
   password: "{{ grafana_psql_pass }}"
 grafana_datasources:

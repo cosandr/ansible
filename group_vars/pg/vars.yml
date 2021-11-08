@@ -20,3 +20,5 @@ postgresql_global_config_options:
     value: 'on'
   - option: ssl_ca_file
     value: 'root.crt'
+
+postgres_exporter_port: "9187"

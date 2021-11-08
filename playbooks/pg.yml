@@ -22,6 +22,8 @@
 
 - hosts: pg
   gather_facts: true
+  vars:
+    postgres_exporter_version: "latest"
   pre_tasks:
     - name: Setup data disk
       include_role:
@@ -111,11 +113,25 @@
             state: enabled
           notify: reload firewalld
 
+        - name: Add postgres exporter to internal zone
+          firewalld:
+            zone: internal
+            port: "{{ postgres_exporter_port }}/tcp"
+            permanent: true
+            state: enabled
+          notify: reload firewalld
+          tags: ["postgres_exporter"]
+
       tags: ["firewalld"]
 
   roles:
     - role: geerlingguy.postgresql
       tags: ["pg"]
+
+    - role: postgres_exporter
+      vars:
+        postgres_service_name: "{{ postgresql_daemon }}"
+      tags: ["prometheus-stack", "postgres_exporter"]
 
     - role: systemd
       tags: ["systemd"]

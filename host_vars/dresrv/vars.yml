@@ -7,7 +7,6 @@ _ports:
   nginx_exporter: 9113
   postgres: 5432
   prometheus: 9092
-  psql_exporter: 9187
   vouch: 8682
 
 domain: "{{ vault_domain }}"

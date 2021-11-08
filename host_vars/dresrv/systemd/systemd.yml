@@ -4,7 +4,6 @@ systemd_script_install_path: "/usr/local/bin/systemd"
 systemd_units:
   - "{{ __sd_backup_gdrive }}"
   - "{{ __sd_backup_gitea }}"
-  - "{{ __sd_backup_psql }}"
   - "{{ __sd_btrfs_mail_scrub }}"
   - "{{ __sd_btrfs_scrub }}"
   - "{{ __sd_concat_motion }}"
