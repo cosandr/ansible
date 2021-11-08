@@ -21,3 +21,6 @@ postgresql_users:
   - name: uuid_gen
 
   - name: web
+
+  - name: terraform
+    password: "{{ vault_postgresql_passwords.terraform }}"

@@ -21,3 +21,6 @@ postgresql_databases:
 
   - name: web
     owner: postgres
+
+  - name: terraform
+    owner: terraform
