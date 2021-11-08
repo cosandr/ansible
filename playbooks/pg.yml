@@ -111,6 +111,9 @@
     - role: geerlingguy.postgresql
       tags: ["pg"]
 
+    - role: systemd
+      tags: ["systemd"]
+
   post_tasks:
     - name: Install RPM requirements
       dnf:

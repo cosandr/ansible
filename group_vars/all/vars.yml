@@ -1,4 +1,6 @@
 ---
+
+ansible_managed: "Ansible managed"
 my_user: andrei
 my_email: "{{ vault_my_email }}"
 ports:
