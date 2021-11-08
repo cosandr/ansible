@@ -1,8 +1,4 @@
 ---
-- name: ensure postgres is running
-  shell: systemctl is-active --quiet {{ postgres_service_name }}
-  check_mode: false
-
 - block:
     - name: Get latest release
       uri:
