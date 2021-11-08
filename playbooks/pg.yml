@@ -18,6 +18,7 @@
               maproot_user: root
               maproot_group: wheel
               enabled: true
+      tags: ["nfs"]
 
 - hosts: pg
   gather_facts: true
@@ -25,6 +26,8 @@
     - name: Setup data disk
       include_role:
         name: setup_disk
+        apply:
+          tags: ["disk"]
       vars:
         disk:
           dev: "/dev/sdb"
@@ -33,6 +36,9 @@
               path: "/var/lib/pgsql"
               shrink: false
               size: "100%FREE"
+              owner: "26"  # postgres
+              group: "26"
+              mode: "0700"
       tags: ["disk"]
 
     - name: Mount NFS share
