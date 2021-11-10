@@ -1,8 +1,13 @@
 ---
-wireguard_port: "51820"
-wireguard_interface: "gw01"
-wireguard_address: "172.16.1.1/24"
-wireguard_endpoint: "{{ domain }}"
-wireguard_persistent_keepalive: "30"
 
-wireguard_ip: "{{ wireguard_address.split('/')[0] }}"
+wireguard_interface: "mt"
+wireguard_address: "10.4.20.101/32"
+wireguard_ip: "{{ wireguard_address | ipaddr('address') }}"
+wireguard_dns: "10.4.20.1"
+wireguard_private_key: "{{ vault_wireguard_private_key }}"
+
+wireguard_unmanaged_peers:
+  mt:
+    endpoint: "{{ hostvars['mt-router'].wireguard_endpoint }}"
+    allowed_ips: "{{ hostvars['gitlab01'].ansible_host }}/32, {{ hostvars['dresrv'].ansible_host }}/32"
+    public_key: "{{ hostvars['mt-router'].wireguard_public_key }}"

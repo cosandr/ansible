@@ -1,5 +1,9 @@
 # Ansible
 
+## Wireguard
+
+Generate keys on the command line with `wg genkey | tee /dev/stderr | wg pubkey`, private is the first string.
+
 ## VMware
 
 [Ansible docs](https://docs.ansible.com/ansible/latest/collections/community/vmware/vmware_vm_inventory_inventory.html)

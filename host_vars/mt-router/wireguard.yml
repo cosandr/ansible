@@ -1,0 +1,6 @@
+---
+
+wireguard_address: "10.4.20.1/32"
+wireguard_ip: "{{ wireguard_address | ipaddr('address') }}"
+wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
+wireguard_public_key: "{{ vault_wireguard_public_key }}"

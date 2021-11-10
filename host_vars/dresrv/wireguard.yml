@@ -1,9 +1,0 @@
----
-wireguard_port: "51820"
-wireguard_interface: "gw01"
-wireguard_address: "172.16.1.2/24"
-# wireguard_endpoint: "{{ ddns_domain }}"
-wireguard_endpoint: ""
-wireguard_persistent_keepalive: "30"
-
-wireguard_ip: "{{ wireguard_address.split('/')[0] }}"

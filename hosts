@@ -25,3 +25,7 @@ ovh-gw01
 
 [pg]
 pg01 ansible_host=10.0.10.11
+
+[mikrotik]
+mt-router ansible_host=10.0.50.1
+

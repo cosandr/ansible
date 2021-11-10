@@ -1,15 +1,20 @@
 ---
 wireguard_port: "51820"
 wireguard_interface: "wg0"
-wireguard_address: "172.16.1.6/24"
+wireguard_address: "10.4.20.206/32"
+wireguard_ip: "{{ wireguard_address | ipaddr('address') }}"
 # wireguard_endpoint: "{{ ddns_domain }}"
 wireguard_endpoint: ""
 wireguard_persistent_keepalive: "30"
 wireguard_postup:
   - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} started'
-  - iptables -t nat -A POSTROUTING -s "{{ wireguard_address | ipaddr('network/prefix') }}" -o br0 -j MASQUERADE
+  - iptables -t nat -A POSTROUTING -s "10.4.20.0/24" -o br0 -j MASQUERADE
 wireguard_postdown:
   - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} stopped'
-  - iptables -t nat -D POSTROUTING -s "{{ wireguard_address | ipaddr('network/prefix') }}" -o br0 -j MASQUERADE
+  - iptables -t nat -D POSTROUTING -s "10.4.20.0/24" -o br0 -j MASQUERADE
 
-wireguard_ip: "{{ wireguard_address.split('/')[0] }}"
+wireguard_unmanaged_peers:
+  mt:
+    endpoint: "{{ hostvars['mt-router'].wireguard_endpoint }}"
+    allowed_ips: "{{ hostvars['dresrv'].ansible_host }}/32"
+    public_key: "{{ hostvars['mt-router'].wireguard_public_key }}"
