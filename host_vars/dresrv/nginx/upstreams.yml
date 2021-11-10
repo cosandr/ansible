@@ -8,7 +8,6 @@ nginx_upstreams:
   - {name: elasticsearch, servers: ["127.0.0.1:9200"], keepalive: 16}
   - {name: firefox, servers: ["127.0.0.1:5800"]}
   - {name: gitea, servers: ["127.0.0.1:3000"]}
-  - {name: gitlab, servers: ["127.0.0.1:4522"]}
   - {name: grafana, servers: ["127.0.0.1:3001"]}
   - {name: jellyfin, servers: ["127.0.0.1:8096"]}
   - {name: kibana, servers: ["127.0.0.1:9205"], keepalive: 16}
@@ -17,7 +16,6 @@ nginx_upstreams:
   - {name: nextcloud, servers: ["127.0.0.1:25683"]}
   - {name: notes_sync, servers: ["127.0.0.1:6683"]}
   - {name: notes_web, servers: ["127.0.0.1:6684"]}
-  - {name: registry, servers: ["127.0.0.1:5000"]}
   - {name: sonarr, servers: ["127.0.0.1:8989"]}
   - {name: transmission, servers: ["127.0.0.1:9091"]}
   - {name: vouch, servers: ["127.0.0.1:8682"]}

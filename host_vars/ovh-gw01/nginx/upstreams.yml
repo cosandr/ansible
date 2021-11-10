@@ -1,0 +1,10 @@
+---
+
+nginx_upstreams:
+  - name: gitlab
+    servers: ["{{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_nginx_listen_port }}"]
+    keepalive: 16
+
+  - name: registry
+    servers: ["{{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_registry_nginx_listen_port }}"]
+    keepalive: 16
