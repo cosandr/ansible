@@ -1,0 +1,9 @@
+---
+
+smtp_config: "{{ vault_smtp_config }}"
+# smtp_config:
+#   example.com:
+#     host:
+#     pass:
+#     port:
+#     user:
