@@ -19,6 +19,8 @@ truenas ansible_host=10.0.10.2 ansible_user=root ansible_python_interpreter=/usr
 
 [servers:children]
 ovh
+pg
+gitlab
 
 [ovh]
 ovh-gw01
@@ -29,3 +31,5 @@ pg01 ansible_host=10.0.10.11
 [mikrotik]
 mt-router ansible_host=10.0.50.1
 
+[gitlab]
+gitlab01 ansible_host=10.0.10.40

@@ -1,0 +1,74 @@
+---
+
+- hosts: gitlab
+  gather_facts: true
+  pre_tasks:
+    - block:
+        - name: Disable some default services
+          firewalld:
+            zone: "{{ item.zone }}"
+            service: "{{ item.service }}"
+            permanent: true
+            state: disabled
+          loop:
+            - zone: public
+              service: cockpit
+            - zone: internal
+              service: cockpit
+            - zone: internal
+              service: samba-client
+            - zone: internal
+              service: samba-client
+          notify: reload firewalld
+
+        - name: Add proxy host to internal network
+          firewalld:
+            zone: internal
+            source: "{{ proxy_host }}"
+            permanent: true
+            state: enabled
+          notify: reload firewalld
+
+        - name: Add mgmt network to internal network
+          firewalld:
+            zone: internal
+            source: "{{ home_net.mgmt.cidr }}"
+            permanent: true
+            state: enabled
+          notify: reload firewalld
+
+        - name: Add gitlab ports to internal zone
+          firewalld:
+            zone: internal
+            port: "{{ item }}/tcp"
+            permanent: true
+            state: enabled
+          loop:
+            - "{{ gitlab_nginx_listen_port }}"
+            - "{{ gitlab_registry_nginx_listen_port }}"
+          notify: reload firewalld
+
+      tags: ["firewalld"]
+  roles:
+    - role: setup_disk
+      vars:
+        disk:
+          dev: "/dev/sdb"
+          vols:
+            - name: gitlab
+              path: "/var/opt/gitlab"
+              shrink: false
+              size: "100%FREE"
+              owner: "993"  # git
+              group: "990"
+              mode: "0770"
+      tags: ["disk"]
+
+    - role: geerlingguy.gitlab
+      tags: ["gitlab"]
+
+  handlers:
+    - name: reload firewalld
+      service:
+        name: firewalld
+        state: reloaded

@@ -1,0 +1,43 @@
+---
+
+ansible_user: root
+ansible_python_interpreter: /usr/bin/python3
+
+domain: "{{ hostvars['ovh-gw01'].domain }}"
+proxy_host: "{{ hostvars['ovh-gw01'].wireguard_ip }}"
+
+gitlab_time_zone: "Europe/Oslo"
+
+gitlab_external_url: "https://gitlab.{{ domain }}"
+
+gitlab_redirect_http_to_https: "false"
+gitlab_create_self_signed_cert: "false"
+gitlab_nginx_listen_https: "false"
+gitlab_nginx_listen_port: 80
+gitlab_nginx_ssl_verify_client: ""
+gitlab_nginx_ssl_client_certificate: ""
+gitlab_nginx_trusted_addresses: ["{{ proxy_host }}"]
+
+gitlab_registry_enable: "true"
+gitlab_registry_external_url: "https://registry.{{ domain }}"
+gitlab_registry_nginx_trusted_addresses: ["{{ proxy_host }}"]
+gitlab_registry_nginx_listen_https: false
+gitlab_registry_nginx_listen_port: 5000
+
+gitlab_email_enabled: "true"
+gitlab_email_from: "gitlab@{{ domain }}"
+gitlab_email_display_name: "Gitlab"
+gitlab_email_reply_to: "no-reply@{{ domain }}"
+
+gitlab_smtp_enable: "true"
+gitlab_smtp_address: "{{ smtp_config[domain].host }}"
+gitlab_smtp_port: "{{ smtp_config[domain].port }}"
+gitlab_smtp_user_name: "{{ smtp_config[domain].user }}"
+gitlab_smtp_password: "{{ smtp_config[domain].pass }}"
+gitlab_smtp_domain: "{{ domain }}"
+gitlab_smtp_authentication: "login"
+gitlab_smtp_enable_starttls_auto: "true"
+gitlab_smtp_tls: "true"
+
+gitlab_letsencrypt_enable: "false"
+gitlab_ldap_enabled: "false"

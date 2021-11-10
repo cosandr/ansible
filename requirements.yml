@@ -7,3 +7,4 @@ collections:
 roles:
   - geerlingguy.docker
   - geerlingguy.postgresql
+  - geerlingguy.gitlab
