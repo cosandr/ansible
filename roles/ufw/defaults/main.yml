@@ -4,3 +4,7 @@ ufw_allow_dhcpv6: true
 ufw_trusted_sources: []
 ufw_local_rules: []
 ufw_custom_rules: []
+ufw_before_rules: |
+  # allow IGMP
+  -A ufw-before-input -p igmp -d 224.0.0.0/4 -j ACCEPT
+  -A ufw-before-output -p igmp -d 224.0.0.0/4 -j ACCEPT

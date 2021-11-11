@@ -31,15 +31,13 @@
     - {direction: "outgoing", policy: "allow"}
   notify: reload ufw
 
-- name: Allow IGMP
+- name: Add before rules
   blockinfile:
     dest: /etc/ufw/before.rules
     insertbefore: ^# don't delete the 'COMMIT' line or these rules won't be processed
-    block: |
-      # allow IGMP
-      -A ufw-before-input -p igmp -d 224.0.0.0/4 -j ACCEPT
-      -A ufw-before-output -p igmp -d 224.0.0.0/4 -j ACCEPT
+    block: "{{ ufw_before_rules }}"
     state: present
+  when: ufw_before_rules | length > 0
   notify: reload ufw
 
 - name: Add trusted sources
