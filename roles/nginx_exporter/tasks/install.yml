@@ -21,9 +21,7 @@
 
   - name: restart systemd-sysusers
     become: true
-    systemd:
-      name: systemd-sysusers.service
-      state: restarted
+    command: systemd-sysusers
     when: __sysusers.changed
 
   when:
