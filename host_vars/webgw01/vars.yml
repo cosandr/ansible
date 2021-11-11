@@ -1,0 +1,6 @@
+---
+
+domain: "{{ domains[1] }}"
+ansible_host: "{{ vault_ansible_host }}"
+ansible_user: "{{ vault_ansible_user }}"
+ipv6_address: "{{ vault_ipv6_address }}"

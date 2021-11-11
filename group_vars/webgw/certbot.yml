@@ -1,9 +1,9 @@
 ---
 
-certbot_extra_pkgs: ["certbot-dns-domeneshop"]
 certbot_email: "{{ vault_certbot_email }}"
+certbot_extra_pkgs: ["certbot-dns-domeneshop"]
 certbot_domains:
-  - "{{ domains[0] }},*.{{ domains[0] }},*.netmaker.{{ domains[0] }}"
+  - "{{ domains[0] }},*.{{ domains[0] }}"
   - "{{ domains[1] }},*.{{ domains[1] }}"
   - "{{ domains[2] }},*.{{ domains[2] }}"
   - "{{ domains[3] }},*.{{ domains[3] }}"

@@ -1,0 +1,23 @@
+---
+
+sshd_config:
+  - regexp: "^#?StrictModes"
+    line: "StrictModes yes"
+  - regexp: "^#?AllowAgentForwarding"
+    line: "AllowAgentForwarding yes"
+  - regexp: "^#?X11Forwarding"
+    line: "X11Forwarding no"
+  - regexp: "^#?PermitRootLogin"
+    line: "PermitRootLogin prohibit-password"
+  - regexp: "^#?PasswordAuthentication"
+    line: "PasswordAuthentication no"
+  - regexp: "^#?PermitEmptyPasswords"
+    line: "PermitEmptyPasswords no"
+  - regexp: "^#?ChallengeResponseAuthentication"
+    line: "ChallengeResponseAuthentication no"
+  - regexp: "^#?TCPKeepAlive"
+    line: "TCPKeepAlive yes"
+  - regexp: "^#?ClientAliveInterval"
+    line: "ClientAliveInterval 30"
+  - regexp: "^#?ClientAliveCountMax"
+    line: "ClientAliveCountMax 3"

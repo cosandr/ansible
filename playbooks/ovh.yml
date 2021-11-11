@@ -2,7 +2,7 @@
 
 - name: SSH
   hosts: ovh
-  gather_facts: false
+  gather_facts: true
   tasks:
     - name: add SSH keys
       authorized_key:
@@ -11,13 +11,6 @@
         state: present
       with_items: "{{ ssh_authorized_keys }}"
       tags: ["ssh"]
-
-  roles:
-    - role: sshd
-      vars:
-        _sshd_pkg: "openssh-server"
-      become: true
-      tags: ["sshd"]
 
 - name: Network
   hosts: ovh
@@ -110,39 +103,8 @@
     - role: hostname
       tags: ["hostname"]
 
-    - role: ufw
-      tags: ["ufw"]
-
-    - role: fail2ban
-      tags: ["fail2ban"]
-
-    - role: unattended-upgrades
-      tags: ["unattended-upgrades"]
-
-    - role: node_exporter
-      tags: ["node_exporter"]
-
-    - role: filebeat
-      tags: ["filebeat"]
-
-    - role: certbot
-      tags: ["certbot"]
-
-    - role: nginx
-      tags: ["nginx"]
-
     - role: netclient
       tags: ["netclient"]
 
     - role: geerlingguy.docker
       tags: ["docker"]
-
-  post_tasks:
-    - name: Download dhparam
-      get_url:
-        url: https://ssl-config.mozilla.org/ffdhe2048.txt
-        dest: "{{ nginx_dhparam }}"
-        mode: 0644
-        owner: root
-        group: root
-      tags: ["nginx"]

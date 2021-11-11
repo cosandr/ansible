@@ -4,6 +4,8 @@ ufw_allow_dhcpv6: false
 ufw_custom_rules:
   - port: 22
     proto: tcp
+  - port: "{{ ansible_port }}"
+    proto: tcp
   - port: 53
     proto: tcp
   - port: 53
@@ -12,11 +14,9 @@ ufw_custom_rules:
     proto: tcp
   - port: 443
     proto: tcp
-  - port: "{{ wireguard_port }}"
-    proto: udp
   - port: "{{ node_exporter_port }}"
     proto: tcp
-    src: "{{ hostvars.dresrv.wireguard_ip }}"
+    src: "{{ hostvars['dresrv'].ansible_host }}"
   # netmaker
   - port: 51821
     proto: udp

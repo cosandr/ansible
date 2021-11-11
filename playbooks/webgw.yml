@@ -1,0 +1,103 @@
+---
+
+-
+  hosts: webgw
+  gather_facts: true
+  pre_tasks:
+    - name: Install epel
+      dnf:
+        name: epel-release
+        state: present
+      tags: ["install"]
+      when: ansible_os_family == 'RedHat'
+
+    - name: Ensure nginx directories exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      loop:
+        - "{{ nginx_dhparam | dirname }}"
+        - "{{ nginx_sites_logs }}"
+      tags: ["nginx"]
+
+    - name: Download dhparam
+      get_url:
+        url: https://ssl-config.mozilla.org/ffdhe2048.txt
+        dest: "{{ nginx_dhparam }}"
+        mode: 0644
+        owner: root
+        group: root
+      tags: ["nginx"]
+  roles:
+    - role: sshd
+      tags: ["sshd"]
+
+    - role: ufw
+      when: ansible_os_family == 'Debian'
+      tags: ["ufw"]
+
+    - role: fail2ban
+      tags: ["fail2ban"]
+
+    - role: unattended-upgrades
+      when: ansible_os_family == 'Debian'
+      tags: ["unattended-upgrades"]
+
+    - role: dnf_automatic
+      when: ansible_os_family == 'RedHat'
+      tags: ["dnf_automatic"]
+
+    - role: node_exporter
+      tags: ["node_exporter"]
+
+    - role: filebeat
+      when: filebeat_config is defined
+      tags: ["filebeat"]
+
+    - role: certbot
+      tags: ["certbot"]
+
+    - role: nginx
+      tags: ["nginx"]
+
+    - role: wireguard
+      tags: ["wireguard"]
+  tasks:
+    - block:
+        - name: Install firewalld
+          dnf:
+            name: firewalld
+            state: present
+          tags: ["install"]
+
+        - name: Remove cockpit from public zone
+          firewalld:
+            zone: "public"
+            service: "cockpit"
+            permanent: true
+            state: disabled
+          notify: reload firewalld
+
+        - name: Add http and https to public zone
+          firewalld:
+            zone: "public"
+            service: "{{ item }}"
+            permanent: true
+            state: enabled
+          loop:
+            - "http"
+            - "https"
+          notify: reload firewalld
+          # TODO: Add prometheus server to internal zone, add node exporter here
+
+      tags: ["firewalld"]
+      when: ansible_os_family == 'RedHat'
+
+  handlers:
+    - name: reload firewalld
+      service:
+        name: firewalld
+        state: reloaded

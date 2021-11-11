@@ -21,6 +21,7 @@ truenas ansible_host=10.0.10.2 ansible_user=root ansible_python_interpreter=/usr
 ovh
 pg
 gitlab
+webgw
 
 [ovh]
 ovh-gw01
@@ -33,3 +34,10 @@ mt-router ansible_host=10.0.50.1
 
 [gitlab]
 gitlab01 ansible_host=10.0.10.40
+
+[webgw]
+webgw01
+
+# Temporary
+[webgw:children]
+ovh

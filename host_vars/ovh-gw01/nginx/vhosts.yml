@@ -1,12 +1,8 @@
 ---
 
-nginx_vhosts:
+__host_nginx_vhosts:
   - filename: netmaker.conf
     server_name: netmaker
-    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/netmaker.conf.j2"
-  - filename: gitlab.conf
-    server_name: gitlab
-    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/gitlab.conf.j2"
-  - filename: registry.conf
-    server_name: registry
-    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/registry.conf.j2"
+    template: "{{ inventory_dir }}/files/webgw/nginx/netmaker.conf.j2"
+
+nginx_hosts: "{{ nginx_hosts + __host_nginx_vhosts }}"
