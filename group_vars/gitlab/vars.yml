@@ -3,6 +3,8 @@
 ansible_user: root
 ansible_python_interpreter: /usr/bin/python3
 
+gitlab_config_template: "{{ inventory_dir }}/files/gitlab/gitlab.rb.j2"
+
 domain: "{{ hostvars['ovh-gw01'].domain }}"
 proxy_host: "{{ hostvars['ovh-gw01'].wireguard_ip }}"
 
@@ -21,7 +23,7 @@ gitlab_nginx_trusted_addresses: ["{{ proxy_host }}"]
 gitlab_registry_enable: "true"
 gitlab_registry_external_url: "https://registry.{{ domain }}"
 gitlab_registry_nginx_trusted_addresses: ["{{ proxy_host }}"]
-gitlab_registry_nginx_listen_https: false
+gitlab_registry_nginx_listen_https: 'false'
 gitlab_registry_nginx_listen_port: 5000
 
 gitlab_email_enabled: "true"
@@ -36,7 +38,6 @@ gitlab_smtp_user_name: "{{ smtp_config[domain].user }}"
 gitlab_smtp_password: "{{ smtp_config[domain].pass }}"
 gitlab_smtp_domain: "{{ domain }}"
 gitlab_smtp_authentication: "login"
-gitlab_smtp_enable_starttls_auto: "true"
 gitlab_smtp_tls: "true"
 
 gitlab_letsencrypt_enable: "false"

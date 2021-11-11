@@ -19,14 +19,7 @@ nginx['redirect_http_to_https'] = {{ gitlab_redirect_http_to_https }}
 nginx['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
 nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
 
-letsencrypt['enable'] = "{{ gitlab_letsencrypt_enable }}"
-{% if gitlab_letsencrypt_enable %}
-letsencrypt['contact_emails'] = "{{ gitlab_letsencrypt_contact_emails | to_json }}"
-letsencrypt['auto_renew_hour'] = "{{ gitlab_letsencrypt_auto_renew_hour }}"
-letsencrypt['auto_renew_minute'] = "{{ gitlab_letsencrypt_auto_renew_minute }}"
-letsencrypt['auto_renew_day_of_month'] = "{{ gitlab_letsencrypt_auto_renew_day_of_month }}"
-letsencrypt['auto_renew'] = "{{ gitlab_letsencrypt_auto_renew }}"
-{% endif %}
+letsencrypt['enable'] = {{ gitlab_letsencrypt_enable }}
 
 # The directory where Git repositories will be stored.
 git_data_dirs({"default" => {"path" => "{{ gitlab_git_data_dir }}"} })
@@ -58,7 +51,7 @@ nginx['listen_https'] = {{ gitlab_nginx_listen_https }}
 {% endif %}
 nginx['real_ip_header'] = 'X-Forwarded-For'
 nginx['real_ip_recursive'] = 'on'
-nginx['real_ip_trusted_addresses'] = "{{ gitlab_nginx_trusted_addresses | to_json }}"
+nginx['real_ip_trusted_addresses'] = {{ gitlab_nginx_trusted_addresses | to_json }}
 
 # Use smtp instead of sendmail/postfix
 # More details and example configuration at
@@ -77,11 +70,7 @@ gitlab_rails['smtp_domain'] = '{{ gitlab_smtp_domain }}'
 {% if gitlab_smtp_authentication %}
 gitlab_rails['smtp_authentication'] = '{{ gitlab_smtp_authentication }}'
 {% endif %}
-gitlab_rails['smtp_enable_starttls_auto'] = {{ gitlab_smtp_enable_starttls_auto }}
 gitlab_rails['smtp_tls'] = {{ gitlab_smtp_tls }}
-gitlab_rails['smtp_openssl_verify_mode'] = '{{ gitlab_smtp_openssl_verify_mode }}'
-gitlab_rails['smtp_ca_path'] = '{{ gitlab_smtp_ca_path }}'
-gitlab_rails['smtp_ca_file'] = '{{ gitlab_smtp_ca_file }}'
 {% endif %}
 
 # GitLab registry.
@@ -92,7 +81,7 @@ registry_nginx['listen_https'] = {{ gitlab_registry_nginx_listen_https }}
 registry_nginx['listen_port'] = {{ gitlab_registry_nginx_listen_port }}
 registry_nginx['real_ip_header'] = 'X-Forwarded-For'
 registry_nginx['real_ip_recursive'] = 'on'
-registry_nginx['real_ip_trusted_addresses'] = "{{ gitlab_registry_nginx_trusted_addresses | to_json }}"
+registry_nginx['real_ip_trusted_addresses'] = {{ gitlab_registry_nginx_trusted_addresses | to_json }}
 {% endif %}
 
 {% if gitlab_extra_settings is defined %}
