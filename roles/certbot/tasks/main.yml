@@ -75,6 +75,14 @@
     - "enable and start {{ item }} timer"
   tags: ["install"]
 
+- name: Ensure /etc/letsencrypt exists
+  file:
+    path: "/etc/letsencrypt"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
 - name: Configure certbot
   copy:
     dest: "/etc/letsencrypt/cli.ini"
