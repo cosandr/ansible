@@ -4,6 +4,21 @@
   hosts: webgw
   gather_facts: true
   pre_tasks:
+    - name: Enable SELinux
+      selinux:
+        policy: targeted
+        state: enforcing
+      register: __selinux_state
+      when: ansible_os_family == 'RedHat'
+      tags: ["selinux"]
+
+    - name: Reboot if required
+      reboot:
+      when:
+        - __selinux_state is defined
+        - __selinux_state.reboot_required
+      tags: ["selinux"]
+
     - name: Install epel
       dnf:
         name: epel-release
