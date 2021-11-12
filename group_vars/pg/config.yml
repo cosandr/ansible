@@ -6,5 +6,5 @@ postgresql_hba_entries:
   - { type: host, database: all, user: all, address: "{{ hostvars.dresrv.ansible_host }}/32", auth_method: "md5" }
   # Desktop VM VLAN
   - { type: host, database: all, user: all, address: "{{ home_net.vm.cidr | ipaddr('4') | ipaddr('address') }}/32", auth_method: "md5" }
-  # dresrv legacy VLAN
-  - { type: host, database: all, user: all, address: "{{ home_net.legacy.cidr | ipaddr('2') | ipaddr('address') }}/32", auth_method: "md5" }
+  # dresrv VM VLAN
+  - { type: host, database: all, user: all, address: "{{ home_net.vm.cidr | ipaddr('7') | ipaddr('address') }}/32", auth_method: "md5" }

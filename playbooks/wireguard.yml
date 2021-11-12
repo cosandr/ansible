@@ -1,6 +1,6 @@
 ---
 
-- hosts: ovh, romsto
+- hosts: webgw, romsto, desktop, laptop
   gather_facts: false
   pre_tasks:
     - name: Run common role

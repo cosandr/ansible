@@ -22,20 +22,6 @@ networkd_netdevs:
 
       [VLAN]
       Id=100
-  - vlan192: |
-      [NetDev]
-      Name=vlan192
-      Kind=vlan
-
-      [VLAN]
-      Id=192
-  - vlan420: |
-      [NetDev]
-      Name=vlan420
-      Kind=vlan
-
-      [VLAN]
-      Id=420
 
 networkd_config:
   - enp42s0: |
@@ -46,8 +32,6 @@ networkd_config:
       VLAN=vlan10
       VLAN=vlan50
       VLAN=vlan100
-      VLAN=vlan192
-      VLAN=vlan420
   - vlan10: |
       [Match]
       Name=vlan10
@@ -58,18 +42,17 @@ networkd_config:
       IPv6AcceptRA=no
 
       [DHCP]
-      RouteMetric=1032
+      RouteMetric=1048
+      UseRoutes=no
   - vlan50: |
       [Match]
       Name=vlan50
 
       [Network]
-      DHCP=ipv4
-      LinkLocalAddressing=no
-      IPv6AcceptRA=no
+      DHCP=yes
 
       [DHCP]
-      RouteMetric=1030
+      RouteMetric=1024
   - vlan100: |
       [Match]
       Name=vlan100
@@ -80,27 +63,8 @@ networkd_config:
       IPv6AcceptRA=no
 
       [DHCP]
-      RouteMetric=1031
-  - vlan192: |
-      [Match]
-      Name=vlan192
-
-      [Network]
-      DHCP=yes
-
-      [DHCP]
-      RouteMetric=1024
-  - vlan420: |
-      [Match]
-      Name=vlan420
-
-      [Network]
-      DHCP=ipv4
-      LinkLocalAddressing=no
-      IPv6AcceptRA=no
-
-      [DHCP]
-      RouteMetric=1500
+      RouteMetric=1064
+      UseRoutes=no
   - wlan: |
       [Match]
       Type=wlan
