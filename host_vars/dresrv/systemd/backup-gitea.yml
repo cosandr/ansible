@@ -6,8 +6,8 @@ __sd_backup_gitea:
     content: |
       [Unit]
       Description=Gitea backup
-      After={{ postgres_service_name }} gitea.service tank.mount
-      Requires={{ postgres_service_name }} gitea.service tank.mount
+      After=gitea.service tank.mount
+      Requires=gitea.service tank.mount
 
       [Service]
       Type=oneshot
