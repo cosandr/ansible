@@ -5,8 +5,8 @@ ansible_python_interpreter: /usr/bin/python3
 
 gitlab_config_template: "{{ inventory_dir }}/files/gitlab/gitlab.rb.j2"
 
-domain: "{{ hostvars['ovh-gw01'].domain }}"
-proxy_host: "{{ hostvars['ovh-gw01'].wireguard_ip }}"
+domain: "{{ hostvars['webgw01'].domain }}"
+proxy_host: "{{ hostvars['webgw01'].wireguard_ip }}"
 
 gitlab_time_zone: "Europe/Oslo"
 

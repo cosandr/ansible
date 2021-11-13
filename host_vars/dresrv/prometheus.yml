@@ -38,9 +38,9 @@ prometheus_scrape_configs:
       - targets: ["localhost:{{ node_exporter_port }}"]
         labels:
           instance: "{{ server_label }}"
-      - targets: ["{{ hostvars['ovh-gw01'].wireguard_ip }}:{{ node_exporter_port }}"]
+      - targets: ["{{ hostvars['webgw01'].wireguard_ip }}:{{ node_exporter_port }}"]
         labels:
-          instance: "{{ hostvars['ovh-gw01'].inventory_hostname }}"
+          instance: "{{ hostvars['webgw01'].inventory_hostname }}"
       - targets: ['localhost:17766']
         labels:
           instance: "{{ desktop_label }}"
