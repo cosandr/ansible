@@ -1,0 +1,13 @@
+---
+
+wireguard_interface: "mt"
+wireguard_address: "10.4.20.5/24"
+wireguard_ip: "{{ wireguard_address | ipaddr('address') }}"
+wireguard_dns: "10.4.20.1"
+wireguard_private_key: "{{ vault_wireguard_private_key }}"
+
+wireguard_unmanaged_peers:
+  mt:
+    endpoint: "{{ hostvars['mt-router'].wireguard_endpoint }}"
+    allowed_ips: "10.4.20.1/32, {{ home_net | dict2items | json_query('[].value.cidr') | join(', ') }}"
+    public_key: "{{ hostvars['mt-router'].wireguard_public_key }}"
