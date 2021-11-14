@@ -33,6 +33,12 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ server_label }}"
 
+  - job_name: "dht"
+    static_configs:
+      - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].dht_exporter_port }}"]
+        labels:
+          instance: "{{ drepi_label }}"
+
   - job_name: "node"
     static_configs:
       - targets: ["localhost:{{ node_exporter_port }}"]

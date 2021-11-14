@@ -4,6 +4,12 @@ smtp_host: "{{ vault_smtp_host }}"
 smtp_pass: "{{ vault_smtp_pass }}"
 smtp_port: "{{ vault_smtp_port }}"
 smtp_user: "{{ vault_smtp_user }}"
+
+dht_exporter_gpio_pin: "17"
+dht_exporter_port: "8001"
+dht_exporter_room: "Hallway"
+
+node_exporter_port: "9100"
 node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
 node_exporter_collectors:
   - systemd
@@ -12,10 +18,6 @@ ssh_authorized_keys:
   - "{{ hostvars.laptop.ssh_keys.andrei }}"
 firewalld_trusted_sources: "{{ vault_firewalld_trusted_sources }}"
 firewall_frontend: "ufw"
-ufw_trusted_sources:
-  - "{{ hostvars['dresrv'].ansible_host }}"
-  - "{{ hostvars['desktop'].ansible_host }}"
-  - "{{ hostvars['laptop'].ansible_host }}"
 
 unattended_mail: "{{ my_email }}"
 unattended_remove_unused_dependencies: true

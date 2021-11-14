@@ -61,6 +61,7 @@
 
   pre_tasks:
     - name: Run common role
+      become: false
       import_role:
         name: common
       tags: ["always"]
@@ -209,6 +210,12 @@
 
     - role: motion
       tags: ["motion"]
+
+    - role: dht_exporter
+      tags: ["dht_exporter"]
+
+    - role: node_exporter
+      tags: ["node_exporter"]
 
     - role: unattended-upgrades
       tags: ["unattended-upgrades"]
