@@ -46,6 +46,16 @@
         owner: root
         group: root
       tags: ["nginx"]
+
+    - name: Allow nginx proxy
+      seboolean:
+        name: httpd_can_network_connect
+        state: yes
+        persistent: yes
+      when:
+        - ansible_os_family == 'RedHat'
+        - ansible_selinux.status == "enabled"
+      tags: ["nginx"]
   roles:
     - role: sshd
       tags: ["sshd"]
