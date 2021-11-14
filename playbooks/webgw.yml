@@ -116,7 +116,24 @@
             - "http"
             - "https"
           notify: reload firewalld
-          # TODO: Add prometheus server to internal zone, add node exporter here
+
+        - name: Add mt interface to internal zone
+          firewalld:
+            zone: "internal"
+            interface: "mt"
+            permanent: true
+            state: enabled
+          notify: reload firewalld
+
+        - name: Add ports to internal zone
+          firewalld:
+            zone: internal
+            port: "{{ item }}/tcp"
+            permanent: true
+            state: enabled
+          loop:
+            - "{{ node_exporter_port }}"
+          notify: reload firewalld
 
       tags: ["firewalld"]
       when: ansible_os_family == 'RedHat'
