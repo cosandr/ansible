@@ -1,0 +1,68 @@
+---
+
+- name: Install python3-venv and pip
+  package:
+    name:
+      - python3-venv
+      - python3-pip
+    state: present
+  tags: ["install"]
+
+- name: Clone repository to localhost
+  become: false
+  delegate_to: localhost
+  git:
+    repo: "{{ dht_exporter_url }}"
+    dest: "/tmp/dht_exporter"
+    version: "{{ dht_exporter_branch }}"
+  tags: ["install"]
+
+- name: Ensure install path exists
+  file:
+    path: "{{ dht_exporter_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  tags: ["install"]
+
+- name: Copy files to remote
+  copy:
+    src: "/tmp/dht_exporter/{{ item.file }}"
+    dest: "{{ dht_exporter_path }}/{{ item.file }}"
+    owner: root
+    group: root
+    mode: "{{ item.mode }}"
+  loop:
+    - file: requirements.txt
+      mode: "0644"
+    - file: dht_exporter.py
+      mode: "0755"
+  tags: ["install"]
+
+- name: Patch dht_exporter.py
+  replace:
+    path: "{{ dht_exporter_path }}/dht_exporter.py"
+    regexp: 'adafruit_dht\.DHT22'
+    replace: 'adafruit_dht.DHT11'
+  when: dht_exporter_sensor == 'dht11'
+  notify: restart dht_exporter
+
+- name: Setup venv
+  pip:
+    requirements: "{{ dht_exporter_path }}/requirements.txt"
+    virtualenv: "{{ dht_exporter_path }}/venv"
+    virtualenv_command: python3 -m venv
+  notify: enable and start dht_exporter
+  tags: ["install"]
+
+- name: Copy service
+  template:
+    src: "templates/dht_exporter.service.j2"
+    dest: "/etc/systemd/system/dht_exporter.service"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - reload systemd
+    - restart dht_exporter
