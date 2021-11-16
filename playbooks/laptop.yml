@@ -173,3 +173,6 @@
       when: ansible_distribution == 'Archlinux'
       tags: ["sway"]
 
+    - role: aisbergg.snapper
+      tags: ["snapper"]
+

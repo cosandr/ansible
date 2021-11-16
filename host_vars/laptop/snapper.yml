@@ -1,0 +1,25 @@
+---
+
+# create root manually since .snapshots is mounted already
+# cp /usr/share/snapper/config-templates/default /etc/snapper/configs/root
+# vim /etc/conf.d/snapper
+# SNAPPER_CONFIGS="root"
+snapper_configs:
+  - path: /
+    name: root
+    vars:
+      TIMELINE_LIMIT_HOURLY: 1
+      TIMELINE_LIMIT_DAILY: 6
+      TIMELINE_LIMIT_WEEKLY: 1
+      TIMELINE_LIMIT_MONTHLY: 1
+      TIMELINE_LIMIT_YEARLY: 0
+      ALLOW_GROUPS: "wheel"
+  - path: /home/andrei
+    name: andrei
+    vars:
+      TIMELINE_LIMIT_HOURLY: 8
+      TIMELINE_LIMIT_DAILY: 5
+      TIMELINE_LIMIT_WEEKLY: 1
+      TIMELINE_LIMIT_MONTHLY: 0
+      TIMELINE_LIMIT_YEARLY: 0
+      ALLOW_GROUPS: "wheel"

@@ -16,3 +16,6 @@
 [submodule "roles/alertmanager"]
 	path = roles/alertmanager
 	url = git@github.com:cosandr/ansible-alertmanager.git
+[submodule "roles/aisbergg.snapper"]
+	path = roles/aisbergg.snapper
+	url = https://github.com/aisbergg/ansible-role-snapper.git
