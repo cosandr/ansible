@@ -32,7 +32,30 @@ pacman_i3_packages:
   - xorg-xrandr
   - xorg-xset
 
-# ansible laptop -m pacman -a 'name={{ pacman_packages }} state=present'
+aur_i3_packages:
+  - adwaita-qt
+  - i3lock-color
+  - i3lock-fancy-rapid-git
+  - polybar
+
+pacman_sway_packages:
+  - gammastep
+  - grim
+  - kanshi
+  - slurp
+  - sway
+  - swaybg
+  - swayidle
+  - waybar
+  - wl-clipboard
+  - wofi
+  - xdg-desktop-portal-wlr
+  - xorg-xwayland
+
+aur_sway_packages:
+  - swaylock-effects-git
+  - wdisplays
+
 pacman_packages:
   - acpi_call-dkms
   - alacritty
@@ -70,6 +93,7 @@ pacman_packages:
   - grep
   - groff
   - gzip
+  - htop
   - htop
   - inetutils
   - intel-gpu-tools
@@ -109,6 +133,7 @@ pacman_packages:
   - powertop
   - pyenv
   - python-aiohttp
+  - python-llfuse  # borg mount
   - python-netaddr
   - python-websockets
   - reflector
@@ -117,7 +142,6 @@ pacman_packages:
   - sed
   - smartmontools
   - sof-firmware
-  - python-llfuse  # borg mount
   - sshfs
   - sshpass
   - sudo
@@ -139,18 +163,13 @@ aur_packages:
   - paru-bin
   - pyenv-virtualenv
   - shellcheck-bin
+  - slack-desktop
   - sublime-text-4
+  - teams
   - tmuxinator
   - ttf-font-awesome-4
   - webex-bin
-
-i3_aur_packages:
-  - adwaita-qt
-  - i3lock-color
-  - i3lock-fancy-rapid-git
-  - polybar
-  - xidlehook
-
+  - zoom
 
 enabled_services:
   - systemd-timesyncd.service
@@ -167,12 +186,10 @@ modprobe_config:
 
 
 # Update key
-# sudo systemd-cryptenroll /dev/nvme0n1p2 --wipe-slot=tpm2
-# sudo systemd-cryptenroll /dev/nvme0n1p3 --wipe-slot=tpm2
-# systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0,7 /dev/nvme0n1p2
-# systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0,7 /dev/nvme0n1p3
+# systemd-cryptenroll /dev/nvme0n1p2 --wipe-slot=tpm2
+# systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+1+7 /dev/nvme0n1p2
 
-kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ intel_iommu=on nmi_watchdog=0 resume=/dev/mapper/swap"
+kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ intel_iommu=on nmi_watchdog=0 resume=/dev/mapper/root resume_offset=941473"
 
 systemd_boot_entries:
   "arch-zen": |
@@ -185,12 +202,12 @@ systemd_boot_entries:
 crypttab: ""
 
 crypttab_initramfs: |
-  root    UUID=9dc722d9-b6f2-4f7c-a411-ebeb4b206a6c   -   luks,discard,tpm2-device=auto
-  swap    UUID=25e20493-f787-4c19-b8db-0f4a45c7a64c   -   luks,discard,tpm2-device=auto,nofail
+  root    UUID=7dc15fde-8ccd-4752-a24b-194b53b37f28   -   luks,discard,tpm2-device=auto
 
 
 fstab: |
-  /dev/mapper/swap    none        swap        defaults,nofail,x-systemd.device-timeout=5     0 0
+  /dev/mapper/root    	/.swap    	btrfs     	rw,relatime,compress-force=zstd:3,ssd,space_cache=v2,subvol=/@swap 0 0
+  /.swap/swapfile		    none		    swap		    defaults	0 0
 
 # go-check-updates
 # git clone https://github.com/cosandr/go-check-updates

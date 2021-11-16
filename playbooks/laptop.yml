@@ -17,6 +17,13 @@
     - name: Gather facts
       setup:
       tags: ["always"]
+
+    - name: Install packages (pacman)
+      pacman:
+        name: "{{ pacman_packages }}"
+        state: present
+      when: ansible_distribution == 'Archlinux'
+      tags: ["pacman"]
   tasks:
     - name: Enable resume dracut module
       become: true
@@ -27,8 +34,24 @@
         mode: 0644
         content: |
           add_dracutmodules+=" resume "
+      when: ansible_os_family == 'RedHat'
       notify: dracut regenerate
       tags: ["hibernate"]
+
+    - name: Install i3 packages (pacman)
+      pacman:
+        name: "{{ pacman_i3_packages }}"
+        state: present
+      when: ansible_distribution == 'Archlinux'
+      tags: ["i3"]
+
+    - name: Install sway packages (pacman)
+      pacman:
+        name: "{{ pacman_sway_packages }}"
+        state: present
+      when: ansible_distribution == 'Archlinux'
+      tags: ["sway"]
+
   handlers:
     - name: dracut regenerate
       become: true
@@ -37,7 +60,6 @@
     - role: node_exporter
       vars:
         node_exporter_skip_install: false
-        node_exporter_no_sysusers: true
         node_exporter_version: "latest"
         node_exporter_port: "{{ ports.node_exporter }}"
         node_exporter_collectors: []
@@ -79,6 +101,12 @@
       when: ansible_distribution == 'Archlinux'
       tags: ["sbctl"]
 
+    - role: paru
+      vars:
+        aur_name: paru-bin
+      when: ansible_distribution == 'Archlinux'
+      tags: ["paru"]
+
     - role: spotify
       tags: ["spotify"]
 
@@ -95,12 +123,6 @@
     - role: install_aur
       when: ansible_distribution == 'Archlinux'
       tags: ["aur"]
-
-    - role: paru
-      vars:
-        aur_name: paru-bin
-      when: ansible_distribution == 'Archlinux'
-      tags: ["paru"]
 
     - role: sshd
       tags: ["sshd"]
@@ -133,9 +155,21 @@
     - role: gnome-keyring
       tags: ["gnome-keyring"]
 
-    - role: thinkfan
-      tags: ["thinkfan"]
+    # - role: thinkfan
+    #   tags: ["thinkfan"]
 
     - role: ddcutil
       tags: ["ddcutil"]
+
+    - role: install_aur
+      vars:
+        aur_packages: "{{ aur_i3_packages }}"
+      when: ansible_distribution == 'Archlinux'
+      tags: ["i3"]
+
+    - role: install_aur
+      vars:
+        aur_packages: "{{ aur_sway_packages }}"
+      when: ansible_distribution == 'Archlinux'
+      tags: ["sway"]
 
