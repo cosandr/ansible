@@ -7,10 +7,16 @@
     name: xidlehook
     state: present
 
+- name: Ensure user service dir exists
+  file:
+    path: "/home/{{ my_user }}/.config/systemd/user"
+    state: directory
+    owner: "{{ my_user }}"
+    group: "{{ my_user }}"
+    mode: 0755
+
 # https://cewood.xyz/posts/my-i3-setup/
 - name: Create user service for xidlehook
-  become: true
-  become_user: "{{ my_user }}"
   copy:
     dest: "/home/{{ my_user }}/.config/systemd/user/xidlehook.service"
     owner: "{{ my_user }}"
