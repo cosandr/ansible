@@ -153,6 +153,8 @@
     #   tags: ["xsession"]
 
     - role: gnome-keyring
+      # vars:
+      #   pam_config: "/etc/pam.d/greetd"
       tags: ["gnome-keyring"]
 
     # - role: thinkfan

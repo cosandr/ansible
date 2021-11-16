@@ -20,7 +20,7 @@
 - name: Setup PAM
   become: true
   lineinfile:
-    path: "/etc/pam.d/login"
+    path: "{{ pam_config }}"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
     insertafter: "{{ item.after }}"
