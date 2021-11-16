@@ -6,14 +6,14 @@ chezmoi_overrides:
     mon=$(xrandr --query | grep -oP '\S+\s+connected' | cut -d' ' -f1)
     _hour=$(date +%H)
     [[ $_hour -ge 8 && $_hour -lt 17 ]] && workhours=1 || workhours=0
-    if [[ $mon =~ DP-3 && $mon =~ HDMI-1 ]]; then
+    if [[ $mon =~ DP-3$ && $mon =~ HDMI-1 ]]; then
       if [[ $workhours -eq 1 ]]; then
         WS["1"]="work"
         WS["2"]="work"
       else
         WS["2"]="no-discord"
       fi
-    elif [[ $mon =~ DP-2 && $mon =~ HDMI-1 ]]; then
+    elif [[ $mon =~ DP-3-2$ && $mon =~ HDMI-1 ]]; then
       if [[ $workhours -eq 1 ]]; then
         WS["1"]="work"
         WS["2"]="laptop-ext"
@@ -31,8 +31,8 @@ chezmoi_overrides:
     fi
   polybar: |
     MONITOR_MAP["eDP-1"]="laptop"
-    MONITOR_MAP["DP-3-2"]="laptop-ext"
-    MONITOR_MAP["HDMI-1"]="laptop-ext-secondary"
+    MONITOR_MAP["HDMI-1"]="laptop-ext"
+    MONITOR_MAP["DP-3-2"]="laptop-ext-secondary"
     DPI_MAP["eDP-1"]="192"
   sway: |
     export MOZ_ENABLE_WAYLAND=1
@@ -57,12 +57,12 @@ chezmoi_overrides:
   xorg_3: |
     DPI=144
     mon=$(xrandr --query | grep -oP '\S+\s+connected' | cut -d' ' -f1)
-    if [[ $mon =~ DP-3 && $mon =~ HDMI-1 ]]; then
+    if [[ $mon =~ DP-3$ && $mon =~ HDMI-1 ]]; then
       MONITOR_MAP["DP-3"]="--primary --mode 3840x2160 --rate 120"
       MONITOR_MAP["HDMI-1"]="--above DP-3 --mode 3840x2160"
       MONITOR_MAP["eDP-1"]="--left-of DP-3 --mode 3840x2160"
-    elif [[ $mon =~ DP-2 && $mon =~ HDMI-1 ]]; then
-      MONITOR_MAP["DP-2"]="--primary --mode 3840x2160"
-      MONITOR_MAP["HDMI-1"]="--left-of DP-2 --mode 3840x2160"
-      MONITOR_MAP["eDP-1"]="--right-of DP-2 --mode 3840x2160"
+    elif [[ $mon =~ DP-3-2$ && $mon =~ HDMI-1 ]]; then
+      MONITOR_MAP["HDMI-1"]="--primary --mode 3840x2160"
+      MONITOR_MAP["DP-3-2"]="--left-of HDMI-1 --mode 3840x2160"
+      MONITOR_MAP["eDP-1"]="--right-of HDMI-1 --mode 3840x2160"
     fi
