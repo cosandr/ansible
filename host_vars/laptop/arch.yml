@@ -133,8 +133,10 @@ pacman_packages:
   - powertop
   - pyenv
   - python-aiohttp
-  - python-llfuse  # borg mount
-  - python-netaddr
+  - python-jmespath  # ansible json filter
+  - python-llfuse    # borg mount
+  - python-netaddr   # ansible ip filter
+  - python-pip
   - python-websockets
   - reflector
   - remmina
