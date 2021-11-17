@@ -37,3 +37,6 @@ gitlab01 ansible_host=10.0.10.40
 
 [webgw]
 webgw01
+
+[prom]
+prom01 ansible_host=10.0.10.21

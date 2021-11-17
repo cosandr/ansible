@@ -1,0 +1,58 @@
+---
+
+- hosts: prom
+  gather_facts: true
+  pre_tasks:
+    - block:
+        - name: Disable some default services
+          firewalld:
+            zone: "{{ item.zone }}"
+            service: "{{ item.service }}"
+            permanent: true
+            state: disabled
+          loop:
+            - zone: public
+              service: cockpit
+            - zone: internal
+              service: cockpit
+            - zone: internal
+              service: samba-client
+            - zone: internal
+              service: samba-client
+          notify: reload firewalld
+
+        - name: Add home networks to internal zone
+          firewalld:
+            zone: internal
+            source: "{{ item.cidr }}"
+            permanent: true
+            state: enabled
+          loop: "{{ home_net.values() }}"
+          loop_control:
+            label: "{{ item.cidr }}"
+          notify: reload firewalld
+
+        - name: Allow ports to internal zone
+          firewalld:
+            zone: internal
+            port: "{{ item }}/tcp"
+            permanent: true
+            state: enabled
+          loop:
+            - "{{ aquaero_exporter_port }}"
+          notify: reload firewalld
+
+      tags: ["firewalld"]
+
+    - name: Install requirements for aquaero exporter
+      dnf:
+        name:
+          - python3
+          - python3-pip
+          - usbutils
+        state: present
+  handlers:
+    - name: reload firewalld
+      service:
+        name: firewalld
+        state: reloaded

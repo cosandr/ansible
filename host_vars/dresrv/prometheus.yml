@@ -63,9 +63,9 @@ prometheus_scrape_configs:
   - job_name: "aquaero"
     scrape_interval: 30s
     static_configs:
-      - targets: ["localhost:2782"]
+      - targets: ["{{ hostvars['prom01'].ansible_host }}:{{ hostvars['prom01'].aquaero_exporter_port }}"]
         labels:
-          instance: "{{ server_label }}"
+          instance: "SLB"
       - targets: ["localhost:17766"]
         labels:
           instance: "{{ desktop_label }}"
