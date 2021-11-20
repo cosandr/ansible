@@ -1,13 +1,15 @@
 ---
 _ports:
   adminer: 54322
-  cadvisor: 8081
   gitea: 3000
   grafana: 3001
-  nginx_exporter: 9113
   postgres: 5432
   prometheus: 9092
   vouch: 8682
+
+cadvisor_port: 8081
+node_exporter_port: 9100
+nginx_exporter_port: 9113
 
 domain: "{{ vault_domain }}"
 ddns_domain: "{{ vault_ddns_domain }}"

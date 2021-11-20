@@ -74,14 +74,11 @@
           real_ip_header CF-Connecting-IP;
       tags: ["nginx", "cloudflare"]
   vars:
-    cadvisor_port: "{{ ports.cadvisor }}"
     cadvisor_version: "0.40.0"
-    grafana_port: "{{ ports.grafana }}"
     grafana_version: "latest"
     nginx_exporter_version: "latest"
     nginx_exporter_port: "{{ ports.nginx_exporter }}"
     node_exporter_version: "latest"
-    node_exporter_port: "{{ ports.node_exporter }}"
     prometheus_port: "{{ ports.prometheus }}"
     prometheus_version: "latest"
   roles:

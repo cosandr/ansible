@@ -9,11 +9,6 @@
         name: common
       tags: ["always"]
 
-    - name: Merge ports
-      set_fact:
-        ports: "{{ ports | combine(_ports, recursive=true) }}"
-      tags: ["always"]
-
     - name: Gather facts
       setup:
       tags: ["always"]
@@ -22,12 +17,7 @@
       tags: ["borg"]
 
     - role: node_exporter
-      vars:
-        node_exporter_skip_install: false
-        node_exporter_version: "latest"
-        node_exporter_port: "{{ ports.node_exporter }}"
-        nvidiaexporter_port: "{{ ports.nvidia_exporter }}"
-      tags: ["prometheus-stack", "node_exporter"]
+      tags: ["node_exporter"]
 
     - role: btrbk
       tags: ["btrbk"]

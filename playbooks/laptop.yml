@@ -102,7 +102,6 @@
       vars:
         node_exporter_skip_install: false
         node_exporter_version: "latest"
-        node_exporter_port: "{{ ports.node_exporter }}"
         node_exporter_collectors: []
 
       tags: ["prometheus-stack", "node_exporter"]

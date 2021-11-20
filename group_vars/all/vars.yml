@@ -1,10 +1,12 @@
 ---
 
+ports: {}
+
 ansible_managed: "Ansible managed"
 my_user: andrei
 my_email: "{{ vault_my_email }}"
-ports:
-  node_exporter: 9100
+
+node_exporter_port: 9100
 
 cert_path: "{{ inventory_dir }}/files/all/elk_ssl"
 ca_pass: "{{ lookup('file', inventory_dir + '/.secrets/ca_key').strip() }}"
