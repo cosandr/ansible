@@ -12,6 +12,30 @@
     - name: Gather facts
       setup:
       tags: ["always"]
+
+    - block:
+        - name: Add prometheus servers to internal zone
+          firewalld:
+            zone: internal
+            source: "{{ hostvars[item].ansible_host }}"
+            permanent: true
+            state: enabled
+          loop: "{{ groups['prom'] }}"
+          notify: reload firewalld
+
+        - name: Allow ports to internal zone
+          firewalld:
+            zone: internal
+            port: "{{ item }}/tcp"
+            permanent: true
+            state: enabled
+          loop:
+            - "{{ aquaero_exporter_port }}"
+            - "{{ node_exporter_port }}"
+            - "{{ nvidia_exporter_port }}"
+          notify: reload firewalld
+
+      tags: ["firewalld"]
   roles:
     - role: borg
       tags: ["borg"]
@@ -77,3 +101,9 @@
 
     # - role: nvidia_exporter
     #   tags: ["prometheus-stack", "nvidia_exporter"]
+
+  handlers:
+    - name: reload firewalld
+      service:
+        name: firewalld
+        state: reloaded

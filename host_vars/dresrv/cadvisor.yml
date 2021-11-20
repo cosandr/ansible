@@ -1,3 +1,4 @@
 ---
+
 cadvisor_docker_only: true
-cadvisor_listen_ip: 127.0.0.1
+cadvisor_listen_ip: "0.0.0.0"

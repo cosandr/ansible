@@ -1,8 +1,12 @@
 ---
+
 desktop_label: "{{ hostvars.desktop.inventory_hostname }}"
 laptop_label: "{{ hostvars.laptop.inventory_hostname }}"
 drepi_label: "{{ hostvars.drepi.inventory_hostname }}"
 server_label: "{{ hostvars.dresrv.inventory_hostname }}"
+__dresrv: "{{ hostvars['dresrv'] }}"
+
+prometheus_port: 9090
 prometheus_storage_retention: "365d"
 prometheus_web_listen_address: "0.0.0.0:{{ prometheus_port }}"
 prometheus_global:
@@ -18,18 +22,18 @@ prometheus_scrape_configs:
     static_configs:
       - targets: ["localhost:{{ alertmanager_web_listen_address.split(':')[1] }}"]
         labels:
-          instance: "{{ server_label }}"
+          instance: "{{ inventory_hostname }}"
 
   - job_name: "prometheus"
     metrics_path: "{{ prometheus_metrics_path }}"
     static_configs:
       - targets: ["localhost:{{ prometheus_port }}"]
         labels:
-          instance: "{{ server_label }}"
+          instance: "{{ inventory_hostname }}"
 
   - job_name: "cadvisor"
     static_configs:
-      - targets: ["localhost:{{ cadvisor_port }}"]
+      - targets: ["{{ __dresrv.ansible_host }}:{{ __dresrv.cadvisor_port }}"]
         labels:
           instance: "{{ server_label }}"
 
@@ -43,19 +47,21 @@ prometheus_scrape_configs:
     static_configs:
       - targets: ["localhost:{{ node_exporter_port }}"]
         labels:
+          instance: "{{ inventory_hostname }}"
+
+      - targets: ["{{ __dresrv.ansible_host }}:{{ __dresrv.node_exporter_port }}"]
+        labels:
           instance: "{{ server_label }}"
-      - targets: ["{{ hostvars['webgw01'].wireguard_ip }}:{{ node_exporter_port }}"]
+
+      - targets: ["{{ hostvars['webgw01'].wireguard_ip }}:{{ hostvars['webgw01'].node_exporter_port }}"]
         labels:
           instance: "{{ hostvars['webgw01'].inventory_hostname }}"
-      - targets: ['localhost:17766']
+
+      - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].node_exporter_port }}"]
         labels:
           instance: "{{ desktop_label }}"
-          __metrics_path__: /node/metrics
-      - targets: ["localhost:27766"]
-        labels:
-          instance: "{{ laptop_label }}"
-          __metrics_path__: /node/metrics
-      - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ node_exporter_port }}"]
+
+      - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].node_exporter_port }}"]
         labels:
           instance: "{{ drepi_label }}"
           __metrics_path__: /metrics
@@ -66,55 +72,16 @@ prometheus_scrape_configs:
       - targets: ["{{ hostvars['prom01'].ansible_host }}:{{ hostvars['prom01'].aquaero_exporter_port }}"]
         labels:
           instance: "SLB"
-      - targets: ["localhost:17766"]
+      - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].aquaero_exporter_port }}"]
         labels:
           instance: "{{ desktop_label }}"
-          __metrics_path__: /aquaero/metrics
 
   - job_name: "nvidia"
     scrape_interval: 30s
     static_configs:
-      - targets: ["localhost:17766"]
+      - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].nvidia_exporter_port }}"]
         labels:
           instance: "{{ desktop_label }}"
-          __metrics_path__: /nvidia/metrics
-
-  - job_name: "fah"
-    scrape_interval: 60s
-    static_configs:
-      - targets: ["localhost:17766"]
-        labels:
-          instance: "{{ desktop_label }}"
-          __metrics_path__: /fah/metrics
-
-  - job_name: "mph"
-    scrape_interval: 120s
-    static_configs:
-      - targets: ["localhost:6743"]
-        labels:
-          instance: "{{ server_label }}"
-      - targets: ["localhost:17766"]
-        labels:
-          instance: "{{ desktop_label }}"
-          __metrics_path__: /mph/metrics
-
-  - job_name: "wmi"
-    static_configs:
-      - targets: ["localhost:17766"]
-        labels:
-          instance: "{{ desktop_label }}"
-          __metrics_path__: /wmi/metrics
-      - targets: ["localhost:27766"]
-        labels:
-          instance: "{{ laptop_label }}"
-          __metrics_path__: /wmi/metrics
-
-  - job_name: "hwinfo"
-    static_configs:
-      - targets: ["localhost:17766"]
-        labels:
-          instance: "{{ desktop_label }}"
-          __metrics_path__: /hwinfo/metrics
 
   - job_name: 'postgres'
     scrape_interval: 60s
@@ -126,7 +93,7 @@ prometheus_scrape_configs:
   - job_name: 'nginx'
     scrape_interval: 60s
     static_configs:
-      - targets: ['localhost:{{ nginx_exporter_port }}']
+      - targets: ['{{ __dresrv.ansible_host }}:{{ __dresrv.nginx_exporter_port }}']
         labels:
           instance: "{{ server_label }}"
 
@@ -149,6 +116,7 @@ prometheus_scrape_configs:
           job: "node"
           instance: "RomeoTV"
           __metrics_path__: /node
+
 prometheus_alert_rules:
   - alert: HostOutOfMemory
     expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10

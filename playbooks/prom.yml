@@ -40,6 +40,8 @@
             state: enabled
           loop:
             - "{{ aquaero_exporter_port }}"
+            - "{{ prometheus_port }}"
+            - "{{ grafana_port }}"
           notify: reload firewalld
 
       tags: ["firewalld"]
@@ -51,6 +53,34 @@
           - python3-pip
           - usbutils
         state: present
+
+  roles:
+    - role: setup_disk
+      vars:
+        disk:
+          dev: "/dev/sdb"
+          vols:
+            - name: prometheus
+              path: "/var/lib/prometheus"
+              shrink: false
+              size: "100%FREE"
+              owner: "994"  # prometheus
+              group: "991"
+              mode: "0775"
+      tags: ["prometheus", "disk"]
+
+    - role: prometheus
+      tags: ["prometheus"]
+
+    - role: alertmanager
+      tags: ["alertmanager"]
+
+    - role: node_exporter
+      tags: ["node_exporter"]
+
+    - role: grafana
+      tags: ["grafana"]
+
   handlers:
     - name: reload firewalld
       service:
