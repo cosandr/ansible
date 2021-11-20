@@ -61,6 +61,10 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ desktop_label }}"
 
+      - targets: ["{{ hostvars['pg01'].ansible_host }}:{{ hostvars['pg01'].node_exporter_port }}"]
+        labels:
+          instance: "{{ hostvars['pg01'].inventory_hostname }}"
+
       - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].node_exporter_port }}"]
         labels:
           instance: "{{ drepi_label }}"

@@ -113,13 +113,16 @@
             state: enabled
           notify: reload firewalld
 
-        - name: Add postgres exporter to internal zone
+        - name: Add exporters to internal zone
           firewalld:
             zone: internal
-            port: "{{ postgres_exporter_port }}/tcp"
+            port: "{{ item }}/tcp"
             permanent: true
             state: enabled
           notify: reload firewalld
+          loop:
+            - "{{ postgres_exporter_port }}"
+            - "{{ node_exporter_port }}"
           tags: ["postgres_exporter"]
 
       tags: ["firewalld"]
@@ -132,6 +135,9 @@
       vars:
         postgres_service_name: "{{ postgresql_daemon }}"
       tags: ["prometheus-stack", "postgres_exporter"]
+
+    - role: node_exporter
+      tags: ["node_exporter"]
 
     - role: systemd
       tags: ["systemd"]

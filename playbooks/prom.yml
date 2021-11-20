@@ -66,8 +66,8 @@
               size: "100%FREE"
               owner: "994"  # prometheus
               group: "991"
-              mode: "0775"
-      tags: ["prometheus", "disk"]
+              mode: "0755"
+      tags: ["disk"]
 
     - role: prometheus
       tags: ["prometheus"]
