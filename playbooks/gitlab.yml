@@ -29,15 +29,18 @@
             state: enabled
           notify: reload firewalld
 
-        - name: Add mgmt network to internal network
+        - name: Add sources to internal zone
           firewalld:
             zone: internal
-            source: "{{ home_net.mgmt.cidr }}"
+            source: "{{ item }}"
             permanent: true
             state: enabled
+          loop:
+            - "{{ home_net.mgmt.cidr }}"
+            - "{{ hostvars['prom01'].ansible_host }}"
           notify: reload firewalld
 
-        - name: Add gitlab ports to internal zone
+        - name: Add ports to internal zone
           firewalld:
             zone: internal
             port: "{{ item }}/tcp"
@@ -46,6 +49,7 @@
           loop:
             - "{{ gitlab_nginx_listen_port }}"
             - "{{ gitlab_registry_nginx_listen_port }}"
+            - "{{ node_exporter_port }}"
           notify: reload firewalld
 
       tags: ["firewalld"]

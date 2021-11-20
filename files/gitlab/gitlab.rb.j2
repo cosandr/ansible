@@ -84,6 +84,10 @@ registry_nginx['real_ip_recursive'] = 'on'
 registry_nginx['real_ip_trusted_addresses'] = {{ gitlab_registry_nginx_trusted_addresses | to_json }}
 {% endif %}
 
+{% if node_exporter_web_listen_address is defined %}
+node_exporter['listen_address'] = '{{ node_exporter_web_listen_address }}'
+{% endif %}
+
 {% if gitlab_extra_settings is defined %}
 # Extra configuration
 {% for extra in gitlab_extra_settings %}
