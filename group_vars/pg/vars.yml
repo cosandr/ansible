@@ -15,7 +15,7 @@ postgresql_packages:
 
 postgresql_global_config_options:
   - option: listen_addresses
-    value: '{{ ["localhost", ansible_host] | join(",") }}'
+    value: '*'
   - option: ssl
     value: 'on'
   - option: ssl_ca_file
