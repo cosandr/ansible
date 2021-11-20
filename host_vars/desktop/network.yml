@@ -1,70 +1,16 @@
 ---
 
-networkd_netdevs:
-  - vlan10: |
-      [NetDev]
-      Name=vlan10
-      Kind=vlan
-
-      [VLAN]
-      Id=10
-  - vlan50: |
-      [NetDev]
-      Name=vlan50
-      Kind=vlan
-
-      [VLAN]
-      Id=50
-  - vlan100: |
-      [NetDev]
-      Name=vlan100
-      Kind=vlan
-
-      [VLAN]
-      Id=100
-
 networkd_config:
-  - enp42s0: |
+  - wired: |
       [Match]
-      Name=enp42s0
-
-      [Network]
-      VLAN=vlan10
-      VLAN=vlan50
-      VLAN=vlan100
-  - vlan10: |
-      [Match]
-      Name=vlan10
-
-      [Network]
-      DHCP=ipv4
-      LinkLocalAddressing=no
-      IPv6AcceptRA=no
-
-      [DHCP]
-      RouteMetric=1048
-      UseRoutes=no
-  - vlan50: |
-      [Match]
-      Name=vlan50
+      Name=en*
 
       [Network]
       DHCP=yes
+      IPForward=yes
 
       [DHCP]
       RouteMetric=1024
-  - vlan100: |
-      [Match]
-      Name=vlan100
-
-      [Network]
-      DHCP=ipv4
-      LinkLocalAddressing=no
-      IPv6AcceptRA=no
-
-      [DHCP]
-      RouteMetric=1064
-      UseRoutes=no
   - wlan: |
       [Match]
       Type=wlan
