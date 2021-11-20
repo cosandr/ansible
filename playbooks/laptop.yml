@@ -52,6 +52,47 @@
       when: ansible_distribution == 'Archlinux'
       tags: ["sway"]
 
+    - block:
+          - name: Ensure bluetooth is enabled
+            systemd:
+              name: bluetooth.service
+              state: started
+              enabled: true
+
+          - name: Enable bluetooth auto power on
+            lineinfile:
+              path: '/etc/bluetooth/main.conf'
+              regexp: '^#?AutoEnable'
+              line: 'AutoEnable=true'
+
+          - name: Ensure pipewire config dir exists
+            file:
+              path: "/etc/pipewire/media-session.d"
+              state: directory
+              owner: root
+              group: root
+              mode: 0755
+
+          - name: Copy default config
+            copy:
+              src: "/usr/share/pipewire/media-session.d/bluez-monitor.conf"
+              dest: "/etc/pipewire/media-session.d/bluez-monitor.conf"
+              owner: root
+              group: root
+              mode: 0644
+              force: false
+            tags: ["pipewire"]
+
+          - name: Enable profile auto-switch
+            lineinfile:
+              path: "/etc/pipewire/media-session.d/bluez-monitor.conf"
+              backrefs: true
+              regexp: '^(\s+)bluez5\.autoswitch-profile'
+              line: '\1bluez5.autoswitch-profile = true'
+            tags: ["pipewire"]
+
+      tags: ["bluetooth"]
+
   handlers:
     - name: dracut regenerate
       become: true
