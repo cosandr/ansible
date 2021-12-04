@@ -91,6 +91,25 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ desktop_label }}"
 
+  - job_name: "fah"
+    scrape_interval: 60s
+    static_configs:
+      - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].fah_exporter_port }}"]
+        labels:
+          instance: "{{ desktop_label }}"
+
+  - job_name: "wmi"
+    static_configs:
+      - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].wmi_exporter_port }}"]
+        labels:
+          instance: "{{ desktop_label }}"
+
+  - job_name: "hwinfo"
+    static_configs:
+      - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].hwinfo_exporter_port }}"]
+        labels:
+          instance: "{{ desktop_label }}"
+
   - job_name: 'postgres'
     scrape_interval: 60s
     static_configs:
