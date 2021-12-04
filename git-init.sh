@@ -1,10 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # sets up a pre-commit hook to ensure that vault.yaml is encrypted
 #
 # extended from https://github.com/IronicBadger/compose-secret-mgt/blob/master/git-init.sh
 
-cat <<EOT > .git/hooks/pre-commit
-#!/bin/bash
+hook_path="$(git rev-parse --git-path hooks)/pre-commit"
+
+cat <<EOT > "$hook_path"
+#!/usr/bin/env bash
 
 find files host_vars group_vars -type f -regextype egrep -regex '.*(\.csr|\.key|vault\.yml)$' -print0 | while read -d $'\0' f
 do
@@ -15,4 +17,4 @@ do
 done
 EOT
 
-chmod +x .git/hooks/pre-commit
+chmod +x "$hook_path"

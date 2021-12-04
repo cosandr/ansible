@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 declare -A file_map
 file_map[".secrets/all_vault.yml"]="group_vars/all/vault.yml"
