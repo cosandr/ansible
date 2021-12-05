@@ -1,0 +1,7 @@
+---
+
+- name: reload udev
+  command: "/usr/bin/udevadm control --reload"
+
+- name: trigger udev
+  command: "/usr/bin/udevadm trigger"

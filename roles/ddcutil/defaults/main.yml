@@ -1,0 +1,4 @@
+---
+
+ddcutil_udev_rule: |
+  KERNEL=="i2c-[0-9]*", GROUP="wheel", MODE="0660", PROGRAM="/usr/bin/ddcutil --bus=%n getvcp 0x10"

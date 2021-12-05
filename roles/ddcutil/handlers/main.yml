@@ -5,11 +5,3 @@
   modprobe:
     name: i2c-dev
     state: present
-
-- name: reload udev
-  become: true
-  command: "/usr/bin/udevadm control --reload"
-
-- name: trigger udev
-  become: true
-  command: "/usr/bin/udevadm trigger"

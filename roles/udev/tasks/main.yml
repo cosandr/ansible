@@ -1,0 +1,15 @@
+---
+
+- name: Install rules
+  copy:
+    dest: "/etc/udev/rules.d/{{ item.key }}.rules"
+    owner: root
+    group: root
+    mode: 0644
+    content: "{{ item.value }}"
+  loop: "{{ udev_rules | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  notify:
+    - reload udev
+    - trigger udev
