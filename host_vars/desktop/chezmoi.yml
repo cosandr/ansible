@@ -6,9 +6,11 @@
 chezmoi_overrides:
   i3: |
     WS["2"]="no-discord"
+  polybar: |
+    DPI_MAP["DP-2"]="144"
   xorg: |
-    DPI=144
-    MONITOR_MAP["DP-4"]="--primary --mode 3840x2160 --rate 120"
+    DPI=120
+    MONITOR_MAP["DP-4"]="--primary --mode 3840x2160 --rate 144"
     MONITOR_MAP["DP-2"]="--above DP-4"
     MONITOR_MAP["HDMI-0"]="--off"
   xinitrc: |

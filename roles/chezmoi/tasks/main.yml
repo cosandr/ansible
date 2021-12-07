@@ -22,7 +22,7 @@
     state: directory
     owner: "{{ chezmoi_user }}"
     group: "{{ chezmoi_user }}"
-    mode: 0644
+    mode: 0755
   when: chezmoi_overrides | length > 0
 
 - name: Copy overrides
