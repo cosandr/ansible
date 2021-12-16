@@ -1,0 +1,13 @@
+---
+
+ipmi_exporter_version: "latest"
+ipmi_exporter_binary_install_dir: "/usr/local/bin"
+ipmi_exporter_web_listen_address: ":9290"
+ipmi_exporter_required_services:
+  - network-online.target
+ipmi_exporter_config_file: "/etc/ipmi_exporter.yml"
+ipmi_exporter_modules: {}
+  # default:
+  #   user: "admin"
+  #   pass: "admin"
+  #   driver: "LAN_2_0"

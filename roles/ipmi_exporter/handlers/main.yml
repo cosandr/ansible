@@ -1,0 +1,15 @@
+---
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: enable and start ipmi_exporter
+  systemd:
+    name: ipmi_exporter
+    state: started
+    enabled: true
+
+- name: restart ipmi_exporter
+  systemd:
+    name: ipmi_exporter
+    state: restarted

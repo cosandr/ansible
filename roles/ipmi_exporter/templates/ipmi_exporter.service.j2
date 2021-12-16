@@ -1,0 +1,19 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=IPMI Exporter
+Requires={{ ipmi_exporter_required_services | join(' ') }}
+After={{ ipmi_exporter_required_services | join(' ') }}
+
+[Service]
+Type=simple
+User=ipmi_exporter
+Group=ipmi_exporter
+ExecStart={{ ipmi_exporter_binary_install_dir }}/ipmi_exporter --web.listen-address={{ ipmi_exporter_web_listen_address }} {% if ipmi_exporter_modules | length > 0 %}--config.file={{ ipmi_exporter_config_file }}{% endif +%}
+Restart=always
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=true
+
+[Install]
+WantedBy=multi-user.target

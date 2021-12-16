@@ -1,0 +1,31 @@
+---
+
+- include_tasks: install.yml
+  tags: ["install"]
+
+- name: Configure IPMI exporter
+  copy:
+    content: "{{ item | to_nice_yaml(indent=2) }}"
+    dest: "{{ ipmi_exporter_config_file }}"
+    owner: ipmi_exporter
+    group: ipmi_exporter
+    mode: 0600
+  vars:
+    item:
+      modules: "{{ ipmi_exporter_modules }}"
+  tags: ["configure"]
+  notify:
+    - restart ipmi_exporter
+  when: ipmi_exporter_modules | length > 0
+
+- name: create or update systemd service unit
+  template:
+    src: ipmi_exporter.service.j2
+    dest: /etc/systemd/system/ipmi_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+    - enable and start ipmi_exporter
+    - restart ipmi_exporter

@@ -1,0 +1,109 @@
+---
+
+- name: Install freeipmi
+  package:
+    name: freeipmi
+    state: present
+
+- name: get systemd version
+  command: systemctl --version
+  changed_when: false
+  check_mode: false
+  register: __systemd_version
+
+- name: set systemd version fact
+  set_fact:
+    ipmi_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
+
+- block:
+  - name: copy ipmi_exporter sysusers file
+    copy:
+      content: |
+        u ipmi_exporter - "IPMI exporter user"
+      dest: /usr/lib/sysusers.d/ipmi_exporter.conf
+      mode: 0644
+      owner: root
+      group: root
+    register: __sysusers
+
+  - name: restart systemd-sysusers
+    become: true
+    command: systemd-sysusers
+    when: __sysusers.changed
+
+  when: ipmi_exporter_systemd_version | int >= 215
+
+- block:
+  - name: create ipmi_exporter system group
+    group:
+      name: ipmi_exporter
+      system: true
+      state: present
+
+  - name: create ipmi_exporter system user
+    user:
+      name: ipmi_exporter
+      system: true
+      shell: "/usr/sbin/nologin"
+      group: ipmi_exporter
+      createhome: false
+      home: "{{ ipmi_exporter_db_dir }}"
+
+  when: ipmi_exporter_systemd_version | int < 215
+
+- block:
+    - name: Get latest release
+      uri:
+        url: "https://api.github.com/repos/prometheus-community/ipmi_exporter/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      no_log: false
+      register: _latest_release
+      until: _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set ipmi_exporter version to {{ _latest_release.json.tag_name[1:] }}"
+      set_fact:
+        ipmi_exporter_version: "{{ _latest_release.json.tag_name[1:] }}"
+
+    - name: Set ipmi_exporter_version on remote host
+      set_fact:
+        ipmi_exporter_version: "{{ hostvars['localhost']['ipmi_exporter_version'] }}"
+  when:
+    - ipmi_exporter_version == "latest"
+
+- name: download ipmi_exporter binary to local folder
+  become: false
+  get_url:
+    url: "https://github.com/prometheus-community/ipmi_exporter/releases/download/v{{ ipmi_exporter_version }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp/ipmi_exporter-{{ ipmi_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  # run_once: true # <-- this cannot be set due to multi-arch support
+  delegate_to: localhost
+  check_mode: false
+
+- name: unpack ipmi_exporter binary
+  become: false
+  unarchive:
+    src: "/tmp/ipmi_exporter-{{ ipmi_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp"
+    creates: "/tmp/ipmi_exporter-{{ ipmi_exporter_version }}.linux-{{ go_arch }}/ipmi_exporter"
+  delegate_to: localhost
+  check_mode: false
+
+- name: install ipmi_exporter binary
+  copy:
+    src: "/tmp/ipmi_exporter-{{ ipmi_exporter_version }}.linux-{{ go_arch }}/ipmi_exporter"
+    dest: "{{ ipmi_exporter_binary_install_dir }}/ipmi_exporter"
+    mode: 0755
+    owner: root
+    group: root
+  notify:
+    - restart ipmi_exporter
