@@ -10,7 +10,6 @@ __sd_btrfs_scrub:
       [Service]
       Type=oneshot
       ExecStart=btrfs scrub start /
-      ExecStart=bash -c 'for d in /dev/mapper/tank_disk*; do btrfs scrub start -B $d; done'
 
       [Install]
       WantedBy=multi-user.target
