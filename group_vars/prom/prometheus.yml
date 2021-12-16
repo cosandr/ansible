@@ -31,6 +31,17 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ inventory_hostname }}"
 
+  - job_name: "ipmi"
+    params:
+      module: ['default']
+    metrics_path: /ipmi
+    scrape_interval: 1m
+    static_configs:
+      - targets: ["localhost:{{ ipmi_exporter_port }}"]
+        labels:
+          instance: "SLB"
+          __param_target: "10.0.100.105"
+
   - job_name: "cadvisor"
     static_configs:
       - targets: ["{{ __dresrv.ansible_host }}:{{ __dresrv.cadvisor_port }}"]
@@ -167,6 +178,27 @@ prometheus_alert_rules:
       severity: warning
     annotations:
       summary: '{% raw %}{{ $labels.name }} systemd service {{ $labels.state }} on {{ $labels.instance }}{% endraw %}'
+  - alert: IpmiCpuTempHigh
+    expr: ipmi_temperature_celsius{name="CPU Temp"} > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: '{% raw %}CPU Temperature high [{{ $value }}C] on {{ $labels.instance }}{% endraw %}'
+  - alert: IpmiVrmTempHigh
+    expr: ipmi_temperature_celsius{name=~"VRM.*"} > 90
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: '{% raw %}{{ $labels.name }} temperature high [{{ $value }}C] on {{ $labels.instance }}{% endraw %}'
+  - alert: IpmiDimmTempHigh
+    expr: ipmi_temperature_celsius{name=~"DIMM.*"} > 60
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: '{% raw %}{{ $labels.name }} temperature high [{{ $value }}C] on {{ $labels.instance }}{% endraw %}'
   - alert: InstanceDown
     expr: 'up{instance!="{{ desktop_label }}",instance!="{{ laptop_label }}",job!="mph"} == 0'
     for: 10m

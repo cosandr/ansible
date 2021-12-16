@@ -42,6 +42,7 @@
             - "{{ aquaero_exporter_port }}"
             - "{{ prometheus_port }}"
             - "{{ grafana_port }}"
+            - "{{ ipmi_exporter_port }}"
           notify: reload firewalld
 
       tags: ["firewalld"]
@@ -77,6 +78,9 @@
 
     - role: node_exporter
       tags: ["node_exporter"]
+
+    - role: ipmi_exporter
+      tags: ["ipmi_exporter"]
 
     - role: grafana
       tags: ["grafana"]
