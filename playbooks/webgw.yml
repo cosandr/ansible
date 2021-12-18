@@ -71,7 +71,7 @@
       when: ansible_os_family == 'Debian'
       tags: ["unattended-upgrades"]
 
-    - role: dnf_automatic
+    - role: cosandr.dnf_automatic
       when: ansible_os_family == 'RedHat'
       tags: ["dnf_automatic"]
 
@@ -137,14 +137,6 @@
 
       tags: ["firewalld"]
       when: ansible_os_family == 'RedHat'
-
-    - role: unattended-upgrades
-      when: ansible_os_family == 'Debian'
-      tags: ["unattended-upgrades"]
-
-    - role: dnf_automatic
-      when: ansible_os_family == 'RedHat'
-      tags: ["dnf_automatic"]
 
   handlers:
     - name: reload firewalld

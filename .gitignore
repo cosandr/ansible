@@ -4,5 +4,6 @@ __pycache__
 *.pyc
 .cache/
 roles/geerlingguy.*
+roles/cosandr.*
 
 playbooks/test.yml

@@ -109,7 +109,7 @@
     - role: systemd
       tags: ["systemd"]
 
-    - role: dnf_automatic
+    - role: cosandr.dnf_automatic
       tags: ["dnf_automatic"]
 
     - role: dracut-sshd

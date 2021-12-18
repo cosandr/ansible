@@ -85,7 +85,7 @@
     - role: grafana
       tags: ["grafana"]
 
-    - role: dnf_automatic
+    - role: cosandr.dnf_automatic
       tags: ["dnf_automatic"]
 
   handlers:
