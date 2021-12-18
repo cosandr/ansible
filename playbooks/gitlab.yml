@@ -71,6 +71,9 @@
     - role: geerlingguy.gitlab
       tags: ["gitlab"]
 
+    - role: dnf_automatic
+      tags: ["dnf_automatic"]
+
   handlers:
     - name: reload firewalld
       service:

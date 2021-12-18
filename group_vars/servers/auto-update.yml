@@ -1,0 +1,10 @@
+---
+
+dnf_automatic_timer_enabled: true
+dnf_automatic_upgrade_type: "security"
+dnf_automatic_apply_updates: true
+dnf_automatic_download_updates: true
+
+unattended_remove_unused_dependencies: true
+unattended_remove_new_unused_dependencies: true
+unattended_automatic_reboot: false

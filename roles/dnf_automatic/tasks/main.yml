@@ -13,7 +13,7 @@
     group: root
     mode: 0644
 
-- name:
+- name: enable and start timer
   systemd:
     name: dnf-automatic.timer
     enabled: true
