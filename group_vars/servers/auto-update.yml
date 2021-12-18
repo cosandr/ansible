@@ -6,6 +6,7 @@ dnf_automatic_apply_updates: true
 dnf_automatic_download_updates: true
 dnf_automatic_excludes:
   - "kernel*"
+  - "kmod*"
   - "systemd*"
 
 unattended_remove_unused_dependencies: true
