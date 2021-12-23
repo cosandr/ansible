@@ -2,5 +2,3 @@
 
 ansible_user: root
 ansible_python_interpreter: /usr/bin/python3
-
-aquaero_exporter_port: "2782"

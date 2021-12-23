@@ -41,3 +41,6 @@ webgw01
 
 [prom]
 prom01 ansible_host=10.0.10.21
+
+[windows]
+win-aquaero ansible_host=10.0.20.10
