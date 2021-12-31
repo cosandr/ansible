@@ -7,4 +7,5 @@ systemd_user_override: "/home/{{ systemd_user }}/.config/override"
 ddcutil_udev_rule: |
   KERNEL=="i2c-[0-9]*", GROUP="wheel", MODE="0660"
 
-
+udev_rules:
+  99-platformio: "{{ lookup('url', 'https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules') }}"
