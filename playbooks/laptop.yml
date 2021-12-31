@@ -200,6 +200,9 @@
     # - role: thinkfan
     #   tags: ["thinkfan"]
 
+    - role: udev
+      tags: ["udev"]
+
     - role: ddcutil
       tags: ["ddcutil"]
 

@@ -1,0 +1,5 @@
+---
+
+udev_rules:
+  40-ttyusb: |
+    KERNEL=="ttyUSB[0-9]*", GROUP="wheel", MODE="0660"
