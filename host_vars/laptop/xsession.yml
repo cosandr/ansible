@@ -1,9 +1,5 @@
 ---
 
-xsession_wants:
-  - xidlehook.service
-  - xsettingsd.service
-
 xidlehook_cmd: |
   /usr/bin/xidlehook \
       --not-when-fullscreen \

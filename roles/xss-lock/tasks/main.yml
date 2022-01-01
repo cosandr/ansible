@@ -7,27 +7,3 @@
   aur:
     name: xss-lock-session
     state: present
-
-# https://cewood.xyz/posts/my-i3-setup/
-- name: Create user service for xss-lock
-  become: true
-  become_user: "{{ my_user }}"
-  copy:
-    dest: "/home/{{ my_user }}/.config/systemd/user/xss-lock.service"
-    owner: "{{ my_user }}"
-    group: "{{ my_user }}"
-    mode: 0644
-    content: |
-      [Unit]
-      Description=xss-lock
-      PartOf=graphical-session.target
-
-      [Service]
-      Type=simple
-      ExecStart=/usr/bin/xss-lock -l -s ${XDG_SESSION_ID} -- ${HOME}/.local/bin/my-screenlock
-
-      [Install]
-      WantedBy=xsession.target
-  notify:
-    - reload systemd user
-    - enable and start xss-lock

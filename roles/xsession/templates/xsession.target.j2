@@ -1,7 +1,0 @@
-{{ ansible_managed | comment }}
-[Unit]
-Description=xsession for starting other user units
-BindsTo=graphical-session.target
-{% for s in xsession_wants %}
-Wants={{ s }}
-{% endfor %}

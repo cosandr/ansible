@@ -189,9 +189,6 @@
       when: ansible_distribution == 'Archlinux'
       tags: ["xidlehook"]
 
-    # - role: xsession
-    #   tags: ["xsession"]
-
     - role: gnome-keyring
       # vars:
       #   pam_config: "/etc/pam.d/greetd"

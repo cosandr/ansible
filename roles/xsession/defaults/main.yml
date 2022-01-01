@@ -1,4 +1,0 @@
----
-
-systemd_user: "{{ my_user | default('andrei') }}"
-systemd_user_conf: "/home/{{ systemd_user }}/.config/systemd/user"

@@ -6,33 +6,3 @@
   aur:
     name: xidlehook
     state: present
-
-- name: Ensure user service dir exists
-  file:
-    path: "/home/{{ my_user }}/.config/systemd/user"
-    state: directory
-    owner: "{{ my_user }}"
-    group: "{{ my_user }}"
-    mode: 0755
-
-# https://cewood.xyz/posts/my-i3-setup/
-- name: Create user service for xidlehook
-  copy:
-    dest: "/home/{{ my_user }}/.config/systemd/user/xidlehook.service"
-    owner: "{{ my_user }}"
-    group: "{{ my_user }}"
-    mode: 0644
-    content: |
-      [Unit]
-      Description=xidlehook
-      PartOf=graphical-session.target
-
-      [Service]
-      Type=simple
-      ExecStart={{ xidlehook_cmd }}
-
-      [Install]
-      WantedBy=xsession.target
-  notify:
-    - reload systemd user
-    - enable and start xidlehook
