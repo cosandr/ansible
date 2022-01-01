@@ -37,25 +37,6 @@
 
       tags: ["firewalld"]
   roles:
-    - role: borg
-      tags: ["borg"]
-
-    - role: node_exporter
-      tags: ["node_exporter"]
-
-    - role: btrbk
-      tags: ["btrbk"]
-
-    - role: reflector
-      tags: ["reflector"]
-
-    - role: arch-common
-      tags: ["arch-common"]
-
-    - role: locale_conf
-      when: ansible_os_family != 'RedHat'
-      tags: ["locale"]
-
     - role: sudo
       tags: ["sudo"]
 
@@ -65,6 +46,37 @@
     - role: systemd_networkd
       when: network_manager == "systemd-networkd"
       tags: ["systemd-networkd"]
+
+    - role: sbctl
+      tags: ["sbctl"]
+
+    - role: arch-common
+      tags: ["arch-common"]
+
+    - role: locale_conf
+      when: ansible_os_family != 'RedHat'
+      tags: ["locale"]
+
+    - role: sshd
+      tags: ["sshd"]
+
+    - role: xorg
+      tags: ["xorg"]
+
+    - role: gnome-keyring
+      tags: ["gnome-keyring"]
+
+    - role: udev
+      tags: ["udev"]
+
+    - role: borg
+      tags: ["borg"]
+
+    - role: btrbk
+      tags: ["btrbk"]
+
+    - role: reflector
+      tags: ["reflector"]
 
     - role: spotify
       tags: ["spotify"]
@@ -78,26 +90,11 @@
     - role: paru
       tags: ["paru"]
 
-    - role: sshd
-      tags: ["sshd"]
-
-    - role: xorg
-      tags: ["xorg"]
-
-    - role: sudo
-      tags: ["sudo"]
-
-    - role: sbctl
-      tags: ["sbctl"]
-
-    - role: gnome-keyring
-      tags: ["gnome-keyring"]
-
     - role: ddcutil
       tags: ["ddcutil"]
 
-    - role: netclient
-      tags: ["netclient"]
+    - role: node_exporter
+      tags: ["node_exporter"]
 
     # - role: nvidia_exporter
     #   tags: ["prometheus-stack", "nvidia_exporter"]
