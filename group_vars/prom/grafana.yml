@@ -8,6 +8,7 @@ grafana_url: "https://www.{{ hostvars['dresrv'].domain }}/grafana/"
 grafana_instance: "localhost"
 grafana_address: "0.0.0.0"
 grafana_port: 3000
+grafana_dashboards_dir: "{{ inventory_dir }}/files/grafana/dashboards"
 
 smtp_host: "{{ smtp_config[hostvars['dresrv'].domain].host }}"
 smtp_pass: "{{ smtp_config[hostvars['dresrv'].domain].pass }}"
