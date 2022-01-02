@@ -31,6 +31,12 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ inventory_hostname }}"
 
+  - job_name: "pushgateway"
+    static_configs:
+      - targets: ["localhost:{{ pushgateway_port }}"]
+        labels:
+          instance: "{{ inventory_hostname }}"
+
   - job_name: "ipmi"
     params:
       module: ['default']

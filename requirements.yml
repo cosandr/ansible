@@ -11,3 +11,4 @@ roles:
   - geerlingguy.docker
   - geerlingguy.postgresql
   - geerlingguy.gitlab
+  - cloudalchemy.pushgateway

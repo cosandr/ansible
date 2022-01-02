@@ -39,10 +39,10 @@
             permanent: true
             state: enabled
           loop:
-            - "{{ aquaero_exporter_port }}"
             - "{{ prometheus_port }}"
             - "{{ grafana_port }}"
             - "{{ ipmi_exporter_port }}"
+            - "{{ pushgateway_port }}"
           notify: reload firewalld
 
       tags: ["firewalld"]
@@ -87,6 +87,9 @@
 
     - role: cosandr.dnf_automatic
       tags: ["dnf_automatic"]
+
+    - role: cloudalchemy.pushgateway
+      tags: ["pushgateway"]
 
   handlers:
     - name: reload firewalld

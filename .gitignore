@@ -5,5 +5,6 @@ __pycache__
 .cache/
 roles/geerlingguy.*
 roles/cosandr.*
+roles/cloudalchemy.*
 
 playbooks/test.yml
