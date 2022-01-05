@@ -42,6 +42,7 @@ pacman_sway_packages:
   - gammastep
   - grim
   - kanshi
+  - qt5-wayland
   - slurp
   - sway
   - swaybg
@@ -82,6 +83,7 @@ pacman_packages:
   - firefox
   - firewalld
   - flex
+  - freerdp
   - fwupd
   - fzf
   - gawk
@@ -137,10 +139,13 @@ pacman_packages:
   - python-llfuse    # borg mount
   - python-netaddr   # ansible ip filter
   - python-pip
+  - python-virtualenv
   - python-websockets
+  - python-wheel
   - reflector
   - remmina
   - sbctl
+  - screen
   - sed
   - smartmontools
   - sof-firmware
