@@ -1,0 +1,9 @@
+---
+
+firewalld_masquerade_zones:
+  - "internal"
+firewalld_port_forwards:
+  - port: 4523
+    proto: tcp
+    toaddr: "{{ hostvars['gitlab01'].ansible_host }}"
+    toport: 22

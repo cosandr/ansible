@@ -1,0 +1,4 @@
+---
+
+firewalld_masquerade_zones:
+  - "public"

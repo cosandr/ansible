@@ -122,6 +122,23 @@
             - "https"
           notify: reload firewalld
 
+        - name: Enable masquerade on configured zones
+          firewalld:
+            zone: "{{ item }}"
+            masquerade: true
+            permanent: true
+            state: enabled
+          loop: "{{ firewalld_masquerade_zones }}"
+          notify: reload firewalld
+
+        - name: Add port forwards to public zone
+          firewalld:
+            zone: "public"
+            port_forward: "{{ firewalld_port_forwards }}"
+            permanent: true
+            state: enabled
+          notify: reload firewalld
+
         - name: Add mt interface to internal zone
           firewalld:
             zone: "internal"
