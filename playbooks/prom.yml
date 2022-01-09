@@ -2,6 +2,9 @@
 
 - hosts: prom
   gather_facts: true
+  vars:
+    # To ensure it takes presedence over "internal"
+    _webgw_zone: "0-webgw"
   pre_tasks:
     - block:
         - name: Disable some default services
@@ -40,9 +43,34 @@
             state: enabled
           loop:
             - "{{ prometheus_port }}"
-            - "{{ grafana_port }}"
             - "{{ ipmi_exporter_port }}"
             - "{{ pushgateway_port }}"
+          notify: reload firewalld
+
+        - name: Create webgw zone
+          firewalld:
+            zone: "{{ _webgw_zone }}"
+            permanent: true
+            state: present
+          notify: reload firewalld
+
+        - name: Add webgw sources
+          firewalld:
+            zone: "{{ _webgw_zone }}"
+            source: "{{ hostvars[item].wireguard_ip | default(hostvars[item].ansible_host) }}"
+            permanent: true
+            state: enabled
+          loop: "{{ groups['webgw'] }}"
+          notify: reload firewalld
+
+        - name: Allow ports to webgw zone
+          firewalld:
+            zone: "{{ _webgw_zone }}"
+            port: "{{ item }}/tcp"
+            permanent: true
+            state: enabled
+          loop:
+            - "{{ grafana_port }}"
           notify: reload firewalld
 
       tags: ["firewalld"]

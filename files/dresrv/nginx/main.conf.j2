@@ -68,15 +68,6 @@ server {
         autoindex on;
     }
 
-{% if nginx_upstreams | selectattr('name', 'search', 'grafana') %}
-    location /grafana/ {
-        proxy_pass          http://grafana/;
-        proxy_set_header    Host $host;
-        proxy_set_header    X-Real-IP $remote_addr;
-        proxy_set_header    X-Forwarded-For $proxy_add_x_forwarded_for;
-    }
-{% endif %}
-
 {% if nginx_upstreams | selectattr('name', 'search', 'notes_web') %}
     location ^~ /standardnotes-extensions {
 		autoindex off;

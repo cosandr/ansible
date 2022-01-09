@@ -3,8 +3,8 @@
 grafana_admin_pass: "{{ vault_grafana_admin_pass }}"
 grafana_admin_user: "{{ vault_grafana_admin_user }}"
 grafana_psql_pass: "{{ vault_grafana_psql_pass }}"
-grafana_domain: "www.{{ hostvars['dresrv'].domain }}"
-grafana_url: "https://www.{{ hostvars['dresrv'].domain }}/grafana/"
+grafana_domain: "grafana.{{ hostvars['webgw01'].domains[1] }}"
+grafana_url: "https://{{ grafana_domain }}/"
 grafana_instance: "localhost"
 grafana_address: "0.0.0.0"
 grafana_port: 3000

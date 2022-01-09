@@ -8,3 +8,7 @@ nginx_upstreams:
   - name: registry
     servers: ["{{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_registry_nginx_listen_port }}"]
     keepalive: 16
+
+  - name: grafana
+    servers: ["{{ hostvars['prom01'].ansible_host }}:{{ hostvars['prom01'].grafana_port }}"]
+    keepalive: 16

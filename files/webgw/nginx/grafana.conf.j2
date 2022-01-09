@@ -1,0 +1,32 @@
+{{ ansible_managed | comment }}
+{% if nginx_upstreams | selectattr('name', 'search', 'grafana') %}
+{% set domain = domains[1] %}
+server {
+    listen 80;
+    listen [::]:80;
+    server_name grafana.{{ domain }};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name grafana.{{ domain }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+    ssl_dhparam {{ nginx_dhparam }};
+
+    access_log {{ nginx_sites_logs }}/access-grafana.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-grafana.{{ domain }}.log {{ nginx_error_log_options }};
+
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_pass http://grafana/;
+    }
+}
+{% endif %}

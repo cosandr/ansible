@@ -4,6 +4,11 @@ nginx_vhosts:
   - filename: gitlab.conf
     server_name: gitlab
     template: "{{ inventory_dir }}/files/webgw/nginx/gitlab.conf.j2"
+
   - filename: registry.conf
     server_name: registry
     template: "{{ inventory_dir }}/files/webgw/nginx/registry.conf.j2"
+
+  - filename: grafana.conf
+    server_name: grafana
+    template: "{{ inventory_dir }}/files/webgw/nginx/grafana.conf.j2"
