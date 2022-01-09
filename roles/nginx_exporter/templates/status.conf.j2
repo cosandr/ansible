@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+server {
+    listen 127.0.0.1:80;
+
+    location /{{ nginx_exporter_scrape_location }} {
+        stub_status on;
+        access_log off;
+        allow 127.0.0.1;
+        deny all;
+    }
+}

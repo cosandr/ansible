@@ -31,9 +31,6 @@ nginx_vhosts:
   - filename: standard-notes.conf
     server_name: standard-notes
     template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/standard-notes.conf.j2"
-  - filename: status.conf
-    server_name: status
-    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/status.conf.j2"
   # - filename: nextcloud-baremetal.conf
   #   template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/nextcloud-baremetal.conf.j2"
   # - filename: nextcloud-official.conf

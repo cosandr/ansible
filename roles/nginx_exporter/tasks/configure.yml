@@ -1,4 +1,15 @@
 ---
+
+- name: install nginx config file
+  template:
+    src: status.conf.j2
+    dest: "{{ nginx_vhost_path }}/status.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when: nginx_exporter_install_conf | bool
+  notify: reload nginx
+
 - name: create or update systemd service unit
   template:
     src: nginx_exporter.service.j2

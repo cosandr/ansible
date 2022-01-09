@@ -77,10 +77,7 @@
     cadvisor_version: "0.40.0"
     grafana_version: "latest"
     nginx_exporter_version: "latest"
-    nginx_exporter_port: "{{ ports.nginx_exporter }}"
     node_exporter_version: "latest"
-    prometheus_port: "{{ ports.prometheus }}"
-    prometheus_version: "latest"
   roles:
     - role: samba
       tags: ["samba"]
