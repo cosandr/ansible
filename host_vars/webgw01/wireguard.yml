@@ -9,5 +9,5 @@ wireguard_private_key: "{{ vault_wireguard_private_key }}"
 wireguard_unmanaged_peers:
   mt:
     endpoint: "{{ hostvars['mt-router'].wireguard_endpoint }}"
-    allowed_ips: "10.4.20.1/32, {{ hostvars['gitlab01'].ansible_host }}/32, {{ hostvars['dresrv'].ansible_host }}/32"
+    allowed_ips: "10.4.20.1/32, {{ home_net.vm.cidr }}, {{ hostvars['dresrv'].ansible_host }}/32"
     public_key: "{{ hostvars['mt-router'].wireguard_public_key }}"
