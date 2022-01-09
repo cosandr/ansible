@@ -12,3 +12,7 @@ nginx_vhosts:
   - filename: grafana.conf
     server_name: grafana
     template: "{{ inventory_dir }}/files/webgw/nginx/grafana.conf.j2"
+
+  - filename: nextcloud.conf
+    server_name: nextcloud
+    template: "{{ inventory_dir }}/files/webgw/nginx/nextcloud.conf.j2"

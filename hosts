@@ -23,6 +23,7 @@ gitlab
 webgw
 localgw
 prom
+nextcloud
 
 [pg]
 pg01 ansible_host=10.0.10.11
@@ -47,3 +48,6 @@ webgw01
 
 [webgw:children]
 localgw
+
+[nextcloud]
+nextcloud01 ansible_host=10.0.10.60 ansible_user=root
