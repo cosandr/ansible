@@ -1,5 +1,7 @@
 ---
 
+nginx_yum_repo_enabled: false
+
 nginx_access_log_options: "main buffer=16k flush=2m"
 nginx_access_log: "/var/log/nginx/access.log {{ nginx_access_log_options }}"
 nginx_error_log_options: "warn"
