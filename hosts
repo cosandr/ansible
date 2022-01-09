@@ -18,14 +18,10 @@ romsto  ansible_host=10.1.0.6   ansible_user=root
 truenas ansible_host=10.0.10.2  ansible_user=root ansible_python_interpreter=/usr/local/bin/python3
 
 [servers:children]
-ovh
 pg
 gitlab
 webgw
 prom
-
-[ovh]
-ovh-gw01
 
 [pg]
 pg01 ansible_host=10.0.10.11

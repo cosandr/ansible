@@ -1,8 +1,0 @@
----
-
-__host_nginx_vhosts:
-  - filename: netmaker.conf
-    server_name: netmaker
-    template: "{{ inventory_dir }}/files/webgw/nginx/netmaker.conf.j2"
-
-nginx_hosts: "{{ nginx_hosts + __host_nginx_vhosts }}"
