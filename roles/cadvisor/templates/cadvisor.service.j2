@@ -2,12 +2,8 @@
 
 [Unit]
 Description=Cadvisor
-Requires=network-online.target
-After=network-online.target
-Requires=prometheus.service
-After=prometheus.service
-Requires=docker.service
-After=docker.service
+Requires=network-online.target {{ cadvisor_required_services | join(' ') }}
+After=network-online.target {{ cadvisor_required_services | join(' ') }}
 
 [Service]
 Type=simple

@@ -2,12 +2,8 @@
 
 [Unit]
 Description=Nginx Exporter
-Requires=network-online.target
-After=network-online.target
-Requires=nginx.service
-After=nginx.service
-Requires=prometheus.service
-After=prometheus.service
+Requires=network-online.target {{ nginx_exporter_required_services | join(' ') }}
+After=network-online.target {{ nginx_exporter_required_services | join(' ') }}
 
 [Service]
 Type=simple

@@ -3,6 +3,7 @@ nginx_exporter_version: 0.6.0
 
 nginx_exporter_no_sysusers: false
 nginx_exporter_skip_install: false
+nginx_exporter_required_services: ["nginx.service"]
 
 nginx_exporter_web_listen_address: "0.0.0.0:9113"
 nginx_exporter_scrape_uri: "http://127.0.0.1:8080/stub_status"

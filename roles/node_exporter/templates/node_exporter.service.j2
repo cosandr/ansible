@@ -2,12 +2,8 @@
 
 [Unit]
 Description=Node Exporter
-Requires=network-online.target
-After=network-online.target
-{% if _have_prometheus_service | default(false) %}
-Requires=prometheus.service
-After=prometheus.service
-{% endif %}
+Requires=network-online.target {{ node_exporter_required_services | join(' ') }}
+After=network-online.target {{ node_exporter_required_services | join(' ') }}
 
 [Service]
 Type=simple
