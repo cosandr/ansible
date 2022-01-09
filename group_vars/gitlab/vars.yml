@@ -9,7 +9,9 @@ node_exporter_port: "{{ node_exporter_web_listen_address.split(':')[1] }}"
 gitlab_config_template: "{{ inventory_dir }}/files/gitlab/gitlab.rb.j2"
 
 domain: "{{ hostvars['webgw01'].domain }}"
-proxy_host: "{{ hostvars['webgw01'].wireguard_ip }}"
+proxy_hosts:
+  - "{{ hostvars['webgw01'].wireguard_ip }}"
+  - "{{ hostvars['localgw01'].ansible_host }}"
 
 gitlab_time_zone: "Europe/Oslo"
 
@@ -21,11 +23,11 @@ gitlab_nginx_listen_https: "false"
 gitlab_nginx_listen_port: 80
 gitlab_nginx_ssl_verify_client: ""
 gitlab_nginx_ssl_client_certificate: ""
-gitlab_nginx_trusted_addresses: ["{{ proxy_host }}"]
+gitlab_nginx_trusted_addresses: "{{ proxy_hosts }}"
 
 gitlab_registry_enable: "true"
 gitlab_registry_external_url: "https://registry.{{ domain }}"
-gitlab_registry_nginx_trusted_addresses: ["{{ proxy_host }}"]
+gitlab_registry_nginx_trusted_addresses: "{{ proxy_hosts }}"
 gitlab_registry_nginx_listen_https: 'false'
 gitlab_registry_nginx_listen_port: 5000
 

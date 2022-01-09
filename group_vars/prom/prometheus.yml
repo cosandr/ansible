@@ -84,6 +84,10 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ hostvars['webgw01'].inventory_hostname }}"
 
+      - targets: ["{{ hostvars['localgw01'].ansible_host }}:{{ hostvars['localgw01'].node_exporter_port }}"]
+        labels:
+          instance: "{{ hostvars['localgw01'].inventory_hostname }}"
+
       - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].node_exporter_port }}"]
         labels:
           instance: "{{ desktop_label }}"

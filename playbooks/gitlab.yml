@@ -21,12 +21,13 @@
               service: samba-client
           notify: reload firewalld
 
-        - name: Add proxy host to internal network
+        - name: Add proxy hosts to internal network
           firewalld:
             zone: internal
-            source: "{{ proxy_host }}"
+            source: "{{ item }}"
             permanent: true
             state: enabled
+          loop: "{{ proxy_hosts }}"
           notify: reload firewalld
 
         - name: Add sources to internal zone

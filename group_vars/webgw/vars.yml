@@ -1,8 +1,7 @@
 ---
 
 domains: "{{ vault_domains }}"
-domeneshop_token: "{{ vault_domeneshop_token }}"
-domeneshop_secret: "{{ vault_domeneshop_secret }}"
+domain: "{{ domains[0] }}"
 
 fail2ban_ignoreip:
   - "127.0.0.1/8"

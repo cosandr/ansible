@@ -79,7 +79,8 @@
       tags: ["node_exporter"]
 
     - role: filebeat
-      when: filebeat_config is defined
+      # "filebeat_config is defined" for some reason doesn't work
+      when: "'filebeat_config' in hostvars[inventory_hostname]"
       tags: ["filebeat"]
 
     - role: certbot
@@ -89,6 +90,7 @@
       tags: ["nginx"]
 
     - role: wireguard
+      when: wireguard_address is defined
       tags: ["wireguard"]
   tasks:
     - block:
@@ -123,6 +125,16 @@
             interface: "mt"
             permanent: true
             state: enabled
+          when: wireguard_address is defined
+          notify: reload firewalld
+
+        - name: Add prom server to internal zone
+          firewalld:
+            zone: "internal"
+            source: "{{ hostvars['prom01'].ansible_host }}"
+            permanent: true
+            state: enabled
+          when: wireguard_address is not defined
           notify: reload firewalld
 
         - name: Add ports to internal zone

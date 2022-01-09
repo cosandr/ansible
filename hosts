@@ -21,6 +21,7 @@ truenas ansible_host=10.0.10.2  ansible_user=root ansible_python_interpreter=/us
 pg
 gitlab
 webgw
+localgw
 prom
 
 [pg]
@@ -32,11 +33,17 @@ mt-router ansible_host=10.0.50.1
 [gitlab]
 gitlab01 ansible_host=10.0.10.40
 
-[webgw]
-webgw01
-
 [prom]
 prom01 ansible_host=10.0.10.21
 
 [windows]
 win-aquaero ansible_host=10.0.20.10
+
+[localgw]
+localgw01 ansible_host=10.0.10.91
+
+[webgw]
+webgw01
+
+[webgw:children]
+localgw
