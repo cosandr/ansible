@@ -1,3 +1,5 @@
 ---
 
 ansible_user: root
+
+nginx_exporter_web_listen_address: "{{ ansible_host }}:{{ nginx_exporter_port }}"

@@ -1,0 +1,4 @@
+---
+
+nginx_exporter_port: "9113"
+nginx_exporter_web_listen_address: "{{ wireguard_ip | default('0.0.0.0') }}:{{ nginx_exporter_port }}"

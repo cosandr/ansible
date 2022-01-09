@@ -159,6 +159,14 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ server_label }}"
 
+      - targets: ["{{ hostvars['webgw01'].wireguard_ip }}:{{ hostvars['webgw01'].nginx_exporter_port }}"]
+        labels:
+          instance: "{{ hostvars['webgw01'].inventory_hostname }}"
+
+      - targets: ["{{ hostvars['localgw01'].ansible_host }}:{{ hostvars['localgw01'].nginx_exporter_port }}"]
+        labels:
+          instance: "{{ hostvars['localgw01'].inventory_hostname }}"
+
   - job_name: "romeo-tv"
     scheme: https
     scrape_interval: 30s

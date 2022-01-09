@@ -89,6 +89,9 @@
     - role: nginx
       tags: ["nginx"]
 
+    - role: nginx_exporter
+      tags: ["nginx_exporter"]
+
     - role: wireguard
       when: wireguard_address is defined
       tags: ["wireguard"]
@@ -145,6 +148,7 @@
             state: enabled
           loop:
             - "{{ node_exporter_port }}"
+            - "{{ nginx_exporter_port }}"
           notify: reload firewalld
 
       tags: ["firewalld"]
