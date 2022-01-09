@@ -5,7 +5,7 @@ Installs and configures LVM on data disks.
 
 ### Required parameters
 
-- `disk`
+- `provisioned_disks`
   - `dev` path to device, required
 
 ### Optional parameters
@@ -34,22 +34,19 @@ If none are specified, the device is formatted with ext4 without any mointpoints
     # With LVM
     - role: linux_setup_disk
       vars:
-        disk:
-          dev: "/dev/sdb"
-          vols:
-            - name: log
-              path: "/var/log/elasticsearch"
-              fstype: xfs
-              size: "20g"
-            - name: esdata
-              path: "/var/lib/elasticsearch"
-              shrink: no  # 100%FREE fails on re-runs if this is true (default)
-              size: "100%FREE"
-    # Raw
-    - role: linux_setup_disk
-      vars:
-        disk:
-          dev: "/dev/sdb"
-          fstype: xfs
-          path: "/var/lib/pgsql"
+        provisioned_disks:
+          - dev: "/dev/sdb"
+            vols:
+              - name: log
+                path: "/var/log/elasticsearch"
+                fstype: xfs
+                size: "20g"
+              - name: esdata
+                path: "/var/lib/elasticsearch"
+                shrink: no  # 100%FREE fails on re-runs if this is true (default)
+                size: "100%FREE"
+          # Raw
+          - dev: "/dev/sdb"
+            fstype: xfs
+            path: "/var/lib/pgsql"
 ```

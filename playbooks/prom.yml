@@ -84,18 +84,7 @@
         state: present
 
   roles:
-    - role: setup_disk
-      vars:
-        disk:
-          dev: "/dev/sdb"
-          vols:
-            - name: prometheus
-              path: "/var/lib/prometheus"
-              shrink: false
-              size: "100%FREE"
-              owner: "994"  # prometheus
-              group: "991"
-              mode: "0755"
+    - role: setup_disks
       tags: ["disk"]
 
     - role: prometheus

@@ -28,13 +28,13 @@
     opts: "{{ item.mkfs_opts | default(omit) }}"
   loop: "{{ disk.vols }}"
 
-- name: Set mountpoint permissions
+- name: Create mountpoint
   file:
     path: "{{ item.path }}"
     state: directory
-    owner: "{{ item.owner | default('root') }}"
-    group: "{{ item.group | default('root') }}"
-    mode: "{{ item.mode | default('0755') }}"
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+    mode: "{{ item.mode | default(omit) }}"
   loop: "{{ disk.vols }}"
   when: item.path is defined
 

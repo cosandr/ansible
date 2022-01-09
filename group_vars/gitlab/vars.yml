@@ -3,6 +3,14 @@
 ansible_user: root
 ansible_python_interpreter: /usr/bin/python3
 
+provisioned_disks:
+  - dev: "/dev/sdb"
+    vols:
+      - name: gitlab
+        path: "/var/opt/gitlab"
+        shrink: false
+        size: "100%FREE"
+
 node_exporter_web_listen_address: '0.0.0.0:9100'
 node_exporter_port: "{{ node_exporter_web_listen_address.split(':')[1] }}"
 

@@ -1,5 +1,14 @@
 ---
 
+provisioned_disks:
+  - dev: "/dev/sdb"
+    vols:
+      - name: pgsql
+        path: "/var/lib/pgsql"
+        shrink: false
+        size: "100%FREE"
+        mode: "0700"
+
 ansible_user: root
 ansible_python_interpreter: /usr/bin/python3
 

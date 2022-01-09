@@ -55,18 +55,7 @@
 
       tags: ["firewalld"]
   roles:
-    - role: setup_disk
-      vars:
-        disk:
-          dev: "/dev/sdb"
-          vols:
-            - name: gitlab
-              path: "/var/opt/gitlab"
-              shrink: false
-              size: "100%FREE"
-              owner: "993"  # git
-              group: "990"
-              mode: "0770"
+    - role: setup_disks
       tags: ["disk"]
 
     - role: geerlingguy.gitlab

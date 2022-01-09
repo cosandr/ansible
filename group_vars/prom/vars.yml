@@ -2,3 +2,11 @@
 
 ansible_user: root
 ansible_python_interpreter: /usr/bin/python3
+
+provisioned_disks:
+  - dev: "/dev/sdb"
+    vols:
+      - name: prometheus
+        path: "/var/lib/prometheus"
+        shrink: false
+        size: "100%FREE"
