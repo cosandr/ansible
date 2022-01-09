@@ -68,6 +68,11 @@ server {
         autoindex on;
     }
 
+    location /grafana/ {
+        {# Can't figure out nested hostvars #}
+        return 301 https://grafana.{{ hostvars['webgw01'].domains[1] }};
+    }
+
 {% if nginx_upstreams | selectattr('name', 'search', 'notes_web') %}
     location ^~ /standardnotes-extensions {
 		autoindex off;
