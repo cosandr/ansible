@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "**/*.yml": "yaml"
+        "**/*.yml": "ansible"
     },
     "python.pythonPath": "/usr/bin/python3",
     "ansibleVaultInline.encryptVaultId": ""
