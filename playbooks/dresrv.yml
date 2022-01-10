@@ -73,6 +73,11 @@
           {% endfor %}
           real_ip_header CF-Connecting-IP;
       tags: ["nginx", "cloudflare"]
+
+    - name: Set nginx facts
+      set_fact:
+        nginx_grafana_url: "{{ hostvars['prom01'].grafana_url }}"
+      tags: ["nginx"]
   vars:
     cadvisor_version: "0.40.0"
     grafana_version: "latest"
