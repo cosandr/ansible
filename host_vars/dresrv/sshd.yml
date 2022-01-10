@@ -4,7 +4,7 @@ sshd_extra_config: |
   Match Address {{ hostvars['desktop'].ansible_host }}
       PermitRootLogin prohibit-password
 
-  Match Address {{ hostvars['laptop'].ansible_host }}
+  Match Address {{ hostvars['laptop'].ansible_host }},{{ hostvars['laptop'].wireguard_ip }},10.0.50.34,10.4.20.34
       PermitRootLogin prohibit-password
 
   Match User {{ my_user }}
