@@ -8,6 +8,9 @@ roles:
   - name: cosandr.dnf_automatic
     src: https://github.com/cosandr/ansible-role-dnf-automatic.git
     scm: git
+  - name: cosandr.nextcloud
+    src: https://github.com/cosandr/ansible-role-nextcloud.git
+    scm: git
   - geerlingguy.docker
   - geerlingguy.postgresql
   - geerlingguy.gitlab
