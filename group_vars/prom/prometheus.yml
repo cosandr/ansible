@@ -238,6 +238,13 @@ prometheus_alert_rules:
       severity: critical
     annotations:
       summary: '{% raw %}Job {{ $labels.job }} on {{ $labels.instance }} down{% endraw %}'
+  - alert: SensorDown
+    expr: 'iot_up == 0'
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: '{% raw %}Sensor {{ $labels.instance }} in room {{ $labels.room }} down{% endraw %}'
   - alert: NodeFilesystemSpaceFillingUp
     annotations:
       description: '{% raw %}Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available space left and is filling up.{% endraw %}'
