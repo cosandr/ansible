@@ -81,6 +81,7 @@ pacman_packages:
   - file
   - findutils
   - firefox
+  - firefox-i18n-nb-no
   - firewalld
   - flex
   - freerdp
@@ -165,6 +166,7 @@ pacman_packages:
   - zsh
 
 aur_packages:
+  - hunspell-nb
   - jetbrains-toolbox
   - kernel-modules-hook
   - paru-bin
