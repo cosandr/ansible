@@ -1,7 +1,7 @@
 ---
 borg_remote_passphrase: "{{ vault_borg_remote_passphrase }}"
 borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
-borg_server_passphrase: "{{ vault_borg_server_passphrase }}"
+borg_server_passphrase: "{{ hostvars['backup01'].borg_server_passphrase }}"
 
 borg_create_home: no
 borg_home: /home/backup

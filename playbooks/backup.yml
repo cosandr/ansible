@@ -1,0 +1,89 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Create NFS share on TrueNAS
+  hosts: truenas
+  gather_facts: false
+  vars:
+    truenas_update_nfs: false
+    truenas_sharing:
+      - type: nfs
+        config:
+          paths: ["/mnt/tank/borg/repos"]
+          hosts: "{{ groups['backup'] | map('extract', hostvars, 'ansible_host') }}"
+          alldirs: true
+          ro: false
+          quiet: false
+          maproot_user: root
+          maproot_group: wheel
+          enabled: true
+  roles:
+    - role: truenas_nfs
+      delegate_to: localhost
+      tags: ["nfs"]
+
+- name: Prepare target hosts group
+  hosts: all
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Add hosts with configured backups
+      run_once: true
+      add_host:
+        name: "{{ item }}"
+        group: backup_hosts
+      loop: "{{ groups['all'] }}"
+      when:
+        - not (hostvars[item].borg_server | default(false))
+        - hostvars[item].borg_backups is defined
+        - hostvars[item].borg_backups | length > 0
+      tags: ["always"]
+
+- name: Setup borg on target hosts
+  become: true
+  hosts: backup_hosts
+  pre_tasks:
+    - name: Generate SSH keys for root user
+      openssh_keypair:
+        path: /root/.ssh/id_ed25519
+        comment: "root@{{ inventory_hostname }}"
+        type: ed25519
+      register: __ssh_key
+      tags: ["ssh"]
+
+  roles:
+    - role: borg
+      tags: ["borg"]
+
+- name: Setup borg on backup server
+  become: true
+  hosts: backup
+  pre_tasks:
+    - name: Append hosts
+      set_fact:
+        borg_auth_users: "{{ borg_auth_users + [{ 'host': item, 'key': hostvars[item].__ssh_key.public_key }] }}"
+      loop: "{{ groups['backup_hosts'] }}"
+      when: hostvars[item].__ssh_key is defined
+      tags: ["ssh"]
+
+    - name: Create borg home
+      file:
+        path: "{{ borg_home }}"
+        owner: "{{ borg_uid }}"
+        group: "{{ borg_gid }}"
+        mode: 0700
+        state: directory
+      tags: ["nfs", "borg"]
+
+    - name: Mount Borg NFS share
+      mount:
+        src: "{{ home_net.vm.cidr | ipaddr('2') | ipaddr('address') }}:/mnt/tank/borg/repos"
+        path: "{{ borg_pool }}"
+        opts: "defaults,vers=4"
+        state: mounted
+        fstype: nfs
+      tags: ["nfs"]
+
+  roles:
+    - role: borg
+      tags: ["borg"]

@@ -40,7 +40,7 @@
         - "python3-policycoreutils"
       state: present
 
-  - name: Get SELinux context
+  - name: Set SELinux context
     sefcontext:
       target: "{{ borg_home }}/.ssh(.*)?"
       setype: ssh_home_t

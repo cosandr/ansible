@@ -1,0 +1,3 @@
+---
+
+borg_server_passphrase: "{{ vault_borg_server_passphrase }}"

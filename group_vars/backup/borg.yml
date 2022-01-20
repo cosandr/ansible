@@ -1,0 +1,14 @@
+---
+
+borg_uid: 1002
+borg_gid: 1002
+borg_create_home: no
+borg_home: /home/backup
+borg_pool: "{{ borg_home }}/repos"
+borg_local_repo: yes
+borg_server: yes
+borg_auth_users:
+  - host: desktop
+    key: "{{ hostvars.desktop.ssh_keys.root }}"
+  - host: rtv
+    key: "{{ hostvars.romsto.ssh_keys.root }}"

@@ -1,0 +1,23 @@
+---
+
+borg_backups:
+  - name: "nextcloud"
+    timer_description: "Backup Nextcloud every midnight"
+    oncalendar: "*-*-* 00:00:00"
+    passphrase: "{{ hostvars['backup01'].borg_server_passphrase }}"
+    repo: "ssh://backup@{{ hostvars['backup01'].ansible_host }}{{ hostvars['backup01'].borg_pool }}/{{ ansible_hostname }}"
+    backup_name: "nextcloud"
+    paths:
+      - "/var/www/html/nextcloud"
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--exclude-caches"
+      - "--one-file-system"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-daily 2"
+      - "--keep-weekly 2"
+      - "--keep-monthly 6"
