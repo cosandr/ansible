@@ -2,4 +2,4 @@
 
 truenas_api_url: "{{ vault_truenas_api_url }}"
 truenas_api_key: "{{ vault_truenas_api_key }}"
-truenas_validate_certs: true
+truenas_validate_certs: false
