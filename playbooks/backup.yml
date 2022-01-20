@@ -51,6 +51,25 @@
       register: __ssh_key
       tags: ["ssh"]
 
+    - name: Scan SSH host key for borg server
+      command: "ssh-keyscan {{ hostvars[item].ansible_host }}"
+      check_mode: false
+      changed_when: false
+      loop: "{{ groups['backup'] }}"
+      register: __host_keys
+      tags: ["ssh"]
+
+    - name: Ensure host keys are in known_hosts
+      blockinfile:
+        path: /root/.ssh/known_hosts
+        create: true
+        mode: 0644
+        block: |
+          {% for h in __host_keys.results %}
+          {{ h.stdout }}
+          {% endfor %}
+      tags: ["ssh"]
+
   roles:
     - role: borg
       tags: ["borg"]
