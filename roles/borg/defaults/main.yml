@@ -1,6 +1,10 @@
+---
+
 borg_package_name: borg
 borg_user: backup
+# borg_uid: 1002
 borg_group: backup
+# borg_gid: 1002
 borg_create_home: yes
 borg_local_repo: no
 borg_server: no

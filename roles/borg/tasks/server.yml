@@ -1,0 +1,63 @@
+---
+
+- name: Create "{{ borg_group }}" group
+  group:
+    name: "{{ borg_group }}"
+    gid: "{{ borg_gid | default(omit) }}"
+    state: present
+
+- name: Create "{{ borg_user }}" user
+  user:
+    name: "{{ borg_user }}"
+    shell: /bin/bash
+    home: "{{ borg_home }}"
+    createhome: "{{ borg_create_home }}"
+    group: "{{ borg_group }}"
+    uid: "{{ borg_uid | default(omit) }}"
+    state: present
+
+- name: Set "{{ borg_home }}" permissions
+  file:
+    path: "{{ borg_home }}"
+    owner: "{{ borg_user }}"
+    group: "{{ borg_group }}"
+    mode: 0700
+    state: directory
+
+- name: Create borg .ssh directory
+  file:
+    path: "{{ borg_home }}/.ssh"
+    owner: "{{ borg_user }}"
+    group: "{{ borg_group }}"
+    mode: 0700
+    state: directory
+
+- block:
+  - name: Install selinux libraries
+    dnf:
+      name:
+        - "python3-libselinux"
+        - "python3-policycoreutils"
+      state: present
+
+  - name: Get SELinux context
+    sefcontext:
+      target: "{{ borg_home }}/.ssh(.*)?"
+      setype: ssh_home_t
+      state: present
+    register: __set_context
+
+  - name: Restore SELinux context
+    command: restorecon -r "{{ borg_home }}/.ssh"
+    changed_when: false
+    when: __set_context.changed
+
+  when: ansible_selinux.status == "enabled"
+
+- name: Create pool directory
+  file:
+    path: "{{ borg_pool }}"
+    owner: "{{ borg_user }}"
+    group: "{{ borg_group }}"
+    mode: 0700
+    state: directory

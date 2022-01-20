@@ -1,8 +1,11 @@
 ---
-- include: install.yml
-  become: true
+
+- include_tasks: install.yml
   tags: ["install"]
 
-- include: configure.yml
-  become: true
+- include_tasks: server.yml
+  when: borg_server | bool
+  tags: ["install", "server"]
+
+- include_tasks: configure.yml
   tags: ["configure"]
