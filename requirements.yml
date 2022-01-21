@@ -3,6 +3,9 @@
 collections:
   - ansible.posix
   - community.general
+  - name: git@github.com:cosandr/ansible-collection-spatiumcepa-truenas.git
+    version: master
+    type: git
 
 roles:
   - name: cosandr.dnf_automatic

@@ -1,5 +1,6 @@
 ---
 
-truenas_api_url: "{{ vault_truenas_api_url }}"
-truenas_api_key: "{{ vault_truenas_api_key }}"
-truenas_validate_certs: false
+ansible_connection: spatiumcepa.truenas.truenas_api
+ansible_truenas_api_address: "{{ vault_truenas_api_url }}"
+ansible_truenas_api_token: "{{ vault_truenas_api_key }}"
+ansible_truenas_validate_certs: false

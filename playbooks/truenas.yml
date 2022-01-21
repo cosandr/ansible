@@ -3,38 +3,31 @@
 - name: Create NFS share on TrueNAS
   hosts: truenas
   gather_facts: false
-  vars:
-    __share:
-        type: nfs
-        config:
-          hosts: "{{ groups['backup'] | map('extract', hostvars, 'ansible_host') + [ hostvars['desktop'].ansible_host, hostvars['dresrv'].ansible_host ] }}"
-          alldirs: true
-          ro: false
-          quiet: false
-          maproot_user: root
-          maproot_group: wheel
-          enabled: true
-
-    truenas_update_nfs: false
-    truenas_sharing: []
   pre_tasks:
     - name: Prepare shares
       set_fact:
-        truenas_sharing: "{{ truenas_sharing + [ __share | combine({ 'config': {'paths': [item]} }, recursive=true) ] }}"
-      loop:
-        - "/mnt/tank"
-        - "/mnt/tank/archive"
-        - "/mnt/tank/backup"
-        - "/mnt/tank/borg"
-        - "/mnt/tank/downloads"
-        - "/mnt/tank/games"
-        - "/mnt/tank/media"
-        - "/mnt/tank/media/photo"
-        - "/mnt/tank/media/motion"
-        - "/mnt/tank/yes"
+        truenas_config_sharing_nfs: "{{ paths | create_nfs_models(hosts, kwargs=kwargs, shares=truenas_config_sharing_nfs) }}"
+      vars:
+        paths:
+          - "/mnt/tank"
+          - "/mnt/tank/archive"
+          - "/mnt/tank/backup"
+          - "/mnt/tank/borg"
+          - "/mnt/tank/downloads"
+          - "/mnt/tank/games"
+          - "/mnt/tank/media"
+          - "/mnt/tank/media/photo"
+          - "/mnt/tank/media/motion"
+          - "/mnt/tank/yes"
+        hosts: "{{ groups['backup'] | map('extract', hostvars, 'ansible_host') + [ hostvars['desktop'].ansible_host, hostvars['dresrv'].ansible_host ] }}"
+        kwargs:
+          maproot_user: root
+          maproot_group: wheel
       tags: ["nfs"]
 
-  roles:
-    - role: truenas_nfs
-      delegate_to: localhost
-      tags: ["nfs"]
+  tasks:
+    - name: Configure NFS shares
+      spatiumcepa.truenas.truenas_api_sharing_nfs:
+        model: "{{ item.model }}"
+        state: "{{ item.state | default('present') }}"
+      loop: "{{ truenas_config_sharing_nfs }}"

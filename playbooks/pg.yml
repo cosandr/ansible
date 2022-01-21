@@ -2,23 +2,22 @@
 
 - hosts: truenas
   gather_facts: false
-  roles:
-    - role: truenas_nfs
-      delegate_to: localhost
-      vars:
-        truenas_update_nfs: false
-        truenas_sharing:
-          - type: nfs
-            config:
-              paths: ["/mnt/tank/backup/pgsql"]
-              hosts: "{{ groups['pg'] | map('extract', hostvars, 'ansible_host') }}"
-              alldirs: true
-              ro: false
-              quiet: false
-              maproot_user: root
-              maproot_group: wheel
-              enabled: true
-      tags: ["nfs"]
+  vars:
+    pg_share:
+      paths: ["/mnt/tank/backup/pgsql"]
+      comment: ""
+      hosts: "{{ groups['pg'] | map('extract', hostvars, 'ansible_host') }}"
+      alldirs: true
+      ro: false
+      quiet: false
+      maproot_user: root
+      maproot_group: wheel
+      enabled: true
+  tasks:
+    - name: Configure PSQL backup share
+      spatiumcepa.truenas.truenas_api_sharing_nfs:
+        model: "{{ pg_share }}"
+        state: present
 
 - hosts: pg
   gather_facts: true
