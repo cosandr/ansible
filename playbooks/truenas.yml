@@ -1,0 +1,40 @@
+---
+
+- name: Create NFS share on TrueNAS
+  hosts: truenas
+  gather_facts: false
+  vars:
+    __share:
+        type: nfs
+        config:
+          hosts: "{{ groups['backup'] | map('extract', hostvars, 'ansible_host') + [ hostvars['desktop'].ansible_host, hostvars['dresrv'].ansible_host ] }}"
+          alldirs: true
+          ro: false
+          quiet: false
+          maproot_user: root
+          maproot_group: wheel
+          enabled: true
+
+    truenas_update_nfs: false
+    truenas_sharing: []
+  pre_tasks:
+    - name: Prepare shares
+      set_fact:
+        truenas_sharing: "{{ truenas_sharing + [ __share | combine({ 'config': {'paths': [item]} }, recursive=true) ] }}"
+      loop:
+        - "/mnt/tank"
+        - "/mnt/tank/archive"
+        - "/mnt/tank/backup"
+        - "/mnt/tank/borg"
+        - "/mnt/tank/downloads"
+        - "/mnt/tank/games"
+        - "/mnt/tank/media"
+        - "/mnt/tank/media/photo"
+        - "/mnt/tank/media/motion"
+        - "/mnt/tank/yes"
+      tags: ["nfs"]
+
+  roles:
+    - role: truenas_nfs
+      delegate_to: localhost
+      tags: ["nfs"]

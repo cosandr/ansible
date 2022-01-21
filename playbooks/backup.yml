@@ -1,27 +1,6 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- name: Create NFS share on TrueNAS
-  hosts: truenas
-  gather_facts: false
-  vars:
-    truenas_update_nfs: false
-    truenas_sharing:
-      - type: nfs
-        config:
-          paths: ["/mnt/tank/borg/repos"]
-          hosts: "{{ groups['backup'] | map('extract', hostvars, 'ansible_host') }}"
-          alldirs: true
-          ro: false
-          quiet: false
-          maproot_user: root
-          maproot_group: wheel
-          enabled: true
-  roles:
-    - role: truenas_nfs
-      delegate_to: localhost
-      tags: ["nfs"]
-
 - name: Prepare target hosts group
   hosts: all
   become: false
