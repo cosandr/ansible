@@ -15,6 +15,9 @@ networkd_config:
       [Match]
       Type=wlan
 
+      [Link]
+      RequiredForOnline=no
+
       [Network]
       DHCP=yes
       IPForward=yes

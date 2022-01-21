@@ -17,7 +17,7 @@ xorg_conf_d:
 
 kernels:
   - "linux-lts"
-  - "linux-zen"
+  - "linux"
 
 sbctl_enroll: false
 sbctl_enroll_microsoft: true
@@ -25,18 +25,16 @@ sbctl_ucode: "amd-ucode.img"
 kernel_params: "root=/dev/mapper/root rootflags=subvol=@ nmi_watchdog=0 nvidia-drm.modeset=1 systemd.unified_cgroup_hierarchy=0"
 
 efi_labels:
-  linux-zen: "Arch Linux Zen"
+  linux: "Arch Linux"
   linux-lts: "Arch Linux LTS"
 
 mkinitcpio_no_fallback: "{{ kernels }}"
 
 network_manager: "systemd-networkd"
-networkd_config:
-  - wired: |
-      [Match]
-      Name=en*
-
-      [Network]
-      DHCP=yes
 
 boot_loader: "refind"
+
+sbctl_sign_files:
+  - "/boot/vmlinuz-linux"
+  - "/boot/vmlinuz-linux-lts"
+  - "/boot/EFI/Boot/bootx64.efi"
