@@ -27,7 +27,7 @@
 {%     set create_nfs_paths = [] %}
 {%     set update_nfs_paths = [] %}
 {%     for path in share['config']['paths'] %}
-{%       if path not in existing_nfs_paths %}
+{%       if (path not in existing_nfs_paths) or share.get('force_create', false) %}
 {%         set _ = create_nfs_paths.append(path) %}
 {%       else %}
 {%         set _ = update_nfs_paths.append(path) %}
