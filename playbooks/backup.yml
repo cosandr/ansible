@@ -19,8 +19,19 @@
 
 - name: Setup borg on target hosts
   become: true
+  gather_facts: false
   hosts: backup_hosts
   pre_tasks:
+    - name: Run common role
+      become: false
+      import_role:
+        name: common
+      tags: ["always"]
+
+    - name: Gather facts
+      setup:
+      tags: ["always"]
+
     - name: Generate SSH keys for root user
       openssh_keypair:
         path: /root/.ssh/id_ed25519
