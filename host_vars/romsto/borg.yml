@@ -1,0 +1,5 @@
+---
+
+borg_user: "andrei"
+borg_pool: "/mnt/user/backup/borg"
+borg_remote_repo: "ssh://{{ borg_user }}@{{ wireguard_ip }}{{ borg_pool }}"

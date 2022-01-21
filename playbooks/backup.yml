@@ -13,7 +13,6 @@
         group: backup_hosts
       loop: "{{ groups['all'] }}"
       when:
-        - not (hostvars[item].borg_server | default(false))
         - hostvars[item].borg_backups is defined
         - hostvars[item].borg_backups | length > 0
       tags: ["always"]
@@ -51,6 +50,7 @@
 
   roles:
     - role: borg
+      when: not (borg_server | default(false))
       tags: ["borg"]
 
 - name: Setup borg on backup server
@@ -61,7 +61,9 @@
       set_fact:
         borg_auth_users: "{{ borg_auth_users + [{ 'host': item, 'key': hostvars[item].__ssh_key.public_key }] }}"
       loop: "{{ groups['backup_hosts'] }}"
-      when: hostvars[item].__ssh_key is defined
+      when:
+        - hostvars[item].__ssh_key is defined
+        - item != inventory_hostname
       tags: ["ssh"]
 
     - name: Create borg home
@@ -73,11 +75,20 @@
         state: directory
       tags: ["nfs", "borg"]
 
+    - name: Mount tank NFS share
+      mount:
+        src: "{{ home_net.vm.cidr | ipaddr('2') | ipaddr('address') }}:/mnt/tank"
+        path: "/mnt/tank"
+        opts: "defaults,vers=4,ro,noatime"
+        state: mounted
+        fstype: nfs
+      tags: ["nfs"]
+
     - name: Mount Borg NFS share
       mount:
         src: "{{ home_net.vm.cidr | ipaddr('2') | ipaddr('address') }}:/mnt/tank/borg/repos"
         path: "{{ borg_pool }}"
-        opts: "defaults,vers=4"
+        opts: "defaults,vers=4,rw,noatime"
         state: mounted
         fstype: nfs
       tags: ["nfs"]

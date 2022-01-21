@@ -5,7 +5,7 @@ borg_backups:
     timer_description: "Backup Nextcloud every midnight"
     oncalendar: "*-*-* 00:00:00"
     passphrase: "{{ hostvars['backup01'].borg_server_passphrase }}"
-    repo: "ssh://backup@{{ hostvars['backup01'].ansible_host }}{{ hostvars['backup01'].borg_pool }}/{{ ansible_hostname }}"
+    repo: "{{ hostvars['backup01'].borg_remote_repo }}/{{ ansible_hostname }}"
     backup_name: "nextcloud"
     paths:
       - "/var/www/html/nextcloud"

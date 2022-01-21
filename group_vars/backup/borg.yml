@@ -1,14 +1,55 @@
 ---
 
+borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
+
+borg_user: "backup"
 borg_uid: 1002
 borg_gid: 1002
-borg_create_home: no
-borg_home: /home/backup
+borg_create_home: false
+borg_home: "/home/{{ borg_user }}"
 borg_pool: "{{ borg_home }}/repos"
-borg_local_repo: yes
-borg_server: yes
+borg_local_repo: false
+borg_server: true
 borg_auth_users:
   - host: desktop
     key: "{{ hostvars.desktop.ssh_keys.root }}"
   - host: rtv
     key: "{{ hostvars.romsto.ssh_keys.root }}"
+
+# Convenience variable for other hosts
+borg_remote_repo: "ssh://{{ borg_user }}@{{ ansible_host }}{{ borg_pool }}"
+
+borg_backups:
+  - name: "remote-tank"
+    timer_description: "Backup tank to remote location every 30 days"
+    oncalendar: "*-*-01/30 00:00:00"
+    passphrase: "{{ borg_remote_tank_passphrase }}"
+    repo: "{{ hostvars['romsto'].borg_remote_repo }}/{{ ansible_hostname }}/tank"
+    backup_name: "tank"
+    pre_run: |
+      if ! grep -q '/mnt/tank' /proc/mounts; then
+          echo "/mnt/tank is not mounted, cannot continue"
+          exit 1
+      fi
+      if ! ssh -q -o "BatchMode=yes" {{ hostvars['romsto'].borg_user }}@{{ hostvars['romsto'].wireguard_ip }} exit &>/dev/null
+      then
+          echo "Cannot SSH into remote server"
+          exit 1
+      fi
+      cd /mnt/tank
+    post_run: |
+      cd /
+    paths:
+      - "."
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--exclude-caches"
+      - "--exclude '**/.snapshots'"
+      - "--remote-ratelimit 20000"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-monthly 3"
+      - "--keep-yearly 2"

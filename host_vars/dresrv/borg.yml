@@ -1,13 +1,9 @@
 ---
 borg_remote_passphrase: "{{ vault_borg_remote_passphrase }}"
-borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
 borg_server_passphrase: "{{ hostvars['backup01'].borg_server_passphrase }}"
 
-borg_create_home: no
-borg_home: /home/backup
-borg_pool: "{{ borg_home }}/repos"
-borg_local_repo: yes
-borg_server: yes
+borg_local_repo: false
+borg_server: false
 borg_auth_users:
   - host: desktop
     key: "{{ hostvars.desktop.ssh_keys.root }}"
@@ -18,8 +14,14 @@ borg_backups:
     timer_description: "Backup root every Friday at 22:00"
     oncalendar: "Fri *-*-* 22:00:00"
     passphrase: "{{ borg_server_passphrase }}"
-    repo: "{{ borg_home }}/repos/{{ ansible_hostname }}"
+    repo: "{{ hostvars['backup01'].borg_remote_repo }}/{{ ansible_hostname }}"
     backup_name: "root"
+    pre_run: |
+      if ! ssh -q -o "BatchMode=yes" {{ hostvars['backup01'].borg_user }}@{{ hostvars['backup01'].ansible_host }} exit &>/dev/null
+      then
+          echo "Cannot SSH into remote server"
+          exit 1
+      fi
     paths:
       - "/"
       - "/boot"
@@ -48,10 +50,10 @@ borg_backups:
     timer_description: "Backup root to remote location every 7 days at 04:00"
     oncalendar: "*-*-01/7 04:00:00"
     passphrase: "{{ borg_remote_passphrase }}"
-    repo: "ssh://{{ my_user }}@{{ hostvars.romsto.ddns_domain }}:{{ hostvars.romsto.ssh_port }}/mnt/user/backup/borg/{{ ansible_hostname }}/root"
+    repo: "{{ hostvars['romsto'].borg_remote_repo }}/{{ ansible_hostname }}/root"
     backup_name: "root"
     pre_run: |
-      if ! ssh -q -o "BatchMode=yes" {{ my_user }}@{{ hostvars.romsto.ddns_domain }} -p {{ hostvars.romsto.ssh_port }} exit &>/dev/null
+      if ! ssh -q -o "BatchMode=yes" {{ hostvars['romsto'].borg_user }}@{{ hostvars['romsto'].wireguard_ip }} exit &>/dev/null
       then
           echo "Cannot SSH into remote server"
           exit 1
@@ -94,36 +96,3 @@ borg_backups:
       - "--show-rc"
       - "--keep-weekly 3"
       - "--keep-monthly 6"
-  - name: "remote-tank"
-    timer_description: "Backup tank to remote location every 30 days"
-    oncalendar: "*-*-01/30 00:00:00"
-    passphrase: "{{ borg_remote_tank_passphrase }}"
-    repo: "ssh://{{ my_user }}@{{ hostvars.romsto.ddns_domain }}:{{ hostvars.romsto.ssh_port }}/mnt/user/backup/borg/{{ ansible_hostname }}/tank"
-    backup_name: "tank"
-    pre_run: |
-      if ! grep -q '/tank' /proc/mounts; then
-          echo "/tank is not mounted, cannot continue"
-          exit 1
-      fi
-      if ! ssh -q -o "BatchMode=yes" {{ my_user }}@{{ hostvars.romsto.ddns_domain }} -p {{ hostvars.romsto.ssh_port }} exit &>/dev/null
-      then
-          echo "Cannot SSH into remote server"
-          exit 1
-      fi
-      cd /tank
-    post_run: |
-      cd /
-    paths:
-      - "."
-    create_args:
-      - "--stats"
-      - "--show-rc"
-      - "--compression auto,zstd"
-      - "--exclude-caches"
-      - "--exclude '**/.snapshots'"
-      - "--remote-ratelimit 20000"
-    prune_args:
-      - "--list"
-      - "--show-rc"
-      - "--keep-monthly 3"
-      - "--keep-yearly 2"

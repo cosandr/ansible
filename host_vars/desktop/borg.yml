@@ -1,14 +1,15 @@
 ---
-borg_server: no
+
+borg_server: false
 borg_backups:
   - name: "root"
     timer_description: "Backup root to server every 7 days at 20:00"
     oncalendar: "*-*-01/7 20:00:00"
     passphrase: "{{ borg_desktop_passphrase }}"
-    repo: "{{ borg_user }}@{{ hostvars.dresrv.ansible_host }}:arch"
+    repo: "{{ hostvars['backup01'].borg_remote_repo }}/{{ ansible_hostname }}/arch"
     backup_name: "{{ ansible_hostname }}"
     pre_run: |
-      if ! ssh -q -o "BatchMode=yes" {{ borg_user }}@{{ hostvars.dresrv.ansible_host }} exit &>/dev/null
+      if ! ssh -q -o "BatchMode=yes" {{ hostvars['backup01'].borg_user }}@{{ hostvars['backup01'].ansible_host }} exit &>/dev/null
       then
           echo "Cannot SSH into remote server"
           exit 1
@@ -41,10 +42,10 @@ borg_backups:
     timer_description: "Backup windows to server every 3 days at 21:00"
     oncalendar: "*-*-01/3 21:00:00"
     passphrase: "{{ borg_desktop_passphrase }}"
-    repo: "{{ borg_user }}@{{ hostvars.dresrv.ansible_host }}:windows"
+    repo: "{{ hostvars['backup01'].borg_remote_repo }}/{{ ansible_hostname }}/windows"
     backup_name: "{{ ansible_hostname }}"
     pre_run: |
-      if ! ssh -q -o "BatchMode=yes" {{ borg_user }}@{{ hostvars.dresrv.ansible_host }} exit &>/dev/null
+      if ! ssh -q -o "BatchMode=yes" {{ hostvars['backup01'].borg_user }}@{{ hostvars['backup01'].ansible_host }} exit &>/dev/null
       then
           echo "Cannot SSH into remote server"
           exit 1
