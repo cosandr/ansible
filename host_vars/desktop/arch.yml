@@ -20,6 +20,7 @@ kernels:
   - "linux-zen"
 
 sbctl_enroll: false
+sbctl_enroll_microsoft: true
 sbctl_ucode: "amd-ucode.img"
 kernel_params: "root=/dev/mapper/root rootflags=subvol=@ nmi_watchdog=0 nvidia-drm.modeset=1 systemd.unified_cgroup_hierarchy=0"
 
