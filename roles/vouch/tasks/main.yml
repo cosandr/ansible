@@ -1,12 +1,10 @@
 ---
-- block:
-  - include: download.yml
-    tags: ["install"]
 
-  - include: install.yml
-    become: true
-    tags: ["install"]
+- include_tasks: download.yml
+  tags: ["install"]
 
-  - include: configure.yml
-    tags: ["configure"]
-  become: true
+- include_tasks: install.yml
+  tags: ["install"]
+
+- include_tasks: configure.yml
+  tags: ["configure"]

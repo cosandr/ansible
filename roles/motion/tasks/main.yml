@@ -1,12 +1,10 @@
 ---
 
-- include: install-pi.yml
-  become: true
+- include_tasks: install-pi.yml
   when: motion_is_rpi
   tags: ["install"]
 
 - name: install Motion
-  become: true
   package:
     name: motion
     state: present
@@ -18,7 +16,6 @@
     motion_config: "{{ motion_default_config | combine(motion_config, recursive=true) }}"
 
 - name: Ensure {{ motion_script_dir }} exists
-  become: true
   file:
     path: "{{ motion_script_dir }}"
     mode: 0755
@@ -26,7 +23,6 @@
   check_mode: false
 
 - name: Copy scripts
-  become: true
   copy:
     src: "{{ item }}"
     dest: "{{ motion_script_dir }}/{{ item }}"
@@ -37,7 +33,6 @@
   when: motion_scripts | length > 0
 
 - name: Ensure motion runs as daemon
-  become: true
   lineinfile:
     path: "{{ motion_sysconfig_file }}"
     regexp: '^\s*start_motion_daemon'
@@ -46,7 +41,6 @@
     create: true
 
 - name: Copy config file
-  become: true
   template:
     src: "motion.conf.j2"
     dest: "{{ motion_config_file }}"

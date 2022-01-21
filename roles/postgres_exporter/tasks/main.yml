@@ -1,16 +1,13 @@
 ---
-- include: install.yml
-  become: true
+- include_tasks: install.yml
   when:
     - not postgres_exporter_skip_install
   tags: ["install"]
 
-- include: configure.yml
-  become: true
+- include_tasks: configure.yml
   tags: ["configure"]
 
 - name: ensure postgres_exporter service is started and enabled
-  become: true
   systemd:
     daemon_reload: true
     name: postgres_exporter

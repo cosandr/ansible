@@ -1,11 +1,9 @@
 ---
-- include: install.yml
-  become: true
+- include_tasks: install.yml
   when:
     - not netclient_skip_install
   tags: ["install"]
 
-- include: configure.yml
-  become: true
+- include_tasks: configure.yml
   when: netclient_daemon
   tags: ["configure"]

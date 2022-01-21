@@ -1,12 +1,10 @@
 ---
-- include: install.yml
-  become: true
+- include_tasks: install.yml
   when:
     - not nginx_exporter_skip_install
   tags: ["install"]
 
-- include: configure.yml
-  become: true
+- include_tasks: configure.yml
   tags: ["configure"]
 
 - name: ensure nginx_exporter service is started and enabled
