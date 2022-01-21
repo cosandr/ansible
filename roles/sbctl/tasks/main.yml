@@ -1,7 +1,6 @@
 ---
 
 - name: Write kernel parameters to {{ sbctl_cmdline }}
-  become: true
   copy:
     dest: "{{ sbctl_cmdline }}"
     owner: root
@@ -10,20 +9,17 @@
     content: "{{ kernel_params }}"
 
 - name: Install sbctl
-  become: true
   pacman:
     name: sbctl
     state: present
   tags: ["install"]
 
 - name: Create keys
-  become: true
   command: "sbctl create-keys"
   args:
     creates: /usr/share/secureboot/GUID
 
 - name: Enroll keys
-  become: true
   command: "sbctl enroll-keys {% if sbctl_enroll_microsoft %}--microsoft{% endif %}"
   args:
     # https://github.com/Foxboron/sbctl/blob/32ac2678342aab8233ee887ea73cc781e907f86a/util.go#L73
@@ -33,7 +29,6 @@
   tags: ["enroll"]
 
 - name: Ensure {{ esp_mount }}/EFI/Linux exists
-  become: true
   file:
     path: "{{ esp_mount }}/EFI/Linux"
     state: directory
@@ -42,7 +37,6 @@
     mode: 0755
 
 - name: Bundle kernels
-  become: true
   command: >
     sbctl bundle -s
     -i {{ boot_mount }}/{{ sbctl_ucode }}
@@ -55,9 +49,15 @@
     creates: "{{ esp_mount }}/EFI/Linux/{{ item }}.efi"
   with_items: "{{ kernels }}"
 
+- name: Sign files
+  command: "sbctl sign -s {{ item }}"
+  register: __sbctl_sign
+  changed_when: "'already been signed' not in __sbctl_sign.stdout"
+  loop: "{{ sbctl_sign_files }}"
+
 - name: Sign all
-  become: true
   command: "sbctl sign-all -g"
+  changed_when: false
 
 - name: Add entries in EFI
   include_role:
