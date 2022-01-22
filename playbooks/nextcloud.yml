@@ -15,6 +15,15 @@
       notify: reload firewalld
       tags: ["firewalld"]
 
+    - name: Allow Prometheus to node exporter
+      firewalld:
+        zone: public
+        rich_rule: rule family=ipv4 source address={{ hostvars['prom01'].ansible_host }} port port={{ node_exporter_port }} protocol=tcp accept
+        permanent: true
+        state: enabled
+      notify: reload firewalld
+      tags: ["node_exporter"]
+
     - name: Install rclone
       dnf:
         name: rclone
@@ -35,6 +44,9 @@
 
     - role: systemd
       tags: ["systemd", "rclone"]
+
+    - role: node_exporter
+      tags: ["node_exporter"]
 
   handlers:
     - name: reload firewalld
