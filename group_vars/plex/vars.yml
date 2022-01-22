@@ -1,0 +1,15 @@
+---
+
+provisioned_disks:
+  - dev: "/dev/sdb"
+    vols:
+      - name: plex
+        path: "/var/lib/plexmediaserver"
+        shrink: false
+        size: "100%FREE"
+
+plex_uid: 1005
+plex_port: 32400
+
+webgw_ports:
+  - "{{ plex_port }}"

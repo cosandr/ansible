@@ -1,0 +1,81 @@
+{{ ansible_managed | comment }}
+{% if nginx_upstreams | selectattr('name', 'search', 'plex') %}
+{% set domain = domains[4] %}
+server {
+    listen 80;
+    listen [::]:80;
+    server_name plex.{{ domain }};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name plex.{{ domain }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+    ssl_dhparam {{ nginx_dhparam }};
+
+    access_log {{ nginx_sites_logs }}/access-plex.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-plex.{{ domain }}.log {{ nginx_error_log_options }};
+
+    client_max_body_size 500M;
+    send_timeout 100m;
+
+    ssl_session_cache builtin:1000 shared:SSL:10m;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers 'TLS-CHACHA20-POLY1305-SHA256:TLS-AES-256-GCM-SHA384:TLS-AES-128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    # For LetsEncrypt/Certbot, you can get your chain like this: https://esham.io/2016/01/ocsp-stapling
+    ssl_trusted_certificate /etc/letsencrypt/live/{{ domain }}/chain.pem;
+
+    add_header Strict-Transport-Security max-age=15768000;
+    add_header Referrer-Policy strict-origin-when-cross-origin;
+    add_header X-Frame-Options deny;
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header Permissions-Policy "geolocation=(self), midi=(self), sync-xhr=(self), microphone=(self), camera=(self), magnetometer=(self), gyroscope=(self), fullscreen=(self), payment=(self)";
+    # Pay attention to how many domains we need to allow
+    add_header Content-Security-Policy "default-src 'none'; base-uri 'self' plex.domain.com; font-src 'self' data: plex.domain.com; media-src 'self' data: blob: plex.domain.com https://*.plex.direct:32400 https://video.internetvideoarchive.net https://*.cloudfront.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' domain.com plex.domain.com; style-src 'self' 'unsafe-inline' plex.domain.com; img-src 'self' data: blob: https: plex.domain.com; worker-src * blob:; frame-src 'self'; connect-src 'self' https: domain.com plex.domain.com wss://*.plex.direct:32400 wss://pubsub.plex.tv; object-src 'self' plex.domain.com; frame-ancestors 'self' domain.com plex.domain.com; form-action 'self' plex.domain.com; manifest-src 'self' plex.domain.com; script-src-elem 'self' 'unsafe-inline' domain.com plex.domain.com www.gstatic.com";
+
+    # gzip source: https://github.com/toomuchio/plex-nginx-reverseproxy/blob/master/nginx.conf
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1000;
+    gzip_proxied any;
+    gzip_types text/plain text/css text/xml application/xml text/javascript application/x-javascript image/svg+xml;
+    gzip_disable "MSIE [1-6]\.";
+
+    # Forward real ip and host to Plex
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+
+    # If not using ngx_http_realip_module change '$http_x_forwarded_for,$realip_remote_addr' to $proxy_add_x_forwarded_for
+    proxy_set_header X-Forwarded-For '$proxy_add_x_forwarded_for,$realip_remote_addr';
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Sec-WebSocket-Extensions $http_sec_websocket_extensions;
+    proxy_set_header Sec-WebSocket-Key $http_sec_websocket_key;
+    proxy_set_header Sec-WebSocket-Version $http_sec_websocket_version;
+
+    # Disables compression between Plex and Nginx, required if using sub_filter below.
+    # May also improve loading time by a very marginal amount, as nginx will compress anyway.
+    #proxy_set_header Accept-Encoding "";
+
+    # Buffering off send to the client as soon as the data is received from Plex.
+    proxy_redirect off;
+    proxy_buffering off;
+
+    location / {
+        proxy_pass http://plex/;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_ssl_verify off;
+        proxy_http_version 1.1;
+        proxy_set_header Host $http_host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400;
+    }
+}
+{% endif %}

@@ -1,6 +1,6 @@
 ---
 
-- name: Create NFS share on TrueNAS
+- name: Create tank NFS shares
   hosts: truenas
   gather_facts: false
   pre_tasks:
@@ -23,7 +23,7 @@
         kwargs:
           maproot_user: root
           maproot_group: wheel
-      tags: ["nfs"]
+      tags: ["tank"]
 
   tasks:
     - name: Configure NFS shares
@@ -31,3 +31,61 @@
         model: "{{ item.model }}"
         state: "{{ item.state | default('present') }}"
       loop: "{{ truenas_config_sharing_nfs }}"
+      tags: ["tank"]
+
+- name: Create plex NFS shares
+  hosts: truenas
+  gather_facts: false
+  vars:
+    plex_paths:
+      - "/mnt/tank/media"
+      - "/mnt/tank/media/photo"
+      - "/mnt/tank/media/motion"
+  pre_tasks:
+    - name: Prepare shares
+      set_fact:
+        truenas_config_sharing_nfs: "{{ plex_paths | create_nfs_models(hosts, kwargs=kwargs, shares=truenas_config_sharing_nfs) }}"
+      vars:
+        hosts: "{{ groups['plex'] | map('extract', hostvars, 'ansible_host') }}"
+        kwargs:
+          ro: true
+          comment: 'Plex shares'
+      tags: ["plex", "nfs"]
+
+  tasks:
+    - name: Configure NFS shares
+      spatiumcepa.truenas.truenas_api_sharing_nfs:
+        model: "{{ item.model }}"
+        state: "{{ item.state | default('present') }}"
+      loop: "{{ truenas_config_sharing_nfs }}"
+      tags: ["plex", "nfs"]
+
+    - name: Create Plex group
+      spatiumcepa.truenas.truenas_api_group:
+        model:
+          name: plex
+          smb: false
+          gid: "{{ hostvars['plex01'].plex_uid }}"
+      tags: ["plex"]
+
+    - name: Create Plex user
+      spatiumcepa.truenas.truenas_api_user:
+        model:
+          username: plex
+          full_name: "Plex user"
+          smb: false
+          password_disabled: true
+          uid: "{{ hostvars['plex01'].plex_uid }}"
+          # It gets assigned the group that was created above
+          group_create: true
+      tags: ["plex"]
+
+    - name: Set plex ACLs
+      # acl module doesn't support recursive on BSD
+      command: "setfacl -R -m u:plex:rx:df:allow /mnt/tank/media"
+      vars:
+        ansible_connection: ssh
+        ansible_host: 10.0.10.2
+        ansible_user: root
+        ansible_python_interpreter: /usr/local/bin/python3
+      tags: ["plex", "acl"]

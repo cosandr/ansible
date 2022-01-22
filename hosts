@@ -25,6 +25,7 @@ localgw
 prom
 nextcloud
 backup
+plex
 
 [pg]
 pg01 ansible_host=10.0.10.11
@@ -55,3 +56,6 @@ nextcloud01 ansible_host=10.0.10.60 ansible_user=root
 
 [backup]
 backup01 ansible_host=10.0.10.8 ansible_user=root
+
+[plex]
+plex01 ansible_host=10.0.10.65 ansible_user=root

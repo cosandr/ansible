@@ -1,0 +1,97 @@
+---
+
+- hosts: plex
+  become: true
+  pre_tasks:
+    - name: Disable some default services
+      firewalld:
+        zone: "{{ item.zone }}"
+        service: "{{ item.service }}"
+        permanent: true
+        state: disabled
+      loop:
+        - zone: public
+          service: cockpit
+      notify: reload firewalld
+      tags: ["firewalld"]
+  roles:
+    - role: setup_disks
+      tags: ["disk"]
+
+    - role: cosandr.dnf_automatic
+      tags: ["dnf_automatic"]
+
+    - role: firewalld_webgw
+      tags: ["firewalld"]
+
+    - role: node_exporter
+      tags: ["node_exporter"]
+
+  tasks:
+    - name: Mount media share
+      mount:
+        src: "{{ home_net.vm.cidr | ipaddr('2') | ipaddr('address') }}:/mnt/tank/media"
+        path: "/tank/media"
+        opts: "defaults,vers=4,ro,noatime,noexec"
+        state: mounted
+        fstype: nfs
+      tags: ["nfs"]
+
+    - name: Allow Prometheus to node exporter
+      firewalld:
+        zone: public
+        rich_rule: rule family=ipv4 source address={{ hostvars['prom01'].ansible_host }} port port={{ node_exporter_port }} protocol=tcp accept
+        permanent: true
+        state: enabled
+      notify: reload firewalld
+      tags: ["node_exporter"]
+
+  handlers:
+    - name: reload firewalld
+      service:
+        name: firewalld
+        state: reloaded
+
+- name: Install Plex
+  hosts: plex
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Install repository
+      yum_repository:
+        name: PlexRepo
+        file: plex
+        description: PlexRepo
+        baseurl: https://downloads.plex.tv/repo/rpm/$basearch/
+        enabled: true
+        gpgkey: https://downloads.plex.tv/plex-keys/PlexSign.key
+        gpgcheck: true
+      tags: ["install", "plex"]
+
+    - name: Create Plex user
+      user:
+        name: plex
+        uid: "{{ plex_uid | default(1000) }}"
+      tags: ["install", "plex"]
+
+    - name: Ensure Plex data dir is owned by plex
+      file:
+        path: /var/lib/plexmediaserver
+        owner: plex
+        group: plex
+        mode: 0755
+        state: directory
+      tags: ["install", "plex"]
+
+    - name: Install Plex
+      dnf:
+        name: plexmediaserver
+        state: present
+      tags: ["install", "plex"]
+
+    - name: Enable and start plex
+      systemd:
+        name: plexmediaserver
+        enabled: true
+        state: started
+      tags: ["plex"]

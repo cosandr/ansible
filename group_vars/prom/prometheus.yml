@@ -104,6 +104,10 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ hostvars['nextcloud01'].inventory_hostname }}"
 
+      - targets: ["{{ hostvars['plex01'].ansible_host }}:{{ hostvars['plex01'].node_exporter_port }}"]
+        labels:
+          instance: "{{ hostvars['plex01'].inventory_hostname }}"
+
       - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].node_exporter_port }}"]
         labels:
           instance: "{{ drepi_label }}"
