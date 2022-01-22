@@ -1,7 +1,7 @@
 ---
 
 certbot_email: "{{ vault_certbot_email }}"
-certbot_extra_pkgs: ["certbot-dns-hetzner"]
+certbot_extra_pkgs: ["certbot-dns-hetzner", "certbot-dns-cloudflare"]
 certbot_domains:
   - "{{ domains[0] }},*.{{ domains[0] }}"
   - "{{ domains[1] }},*.{{ domains[1] }}"
