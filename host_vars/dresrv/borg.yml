@@ -64,7 +64,6 @@ borg_backups:
         "/srv"
         "/var"
         "/home"
-        "/srv/vm"
       )
       mkdir -p /.snapshots/borg_tmp
       cd /.snapshots/borg_tmp

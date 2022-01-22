@@ -70,7 +70,7 @@
   pre_tasks:
     - name: Append hosts
       set_fact:
-        borg_auth_users: "{{ borg_auth_users + [{ 'host': item, 'key': hostvars[item].__ssh_key.public_key }] }}"
+        borg_auth_users: "{{ borg_auth_users + [{ 'host': hostvars[item].ansible_hostname, 'key': hostvars[item].__ssh_key.public_key }] }}"
       loop: "{{ groups['backup_hosts'] }}"
       when:
         - hostvars[item].__ssh_key is defined
