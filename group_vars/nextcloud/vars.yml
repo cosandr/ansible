@@ -12,3 +12,6 @@ nextcloud_port: 443
 nextcloud_proxies: "{{ proxy_hosts }}"
 nextcloud_domain: "nextcloud.{{ hostvars['webgw01'].domains[1] }}"
 nextcloud_server_name: "{{ nextcloud_domain }}"
+
+webgw_ports:
+  - "{{ nextcloud_port }}"

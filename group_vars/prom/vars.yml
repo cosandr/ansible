@@ -10,3 +10,6 @@ provisioned_disks:
         path: "/var/lib/prometheus"
         shrink: false
         size: "100%FREE"
+
+webgw_ports:
+  - "{{ grafana_port }}"

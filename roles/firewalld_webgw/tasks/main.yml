@@ -1,0 +1,26 @@
+---
+
+- name: Create webgw zone
+  firewalld:
+    zone: "{{ webgw_zone }}"
+    permanent: true
+    state: present
+  notify: reload firewalld
+
+- name: Add webgw sources
+  firewalld:
+    zone: "{{ webgw_zone }}"
+    source: "{{ hostvars[item].wireguard_ip | default(hostvars[item].ansible_host) }}"
+    permanent: true
+    state: enabled
+  loop: "{{ groups['webgw'] }}"
+  notify: reload firewalld
+
+- name: Allow ports to webgw zone
+  firewalld:
+    zone: "{{ webgw_zone }}"
+    port: "{{ item }}/tcp"
+    permanent: true
+    state: enabled
+  loop: "{{ webgw_ports }}"
+  notify: reload firewalld

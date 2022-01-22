@@ -2,47 +2,17 @@
 
 - hosts: nextcloud
   gather_facts: true
-  vars:
-    _webgw_zone: "0-webgw"
   pre_tasks:
-    - block:
-        - name: Disable some default services
-          firewalld:
-            zone: "{{ item.zone }}"
-            service: "{{ item.service }}"
-            permanent: true
-            state: disabled
-          loop:
-            - zone: public
-              service: cockpit
-          notify: reload firewalld
-
-        - name: Create webgw zone
-          firewalld:
-            zone: "{{ _webgw_zone }}"
-            permanent: true
-            state: present
-          notify: reload firewalld
-
-        - name: Add webgw sources
-          firewalld:
-            zone: "{{ _webgw_zone }}"
-            source: "{{ hostvars[item].wireguard_ip | default(hostvars[item].ansible_host) }}"
-            permanent: true
-            state: enabled
-          loop: "{{ groups['webgw'] }}"
-          notify: reload firewalld
-
-        - name: Allow ports to webgw zone
-          firewalld:
-            zone: "{{ _webgw_zone }}"
-            port: "{{ item }}/tcp"
-            permanent: true
-            state: enabled
-          loop:
-            - "{{ nextcloud_port }}"
-          notify: reload firewalld
-
+    - name: Disable some default services
+      firewalld:
+        zone: "{{ item.zone }}"
+        service: "{{ item.service }}"
+        permanent: true
+        state: disabled
+      loop:
+        - zone: public
+          service: cockpit
+      notify: reload firewalld
       tags: ["firewalld"]
 
     - name: Install rclone
@@ -57,11 +27,15 @@
     - role: cosandr.dnf_automatic
       tags: ["dnf_automatic"]
 
+    - role: firewalld_webgw
+      tags: ["firewalld"]
+
     - role: cosandr.nextcloud
       tags: ["nextcloud"]
 
     - role: systemd
       tags: ["systemd", "rclone"]
+
   handlers:
     - name: reload firewalld
       service:
