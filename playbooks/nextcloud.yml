@@ -44,6 +44,12 @@
           notify: reload firewalld
 
       tags: ["firewalld"]
+
+    - name: Install rclone
+      dnf:
+        name: rclone
+        state: present
+      tags: ["rclone"]
   roles:
     - role: setup_disks
       tags: ["disk"]
@@ -54,6 +60,8 @@
     - role: cosandr.nextcloud
       tags: ["nextcloud"]
 
+    - role: systemd
+      tags: ["systemd", "rclone"]
   handlers:
     - name: reload firewalld
       service:

@@ -1,0 +1,6 @@
+---
+
+systemd_script_install_path: "/usr/local/bin/systemd"
+
+systemd_units:
+  - "{{ __sd_backup_gdrive }}"

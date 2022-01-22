@@ -1,24 +1,24 @@
 {{ ansible_managed | comment }}
 {% if nginx_upstreams | selectattr('name', 'search', 'nextcloud') %}
-{% set domain = domains[1] %}
+{% set domain = domains[4] %}
 server {
     listen 80;
     listen [::]:80;
-    server_name nextcloud.{{ domain }};
+    server_name cloud.{{ domain }};
     return 301 https://$host$request_uri;
 }
 
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name nextcloud.{{ domain }};
+    server_name cloud.{{ domain }};
 
     ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
     ssl_dhparam {{ nginx_dhparam }};
 
-    access_log {{ nginx_sites_logs }}/access-nextcloud.{{ domain }}.log {{ nginx_access_log_options }};
-    error_log {{ nginx_sites_logs }}/error-nextcloud.{{ domain }}.log {{ nginx_error_log_options }};
+    access_log {{ nginx_sites_logs }}/access-cloud.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-cloud.{{ domain }}.log {{ nginx_error_log_options }};
 
     client_max_body_size 0;
 
