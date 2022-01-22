@@ -105,5 +105,8 @@
       tags: ["nfs"]
 
   roles:
+    - role: cosandr.dnf_automatic
+      tags: ["dnf_automatic"]
+
     - role: borg
       tags: ["borg"]
