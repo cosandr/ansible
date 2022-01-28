@@ -1,0 +1,78 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Prepare esxi groups
+  hosts: all
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Add managed guests
+      run_once: true
+      add_host:
+        name: "{{ item }}"
+        group: esxi
+      loop: "{{ groups['all_esxi'] }}"
+      when: "'all_guests' in ansible_run_tags or item in groups['servers']"
+      tags: ["always"]
+
+    - name: Add managed guests [manual]
+      run_once: true
+      add_host:
+        name: "{{ item }}"
+        group: esxi
+      loop:
+        - "DreSRV"
+        - "win-aquaero"
+      when: "'all_guests' not in ansible_run_tags"
+      tags: ["always"]
+
+- hosts: esxi
+  gather_facts: false
+  tasks:
+    - name: Set guest power state
+      delegate_to: localhost
+      community.vmware.vmware_guest:
+        hostname: "{{ hostvars['slb'].ansible_host }}"
+        username: "{{ hostvars['slb'].esxi_username }}"
+        password: "{{ hostvars['slb'].esxi_password }}"
+        validate_certs: false
+        uuid: "{{ vm_uuid }}"
+        state: "{{ 'poweredon' if _have_start else 'poweredoff' }}"
+      vars:
+        _have_start: "{{ 'start' in ansible_run_tags }}"
+        _have_stop: "{{ 'stop' in ansible_run_tags }}"
+      when: _have_start or _have_stop
+      tags: ["start", "stop"]
+
+- hosts: esxi_hosts
+  gather_facts: false
+  tasks:
+    - name: Mount NFS datastores
+      delegate_to: localhost
+      community.vmware.vmware_host_datastore:
+        hostname: '{{ ansible_host }}'
+        username: '{{ esxi_username }}'
+        password: '{{ esxi_password }}'
+        validate_certs: false
+        datastore_name: '{{ item.name }}'
+        datastore_type: 'nfs41'
+        nfs_server: '{{ item.server }}'
+        nfs_path: '{{ item.path }}'
+        nfs_ro: false
+        state: present
+      loop: "{{ nfs_datastores }}"
+      when: "'mount' in ansible_run_tags "
+      tags: ["mount"]
+
+    - name: Unmount NFS datastores
+      delegate_to: localhost
+      community.vmware.vmware_host_datastore:
+        hostname: '{{ ansible_host }}'
+        username: '{{ esxi_username }}'
+        password: '{{ esxi_password }}'
+        validate_certs: false
+        datastore_name: '{{ item.name }}'
+        state: absent
+      loop: "{{ nfs_datastores }}"
+      when: "'unmount' in ansible_run_tags "
+      tags: ["unmount"]

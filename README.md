@@ -12,30 +12,30 @@ Generate keys on the command line with `wg genkey | tee /dev/stderr | wg pubkey`
 pip install -U --user pyvmomi git+https://github.com/vmware/vsphere-automation-sdk-python.git
 ```
 
-Run with ansible with `-i home.vmware.yml`, e.g:
+Run with ansible with `-i vcenter.vmware.yml`, e.g:
 
 ```sh
-ansible-playbook -i home.vmware.yml playbooks/pg.yml
+ansible-playbook -i hosts -i vcenter.vmware.yml playbooks/pg.yml
 ```
 
-Example dynamic inventory
+Power on/off managed VMs
 
-```yml
-plugin: vmware_vm_inventory
-strict: False
-hostname: ""
-username: "administrator@vsphere.local"
-password: ""
-validate_certs: False
-with_tags: False
-hostnames:
-  - config.name
-filters:
-  - not config.template
-keyed_groups:
-  - key: tag_category.ansible_group
-    prefix: ""
-    separator: ""
+```sh
+# Power on
+ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -t start
+# Power off
+ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -t stop
+# Target all VMs
+ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -t stop,all_guests
+# All except TrueNAS
+ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -t stop,all_guests -l '!TrueNAS'
+```
+
+(un)mount NFS
+
+```sh
+# targetting one host
+ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -l slb -t mount
 ```
 
 ## GCP

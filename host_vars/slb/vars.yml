@@ -1,0 +1,17 @@
+---
+
+esxi_username: "{{ vault_esxi_username }}"
+esxi_password: "{{ vault_esxi_password }}"
+
+nfs_datastores:
+  - name: TrueNAS-VM
+    server: 172.16.200.20
+    path: /mnt/ssd/vm
+
+  - name: TrueNAS-Extra
+    server: 172.16.200.20
+    path: /mnt/extra/esxi
+
+  - name: TrueNAS-Disk-Images
+    server: 172.16.200.20
+    path: /mnt/tank/archive/disk-images
