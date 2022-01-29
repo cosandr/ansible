@@ -12,7 +12,7 @@
         name: "{{ item }}"
         group: esxi
       loop: "{{ groups['all_esxi'] }}"
-      when: "'all_guests' in ansible_run_tags or item in groups['servers']"
+      when: "'all_guests' in ansible_run_tags or item.lower() in groups['servers']"
       tags: ["always"]
 
     - name: Add managed guests [manual]
@@ -21,7 +21,6 @@
         name: "{{ item }}"
         group: esxi
       loop:
-        - "DreSRV"
         - "win-aquaero"
       when: "'all_guests' not in ansible_run_tags"
       tags: ["always"]
@@ -37,7 +36,7 @@
         password: "{{ hostvars['slb'].esxi_password }}"
         validate_certs: false
         uuid: "{{ vm_uuid }}"
-        state: "{{ 'poweredon' if _have_start else 'poweredoff' }}"
+        state: "{{ 'poweredon' if _have_start else 'shutdownguest' }}"
       vars:
         _have_start: "{{ 'start' in ansible_run_tags }}"
         _have_stop: "{{ 'stop' in ansible_run_tags }}"
