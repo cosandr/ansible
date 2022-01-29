@@ -253,6 +253,13 @@ prometheus_alert_rules:
       severity: critical
     annotations:
       summary: '{% raw %}Sensor {{ $labels.instance }} in room {{ $labels.room }} down{% endraw %}'
+  - alert: BmeSensorDown
+    expr: '(time() - push_time_seconds{exported_job="bme"}) > 120'
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: '{% raw %}Sensor {{ $labels.exported_instance }} in room {{ $labels.room }} down{% endraw %}'
   - alert: NodeFilesystemSpaceFillingUp
     annotations:
       description: '{% raw %}Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available space left and is filling up.{% endraw %}'
