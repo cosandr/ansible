@@ -60,15 +60,12 @@ prometheus_scrape_configs:
         labels:
           instance: "{{ drepi_label }}"
 
-      - targets: ["10.0.50.53:80"]
-        labels:
-          instance: "dht03"
-          room: "Living Room"
-
-      - targets: ["10.0.50.54:80"]
-        labels:
-          instance: "dht04"
-          room: "Bedroom"
+  - job_name: "bme"
+    static_configs:
+      - targets:
+          - "10.0.50.51:80"
+          - "10.0.50.54:80"
+          - "10.0.50.55:80"
 
   - job_name: "node"
     static_configs:
