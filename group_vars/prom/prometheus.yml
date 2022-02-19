@@ -17,6 +17,25 @@ prometheus_alertmanager_config:
   - scheme: http
     static_configs:
       - targets: ["localhost:{{ alertmanager_web_listen_address.split(':')[1] }}"]
+
+prometheus_node_static_config:
+  - targets: ["localhost:{{ node_exporter_port }}"]
+    labels:
+      instance: "{{ inventory_hostname }}"
+
+  - targets: ["{{ __dresrv.ansible_host }}:{{ __dresrv.node_exporter_port }}"]
+    labels:
+      instance: "{{ server_label }}"
+
+  - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].node_exporter_port }}"]
+    labels:
+      instance: "{{ desktop_label }}"
+
+  - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].node_exporter_port }}"]
+    labels:
+      instance: "{{ drepi_label }}"
+      __metrics_path__: /metrics
+
 prometheus_scrape_configs:
   - job_name: "alertmanager"
     static_configs:
@@ -68,47 +87,7 @@ prometheus_scrape_configs:
           - "10.0.50.55:80"
 
   - job_name: "node"
-    static_configs:
-      - targets: ["localhost:{{ node_exporter_port }}"]
-        labels:
-          instance: "{{ inventory_hostname }}"
-
-      - targets: ["{{ __dresrv.ansible_host }}:{{ __dresrv.node_exporter_port }}"]
-        labels:
-          instance: "{{ server_label }}"
-
-      - targets: ["{{ hostvars['webgw01'].wireguard_ip }}:{{ hostvars['webgw01'].node_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['webgw01'].inventory_hostname }}"
-
-      - targets: ["{{ hostvars['localgw01'].ansible_host }}:{{ hostvars['localgw01'].node_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['localgw01'].inventory_hostname }}"
-
-      - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].node_exporter_port }}"]
-        labels:
-          instance: "{{ desktop_label }}"
-
-      - targets: ["{{ hostvars['pg01'].ansible_host }}:{{ hostvars['pg01'].node_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['pg01'].inventory_hostname }}"
-
-      - targets: ["{{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].node_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['gitlab01'].inventory_hostname }}"
-
-      - targets: ["{{ hostvars['nextcloud01'].ansible_host }}:{{ hostvars['nextcloud01'].node_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['nextcloud01'].inventory_hostname }}"
-
-      - targets: ["{{ hostvars['plex01'].ansible_host }}:{{ hostvars['plex01'].node_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['plex01'].inventory_hostname }}"
-
-      - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].node_exporter_port }}"]
-        labels:
-          instance: "{{ drepi_label }}"
-          __metrics_path__: /metrics
+    static_configs: "{{ prometheus_node_static_config }}"
 
   - job_name: "aquaero"
     scrape_interval: 30s

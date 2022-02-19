@@ -108,5 +108,8 @@
     - role: cosandr.dnf_automatic
       tags: ["dnf_automatic"]
 
+    - role: node_exporter
+      tags: ["node_exporter"]
+
     - role: borg
       tags: ["borg"]

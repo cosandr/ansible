@@ -2,6 +2,12 @@
 
 - hosts: prom
   gather_facts: true
+  vars:
+    __exclude_auto_node:
+      - dresrv
+      - drepi
+      - romsto
+      - truenas
   pre_tasks:
     - block:
         - name: Disable some default services
@@ -53,6 +59,17 @@
           - python3-pip
           - usbutils
         state: present
+
+    - name: Add servers to node scrape config
+      set_fact:
+        prometheus_node_static_config: "{{ prometheus_node_static_config + [tmp_dict] }}"
+      vars:
+        tmp_dict:
+          targets: ["{{ hostvars[item].wireguard_ip | default(hostvars[item].ansible_host) }}:{{ hostvars[item].node_exporter_port }}"]
+          labels:
+            instance: "{{ hostvars[item].inventory_hostname }}"
+      loop: "{{ groups['servers'] | difference(__exclude_auto_node) }}"
+      tags: ["prometheus"]
 
   roles:
     - role: setup_disks
