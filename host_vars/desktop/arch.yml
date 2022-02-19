@@ -15,20 +15,18 @@ xorg_conf_d:
         Option         "Coolbits" "28"
     EndSection
 
-kernels:
-  - "linux-lts"
-  - "linux"
+sbctl_bundles:
+  - kernel: linux
+    label: "Arch Linux"
+  - kernel: linux-lts
+    label: "Arch Linux LTS"
 
 sbctl_enroll: false
 sbctl_enroll_microsoft: true
 sbctl_ucode: "amd-ucode.img"
 kernel_params: "root=/dev/mapper/root rootflags=subvol=@ nmi_watchdog=0 nvidia-drm.modeset=1 systemd.unified_cgroup_hierarchy=0"
 
-efi_labels:
-  linux: "Arch Linux"
-  linux-lts: "Arch Linux LTS"
-
-mkinitcpio_no_fallback: "{{ kernels }}"
+mkinitcpio_no_fallback: "{{ sbctl_bundles | map(attribute='kernel') }}"
 
 network_manager: "systemd-networkd"
 

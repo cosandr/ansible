@@ -8,9 +8,6 @@ sbctl_enroll: true
 sbctl_enroll_microsoft: false
 sbctl_sign_files: []
 efistub_splash: "/usr/share/systemd/bootctl/splash-arch.bmp"
-
-kernels:
-  - linux
-
-efi_labels:
-  linux: "Arch Linux"
+sbctl_bundles:
+  - kernel: linux
+    label: "Arch Linux"
