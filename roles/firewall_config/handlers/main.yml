@@ -1,0 +1,11 @@
+---
+
+- name: reload firewalld
+  systemd:
+    name: firewalld
+    state: reloaded
+
+- name: reload ufw
+  systemd:
+    name: ufw
+    state: reloaded

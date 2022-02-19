@@ -1,0 +1,13 @@
+---
+
+- name: Detect firewall in use
+  include_tasks: detect.yml
+  when: not firewall_frontend
+
+- name: Configure firewalld
+  include_tasks: firewalld.yml
+  when: firewall_frontend == "firewalld"
+
+- name: Configure ufw
+  include_tasks: ufw.yml
+  when: firewall_frontend == "ufw"

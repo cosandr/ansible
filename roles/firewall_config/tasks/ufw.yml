@@ -1,0 +1,10 @@
+---
+
+- name: Add ufw rules
+  ufw:
+    direction: "{{ item.direction | default('in') }}"
+    rule: "{{ (item.state | default('present') == 'present') | ternary('allow', 'deny') }}"
+    src: "{{ item.source | default('any') }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.protocol | default('tcp') }}"
+  loop: "{{ firewall_rules }}"

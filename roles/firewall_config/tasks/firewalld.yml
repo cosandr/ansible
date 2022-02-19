@@ -1,0 +1,43 @@
+---
+
+- name: Create configured zones
+  firewalld:
+    zone: "{{ item.name }}"
+    permanent: true
+    state: present
+  notify: reload firewalld
+  loop: "{{ firewalld_zones }}"
+
+- name: flush handlers
+  meta: flush_handlers
+
+- name: Add zone sources
+  firewalld:
+    zone: "{{ item.name }}"
+    source: "{{ item.source | default(omit) }}"
+    interface: "{{ item.interface | default(omit) }}"
+    permanent: true
+    state: "{{ (item.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
+  notify: reload firewalld
+  loop: "{{ firewalld_zones }}"
+  when: item.source is defined or item.interface is defined
+
+- name: Configure simple firewalld rules
+  firewalld:
+    zone: "{{ item.zone | default('public') }}"
+    port: "{{ item.port }}/{{ item.protocol | default('tcp') }}"
+    permanent: true
+    state: "{{ (item.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
+  loop: "{{ firewall_rules }}"
+  notify: reload firewalld
+  when: item.source is not defined or item.source == 'any'
+
+- name: Configure rich firewalld rules
+  firewalld:
+    zone: "{{ item.zone | default('public') }}"
+    rich_rule: "rule family={{ item.family | default('ipv4') }} source address={{ item.source }} port port={{ item.port }} protocol={{ item.protocol | default('tcp') }} accept"
+    permanent: true
+    state: "{{ (item.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
+  loop: "{{ firewall_rules }}"
+  notify: reload firewalld
+  when: item.source is defined and item.source != 'any'

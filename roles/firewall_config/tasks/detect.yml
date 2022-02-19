@@ -1,0 +1,14 @@
+---
+
+- name: Gather service facts
+  service_facts:
+
+- name: Set frontend to firewalld
+  set_fact:
+    firewall_frontend: "firewalld"
+  when: ansible_facts.services.get('firewalld.service', {}).get('status', '') == 'enabled'
+
+- name: Set frontend to ufw
+  set_fact:
+    firewall_frontend: "ufw"
+  when: ansible_facts.services.get('ufw.service', {}).get('status', '') == 'enabled'
