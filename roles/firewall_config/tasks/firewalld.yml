@@ -7,20 +7,33 @@
     state: present
   notify: reload firewalld
   loop: "{{ firewalld_zones }}"
+  loop_control:
+    label: "{{ item.name }}"
 
 - name: flush handlers
   meta: flush_handlers
 
 - name: Add zone sources
   firewalld:
-    zone: "{{ item.name }}"
-    source: "{{ item.source | default(omit) }}"
-    interface: "{{ item.interface | default(omit) }}"
+    zone: "{{ item.0.name }}"
+    source: "{{ item.1 }}"
     permanent: true
-    state: "{{ (item.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
+    state: "{{ (item.0.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
   notify: reload firewalld
-  loop: "{{ firewalld_zones }}"
-  when: item.source is defined or item.interface is defined
+  loop: "{{ firewalld_zones | subelements('sources', skip_missing=True) }}"
+  loop_control:
+    label: "{{ item.0.name }} - {{ item.1 }}"
+
+- name: Add zone interfaces
+  firewalld:
+    zone: "{{ item.0.name }}"
+    interface: "{{ item.1 }}"
+    permanent: true
+    state: "{{ (item.0.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
+  notify: reload firewalld
+  loop: "{{ firewalld_zones | subelements('interfaces', skip_missing=True) }}"
+  loop_control:
+    label: "{{ item.0.name }} - {{ item.1 }}"
 
 - name: Configure simple firewalld rules
   firewalld:
@@ -30,7 +43,9 @@
     state: "{{ (item.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
   loop: "{{ firewall_rules }}"
   notify: reload firewalld
-  when: item.source is not defined or item.source == 'any'
+  when:
+    - item.sources is not defined
+    - item.source is not defined or item.source == 'any'
 
 - name: Configure rich firewalld rules
   firewalld:
@@ -40,4 +55,17 @@
     state: "{{ (item.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
   loop: "{{ firewall_rules }}"
   notify: reload firewalld
-  when: item.source is defined and item.source != 'any'
+  when:
+    - item.sources is not defined
+    - item.source is defined and item.source != 'any'
+
+- name: Configure rich firewalld rules [multiple sources]
+  firewalld:
+    zone: "{{ item.0.zone | default('public') }}"
+    rich_rule: "rule family={{ item.0.family | default('ipv4') }} source address={{ item.1 }} port port={{ item.0.port }} protocol={{ item.0.protocol | default('tcp') }} accept"
+    permanent: true
+    state: "{{ (item.0.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
+  loop: "{{ firewall_rules | subelements('sources', skip_missing=True) }}"
+  loop_control:
+    label: "{{ item.0.port }} - {{ item.1 }}"
+  notify: reload firewalld

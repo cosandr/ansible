@@ -8,3 +8,15 @@
     port: "{{ item.port }}"
     proto: "{{ item.protocol | default('tcp') }}"
   loop: "{{ firewall_rules }}"
+  when: item.sources is not defined
+
+- name: Add ufw rules [multiple sources]
+  ufw:
+    direction: "{{ item.0.direction | default('in') }}"
+    rule: "{{ (item.0.state | default('present') == 'present') | ternary('allow', 'deny') }}"
+    src: "{{ item.1 | default('any') }}"
+    port: "{{ item.0.port }}"
+    proto: "{{ item.0.protocol | default('tcp') }}"
+  loop: "{{ firewall_rules | subelements('sources', skip_missing=True) }}"
+  loop_control:
+    label: "{{ item.0.port }} - {{ item.1 }}"
