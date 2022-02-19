@@ -1,0 +1,24 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=elastic Exporter
+Requires={{ elastic_exporter_required_services | join(' ') }}
+After={{ elastic_exporter_required_services | join(' ') }}
+
+[Service]
+Type=simple
+User=elastic_exporter
+Group=elastic_exporter
+ExecStart={{ elastic_exporter_binary_install_dir }}/elasticsearch_exporter \
+    --web.listen-address={{ elastic_exporter_web_listen_address }} \
+    {% for c in elastic_exporter_es_config %}
+    --{{ c }} \
+    {% endfor %}
+
+Restart=always
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=true
+
+[Install]
+WantedBy=multi-user.target

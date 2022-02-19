@@ -1,0 +1,15 @@
+---
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: enable and start elasticsearch-exporter
+  systemd:
+    name: elasticsearch-exporter
+    state: started
+    enabled: true
+
+- name: restart elasticsearch-exporter
+  systemd:
+    name: elasticsearch-exporter
+    state: restarted

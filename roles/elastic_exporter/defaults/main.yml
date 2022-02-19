@@ -1,0 +1,10 @@
+---
+
+elastic_exporter_version: "latest"
+elastic_exporter_binary_install_dir: "/usr/local/bin"
+elastic_exporter_web_listen_address: ":9114"
+elastic_exporter_required_services:
+  - network-online.target
+elastic_exporter_es_config: []
+elastic_exporter_allow_ips: []
+elastic_exporter_config_firewall: true

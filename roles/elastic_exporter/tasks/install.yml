@@ -1,0 +1,104 @@
+---
+
+- name: get systemd version
+  command: systemctl --version
+  changed_when: false
+  check_mode: false
+  register: __systemd_version
+
+- name: set systemd version fact
+  set_fact:
+    elastic_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
+
+- block:
+  - name: copy elasticsearch-exporter sysusers file
+    copy:
+      content: |
+        u elastic_exporter - "elastic exporter user"
+      dest: /usr/lib/sysusers.d/elastic_exporter.conf
+      mode: 0644
+      owner: root
+      group: root
+    register: __sysusers
+
+  - name: restart systemd-sysusers
+    become: true
+    command: systemd-sysusers
+    when: __sysusers.changed
+
+  when: elastic_exporter_systemd_version | int >= 215
+
+- block:
+  - name: create elastic_exporter system group
+    group:
+      name: elastic_exporter
+      system: true
+      state: present
+
+  - name: create elastic_exporter system user
+    user:
+      name: elastic_exporter
+      system: true
+      shell: "/usr/sbin/nologin"
+      group: elastic_exporter
+      createhome: false
+      home: "{{ elastic_exporter_db_dir }}"
+
+  when: elastic_exporter_systemd_version | int < 215
+
+- block:
+    - name: Get latest release
+      uri:
+        url: "https://api.github.com/repos/prometheus-community/elasticsearch_exporter/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      no_log: false
+      register: _latest_release
+      until: _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set elasticsearch-exporter version to {{ _latest_release.json.tag_name[1:] }}"
+      set_fact:
+        elastic_exporter_version: "{{ _latest_release.json.tag_name[1:] }}"
+
+    - name: Set elastic_exporter_version on remote host
+      set_fact:
+        elastic_exporter_version: "{{ hostvars['localhost']['elastic_exporter_version'] }}"
+  when:
+    - elastic_exporter_version == "latest"
+
+- name: download elasticsearch-exporter binary to local folder
+  become: false
+  get_url:
+    url: "https://github.com/prometheus-community/elasticsearch_exporter/releases/download/v{{ elastic_exporter_version }}/elasticsearch_exporter-{{ elastic_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp/elasticsearch_exporter-{{ elastic_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  # run_once: true # <-- this cannot be set due to multi-arch support
+  delegate_to: localhost
+  check_mode: false
+
+- name: unpack elasticsearch-exporter binary
+  become: false
+  unarchive:
+    src: "/tmp/elasticsearch_exporter-{{ elastic_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp"
+    creates: "/tmp/elasticsearch_exporter-{{ elastic_exporter_version }}.linux-{{ go_arch }}/elasticsearch_exporter"
+  delegate_to: localhost
+  check_mode: false
+
+- name: install elasticsearch-exporter binary
+  copy:
+    src: "/tmp/elasticsearch_exporter-{{ elastic_exporter_version }}.linux-{{ go_arch }}/elasticsearch_exporter"
+    dest: "{{ elastic_exporter_binary_install_dir }}/elasticsearch_exporter"
+    mode: 0755
+    owner: root
+    group: root
+  notify:
+    - restart elasticsearch-exporter
