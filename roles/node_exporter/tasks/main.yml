@@ -13,3 +13,15 @@
     name: node_exporter
     state: started
     enabled: true
+
+- name: Configure firewall
+  include_role:
+    name: firewall_config
+    apply:
+      become: true
+      tags: ["firewall"]
+  vars:
+    firewall_rules:
+      - port: "{{ node_exporter_web_listen_address.split(':')[1] }}"
+        source: "{{ node_exporter_allow_ip }}"
+  when: node_exporter_config_firewall

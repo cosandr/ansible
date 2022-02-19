@@ -11,3 +11,7 @@ smtp_config: "{{ vault_smtp_config }}"
 #     pass:
 #     port:
 #     user:
+
+firewall_frontend: 'firewalld'
+node_exporter_config_firewall: true
+node_exporter_allow_ip: "{{ hostvars['prom01'].ansible_host }}"

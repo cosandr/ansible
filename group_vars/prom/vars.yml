@@ -13,3 +13,5 @@ provisioned_disks:
 
 webgw_ports:
   - "{{ grafana_port }}"
+
+node_exporter_config_firewall: false
