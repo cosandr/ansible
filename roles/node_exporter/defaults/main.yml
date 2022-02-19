@@ -14,4 +14,4 @@ node_exporter_web_listen_address: "0.0.0.0:9100"
 node_exporter_required_services: []
 
 node_exporter_config_firewall: true
-node_exporter_allow_ip: 'any'
+node_exporter_allow_ips: []

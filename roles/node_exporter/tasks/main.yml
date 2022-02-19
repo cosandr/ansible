@@ -21,7 +21,8 @@
       become: true
       tags: ["firewall"]
   vars:
+    firewalld_zones: []
     firewall_rules:
       - port: "{{ node_exporter_web_listen_address.split(':')[1] }}"
-        source: "{{ node_exporter_allow_ip }}"
+        sources: "{{ node_exporter_allow_ips }}"
   when: node_exporter_config_firewall

@@ -8,7 +8,7 @@
     port: "{{ item.port }}"
     proto: "{{ item.protocol | default('tcp') }}"
   loop: "{{ firewall_rules }}"
-  when: item.sources is not defined
+  when: item.sources is not defined or item.sources | length == 0
 
 - name: Add ufw rules [multiple sources]
   ufw:

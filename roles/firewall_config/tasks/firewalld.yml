@@ -44,7 +44,7 @@
   loop: "{{ firewall_rules }}"
   notify: reload firewalld
   when:
-    - item.sources is not defined
+    - item.sources is not defined or item.sources | length == 0
     - item.source is not defined or item.source == 'any'
 
 - name: Configure rich firewalld rules
@@ -56,7 +56,7 @@
   loop: "{{ firewall_rules }}"
   notify: reload firewalld
   when:
-    - item.sources is not defined
+    - item.sources is not defined or item.sources | length == 0
     - item.source is defined and item.source != 'any'
 
 - name: Configure rich firewalld rules [multiple sources]
