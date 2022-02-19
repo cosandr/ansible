@@ -1,0 +1,19 @@
+---
+
+- hosts: servers, !truenas, !romsto
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Upgrade with dnf
+      dnf:
+        name: '*'
+        state: latest
+        update_cache: true
+      when: ansible_os_family == 'RedHat'
+
+    - name: Upgrade with apt
+      apt:
+        name: '*'
+        state: latest
+        update_cache: true
+      when: ansible_os_family == 'Debian'
