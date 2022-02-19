@@ -6,5 +6,6 @@ __pycache__
 roles/geerlingguy.*
 roles/cosandr.*
 roles/cloudalchemy.*
+roles/elastic.*
 
 playbooks/test.yml

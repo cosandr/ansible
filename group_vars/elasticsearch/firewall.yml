@@ -1,0 +1,12 @@
+---
+
+firewalld_zones:
+  - name: elastic
+    sources: "{{ (groups['elasticsearch'] | difference(inventory_hostname)) | map('extract', hostvars, 'ansible_host') | list }}"
+
+firewall_rules:
+  - port: 9200
+    zone: elastic
+
+  - port: 9300
+    zone: elastic

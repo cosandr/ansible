@@ -36,7 +36,10 @@ prometheus_node_static_config:
       instance: "{{ drepi_label }}"
       __metrics_path__: /metrics
 
-prometheus_scrape_configs:
+prometheus_scrape_configs_runtime: []
+# Workaround vars set during role runtime, prometheus_metrics_path for example
+prometheus_scrape_configs: "{{ prometheus_scrape_configs_static + prometheus_scrape_configs_runtime }}"
+prometheus_scrape_configs_static:
   - job_name: "alertmanager"
     static_configs:
       - targets: ["localhost:{{ alertmanager_web_listen_address.split(':')[1] }}"]

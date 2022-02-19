@@ -4,16 +4,36 @@
   gather_facts: true
   become: true
   tasks:
-    - name: Upgrade with dnf
+    - name: Upgrade with dnf # noqa package-latest
       dnf:
         name: '*'
         state: latest
         update_cache: true
+      register: __dnf_result
       when: ansible_os_family == 'RedHat'
 
-    - name: Upgrade with apt
+    - name: Upgrade with apt # noqa package-latest
       apt:
         name: '*'
         state: latest
         update_cache: true
+      register: __apt_result
       when: ansible_os_family == 'Debian'
+
+    # - name: Reboot if required [dnf]
+    #   async: 30
+    #   poll: 0
+    #   reboot:
+    #   when:
+    #     - __dnf_result is defined
+    #     - __dnf_result.results | select('regex', '^Installed: (kernel-|systemd-).*') is any
+    #   tags: ["reboot"]
+
+    # - name: Reboot if required [apt]
+    #   async: 30
+    #   poll: 0
+    #   reboot:
+    #   when:
+    #     - __apt_result is defined
+    #     - __apt_result.stdout_lines | select('regex', '^Setting up ((raspberrypi-)?kernel|systemd).*') is any
+    #   tags: ["reboot"]

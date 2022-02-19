@@ -1,0 +1,28 @@
+---
+
+- hosts: elk
+  gather_facts: true
+  roles:
+    - role: cosandr.dnf_automatic
+      tags: ["dnf_automatic"]
+
+    - role: node_exporter
+      tags: ["node_exporter"]
+
+    - role: firewall_config
+      tags: ["firewall"]
+      when: firewall_rules is defined
+
+- hosts: elasticsearch
+  gather_facts: true
+  roles:
+    - role: setup_disks
+      tags: ["disk"]
+
+    - role: elastic.elasticsearch
+      vars:
+        ansible_distribution: RedHat
+      tags: ["elasticsearch"]
+
+    - role: elastic_exporter
+      tags: ["elastic_exporter"]

@@ -14,6 +14,8 @@ roles:
   - name: cosandr.nextcloud
     src: https://github.com/cosandr/ansible-role-nextcloud.git
     scm: git
+  - name: elastic.elasticsearch
+    version: v7.17.0
   - geerlingguy.docker
   - geerlingguy.postgresql
   - geerlingguy.gitlab

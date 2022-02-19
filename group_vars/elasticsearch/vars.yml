@@ -1,0 +1,9 @@
+---
+
+provisioned_disks:
+  - dev: "/dev/sdb"
+    vols:
+      - name: elasticsearch
+        path: "/var/lib/elasticsearch"
+        shrink: false
+        size: "100%FREE"
