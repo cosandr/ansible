@@ -10,3 +10,7 @@ firewall_rules:
 
   - port: 9300
     zone: elastic
+
+  - port: 9200
+    zone: public
+    sources: "{{ (groups['logstash'] + groups['kibana']) | unique | map('extract', hostvars, 'ansible_host') | list }}"

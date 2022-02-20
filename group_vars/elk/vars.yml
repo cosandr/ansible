@@ -2,3 +2,6 @@
 
 ansible_user: root
 ansible_python_interpreter: /usr/bin/python3
+
+kibana_elasticsearch_url: "{{ groups['elasticsearch'] | map('extract', hostvars, 'ansible_host') | map('regex_replace', '^(.*)$', 'http://\\1:9200') | list }}"
+logstash_elasticsearch_hosts: "{{ kibana_elasticsearch_url }}"

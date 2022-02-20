@@ -26,3 +26,15 @@
 
     - role: elastic_exporter
       tags: ["elastic_exporter"]
+
+- hosts: logstash
+  gather_facts: true
+  roles:
+    - role: logstash
+      tags: ["logstash"]
+
+- hosts: kibana
+  gather_facts: true
+  roles:
+    - role: kibana
+      tags: ["kibana"]
