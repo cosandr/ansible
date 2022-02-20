@@ -36,18 +36,31 @@
     group: root
     mode: 0755
 
+- name: Prepare required facts
+  set_fact:
+    __bundles: "{{ __bundles | default([]) + [tmp_dict] }}"
+  vars:
+    tmp_dict:
+      label: "{{ item.label | default(ansible_distribution + ' ' + item.kernel) }}"
+      kernel_path: "{{ item.kernel_path | default('vmlinuz-' + item.kernel) }}"
+      initrd: "{{ item.initrd | default('initramfs-' + item.kernel + '.img') }}"
+      bundle: "{{ item.bundle | default(item.kernel + '.efi') }}"
+  loop: "{{ sbctl_bundles }}"
+  loop_control:
+    label: "{{ item.kernel }}"
+
 - name: Bundle kernels
   command: >
     sbctl bundle -s
     -i {{ boot_mount }}/{{ sbctl_ucode }}
     -c {{ sbctl_cmdline }}
     -l {{ efistub_splash }}
-    -k {{ boot_mount }}/vmlinuz-{{ item }}
-    -f {{ boot_mount }}/initramfs-{{ item }}.img
-    {{ esp_mount }}/EFI/Linux/{{ item }}.efi
+    -k {{ boot_mount }}/{{ item.kernel_path }}
+    -f {{ boot_mount }}/{{ item.initrd }}
+    {{ esp_mount }}/EFI/Linux/{{ item.bundle }}
   args:
-    creates: "{{ esp_mount }}/EFI/Linux/{{ item }}.efi"
-  with_items: "{{ kernels }}"
+    creates: "{{ esp_mount }}/EFI/Linux/{{ item.bundle }}"
+  loop: "{{ __bundles }}"
 
 - name: Sign files
   command: "sbctl sign -s {{ item }}"
@@ -65,6 +78,6 @@
   vars:
     disk: "/dev/nvme0n1"
     part: "1"
-    loader: "/EFI/Linux/{{ item }}.efi"
-    label: "{{ efi_labels[item] | default(ansible_distribution + ' ' + item) }}"
-  with_items: "{{ kernels }}"
+    loader: "/EFI/Linux/{{ item.bundle }}"
+    label: "{{ item.label }}"
+  loop: "{{ __bundles }}"

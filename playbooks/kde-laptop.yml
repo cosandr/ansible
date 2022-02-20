@@ -1,0 +1,210 @@
+---
+
+- name: Pre-chroot tasks
+  hosts: localhost
+  gather_facts: false
+  become: true
+  vars:
+    ansible_os_family: Archlinux
+    ansible_distribution: Archlinux
+    base_packages:
+      - base
+      - base-devel
+      - linux-firmware
+      - networkmanager
+      - python-pip
+      - sof-firmware
+      - vim
+    btrfs_src: "/dev/mapper/root"
+    btrfs_opts: "rw,relatime,compress-force=zstd:3,ssd,space_cache=v2"
+    btrfs_root: "/mnt/btrfs_root"
+    esp_src: "UUID=A14E-3411"
+    esp_path: "/boot/efi"
+    env_name: "arch_kde"
+    chroot_path: "/mnt/{{ env_name }}"
+    mounts:
+      - path: /
+        subvol: "{{ env_name }}/@"
+      - path: /home
+        subvol: "{{ env_name }}/@home"
+      - path: /var/log
+        subvol: "{{ env_name }}/@var_log"
+      - path: /.snapshots
+        subvol: "{{ env_name }}/@snapshots"
+      - path: /.swap
+        subvol: "{{ env_name }}/@swap"
+  tasks:
+    - name: Get existing subvolumes
+      shell: "set -o pipefail; btrfs sub list -t {{ btrfs_root }} | tail -n+3 | awk '{ print $4 }'"
+      changed_when: false
+      register: __subvols
+
+    - name: Create missing subvolumes
+      command: "btrfs sub create {{ btrfs_root }}/{{ item }}"
+      loop: "{{ [env_name] + (mounts | map(attribute='subvol') | list) }}"
+      when: item not in __subvols.stdout_lines
+
+    - name: Prepare chroot mounts
+      mount:
+        src: "{{ btrfs_src }}"
+        path: "{{ chroot_path }}{{ item.path }}"
+        opts: "{{ btrfs_opts }},subvol={{ item.subvol }}"
+        state: mounted
+        fstype: btrfs
+        fstab: "/tmp/{{ env_name }}.fstab"
+      loop: "{{ mounts }}"
+      tags: ["mount"]
+
+    - name: Ensure install scripts are present
+      pacman:
+        name: arch-install-scripts
+        state: present
+
+    - name: Install base packages
+      command: "pacstrap {{ chroot_path }} {{ base_packages | join(' ') }}"
+      args:
+        creates: "{{ chroot_path }}/etc/fstab"
+
+    - name: Create some required directories
+      file:
+        path: "{{ item }}"
+        owner: root
+        group: root
+        mode: 0755
+        state: directory
+      loop:
+        - "{{ chroot_path }}/{{ btrfs_root }}"
+        - "{{ chroot_path }}/{{ esp_path }}"
+        - "{{ chroot_path }}/usr/share/secureboot"
+      tags: ["mount"]
+
+    - name: Bind mount ESP
+      mount:
+        src: "/boot"
+        path: "{{ chroot_path }}/{{ esp_path }}"
+        state: mounted
+        opts: bind
+        fstype: none
+        fstab: "/tmp/{{ env_name }}.fstab"
+      tags: ["mount"]
+
+    - name: Configure fstab # noqa no-tabs
+      copy:
+        dest: "{{ chroot_path }}/etc/fstab"
+        owner: root
+        group: root
+        mode: 0644
+        content: |
+          # Static information about the filesystems.
+          # See fstab(5) for details.
+
+          # <file system> <dir> <type> <options> <dump> <pass>
+          {{ esp_src }} 	 {{ esp_path }} 	 vfat 	 rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 	 0  2
+          {{ btrfs_src }} 	 {{ btrfs_root }} 	 btrfs 	 {{ btrfs_opts }} 	0  0
+          {% for m in mounts %}
+          {{ btrfs_src }} 	 {{ m.path }} 	 btrfs 	 {{ btrfs_opts }},subvol={{ m.subvol }} 	0  0
+          {% endfor %}
+
+    - name: Copy sbctl files
+      copy:
+        src: "/usr/share/secureboot/{{ item }}"
+        dest: "{{ chroot_path }}/usr/share/secureboot/"
+        mode: preserve
+      loop:
+        - GUID
+        - keys
+      tags: ["sbctl"]
+
+    - name: Copy initrd config
+      copy:
+        src: "/etc/{{ item }}"
+        dest: "{{ chroot_path }}/etc/"
+        mode: preserve
+      loop:
+        - mkinitcpio.conf
+        - crypttab.initramfs
+        - vconsole.conf
+      tags: ["mkinitcpio"]
+
+    - name: Add chroot to inventory
+      add_host:
+        name: "{{ chroot_path }}"
+        groups: chroots
+        env_name: "{{ env_name }}"
+        esp_path: "{{ esp_path }}"
+
+- name: Run in chroot
+  hosts: chroots
+  gather_facts: false
+  connection: chroot
+  vars:
+    ansible_os_family: Archlinux
+    ansible_distribution: Archlinux
+  pre_tasks:
+    - name: Create my user
+      user:
+        name: andrei
+        password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          62353464383663383335353432663531373334356565316561316266393134353539643836316438
+          6233383661393830383936353434643163646266616464390a646130623539363266376635376137
+          38396138303830333566363733356638396331346437323161353462643762353836386232333061
+          6331363865653638640a383636323831653432653830396231363562656230336530636335336639
+          39363364313766363564613364326330643239366135343139626239613063616439643038383664
+          65353865383931666333643238653365353938356531313730393033663431363938306439613266
+          61356437623130393538616636316662356333653866386234653830626565616365313664633338
+          63626333366335643634373634386632653532633462383136343231333739383036333734313264
+          38356561393566396665353761616536643866313165353033656238623030633938
+        groups: [ wheel, docker ]
+        append: true
+  roles:
+    - role: arch-common
+      vars:
+        mkinitcpio_no_fallback: "{{ hostvars['laptop'].mkinitcpio_no_fallback }}"
+    - role: locale_conf
+      vars:
+        locale_gen: "{{ hostvars['laptop'].locale_gen }}"
+        locale_conf: "{{ hostvars['laptop'].locale_conf }}"
+    - role: sudo
+      vars:
+        sudoers_files: "{{ hostvars['laptop'].sudoers_files }}"
+    - role: pipewire
+    - role: sshd
+
+    - role: sbctl
+      vars:
+        kernel_params: "root=/dev/mapper/root rw rootflags=subvol={{ env_name }}/@ intel_iommu=on nmi_watchdog=0 console=tty7 systemd.unified_cgroup_hierarchy=0"
+        sbctl_enroll: false
+        boot_mount: /boot
+        esp_mount: "{{ esp_path }}"
+        sbctl_bundles:
+          - kernel: linux
+            label: "Arch Linux KDE"
+            bundle: "{{ env_name }}-linux.efi"
+      tags: ["sbctl"]
+
+  post_tasks:
+    - name: Install common packages
+      pacman:
+        name: "{{ hostvars['laptop'].pacman_packages }}"
+        state: present
+
+    - name: Install KDE
+      pacman:
+        name:
+          - plasma
+          - plasma-wayland-session
+          - kde-applications
+          - sddm
+          - xdg-desktop-portal-kde
+        state: present
+
+    - name: Enable services
+      systemd:
+        name: "{{ item }}"
+        enabled: true
+      loop:
+        - sshd
+        - firewalld
+        - sddm
+        - NetworkManager

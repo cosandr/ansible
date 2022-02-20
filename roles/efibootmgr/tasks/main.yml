@@ -3,6 +3,7 @@
 - name: Get existing entries
   command: "efibootmgr --verbose"
   check_mode: false
+  changed_when: false
   args:
     warn: false
   register: __efi_entries

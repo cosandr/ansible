@@ -97,7 +97,6 @@ pacman_packages:
   - groff
   - gzip
   - htop
-  - htop
   - inetutils
   - intel-gpu-tools
   - intel-media-driver
@@ -198,7 +197,7 @@ modprobe_config:
 # systemd-cryptenroll /dev/nvme0n1p2 --wipe-slot=tpm2
 # systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+1+7 /dev/nvme0n1p2
 
-kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ intel_iommu=on nmi_watchdog=0 resume=/dev/mapper/root resume_offset=941473"
+kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ intel_iommu=on nmi_watchdog=0 resume=/dev/mapper/root resume_offset=941473 console=tty7 systemd.unified_cgroup_hierarchy=0"
 
 systemd_boot_entries:
   "arch-zen": |
@@ -245,12 +244,10 @@ firewalld_add_sources:
   - zone: home
     source: "10.0.0.0/24"
 
-kernels:
-  - "linux"
-  - "linux-lts"
+sbctl_bundles:
+  - kernel: linux
+    label: "Arch Linux"
+  - kernel: linux-lts
+    label: "Arch Linux LTS"
 
-efi_labels:
-  linux: "Arch Linux"
-  linux-lts: "Arch Linux LTS"
-
-mkinitcpio_no_fallback: "{{ kernels }}"
+mkinitcpio_no_fallback: "{{ sbctl_bundles | map(attribute='kernel') }}"
