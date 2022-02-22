@@ -11,11 +11,38 @@
         name: common
       tags: ["always"]
 
-    - name: Gather facts
-      setup:
-      tags: ["always"]
+    # - name: Gather facts
+    #   setup:
+    #   tags: ["always"]
 
   tasks:
+    - name: Enable HiDPI in SDDM
+      become: true
+      copy:
+        content: |
+          [Wayland]
+          EnableHiDPI=true
+
+          [X11]
+          EnableHiDPI=true
+        dest: "/etc/sddm.conf.d/hidpi.conf"
+        owner: root
+        group: root
+        mode: 0644
+      tags: ["sddm"]
+
+    - name: Configure SDDM DPI
+      become: true
+      copy:
+        content: |
+          [X11]
+          ServerArguments=-nolisten tcp -dpi 192
+        dest: "/etc/sddm.conf.d/dpi.conf"
+        owner: root
+        group: root
+        mode: 0644
+      tags: ["sddm"]
+
     - name: Ensure startup script dir exists
       file:
         path: "{{ __startup_script_path }}"
@@ -38,10 +65,19 @@
       loop: "{{ plasma_startup_scripts }}"
       tags: ["scripts"]
 
+    - name: Configure global shortcuts
+      lineinfile:
+        path: "/home/{{ my_user }}/.config/kglobalshortcutsrc"
+        backrefs: true
+        regexp: '^({{ item.key | regex_escape() }})=([^,]+)(.*)$'
+        line: '\1={{ item.value }}\3'
+      with_dict: "{{ kde_global_shortcuts }}"
+      tags: ["shortcuts"]
+
     - name: Write KDE configs
       become: true
       become_user: "{{ my_user }}"
       changed_when: false
       command: "kwriteconfig5 {{ item }}"
-      loop:
-        - "--file startkderc --group General --key systemdBoot true"
+      loop: "{{ kde_configs }}"
+      tags: ["kconfig"]
