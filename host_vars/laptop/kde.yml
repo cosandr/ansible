@@ -72,6 +72,15 @@ kde_configs:
   - "--file kwinrc --group NightColor --key MorningBeginFixed '0700'"
   - "--file kwinrc --group NightColor --key EveningBeginFixed '1900'"
   - "--file kwinrc --group NightColor --key NightTemperature '4500'"
+  # Add Firefox shortcut
+  - "--file kglobalshortcutsrc --group firefox.desktop --key _k_friendly_name 'Firefox'"
+  - "--file kglobalshortcutsrc --group firefox.desktop --key _launch 'none,none,Firefox'"
+  - "--file kglobalshortcutsrc --group firefox.desktop --key new-private-window 'none,none,New Private Window'"
+  - "--file kglobalshortcutsrc --group firefox.desktop --key new-window 'Meta+Alt+B,none,New Window'"
+  # VS Code shortcut
+  - "--file kglobalshortcutsrc --group visual-studio-code.desktop --key _k_friendly_name 'Visual Studio Code'"
+  - "--file kglobalshortcutsrc --group visual-studio-code.desktop --key _launch 'none,none,Visual Studio Code'"
+  - "--file kglobalshortcutsrc --group visual-studio-code.desktop --key new-empty-window 'Meta+Alt+C,none,New Empty Window'"
 
 kde_global_shortcuts:
   # Disable

@@ -65,6 +65,15 @@
       loop: "{{ plasma_startup_scripts }}"
       tags: ["scripts"]
 
+    # Doing it seperately because I'm not sure if the key is the same across installations
+    - name: Configure Konsole shortcut
+      lineinfile:
+        path: "/home/{{ my_user }}/.config/kglobalshortcutsrc"
+        backrefs: true
+        regexp: '^(.*)=([^,]+)(.*)Launch Konsole$'
+        line: '\1=Meta+Return\3Launch Konsole'
+      tags: ["shortcuts"]
+
     - name: Configure global shortcuts
       lineinfile:
         path: "/home/{{ my_user }}/.config/kglobalshortcutsrc"
