@@ -7,7 +7,9 @@
     owner: root
     group: root
     mode: 0755
-  when: logind_config | length > 0
+  when:
+    - logind_config | length > 0
+    - install_logind_config | bool
   tags: ["logind"]
 
 - name: Copy logind config
@@ -18,7 +20,9 @@
     owner: root
     group: root
     mode: 0644
-  when: logind_config | length > 0
+  when:
+    - logind_config | length > 0
+    - install_logind_config | bool
   notify: reload systemd
   tags: ["logind"]
 
@@ -30,7 +34,9 @@
     owner: root
     group: root
     mode: 0755
-  when: systemd_sleep_config | length > 0
+  when:
+    - systemd_sleep_config | length > 0
+    - install_sleep_config | bool
   tags: ["sleep"]
 
 - name: Copy systemd sleep config
@@ -41,7 +47,9 @@
     owner: root
     group: root
     mode: 0644
-  when: systemd_sleep_config | length > 0
+  when:
+    - systemd_sleep_config | length > 0
+    - install_sleep_config | bool
   notify: reload systemd
   tags: ["sleep"]
 

@@ -1,0 +1,38 @@
+---
+
+- name: Ensure directories exist
+  file:
+    path: "{{ item }}"
+    owner: "{{ kde_user }}"
+    group: "{{ kde_user }}"
+    mode: 0755
+    state: directory
+  loop:
+    - "{{ plasma_startup_script_path }}"
+    - "{{ autostart_path }}"
+
+- name: Copy keyring script
+  copy:
+    src: gnome-keyring.sh
+    dest: "{{ plasma_startup_script_path }}/gnome-keyring.sh"
+    owner: "{{ kde_user }}"
+    group: "{{ kde_user }}"
+    mode: 0755
+
+- name: Copy autostart desktop entries
+  copy:
+    src: "/etc/xdg/autostart/{{ item }}"
+    dest: "{{ autostart_path }}/{{ item }}"
+    owner: "{{ kde_user }}"
+    group: "{{ kde_user }}"
+    mode: 0644
+    remote_src: true
+    force: false
+  loop: "{{ gnome_keyring_autostart_files }}"
+
+- name: Remove GNOME dependency
+  lineinfile:
+    path: "{{ autostart_path }}/{{ item }}"
+    regexp: '^OnlyShowIn=.*'
+    state: absent
+  loop: "{{ gnome_keyring_autostart_files }}"

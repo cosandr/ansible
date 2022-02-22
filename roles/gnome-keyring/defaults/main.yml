@@ -1,3 +1,14 @@
 ---
 
+desktop_environment: "sway"
+kde_user: "{{ my_user | default('andrei') }}"
 pam_config: "/etc/pam.d/login"
+pam_configure: "{{ desktop_environment in ['i3', 'sway'] }}"
+plasma_startup_script_path: "/home/{{ kde_user }}/.config/plasma-workspace/env"
+autostart_path: "/home/{{ kde_user }}/.config/autostart"
+
+# https://wiki.archlinux.org/title/GNOME/Keyring#XDG_autostart
+gnome_keyring_autostart_files:
+  - gnome-keyring-ssh.desktop
+  - gnome-keyring-pkcs11.desktop
+  - gnome-keyring-secrets.desktop

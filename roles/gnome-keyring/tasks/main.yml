@@ -25,6 +25,7 @@
     line: "{{ item.line }}"
     insertafter: "{{ item.after }}"
     state: present
+  when: pam_configure | bool
   with_items:
     - regexp: '^auth\s+optional\s+pam_gnome_keyring'
       line: "auth       optional     pam_gnome_keyring.so"
@@ -32,3 +33,8 @@
     - regexp: '^session\s+optional\s+pam_gnome_keyring'
       line: "session    optional     pam_gnome_keyring.so auto_start"
       after: '^session\s+include'
+
+- name: Configure KDE
+  include_tasks: kde.yml
+  when: desktop_environment == 'kde'
+  tags: ["kde"]

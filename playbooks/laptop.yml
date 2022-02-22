@@ -42,14 +42,18 @@
       pacman:
         name: "{{ pacman_i3_packages }}"
         state: present
-      when: ansible_distribution == 'Archlinux'
+      when:
+        - ansible_distribution == 'Archlinux'
+        - desktop_environment in ["i3", "sway"]
       tags: ["i3"]
 
     - name: Install sway packages (pacman)
       pacman:
         name: "{{ pacman_sway_packages }}"
         state: present
-      when: ansible_distribution == 'Archlinux'
+      when:
+        - ansible_distribution == 'Archlinux'
+        - desktop_environment == "sway"
       tags: ["sway"]
 
     - block:
@@ -183,15 +187,17 @@
     #   tags: ["xss-lock"]
 
     - role: xorg
+      when:
+        - desktop_environment == "i3"
       tags: ["xorg"]
 
     - role: xidlehook
-      when: ansible_distribution == 'Archlinux'
+      when:
+        - ansible_distribution == 'Archlinux'
+        - desktop_environment == "i3"
       tags: ["xidlehook"]
 
     - role: gnome-keyring
-      # vars:
-      #   pam_config: "/etc/pam.d/greetd"
       tags: ["gnome-keyring"]
 
     # - role: thinkfan
@@ -206,13 +212,17 @@
     - role: install_aur
       vars:
         aur_packages: "{{ aur_i3_packages }}"
-      when: ansible_distribution == 'Archlinux'
+      when:
+        - ansible_distribution == 'Archlinux'
+        - desktop_environment in ["i3", "sway"]
       tags: ["i3"]
 
     - role: install_aur
       vars:
         aur_packages: "{{ aur_sway_packages }}"
-      when: ansible_distribution == 'Archlinux'
+      when:
+        - ansible_distribution == 'Archlinux'
+        - desktop_environment == "sway"
       tags: ["sway"]
 
     - role: aisbergg.snapper

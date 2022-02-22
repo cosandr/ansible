@@ -1,0 +1,47 @@
+---
+
+- hosts: laptop
+  gather_facts: false
+  vars:
+    desktop_environment: "kde"
+    __startup_script_path: "/home/{{ my_user }}/.config/plasma-workspace/env"
+  pre_tasks:
+    - name: Run common role
+      import_role:
+        name: common
+      tags: ["always"]
+
+    - name: Gather facts
+      setup:
+      tags: ["always"]
+
+  tasks:
+    - name: Ensure startup script dir exists
+      file:
+        path: "{{ __startup_script_path }}"
+        owner: "{{ my_user }}"
+        group: "{{ my_user }}"
+        mode: 0755
+        state: directory
+      tags: ["scripts"]
+
+    - name: Copy startup scripts
+      copy:
+        content: |
+          #!/bin/bash
+
+          {{ item.content }}
+        dest: "{{ __startup_script_path }}/{{ item.name }}.sh"
+        owner: "{{ my_user }}"
+        group: "{{ my_user }}"
+        mode: 0755
+      loop: "{{ plasma_startup_scripts }}"
+      tags: ["scripts"]
+
+    - name: Write KDE configs
+      become: true
+      become_user: "{{ my_user }}"
+      changed_when: false
+      command: "kwriteconfig5 {{ item }}"
+      loop:
+        - "--file startkderc --group General --key systemdBoot true"
