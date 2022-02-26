@@ -3,10 +3,13 @@
 home_net:
   vm:
     cidr: "10.0.10.0/24"
+    cidr6: "fd00:10::0/64"
     vlan: 10
   general:
     cidr: "10.0.50.0/24"
+    cidr6: "fd00:50::0/64"
     vlan: 50
   mgmt:
     cidr: "10.0.100.0/24"
+    cidr6: "fd00:100::0/64"
     vlan: 100
