@@ -6,6 +6,7 @@ sudoers_files:
     content: "%wheel ALL=(ALL) ALL"
 
 sys_timezone: "Europe/Oslo"
+hwclock_sync: true
 
 network_manager: "systemd-networkd"
 boot_loader: "systemd-boot"

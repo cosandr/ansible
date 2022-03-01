@@ -7,9 +7,12 @@
   vars:
     ansible_os_family: Archlinux
     ansible_distribution: Archlinux
+    desktop_environment: kde
     base_packages:
       - base
       - base-devel
+      - linux
+      - linux-lts
       - linux-firmware
       - networkmanager
       - python-pip
@@ -20,7 +23,8 @@
     btrfs_root: "/mnt/btrfs_root"
     esp_src: "UUID=A14E-3411"
     esp_path: "/boot/efi"
-    env_name: "arch_kde"
+    env_name: "arch_{{ desktop_environment }}"
+    src_host: "laptop"
     chroot_path: "/mnt/{{ env_name }}"
     mounts:
       - path: /
@@ -60,8 +64,24 @@
         name: arch-install-scripts
         state: present
 
+    - name: Copy pacman.conf
+      copy:
+        src: /etc/pacman.conf
+        dest: /tmp/pacstrap.conf
+        remote_src: true
+        force: false
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Ensure no packages are ignored
+      lineinfile:
+        path: /tmp/pacstrap.conf
+        regexp: '^IgnorePkg'
+        state: absent
+
     - name: Install base packages
-      command: "pacstrap {{ chroot_path }} {{ base_packages | join(' ') }}"
+      command: "pacstrap -C /tmp/pacstrap.conf {{ chroot_path }} {{ base_packages | join(' ') }}"
       args:
         creates: "{{ chroot_path }}/etc/fstab"
 
@@ -132,6 +152,7 @@
         groups: chroots
         env_name: "{{ env_name }}"
         esp_path: "{{ esp_path }}"
+        src_host: "{{ src_host }}"
 
 - name: Run in chroot
   hosts: chroots
@@ -155,19 +176,25 @@
           61356437623130393538616636316662356333653866386234653830626565616365313664633338
           63626333366335643634373634386632653532633462383136343231333739383036333734313264
           38356561393566396665353761616536643866313165353033656238623030633938
-        groups: [ wheel, docker ]
+        groups: [ wheel ]
         append: true
+
+    - name: Install common packages
+      pacman:
+        name: "{{ hostvars[src_host].pacman_packages }}"
+        state: present
   roles:
     - role: arch-common
       vars:
-        mkinitcpio_no_fallback: "{{ hostvars['laptop'].mkinitcpio_no_fallback }}"
+        mkinitcpio_no_fallback: "{{ hostvars[src_host].mkinitcpio_no_fallback }}"
+        hwclock_sync: false
     - role: locale_conf
       vars:
-        locale_gen: "{{ hostvars['laptop'].locale_gen }}"
-        locale_conf: "{{ hostvars['laptop'].locale_conf }}"
+        locale_gen: "{{ hostvars[src_host].locale_gen }}"
+        locale_conf: "{{ hostvars[src_host].locale_conf }}"
     - role: sudo
       vars:
-        sudoers_files: "{{ hostvars['laptop'].sudoers_files }}"
+        sudoers_files: "{{ hostvars[src_host].sudoers_files }}"
     - role: pipewire
     - role: sshd
 
@@ -175,20 +202,16 @@
       vars:
         kernel_params: "root=/dev/mapper/root rw rootflags=subvol={{ env_name }}/@ intel_iommu=on nmi_watchdog=0 console=tty7 systemd.unified_cgroup_hierarchy=0"
         sbctl_enroll: false
+        sbctl_ucode: "{{ hostvars[src_host].sbctl_ucode | default('intel-ucode.img') }}"
         boot_mount: /boot
         esp_mount: "{{ esp_path }}"
         sbctl_bundles:
           - kernel: linux
-            label: "Arch Linux KDE"
+            label: "Arch Linux {{ desktop_environment | upper }}"
             bundle: "{{ env_name }}-linux.efi"
       tags: ["sbctl"]
 
   post_tasks:
-    - name: Install common packages
-      pacman:
-        name: "{{ hostvars['laptop'].pacman_packages }}"
-        state: present
-
     - name: Install KDE
       pacman:
         name:
@@ -198,13 +221,33 @@
           - sddm
           - xdg-desktop-portal-kde
         state: present
+      when: desktop_environment == 'kde'
 
-    - name: Enable services
+    - name: Install GNOME
+      pacman:
+        name:
+          - gnome
+          - xdg-desktop-portal-gnome
+        state: present
+      when: desktop_environment == 'gnome'
+
+    - name: Enable common services
       systemd:
         name: "{{ item }}"
         enabled: true
       loop:
         - sshd
         - firewalld
-        - sddm
         - NetworkManager
+
+    - name: Enable SDDM service
+      systemd:
+        name: sddm
+        enabled: true
+      when: desktop_environment == 'kde'
+
+    - name: Enable GDM service
+      systemd:
+        name: gdm
+        enabled: true
+      when: desktop_environment == 'gnome'

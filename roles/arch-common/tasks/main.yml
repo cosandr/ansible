@@ -15,6 +15,7 @@
   command: "hwclock --systohc"
   args:
     creates: "/etc/adjtime"
+  when: hwclock_sync | bool
   tags: ["time"]
 
 - name: Configure pacman
