@@ -10,7 +10,7 @@ __sd_btrfs_scrub:
       [Service]
       Type=forking
       ExecStart=btrfs scrub start /
-      ExecStop=btrfs scrub cancel /
+      ExecStop=-btrfs scrub cancel /
 
       [Install]
       WantedBy=multi-user.target
