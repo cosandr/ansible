@@ -15,3 +15,10 @@ nextcloud_server_name: "{{ nextcloud_domain }}"
 
 webgw_ports:
   - "{{ nextcloud_port }}"
+
+nextcloud_generate_certificate: true
+nextcloud_certificate_cn: "{{ inventory_hostname }}.vm.{{ hostvars['webgw01'].domains[1] }}"
+nextcloud_certificate_alt_name:
+  - "DNS:{{ ansible_host }}"
+  - "DNS:{{ ansible_hostname }}"
+  - "DNS:{{ nextcloud_domain }}"
