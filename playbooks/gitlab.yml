@@ -9,6 +9,9 @@
     - role: firewall_config
       tags: ["firewall"]
 
+    - role: sshd
+      tags: ["sshd"]
+
     - role: geerlingguy.gitlab
       tags: ["gitlab"]
 
@@ -16,6 +19,15 @@
       tags: ["dnf_automatic"]
 
   post_tasks:
+    - name: Ensure correct SELinux context for git .ssh
+      sefcontext:
+        target: "/var/opt/gitlab/.ssh(/.*)?"
+        setype: ssh_home_t
+        state: present
+      notify: restore git contexts
+      when: ansible_selinux.status == "enabled"
+      tags: ["gitlab", "selinux"]
+
     - name: Add garbage collection job
       template:
         src: "{{ inventory_dir }}/files/gitlab/registry-garbage-collect.timer.j2"
@@ -39,6 +51,9 @@
       tags: ["gitlab", "gc"]
 
   handlers:
+    - name: restore git contexts
+      command: restorecon -r /var/opt/gitlab/.ssh
+
     - name: reload systemd
       systemd:
         daemon_reload: true
