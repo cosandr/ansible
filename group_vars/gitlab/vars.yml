@@ -16,7 +16,7 @@ node_exporter_port: "{{ node_exporter_web_listen_address.split(':')[1] }}"
 
 gitlab_config_template: "{{ inventory_dir }}/files/gitlab/gitlab.rb.j2"
 
-domain: "{{ hostvars['webgw01'].domain }}"
+domain: "{{ hostvars['webgw01'].domains[4] }}"
 
 gitlab_time_zone: "Europe/Oslo"
 

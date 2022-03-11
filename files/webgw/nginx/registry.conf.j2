@@ -1,5 +1,6 @@
 {{ ansible_managed | comment }}
 {% if nginx_upstreams | selectattr('name', 'search', 'registry') %}
+{% set domain = domains[4] %}
 server {
     listen 80;
     listen [::]:80;
