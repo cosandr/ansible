@@ -2,61 +2,12 @@
 
 - hosts: gitlab
   gather_facts: true
-  pre_tasks:
-    - block:
-        - name: Disable some default services
-          firewalld:
-            zone: "{{ item.zone }}"
-            service: "{{ item.service }}"
-            permanent: true
-            state: disabled
-          loop:
-            - zone: public
-              service: cockpit
-            - zone: internal
-              service: cockpit
-            - zone: internal
-              service: samba-client
-            - zone: internal
-              service: samba-client
-          notify: reload firewalld
-
-        - name: Add proxy hosts to internal network
-          firewalld:
-            zone: internal
-            source: "{{ item }}"
-            permanent: true
-            state: enabled
-          loop: "{{ proxy_hosts }}"
-          notify: reload firewalld
-
-        - name: Add sources to internal zone
-          firewalld:
-            zone: internal
-            source: "{{ item }}"
-            permanent: true
-            state: enabled
-          loop:
-            - "{{ home_net.mgmt.cidr }}"
-            - "{{ hostvars['prom01'].ansible_host }}"
-          notify: reload firewalld
-
-        - name: Add ports to internal zone
-          firewalld:
-            zone: internal
-            port: "{{ item }}/tcp"
-            permanent: true
-            state: enabled
-          loop:
-            - "{{ gitlab_nginx_listen_port }}"
-            - "{{ gitlab_registry_nginx_listen_port }}"
-            - "{{ node_exporter_port }}"
-          notify: reload firewalld
-
-      tags: ["firewalld"]
   roles:
     - role: setup_disks
       tags: ["disk"]
+
+    - role: firewall_config
+      tags: ["firewall"]
 
     - role: geerlingguy.gitlab
       tags: ["gitlab"]
@@ -97,8 +48,3 @@
         name: registry-garbage-collect.timer
         state: started
         enabled: true
-
-    - name: reload firewalld
-      service:
-        name: firewalld
-        state: reloaded

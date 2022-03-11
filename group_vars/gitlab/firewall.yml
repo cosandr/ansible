@@ -1,0 +1,33 @@
+---
+
+firewalld_zones:
+  - name: internal
+    # Allow prometheus and webgw
+    sources: "{{ node_exporter_allow_ips + proxy_hosts }}"
+
+firewall_rules:
+  - port: "{{ gitlab_nginx_listen_port }}"
+    zone: internal
+
+  - port: "{{ gitlab_registry_nginx_listen_port }}"
+    zone: internal
+
+  - port: "{{ node_exporter_port }}"
+    zone: internal
+
+firewalld_services:
+  - name: cockpit
+    zone: public
+    state: absent
+
+  - name: cockpit
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: public
+    state: absent
