@@ -31,6 +31,7 @@ gitlab_nginx_ssl_client_certificate: ""
 gitlab_nginx_trusted_addresses: "{{ proxy_hosts }}"
 
 gitlab_registry_enable: "true"
+gitlab_registry_port: 5005
 gitlab_registry_external_url: "https://registry.{{ domain }}"
 gitlab_registry_nginx_trusted_addresses: "{{ proxy_hosts }}"
 gitlab_registry_nginx_listen_https: 'false'

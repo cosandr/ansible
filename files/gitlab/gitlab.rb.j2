@@ -76,6 +76,7 @@ gitlab_rails['smtp_tls'] = {{ gitlab_smtp_tls }}
 # GitLab registry.
 registry['enable'] = {{ gitlab_registry_enable }}
 {% if gitlab_registry_enable == "true" %}
+registry['registry_http_addr'] = "localhost:{{ gitlab_registry_port }}"
 registry_external_url "{{ gitlab_registry_external_url }}"
 registry_nginx['listen_https'] = {{ gitlab_registry_nginx_listen_https }}
 registry_nginx['listen_port'] = {{ gitlab_registry_nginx_listen_port }}
