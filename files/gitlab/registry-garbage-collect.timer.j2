@@ -1,0 +1,9 @@
+[Unit]
+Description=Gitlab garbage collection every Sunday morning
+
+[Timer]
+OnCalendar={{ gitlab_gc_oncalendar }}
+RandomizedDelaySec=5m
+
+[Install]
+WantedBy=timers.target

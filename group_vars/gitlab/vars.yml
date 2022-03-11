@@ -53,3 +53,5 @@ gitlab_smtp_tls: "true"
 
 gitlab_letsencrypt_enable: "false"
 gitlab_ldap_enabled: "false"
+
+gitlab_gc_oncalendar: "Tue,Fri 02:00:00"

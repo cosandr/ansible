@@ -1,0 +1,6 @@
+[Unit]
+Description=Gitlab garbage collection
+After=gitlab-runsvdir.service
+
+[Service]
+ExecStart=/usr/bin/gitlab-ctl registry-garbage-collect
