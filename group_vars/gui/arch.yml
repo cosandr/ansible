@@ -1,0 +1,169 @@
+---
+
+btrfs_root: "/mnt/btrfs_root"
+
+base_pacman_packages:
+  - alacritty
+  - alsa-utils
+  - ansible
+  - ansible-lint
+  - autoconf
+  - automake
+  - base
+  - bat
+  - binutils
+  - bison
+  - bluez
+  - bluez-utils
+  - btrfs-progs
+  - deluge-gtk
+  - docker
+  - docker-compose
+  - efibootmgr
+  - ethtool
+  - fakeroot
+  - file
+  - findutils
+  - firefox
+  - firefox-i18n-nb-no
+  - firewalld
+  - flex
+  - freerdp
+  - fzf
+  - gawk
+  - gcc
+  - gettext
+  - git
+  - gnu-netcat
+  - go
+  - grep
+  - groff
+  - gzip
+  - htop
+  - inetutils
+  - iotop
+  - ipython
+  - iwd
+  - jq
+  - kernel-modules-hook
+  - kitty
+  - libpulse
+  - libtool
+  - libva-utils
+  - linux
+  - linux-firmware
+  - linux-headers
+  - linux-lts
+  - linux-lts-headers
+  - m4
+  - make
+  - man-db
+  - mesa-demos
+  - ncdu
+  - net-tools
+  - nextcloud-client
+  - noto-fonts
+  - noto-fonts-emoji
+  - ntfs-3g
+  - openssh
+  - otf-cascadia-code
+  - p7zip
+  - pacman-contrib
+  - pacutils
+  - patch
+  - pkgconf
+  - pyenv
+  - python-aiohttp
+  - python-jmespath  # ansible json filter
+  - python-llfuse    # borg mount
+  - python-netaddr   # ansible ip filter
+  - python-pip
+  - python-virtualenv
+  - python-websockets
+  - python-wheel
+  - reflector
+  - remmina
+  - sbctl
+  - screen
+  - sed
+  - smartmontools
+  - sshfs
+  - sshpass
+  - sudo
+  - texinfo
+  - tmux
+  - ttf-fira-code
+  - ttf-font-awesome
+  - ttf-nerd-fonts-symbols
+  - usbutils
+  - vim
+  - vlc
+  - which
+  - zsh
+
+base_aur_packages:
+  - hunspell-nb
+  - jetbrains-toolbox
+  - paru-bin
+  - pyenv-virtualenv
+  - shellcheck-bin
+  - sublime-text-4
+  - tmuxinator
+  - ttf-font-awesome-4
+
+pacman_i3_packages:
+  - arandr
+  - brightnessctl
+  - dunst
+  - evince
+  - feh
+  - file-roller
+  - gnome-calculator
+  - gnome-themes-extra
+  - gvfs-mtp
+  - gvfs-nfs
+  - gvfs-smb
+  - i3-gaps
+  - lxappearance
+  - numlockx
+  - pamixer
+  - pavucontrol
+  - picom
+  - playerctl
+  - qt5ct
+  - redshift
+  - rofi
+  - scrot
+  - thunar
+  - thunar-archive-plugin
+  - xclip
+  - xorg-xev
+  - xorg-xinit
+  - xorg-xinput
+  - xorg-xrandr
+  - xorg-xset
+
+aur_i3_packages:
+  - adwaita-qt
+  - i3lock-color
+  - i3lock-fancy-rapid-git
+  - polybar
+
+pacman_sway_packages:
+  - gammastep
+  - grim
+  - kanshi
+  - qt5-wayland
+  - slurp
+  - sway
+  - swaybg
+  - swayidle
+  - waybar
+  - wl-clipboard
+  - wofi
+  - xdg-desktop-portal-wlr
+  - xorg-xwayland
+
+aur_sway_packages:
+  - swaylock-effects-git
+  - wdisplays

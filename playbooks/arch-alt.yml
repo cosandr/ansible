@@ -20,11 +20,11 @@
       - vim
     btrfs_src: "/dev/mapper/root"
     btrfs_opts: "rw,relatime,compress-force=zstd:3,ssd,space_cache=v2"
-    btrfs_root: "/mnt/btrfs_root"
-    esp_src: "UUID=A14E-3411"
     esp_path: "/boot/efi"
     env_name: "arch_{{ desktop_environment }}"
-    src_host: "laptop"
+    src_host: "{{ lookup('pipe', 'hostname') | lower }}"
+    btrfs_root: "{{ hostvars[src_host].btrfs_root }}"
+    esp_src: "{{ hostvars[src_host].esp_src }}"
     chroot_path: "/mnt/{{ env_name }}"
     mounts:
       - path: /
@@ -176,7 +176,7 @@
           61356437623130393538616636316662356333653866386234653830626565616365313664633338
           63626333366335643634373634386632653532633462383136343231333739383036333734313264
           38356561393566396665353761616536643866313165353033656238623030633938
-        groups: [ wheel ]
+        groups: ["wheel"]
         append: true
 
     - name: Install common packages
@@ -200,7 +200,7 @@
 
     - role: sbctl
       vars:
-        kernel_params: "root=/dev/mapper/root rw rootflags=subvol={{ env_name }}/@ intel_iommu=on nmi_watchdog=0 console=tty7 systemd.unified_cgroup_hierarchy=0"
+        kernel_params: "root=/dev/mapper/root rw rootflags=subvol={{ env_name }}/@ {{ hostvars[src_host].extra_kernel_params | default('') }}"
         sbctl_enroll: false
         sbctl_ucode: "{{ hostvars[src_host].sbctl_ucode | default('intel-ucode.img') }}"
         boot_mount: /boot

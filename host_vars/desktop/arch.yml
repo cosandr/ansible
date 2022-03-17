@@ -24,7 +24,10 @@ sbctl_bundles:
 sbctl_enroll: false
 sbctl_enroll_microsoft: true
 sbctl_ucode: "amd-ucode.img"
-kernel_params: "root=/dev/mapper/root rootflags=subvol=@ nmi_watchdog=0 nvidia-drm.modeset=1 systemd.unified_cgroup_hierarchy=0"
+
+esp_src: "UUID=538E-A9BF"
+extra_kernel_params: "nmi_watchdog=0 nvidia-drm.modeset=1 systemd.unified_cgroup_hierarchy=0"
+kernel_params: "root=/dev/mapper/root rootflags=subvol=@ {{ extra_kernel_params }}"
 
 mkinitcpio_no_fallback: "{{ sbctl_bundles | map(attribute='kernel') }}"
 
@@ -36,3 +39,13 @@ sbctl_sign_files:
   - "/boot/vmlinuz-linux"
   - "/boot/vmlinuz-linux-lts"
   - "/boot/EFI/Boot/bootx64.efi"
+
+pacman_packages: "{{ base_pacman_packages + host_pacman_packages }}"
+aur_packages: "{{ base_aur_packages + host_aur_packages }}"
+
+host_pacman_packages:
+  - amd-ucode
+  - nvidia-dkms
+  - nvidia-settings
+
+host_aur_packages: []
