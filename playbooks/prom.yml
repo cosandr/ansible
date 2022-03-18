@@ -38,6 +38,17 @@
             label: "{{ item.cidr }}"
           notify: reload firewalld
 
+        - name: Add some wireguard clients to internal zone
+          firewalld:
+            zone: internal
+            source: "{{ item }}"
+            permanent: true
+            state: enabled
+          loop:
+            - "{{ hostvars['laptop'].wireguard_ip }}"
+            - "10.4.20.34"
+          notify: reload firewalld
+
         - name: Allow ports to internal zone
           firewalld:
             zone: internal
