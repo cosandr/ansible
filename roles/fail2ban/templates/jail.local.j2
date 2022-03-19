@@ -12,6 +12,9 @@ backend = systemd
 enabled  = true
 logpath  = %(sshd_log)s
 backend  = %(sshd_backend)s
+{% if ansible_port != 22 %}
+port     = {{ ansible_port }}
+{% endif %}
 {% for k, v in fail2ban_sshd_extra.items() %}
 {{ k }} = {{ v }}
 {% endfor %}
