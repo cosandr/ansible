@@ -68,10 +68,6 @@ server {
         autoindex on;
     }
 
-    location /grafana/ {
-        return 301 {{ nginx_grafana_url }};
-    }
-
 {% if nginx_upstreams | selectattr('name', 'search', 'notes_web') %}
     location ^~ /standardnotes-extensions {
 		autoindex off;
