@@ -1,0 +1,5 @@
+---
+
+# Need to restart both at the same time
+- name: restart sshd and firewall  # noqa command-instead-of-module
+  command: "systemctl restart sshd {{ firewall_frontend }}"
