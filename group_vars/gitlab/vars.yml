@@ -3,6 +3,9 @@
 ansible_user: root
 ansible_python_interpreter: /usr/bin/python3
 
+# 40h == 64d
+ansible_host6: "{{ home_net.vm.cidr6 | ipaddr('64') | ipaddr('address') }}"
+
 provisioned_disks:
   - dev: "/dev/sdb"
     vols:

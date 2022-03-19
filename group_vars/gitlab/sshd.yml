@@ -1,0 +1,5 @@
+---
+
+sshd_extra_config: |
+  Match Address {{ hostvars['webgw01'].wireguard_ip }},{{ hostvars['webgw01'].wireguard_ipv6 }}
+      PermitRootLogin no

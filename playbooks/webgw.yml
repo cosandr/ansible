@@ -1,6 +1,31 @@
 ---
 
--
+- name: Configure SSH
+  hosts: webgw
+  gather_facts: false
+  pre_tasks:
+    - name: Check if we can connect on configured port
+      wait_for:
+        port: "{{ ansible_port }}"
+        state: "started"
+        host: "{{ ansible_host }}"
+        connect_timeout: 2
+        timeout: 4
+      delegate_to: "localhost"
+      ignore_errors: true
+      check_mode: false
+      register: __configured_ssh
+      tags: ["sshd"]
+
+  roles:
+    - role: change_ssh_port
+      when:
+        - ansible_port != 22
+        - __configured_ssh is defined
+        - __configured_ssh.state is undefined
+      tags: ["sshd"]
+
+- name: Configure gateways
   hosts: webgw
   gather_facts: true
   pre_tasks:
@@ -74,12 +99,17 @@
     - name: Allow nginx proxy
       seboolean:
         name: httpd_can_network_connect
-        state: yes
-        persistent: yes
+        state: true
+        persistent: true
       when:
         - ansible_os_family == 'RedHat'
         - ansible_selinux.status == "enabled"
       tags: ["nginx"]
+
+    - name: Set fail2ban facts
+      set_fact:
+        fail2ban_ignoreip: "{{ (__f2b_extra_ignore + hostvars['laptop'].wireguard_mt_allowed_ips) | flatten }}"
+      tags: ["fail2ban"]
   roles:
     - role: sshd
       tags: ["sshd"]
@@ -172,13 +202,14 @@
           loop: "{{ firewalld_masquerade_zones }}"
           notify: reload firewalld
 
-        - name: Add port forwards to public zone
+        - name: Configure rich rules
           firewalld:
-            zone: "public"
-            port_forward: "{{ firewalld_port_forwards }}"
+            zone: "{{ item.zone | default('public') }}"
+            rich_rule: "{{ item.rich_rule }}"
             permanent: true
             state: enabled
           notify: reload firewalld
+          loop: "{{ firewalld_rich_rules }}"
 
         - name: Add mt interface to internal zone
           firewalld:
