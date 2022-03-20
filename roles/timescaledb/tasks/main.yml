@@ -1,0 +1,61 @@
+---
+
+- name: Install timescaledb repo
+  template:
+    src: timescaledb.repo.j2
+    dest: /etc/yum.repos.d/timescaledb.repo
+    owner: root
+    group: root
+    mode: 0644
+  tags: ["install"]
+
+- name: Install timescaledb packages
+  dnf:
+    name:
+      - "{{ timescaledb_package }}"
+      - timescaledb-tools
+    state: present
+  tags: ["install"]
+
+- name: Check if shared_preload_libraries is unconfigured
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  command: grep -qE "^#?shared_preload_libraries = ''.*" "{{ postgresql_config_path }}/postgresql.conf"
+  register: __unconf_lib
+
+- name: Ensure timescaledb library is loaded
+  lineinfile:
+    path: "{{ postgresql_config_path }}/postgresql.conf"
+    regexp: "^#shared_preload_libraries.*$"
+    line: "shared_preload_libraries = 'timescaledb'"
+  notify: restart postgresql
+  when: __unconf_lib.rc == 0
+
+- name: Check if timescaledb is in shared_preload_libraries
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  command: grep -qE '^shared_preload_libraries =.*timescaledb.*$' "{{ postgresql_config_path }}/postgresql.conf"
+  register: __timescaledb_loaded
+  when: __unconf_lib.rc != 0
+
+- name: Add timescaledb library to shared_preload_libraries
+  lineinfile:
+    path: "{{ postgresql_config_path }}/postgresql.conf"
+    regexp: "^shared_preload_libraries = '(.*)'$"
+    backrefs: true
+    line: "shared_preload_libraries = '\\1,timescaledb'"
+  notify: restart postgresql
+  when:
+    - __timescaledb_loaded.rc is defined
+    - __timescaledb_loaded.rc != 0
+
+- name: Tune postgresql settings
+  lineinfile:
+    path: "{{ postgresql_config_path }}/postgresql.conf"
+    regexp: "^#?{{ item.key }}.+$"
+    line: "{{ item.key }} = {{ item.value }}"
+  with_dict: "{{ timescaledb_configuration_settings }}"
+  notify: restart postgresql
+  tags: ["configure"]
