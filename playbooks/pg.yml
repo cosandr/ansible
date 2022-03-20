@@ -40,6 +40,9 @@
     - role: postgresql
       tags: ["pg"]
 
+    - role: timescaledb
+      tags: ["timescaledb"]
+
     - role: postgres_exporter
       vars:
         postgres_service_name: "{{ postgresql_daemon }}"

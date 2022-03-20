@@ -24,3 +24,10 @@ postgresql_databases:
 
   - name: terraform
     owner: terraform
+
+  - name: promscale
+    owner: promscale
+
+postgresql_extensions:
+  - name: timescaledb
+    db: promscale

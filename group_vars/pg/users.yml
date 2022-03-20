@@ -24,3 +24,8 @@ postgresql_users:
 
   - name: terraform
     password: "{{ vault_postgresql_passwords.terraform }}"
+
+  - name: promscale
+    # https://github.com/timescale/promscale/blob/master/docs/sql_permissions.md
+    role_attr_flags: "SUPERUSER"
+    password: "{{ vault_postgresql_passwords.promscale }}"
