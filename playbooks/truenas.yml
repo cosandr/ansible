@@ -89,3 +89,41 @@
         ansible_user: root
         ansible_python_interpreter: /usr/local/bin/python3
       tags: ["plex", "acl"]
+
+- name: Create gitlab NFS shares
+  hosts: truenas
+  gather_facts: false
+  vars:
+    gitlab_paths:
+      - /mnt/tank/backup/gitlab
+  pre_tasks:
+    - name: Create paths
+      vars:
+        ansible_connection: ssh
+        ansible_host: "{{ local_ips.general }}"
+        ansible_user: root
+        ansible_python_interpreter: /usr/local/bin/python3
+      file:
+        path: "{{ item }}"
+        state: directory
+      loop: "{{ gitlab_paths }}"
+      tags: ["gitlab"]
+
+    - name: Prepare shares
+      set_fact:
+        truenas_config_sharing_nfs: "{{ gitlab_paths | create_nfs_models(hosts, kwargs=kwargs, shares=truenas_config_sharing_nfs) }}"
+      vars:
+        hosts: "{{ groups['gitlab'] | map('extract', hostvars, 'ansible_host') }}"
+        kwargs:
+          maproot_user: root
+          maproot_group: wheel
+          comment: 'Gitlab backup shares'
+      tags: ["gitlab", "nfs"]
+
+  tasks:
+    - name: Configure NFS shares
+      spatiumcepa.truenas.truenas_api_sharing_nfs:
+        model: "{{ item.model }}"
+        state: "{{ item.state | default('present') }}"
+      loop: "{{ truenas_config_sharing_nfs }}"
+      tags: ["gitlab", "nfs"]

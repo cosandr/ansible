@@ -1,0 +1,48 @@
+---
+
+__sd_backup_gitlab_remote:
+  name: backup-gitlab-remote
+  service:
+    content: |
+      [Unit]
+      Description=Gitlab backup
+
+      [Service]
+      ExecStart=/opt/gitlab/bin/gitlab-backup create CRON=1 GZIP_RSYNCABLE=yes SKIP=builds,artifacts,registry
+      ExecStartPost={{ systemd_script_install_path }}/prune-gitlab-backups
+
+      [Install]
+      WantedBy=multi-user.target
+
+  # Daily at 03:30
+  timer:
+    enabled: true
+    state: started
+    content: |
+      [Unit]
+      Description=Backup Gitlab every night
+
+      [Timer]
+      Persistent=yes
+      OnCalendar=*-*-* 03:30:00
+
+      [Install]
+      WantedBy=timers.target
+
+  scripts:
+    - dest: "{{ systemd_script_install_path }}/prune-gitlab-backups"
+      content: |
+        #!/bin/bash
+
+        set -e
+
+        KEEP=3
+        DIR="{{ gitlab_backup_upload_connection.local_root }}"
+
+        # remove all backups except the $KEEP latests
+        BACKUPS=$(find "${DIR}" -name "*_gitlab_backup.tar" | wc -l | sed 's/\ //g')
+        while [ "$BACKUPS" -ge "$KEEP" ]
+        do
+          ls -tr1 "${DIR}"/*_gitlab_backup.tar | head -n 1 | xargs rm -fv
+          BACKUPS=$(( BACKUPS - 1 ))
+        done

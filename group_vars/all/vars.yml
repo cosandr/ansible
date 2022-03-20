@@ -19,3 +19,5 @@ locale_gen:
 locale_conf:
   LANG: en_US.UTF-8
   LC_TIME: en_GB.UTF-8
+
+systemd_script_install_path: "/usr/local/bin/systemd"

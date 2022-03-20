@@ -73,6 +73,16 @@ gitlab_rails['smtp_authentication'] = '{{ gitlab_smtp_authentication }}'
 gitlab_rails['smtp_tls'] = {{ gitlab_smtp_tls }}
 {% endif %}
 
+gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
+gitlab_rails['backup_upload_connection'] = {
+{% for k, v in gitlab_backup_upload_connection.items() %}
+  '{{ k }}' => '{{ v }}',
+{% endfor %}
+}
+# The directory inside the mounted folder to copy backups to
+# Use '.' to store them in the root directory
+gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_backup_upload_remote_directory }}'
+
 # GitLab registry.
 registry['enable'] = {{ gitlab_registry_enable }}
 {% if gitlab_registry_enable == "true" %}

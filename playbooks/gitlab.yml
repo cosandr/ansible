@@ -18,7 +18,28 @@
     - role: cosandr.dnf_automatic
       tags: ["dnf_automatic"]
 
+    - role: systemd
+      tags: ["systemd"]
+
   post_tasks:
+    - name: Mount backup NFS share
+      mount:
+        src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/backup/gitlab"
+        path: "{{ gitlab_backup_upload_connection.local_root }}"
+        opts: "defaults,vers=4,rw,noatime"
+        state: mounted
+        fstype: nfs
+      tags: ["gitlab", "nfs"]
+
+    - name: Ensure git owns backup mount
+      file:
+        path: "{{ gitlab_backup_upload_connection.local_root }}"
+        owner: git
+        group: git
+        mode: 0750
+        state: directory
+      tags: ["gitlab", "nfs"]
+
     - name: Ensure correct SELinux context for git .ssh
       sefcontext:
         target: "/var/opt/gitlab/.ssh(/.*)?"

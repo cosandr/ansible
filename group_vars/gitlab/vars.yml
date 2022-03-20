@@ -21,6 +21,12 @@ gitlab_config_template: "{{ inventory_dir }}/files/gitlab/gitlab.rb.j2"
 
 domain: "{{ hostvars['webgw01'].domains[4] }}"
 
+gitlab_backup_keep_time: 604800  # 7 days
+gitlab_backup_upload_remote_directory: "."
+gitlab_backup_upload_connection:
+  provider: "Local"
+  local_root: "/mnt/backups"
+
 gitlab_time_zone: "Europe/Oslo"
 
 gitlab_external_url: "https://gitlab.{{ domain }}"
