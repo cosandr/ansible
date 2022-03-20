@@ -8,3 +8,6 @@ promscale_db_password: "{{ hostvars['pg01'].vault_postgresql_passwords.promscale
 promscale_db_port: 5432
 promscale_db_ssl_mode: require
 promscale_db_user: promscale
+
+promscale_config:
+  PROMSCALE_TELEMETRY_LOG_LEVEL: warn
