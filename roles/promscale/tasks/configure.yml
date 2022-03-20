@@ -1,0 +1,31 @@
+---
+
+- name: Configure promscale
+  lineinfile:
+    path: "{{ promscale_env_file }}"
+    regexp: '^#?\s*{{ item.key }}'
+    line: '{{ item.key }}="{{ item.value }}"'
+  loop:
+    - key: PROMSCALE_WEB_LISTEN_ADDRESS
+      value: "{{ promscale_web_listen_address }}"
+    - key: PROMSCALE_DB_HOST
+      value: "{{ promscale_db_host }}"
+    - key: PROMSCALE_DB_NAME
+      value: "{{ promscale_db_name }}"
+    - key: PROMSCALE_DB_PASSWORD
+      value: "{{ promscale_db_password }}"
+    - key: PROMSCALE_DB_PORT
+      value: "{{ promscale_db_port }}"
+    - key: PROMSCALE_DB_SSL_MODE
+      value: "{{ promscale_db_ssl_mode }}"
+    - key: PROMSCALE_DB_USER
+      value: "{{ promscale_db_user }}"
+  notify: restart promscale
+
+- name: Configure promscale [extra]
+  lineinfile:
+    path: "{{ promscale_env_file }}"
+    regexp: '^#?\s*{{ item.key }}'
+    line: '{{ item.key }}="{{ item.value }}"'
+  with_dict: "{{ promscale_config }}"
+  notify: restart promscale
