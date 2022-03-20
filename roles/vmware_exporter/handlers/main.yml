@@ -1,0 +1,6 @@
+---
+
+- name: restart vmware exporter
+  systemd:
+    name: "container-{{ vmware_exporter_container_name }}"
+    state: restarted

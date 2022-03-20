@@ -1,0 +1,8 @@
+---
+
+vmware_exporter_port: 9272
+vmware_exporter_listen_address: "0.0.0.0"
+vmware_exporter_version: latest
+vmware_exporter_container_name: vmware_exporter
+vmware_exporter_config_file: "/etc/vmware_exporter.yml"
+vmware_exporter_config: {}
