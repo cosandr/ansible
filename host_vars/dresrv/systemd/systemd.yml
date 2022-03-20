@@ -2,7 +2,6 @@
 
 systemd_units:
   - "{{ __sd_backup_gdrive }}"
-  - "{{ __sd_backup_gitea }}"
   - "{{ __sd_btrfs_mail_scrub }}"
   - "{{ __sd_btrfs_scrub }}"
   - "{{ __sd_concat_motion }}"
@@ -11,6 +10,7 @@ systemd_units:
   - "{{ __sd_mpop_refresh }}"
   - "{{ __sd_nextcloud_mount }}"
   - "{{ __sd_update_cloudflare }}"
-  - "{{ __sd_update_gitea }}"
+  # - "{{ __sd_backup_gitea }}"
+  # - "{{ __sd_update_gitea }}"
   # - "{{ __sd_clear_recyle }}"
   # - "{{ __sd_ngx_recompile_modules }}"
