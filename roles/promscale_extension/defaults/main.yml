@@ -1,0 +1,4 @@
+---
+
+postgresql_version: 14
+promscale_ext_version: latest
