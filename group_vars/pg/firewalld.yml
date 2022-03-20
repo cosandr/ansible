@@ -1,0 +1,32 @@
+---
+
+firewalld_zones:
+  - name: internal
+    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+
+firewalld_services:
+  - name: postgresql
+    zone: internal
+
+  - name: cockpit
+    zone: public
+    state: absent
+
+  - name: cockpit
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: public
+    state: absent
+
+firewall_rules:
+  - port: "{{ postgres_exporter_port }}"
+    zone: internal
+
+  - port: "{{ node_exporter_port }}"
+    zone: internal

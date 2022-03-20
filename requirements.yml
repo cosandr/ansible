@@ -10,7 +10,6 @@ collections:
 
 roles:
   - name: geerlingguy.docker
-  - name: geerlingguy.postgresql
   - name: geerlingguy.gitlab
   - name: cloudalchemy.pushgateway
 

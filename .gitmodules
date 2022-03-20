@@ -25,3 +25,6 @@
 [submodule "roles/kibana"]
 	path = roles/kibana
 	url = git@github.com:cosandr/ansible-role-kibana.git
+[submodule "roles/postgresql"]
+	path = roles/postgresql
+	url = git@github.com:cosandr/ansible-role-postgresql.git
