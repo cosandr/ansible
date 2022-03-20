@@ -1,0 +1,10 @@
+---
+
+promscale_web_listen_address: "127.0.0.1:9201"
+
+promscale_db_host: "{{ hostvars['pg01'].ansible_host }}"
+promscale_db_name: promscale
+promscale_db_password: "{{ hostvars['pg01'].vault_postgresql_passwords.promscale }}"
+promscale_db_port: 5432
+promscale_db_ssl_mode: require
+promscale_db_user: promscale

@@ -112,6 +112,9 @@
     - role: prometheus
       tags: ["prometheus"]
 
+    - role: promscale
+      tags: ["promscale"]
+
     - role: alertmanager
       tags: ["alertmanager"]
 
