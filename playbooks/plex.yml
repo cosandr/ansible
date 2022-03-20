@@ -30,7 +30,7 @@
   tasks:
     - name: Mount media share
       mount:
-        src: "{{ home_net.vm.cidr | ipaddr('2') | ipaddr('address') }}:/mnt/tank/media"
+        src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/media"
         path: "/tank/media"
         opts: "defaults,vers=4,ro,noatime,noexec"
         state: mounted

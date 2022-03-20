@@ -26,7 +26,7 @@
   pre_tasks:
     - name: Mount NFS share
       mount:
-        src: "{{ home_net.vm.cidr | ipaddr('2') | ipaddr('address') }}:/mnt/tank/backup/pgsql"
+        src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/backup/pgsql"
         path: "/mnt/backup-pgsql"
         opts: "vers=4"
         state: mounted

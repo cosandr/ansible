@@ -85,7 +85,7 @@
       command: "setfacl -R -m u:plex:rx:df:allow /mnt/tank/media"
       vars:
         ansible_connection: ssh
-        ansible_host: 10.0.10.2
+        ansible_host: "{{ local_ips.general }}"
         ansible_user: root
         ansible_python_interpreter: /usr/local/bin/python3
       tags: ["plex", "acl"]

@@ -88,7 +88,7 @@
 
     - name: Mount tank NFS share
       mount:
-        src: "{{ home_net.vm.cidr | ipaddr('2') | ipaddr('address') }}:/mnt/tank"
+        src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank"
         path: "/mnt/tank"
         opts: "defaults,vers=4,ro,noatime"
         state: mounted
@@ -97,7 +97,7 @@
 
     - name: Mount Borg NFS share
       mount:
-        src: "{{ home_net.vm.cidr | ipaddr('2') | ipaddr('address') }}:/mnt/tank/borg/repos"
+        src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/borg/repos"
         path: "{{ borg_pool }}"
         opts: "defaults,vers=4,rw,noatime"
         state: mounted
