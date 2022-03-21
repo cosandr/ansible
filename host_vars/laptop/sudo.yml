@@ -3,3 +3,5 @@
 sudoers_files:
   - dest: "10-wheel"
     content: "%wheel ALL=(ALL) ALL"
+  - dest: "30-openconnect"
+    content: "{{ my_user }} ALL=(root) NOPASSWD: /usr/bin/openconnect"
