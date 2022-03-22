@@ -153,7 +153,7 @@ prometheus_scrape_configs_static:
     static_configs:
       - targets: ["{{ hostvars['pg01'].ansible_host }}:{{ hostvars['pg01'].postgres_exporter_port }}"]
         labels:
-          instance: "{{ server_label }}"
+          instance: "{{ hostvars['pg01'].inventory_hostname }}"
 
   - job_name: 'nginx'
     scrape_interval: 60s
