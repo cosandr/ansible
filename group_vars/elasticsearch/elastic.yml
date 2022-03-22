@@ -1,6 +1,6 @@
 ---
 
-es_version: "7.17.0"
+es_version: "7.17.1"
 __elastic_nodes: "{{ groups['elasticsearch'] | map('extract', hostvars, 'ansible_host') | list }}"
 es_heap_size: "{{ (ansible_memtotal_mb * 0.8 / 1000) | int }}g"
 es_api_host: "{{ ansible_host }}"
@@ -13,8 +13,6 @@ es_config:
   discovery.seed_hosts: "{{ __elastic_nodes }}"
   http.host: 0.0.0.0
   http.port: 9200
-  node.data: true
-  node.master: true
   transport.host: 0.0.0.0
   transport.port: 9300
   bootstrap.memory_lock: true

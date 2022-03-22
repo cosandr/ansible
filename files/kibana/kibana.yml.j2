@@ -1,0 +1,4 @@
+server.port: {{ kibana_server_port }}
+server.host: "{{ kibana_server_host }}"
+elasticsearch.hosts: {{ kibana_elasticsearch_url }}
+{{ kibana_config | to_nice_yaml }}

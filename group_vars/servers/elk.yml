@@ -1,0 +1,20 @@
+---
+
+__logstash_hosts: "{{ groups['logstash'] | map('extract', hostvars, 'ansible_host') | map('regex_replace', '$', ':5044') | list }}"
+
+filebeat_version: "7.17.1"
+
+filebeat_config:
+  logging.level: warning
+  filebeat.inputs:
+    - type: journald
+      id: everything
+
+  output.logstash:
+    hosts: "{{ __logstash_hosts }}"
+    # https://www.elastic.co/guide/en/beats/filebeat/current/publishing-ls-fails-connection-reset-by-peer.html
+    ttl: 300
+    pipelining: 0
+    # ssl.certificate_authorities: ["{{ ca_path }}"]
+    # ssl.certificate: "/etc/filebeat/filebeat.crt"
+    # ssl.key: "/etc/filebeat/filebeat.key"

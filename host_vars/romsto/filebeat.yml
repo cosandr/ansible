@@ -1,4 +1,5 @@
 ---
+filebeat_version: "7.13.4"
 
 filebeat_config:
   filebeat.inputs:

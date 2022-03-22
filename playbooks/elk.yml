@@ -38,3 +38,32 @@
   roles:
     - role: kibana
       tags: ["kibana"]
+
+
+- name: Prepare target hosts group
+  hosts: all
+  become: false
+  gather_facts: false
+  vars:
+    skip_hosts:
+      - dresrv
+      - drepi  # filebeat role doesn't support arm yet
+      - romsto
+      - truenas
+  tasks:
+    - name: Add hosts with filebeat configured
+      run_once: true
+      add_host:
+        name: "{{ item }}"
+        group: log_hosts
+      loop: "{{ groups['all'] }}"
+      when:
+        - item not in skip_hosts
+        - hostvars[item].filebeat_config is defined
+        - hostvars[item].filebeat_config | length > 0
+      tags: ["always"]
+
+- hosts: log_hosts
+  roles:
+    - role: filebeat
+      tags: ["filebeat"]

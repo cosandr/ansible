@@ -1,0 +1,18 @@
+---
+
+firewalld_services:
+  - name: cockpit
+    zone: public
+    state: absent
+
+  - name: cockpit
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: public
+    state: absent

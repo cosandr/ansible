@@ -22,8 +22,17 @@
     owner: root
     group: root
     mode: 0640
+  notify: restart filebeat
   tags: ["configure"]
 
-- name: Install filebeaet
+- name: Install filebeat
   include_tasks: install.yml
+  tags: ["install"]
+
+- name: enable and start filebeat
+  service:
+    name: filebeat
+    state: started
+    enabled: true
+  when: ansible_os_family != 'Slackware'
   tags: ["install"]

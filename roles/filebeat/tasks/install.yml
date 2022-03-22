@@ -1,16 +1,29 @@
 ---
 
-- name: Install with apt
-  apt:
-    deb: "{{ __filebeat_package_name }}"
+
+- block:
+  - name: Add Elasticsearch apt key.
+    apt_key:
+      url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+      state: present
+
+  - name: Install with apt
+    apt:
+      deb: "{{ __filebeat_package_name }}"
   when:
     - __filebeat_package_name is defined
     - ansible_pkg_mgr == 'apt'
 
-- name: Install with DNF
-  dnf:
-    name: "{{ __filebeat_package_name }}"
-    state: present
+- block:
+    - name: Add Elasticsearch GPG key.
+      rpm_key:
+        key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+        state: present
+
+    - name: Install with DNF
+      dnf:
+        name: "{{ __filebeat_package_name }}"
+        state: present
   when:
     - __filebeat_package_name is defined
     - ansible_pkg_mgr == 'dnf'
