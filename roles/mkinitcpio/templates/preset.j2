@@ -1,0 +1,22 @@
+# mkinitcpio preset file for the '{{ item.name }}' package
+
+ALL_config="/etc/mkinitcpio.conf"
+ALL_kver="/boot/vmlinuz-{{ item.name }}"
+{% if mkinitcpio_uefi_bundle | bool %}
+ALL_microcode=(/boot/*-ucode.img)
+{% endif %}
+
+PRESETS=({{ item.presets | default(mkinitcpio_kernel_presets) | map("regex_replace","(.+)","\'\\1\'") | join(' ') }})
+
+default_image="/boot/initramfs-{{ item.name }}.img"
+{% if mkinitcpio_uefi_bundle | bool %}
+default_efi_image="{{ mkinitcpio_uefi_path }}/{{ mkinitcpio_uefi_prefix }}-{{ item.name }}.efi"
+{% endif %}
+default_options="--splash {{ mkinitcpio_uefi_splash }}"
+
+#fallback_config="/etc/mkinitcpio.conf"
+fallback_image="/boot/initramfs-{{ item.name }}-fallback.img"
+{% if mkinitcpio_uefi_bundle | bool %}
+fallback_efi_image="{{ mkinitcpio_uefi_path }}/{{ mkinitcpio_uefi_prefix }}-{{ item.name }}-fallback.efi"
+{% endif %}
+fallback_options="-S autodetect --splash {{ mkinitcpio_uefi_splash }}"

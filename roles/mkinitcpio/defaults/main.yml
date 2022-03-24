@@ -1,0 +1,25 @@
+---
+
+esp_mount: "/boot"
+esp_disk: "/dev/nvme0n1"
+esp_part: "1"
+kernel_params: ""
+
+mkinitcpio_modules: ""
+mkinitcpio_binaries: ""
+mkinitcpio_files: ""
+mkinitcpio_hooks: "base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt filesystems fsck"
+
+mkinitcpio_kernel_presets:
+  - default
+
+mkinitcpio_kernels:
+  - name: linux
+    label: "Arch Linux"
+
+mkinitcpio_uefi_bundle: false
+mkinitcpio_uefi_sbctl_sign: true
+mkinitcpio_uefi_add: true
+mkinitcpio_uefi_path: "{{ esp_mount }}/EFI/Linux"
+mkinitcpio_uefi_prefix: "archlinux"
+mkinitcpio_uefi_splash: "/usr/share/systemd/bootctl/splash-arch.bmp"

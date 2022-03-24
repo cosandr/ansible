@@ -36,16 +36,9 @@
   with_items: "{{ makepkg_config }}"
   tags: ["makepkg"]
 
-# - name: Configure systemd-boot
-#   include_role:
-#     name: systemd_boot
-#   when: boot_loader == "systemd-boot"
-
-- name: Disable fallback images
-  become: true
-  lineinfile:
-    path: "/etc/mkinitcpio.d/{{ item }}.preset"
-    regexp: "^PRESETS"
-    line: "PRESETS=('default')"
-  with_items: "{{ mkinitcpio_no_fallback }}"
-  tags: ["mkinitcpio"]
+- name: Enable and start systemd-timesyncd
+  systemd:
+    name: systemd-timesyncd.service
+    state: started
+    enabled: true
+  tags: ["timesyncd"]
