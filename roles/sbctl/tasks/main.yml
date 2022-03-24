@@ -39,12 +39,18 @@
 - name: Prepare required facts
   set_fact:
     __bundles: "{{ __bundles | default([]) + [tmp_dict] }}"
+    __sbctl_efibootmgr: "{{ __sbctl_efibootmgr | default([]) + [tmp_dict_efi] }}"
   vars:
     tmp_dict:
       label: "{{ item.label | default(ansible_distribution + ' ' + item.kernel) }}"
       kernel_path: "{{ item.kernel_path | default('vmlinuz-' + item.kernel) }}"
       initrd: "{{ item.initrd | default('initramfs-' + item.kernel + '.img') }}"
       bundle: "{{ item.bundle | default(item.kernel + '.efi') }}"
+    tmp_dict_efi:
+      disk: "{{ esp_disk }}"
+      part: "{{ esp_part }}"
+      loader: "/EFI/Linux/{{ tmp_dict.bundle }}"
+      label: "{{ tmp_dict.label }}"
   loop: "{{ sbctl_bundles }}"
   loop_control:
     label: "{{ item.kernel }}"
@@ -76,8 +82,4 @@
   include_role:
     name: "efibootmgr"
   vars:
-    disk: "/dev/nvme0n1"
-    part: "1"
-    loader: "/EFI/Linux/{{ item.bundle }}"
-    label: "{{ item.label }}"
-  loop: "{{ __bundles }}"
+    efibootmgr_entries: "{{ __sbctl_efibootmgr }}"

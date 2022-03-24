@@ -1,7 +1,7 @@
 ---
 
 - name: Get existing entries
-  command: "efibootmgr --verbose"
+  command: "/usr/bin/efibootmgr --verbose"
   check_mode: false
   changed_when: false
   args:
@@ -11,11 +11,14 @@
 - name: Add entry if it doesn't exist already
   become: true
   command: >
-    efibootmgr --create
-    --disk {{ disk }}
-    --part {{ part }}
-    --loader {{ loader }}
-    --label {{ label | quote }}
+    /usr/bin/efibootmgr --create
+    --disk {{ item.disk }}
+    --part {{ item.part }}
+    --loader {{ item.loader }}
+    --label {{ item.label | quote }}
+  loop: "{{ efibootmgr_entries }}"
+  loop_control:
+    label: "{{ item.loader }}"
   when:
     # Accept both / and \ as path seperators and ignore case
-    - not __efi_entries.stdout | replace('\\', '/') is search(loader | replace('\\', '/'), ignorecase=True)
+    - not __efi_entries.stdout | replace('\\', '/') is search(item.loader | replace('\\', '/'), ignorecase=True)

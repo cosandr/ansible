@@ -1,0 +1,7 @@
+---
+
+efibootmgr_entries:
+  - disk: "/dev/nvme0n1"
+    part: "1"
+    loader: "/EFI/Linux/linux.efi"
+    label: "Linux"
