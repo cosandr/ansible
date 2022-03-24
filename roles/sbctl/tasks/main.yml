@@ -69,6 +69,7 @@
   args:
     creates: "{{ esp_mount }}/EFI/Linux/{{ item.bundle }}"
   loop: "{{ __bundles }}"
+  when: __bundles is defined
 
 - name: Sign files
   command: "sbctl sign -s {{ item }}"
@@ -85,3 +86,4 @@
     name: "efibootmgr"
   vars:
     efibootmgr_entries: "{{ __sbctl_efibootmgr }}"
+  when: __sbctl_efibootmgr is defined
