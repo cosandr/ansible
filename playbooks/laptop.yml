@@ -225,6 +225,12 @@
         - desktop_environment == "i3"
       tags: ["xidlehook"]
 
+    - role: gnome
+      when:
+        - ansible_distribution == 'Archlinux'
+        - desktop_environment == "gnome"
+      tags: ["gnome"]
+
     - role: gnome-keyring
       tags: ["gnome-keyring"]
 

@@ -1,0 +1,32 @@
+---
+
+- name: Install GNOME packages
+  pacman:
+    name: "{{ gnome_packages }}"
+    state: present
+  tags: ["install"]
+
+- name: Install GNOME AUR packages
+  include_role:
+    name: install_aur
+    apply:
+      tags: ["install", "aur"]
+  vars:
+    aur_packages: "{{ gnome_aur_packages }}"
+  tags: ["install", "aur"]
+
+- name: Ensure psutil library is installed
+  pacman:
+    name: python-psutil
+    state: present
+  tags: ["install", "dconf"]
+
+- name: Configure dconf
+  become: true
+  become_user: "{{ my_user }}"
+  community.general.dconf:
+    key: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  with_dict: "{{ gnome_dconf_settings }}"
+  tags: ["dconf"]

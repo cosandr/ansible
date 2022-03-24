@@ -1,0 +1,28 @@
+---
+
+my_user: "andrei"
+
+gnome_packages:
+  - power-profiles-daemon
+  - system-config-printer
+
+gnome_aur_packages:
+  - extension-manager
+  - chrome-gnome-shell
+  # - gnome-shell-extension-installer
+
+gnome_extensions:
+  - 1460  # Vitals
+  - 615   # AppIndicator
+  - 906   # Sound Device Chooser
+  - 3733  # Tiling Assistant
+
+gnome_dconf_settings:
+  "/org/gnome/mutter/experimental-features": "['scale-monitor-framebuffer']"
+  "/org/gnome/desktop/input-sources/sources": "[('xkb', 'us'), ('xkb', 'no')]"
+  "/org/gnome/desktop/peripherals/mouse/accel-profile": "'flat'"
+  "/org/gnome/desktop/wm/preferences/resize-with-right-button": "true"
+  "/org/gnome/desktop/wm/keybindings/switch-applications": "@as []"
+  "/org/gnome/desktop/wm/keybindings/switch-applications-backward": "@as []"
+  "/org/gnome/desktop/wm/keybindings/switch-windows": "['<Alt>Tab']"
+  "/org/gnome/desktop/wm/keybindings/switch-windows-backward": "['<Shift><Alt>Tab']"
