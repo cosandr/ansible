@@ -1,13 +1,5 @@
 ---
 
-- name: Write kernel parameters to {{ sbctl_cmdline }}
-  copy:
-    dest: "{{ sbctl_cmdline }}"
-    owner: root
-    group: root
-    mode: 0644
-    content: "{{ kernel_params }}"
-
 - name: Install sbctl
   pacman:
     name: sbctl
@@ -18,6 +10,15 @@
   command: "sbctl create-keys"
   args:
     creates: /usr/share/secureboot/GUID
+
+- name: Write kernel parameters to {{ sbctl_cmdline }}
+  copy:
+    dest: "{{ sbctl_cmdline }}"
+    owner: root
+    group: root
+    mode: 0644
+    content: "{{ kernel_params }}"
+  when: sbctl_bundles | length > 0
 
 - name: Enroll keys
   command: "sbctl enroll-keys {% if sbctl_enroll_microsoft %}--microsoft{% endif %}"
@@ -35,6 +36,7 @@
     owner: root
     group: root
     mode: 0755
+  when: sbctl_bundles | length > 0
 
 - name: Prepare required facts
   set_fact:
