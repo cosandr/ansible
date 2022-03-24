@@ -26,10 +26,9 @@ sbctl_enroll_microsoft: true
 sbctl_ucode: "amd-ucode.img"
 
 esp_src: "UUID=538E-A9BF"
+esp_disk: "/dev/nvme1n1"
 extra_kernel_params: "nmi_watchdog=0 nvidia-drm.modeset=1 systemd.unified_cgroup_hierarchy=0"
 kernel_params: "root=/dev/mapper/root rootflags=subvol=@ {{ extra_kernel_params }}"
-
-mkinitcpio_no_fallback: "{{ sbctl_bundles | map(attribute='kernel') }}"
 
 network_manager: "systemd-networkd"
 
@@ -49,3 +48,6 @@ host_pacman_packages:
   - nvidia-settings
 
 host_aur_packages: []
+
+mkinitcpio_uefi_bundle: false
+mkinitcpio_modules: "nvidia nvidia_modeset nvidia_uvm nvidia_drm"

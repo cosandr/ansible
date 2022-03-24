@@ -19,12 +19,6 @@ host_aur_packages:
   - webex-bin
   - zoom
 
-enabled_services:
-  - systemd-timesyncd.service
-  - firewalld.service
-  - bluetooth.service
-  - sshd.service
-
 masked_services:
   - systemd-rfkill.service
   - systemd-rfkill.socket
@@ -32,12 +26,14 @@ masked_services:
 modprobe_config:
   "nobeep.conf": "blacklist pcspkr"
 
-
 # Update key
 # systemd-cryptenroll /dev/nvme0n1p2 --wipe-slot=tpm2
 # systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+1+7 /dev/nvme0n1p2
 
 esp_src: "UUID=A14E-3411"
+esp_mount: "{{ '/boot' if desktop_environment in ['i3', 'sway'] else '/boot/efi' }}"
+mkinitcpio_uefi_prefix: "arch_{{ desktop_environment }}"
+
 extra_kernel_params: "intel_iommu=on nmi_watchdog=0 console=tty7 systemd.unified_cgroup_hierarchy=0"
 kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ resume=/dev/mapper/root resume_offset=941473 {{ extra_kernel_params }}"
 
@@ -66,30 +62,17 @@ fstab: |
 # sudo systemctl enable --now go-check-updates.socket
 
 sbctl_sign_files:
-  - "/boot/vmlinuz-linux"
-  - "/boot/vmlinuz-linux-zen"
-  - "/boot/EFI/BOOT/BOOTX64.EFI"
-  - "/boot/EFI/arch/fwupdx64.efi"
-  - "/boot/EFI/systemd/systemd-bootx64.efi"
+  - "{{ esp_mount }}/EFI/BOOT/BOOTX64.EFI"
+  - "{{ esp_mount }}/EFI/arch/fwupdx64.efi"
 
-# ansible_form_factor: Notebook
+firewalld_zones:
+  - name: public
+    interfaces: ["wlan0"]
 
-firewalld_interfaces:
-  - zone: public
-    interface: wlan0
+  - name: home
+    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
 
-firewalld_remove_services:
-  - zone: public
-    service: ssh
-
-firewalld_add_sources:
-  - zone: home
-    source: "10.0.0.0/24"
-
-sbctl_bundles:
-  - kernel: linux
-    label: "Arch Linux"
-  - kernel: linux-lts
-    label: "Arch Linux LTS"
-
-mkinitcpio_no_fallback: "{{ sbctl_bundles | map(attribute='kernel') }}"
+firewalld_services:
+  - name: ssh
+    zone: public
+    state: absent

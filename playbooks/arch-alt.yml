@@ -20,7 +20,7 @@
       - vim
     btrfs_src: "/dev/mapper/root"
     btrfs_opts: "rw,relatime,compress-force=zstd:3,ssd,space_cache=v2"
-    esp_path: "/boot/efi"
+    esp_mount: "/boot/efi"
     env_name: "arch_{{ desktop_environment }}"
     src_host: "{{ lookup('pipe', 'hostname') | lower }}"
     btrfs_root: "{{ hostvars[src_host].btrfs_root }}"
@@ -94,14 +94,14 @@
         state: directory
       loop:
         - "{{ chroot_path }}/{{ btrfs_root }}"
-        - "{{ chroot_path }}/{{ esp_path }}"
+        - "{{ chroot_path }}/{{ esp_mount }}"
         - "{{ chroot_path }}/usr/share/secureboot"
       tags: ["mount"]
 
     - name: Bind mount ESP
       mount:
         src: "/boot"
-        path: "{{ chroot_path }}/{{ esp_path }}"
+        path: "{{ chroot_path }}/{{ esp_mount }}"
         state: mounted
         opts: bind
         fstype: none
@@ -119,7 +119,7 @@
           # See fstab(5) for details.
 
           # <file system> <dir> <type> <options> <dump> <pass>
-          {{ esp_src }} 	 {{ esp_path }} 	 vfat 	 rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 	 0  2
+          {{ esp_src }} 	 {{ esp_mount }} 	 vfat 	 rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 	 0  2
           {{ btrfs_src }} 	 {{ btrfs_root }} 	 btrfs 	 {{ btrfs_opts }} 	0  0
           {% for m in mounts %}
           {{ btrfs_src }} 	 {{ m.path }} 	 btrfs 	 {{ btrfs_opts }},subvol={{ m.subvol }} 	0  0
@@ -151,7 +151,7 @@
         name: "{{ chroot_path }}"
         groups: chroots
         env_name: "{{ env_name }}"
-        esp_path: "{{ esp_path }}"
+        esp_mount: "{{ esp_mount }}"
         src_host: "{{ src_host }}"
 
 - name: Run in chroot
@@ -204,7 +204,7 @@
         sbctl_enroll: false
         sbctl_ucode: "{{ hostvars[src_host].sbctl_ucode | default('intel-ucode.img') }}"
         boot_mount: /boot
-        esp_mount: "{{ esp_path }}"
+        esp_mount: "{{ esp_mount }}"
         sbctl_bundles:
           - kernel: linux
             label: "Arch Linux {{ desktop_environment | upper }}"

@@ -18,6 +18,34 @@
       setup:
       tags: ["always"]
 
+    - name: Gather service facts
+      service_facts:
+      tags: ["always"]
+
+    - name: Set desktop_environment to GNOME
+      set_fact:
+        desktop_environment: "gnome"
+        kernel_params: "root=/dev/mapper/root rw rootflags=subvol=arch_gnome/@ {{ extra_kernel_params }}"
+        mkinitcpio_kernels:
+          - name: linux
+            label: "Arch GNOME"
+          - name: linux-lts
+            label: "Arch GNOME LTS"
+      when: ansible_facts.services.get('gdm.service', {}).get('status', '') == 'enabled'
+      tags: ["always"]
+
+    - name: Set desktop_environment to KDE
+      set_fact:
+        desktop_environment: "kde"
+        kernel_params: "root=/dev/mapper/root rw rootflags=subvol=arch_kde/@ {{ extra_kernel_params }}"
+        mkinitcpio_kernels:
+          - name: linux
+            label: "Arch KDE"
+          - name: linux-lts
+            label: "Arch KDE LTS"
+      when: ansible_facts.services.get('sddm.service', {}).get('status', '') == 'enabled'
+      tags: ["always"]
+
     - name: Install packages (pacman)
       pacman:
         name: "{{ pacman_packages }}"
@@ -57,43 +85,43 @@
       tags: ["sway"]
 
     - block:
-          - name: Ensure bluetooth is enabled
-            systemd:
-              name: bluetooth.service
-              state: started
-              enabled: true
+        - name: Ensure bluetooth is enabled
+          systemd:
+            name: bluetooth.service
+            state: started
+            enabled: true
 
-          - name: Enable bluetooth auto power on
-            lineinfile:
-              path: '/etc/bluetooth/main.conf'
-              regexp: '^#?AutoEnable'
-              line: 'AutoEnable=true'
+        - name: Enable bluetooth auto power on
+          lineinfile:
+            path: '/etc/bluetooth/main.conf'
+            regexp: '^#?AutoEnable'
+            line: 'AutoEnable=true'
 
-          - name: Ensure pipewire config dir exists
-            file:
-              path: "/etc/pipewire/media-session.d"
-              state: directory
-              owner: root
-              group: root
-              mode: 0755
+        - name: Ensure pipewire config dir exists
+          file:
+            path: "/etc/pipewire/media-session.d"
+            state: directory
+            owner: root
+            group: root
+            mode: 0755
 
-          - name: Copy default config
-            copy:
-              src: "/usr/share/pipewire/media-session.d/bluez-monitor.conf"
-              dest: "/etc/pipewire/media-session.d/bluez-monitor.conf"
-              owner: root
-              group: root
-              mode: 0644
-              force: false
-            tags: ["pipewire"]
+        - name: Copy default config
+          copy:
+            src: "/usr/share/pipewire/media-session.d/bluez-monitor.conf"
+            dest: "/etc/pipewire/media-session.d/bluez-monitor.conf"
+            owner: root
+            group: root
+            mode: 0644
+            force: false
+          tags: ["pipewire"]
 
-          - name: Enable profile auto-switch
-            lineinfile:
-              path: "/etc/pipewire/media-session.d/bluez-monitor.conf"
-              backrefs: true
-              regexp: '^(\s+)bluez5\.autoswitch-profile'
-              line: '\1bluez5.autoswitch-profile = true'
-            tags: ["pipewire"]
+        - name: Enable profile auto-switch
+          lineinfile:
+            path: "/etc/pipewire/media-session.d/bluez-monitor.conf"
+            backrefs: true
+            regexp: '^(\s+)bluez5\.autoswitch-profile'
+            line: '\1bluez5.autoswitch-profile = true'
+          tags: ["pipewire"]
 
       tags: ["bluetooth"]
 
@@ -102,20 +130,15 @@
       become: true
       command: dracut -f --regenerate-all
   roles:
-    - role: node_exporter
-      vars:
-        node_exporter_skip_install: false
-        node_exporter_version: "latest"
-        node_exporter_collectors: []
-
-      tags: ["prometheus-stack", "node_exporter"]
-
     - role: laptop
       tags: ["laptop"]
 
     - role: arch-common
       when: ansible_distribution == 'Archlinux'
       tags: ["arch-common"]
+
+    - role: firewall_config
+      tags: ["firewall"]
 
     - role: borg
       tags: ["borg"]
@@ -144,6 +167,10 @@
     - role: sbctl
       when: ansible_distribution == 'Archlinux'
       tags: ["sbctl"]
+
+    - role: mkinitcpio
+      when: ansible_distribution == 'Archlinux'
+      tags: ["mkinitcpio"]
 
     - role: paru
       vars:
@@ -181,6 +208,7 @@
       tags: ["google-chrome"]
 
     - role: tlp
+      when: desktop_environment in ["i3", "sway"]
       tags: ["tlp"]
 
     # - role: xss-lock
@@ -227,4 +255,11 @@
 
     - role: aisbergg.snapper
       tags: ["snapper"]
+
+    - role: node_exporter
+      vars:
+        node_exporter_skip_install: false
+        node_exporter_version: "latest"
+        node_exporter_collectors: []
+      tags: ["prometheus-stack", "node_exporter"]
 

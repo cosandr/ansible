@@ -1,6 +1,15 @@
 ---
 
 btrfs_root: "/mnt/btrfs_root"
+esp_mount: "/boot"
+
+mkinitcpio_uefi_bundle: true
+mkinitcpio_kernel_presets: ["default"]
+mkinitcpio_kernels:
+  - name: linux
+    label: "Arch Linux"
+  - name: linux-lts
+    label: "Arch Linux LTS"
 
 base_pacman_packages:
   - alacritty
