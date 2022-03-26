@@ -26,7 +26,67 @@
   become_user: "{{ my_user }}"
   community.general.dconf:
     key: "{{ item.key }}"
-    value: "{{ item.value }}"
+    value: "{{ item.value | string }}"
     state: present
   with_dict: "{{ gnome_dconf_settings }}"
   tags: ["dconf"]
+
+- name: Prepare key bindings commands
+  set_fact:
+    __kb_list: "{{ __kb_list | default([]) + [tmp_dict] }}"
+  vars:
+    tmp_dict:
+      key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom{{ (my_idx / 3) | round(0, 'floor') | int }}/{{ item.1 }}"
+      value: "'{{ item.0.get(item.1) }}'"
+  with_nested:
+    - "{{ gnome_custom_keybindings }}"
+    - ["binding", "command", "name"]
+  loop_control:
+    index_var: my_idx
+  tags: ["bindings"]
+
+- name: Configure key bindings
+  become: true
+  become_user: "{{ my_user }}"
+  community.general.dconf:
+    key: "{{ item.key }}"
+    value: "{{ item.value | string }}"
+    state: present
+  loop: "{{ __kb_list }}"
+  tags: ["bindings"]
+
+- name: Prepare bindings list fact
+  set_fact:
+    __kb_list_var: "{{ __kb_list_var | default([]) + [tmp] }}"
+  vars:
+    tmp: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom{{ my_idx }}/"
+  loop: "{{ gnome_custom_keybindings }}"
+  loop_control:
+    label: "custom{{ my_idx }}"
+    index_var: my_idx
+  tags: ["bindings"]
+
+- name: Configure custom-keybindings list
+  become: true
+  become_user: "{{ my_user }}"
+  community.general.dconf:
+    key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
+    value: "{{ ('[' + value + ']') | string }}"
+    state: present
+  vars:
+    value: "{{ __kb_list_var | map('regex_replace', '(.+)',\"'\\1'\") | join(', ') }}"
+  tags: ["bindings"]
+
+# - name: Get current keybindings
+#   become: true
+#   become_user: "{{ my_user }}"
+#   community.general.dconf:
+#     key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings"
+#     state: read
+#   register: __bindings
+#   tags: ["bindings"]
+
+# - debug:
+#     # msg: "{{ __bindings.value | replace(\"'\", '\"') | from_json }}"
+#     msg: "{{ __bindings.value.split(',') | length }}"
+#   tags: ["bindings"]

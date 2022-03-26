@@ -107,7 +107,9 @@ base_pacman_packages:
   - usbutils
   - vim
   - vlc
+  - wget
   - which
+  - yamllint
   - zsh
 
 base_aur_packages:

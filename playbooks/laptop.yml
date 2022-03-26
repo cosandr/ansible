@@ -18,20 +18,32 @@
       setup:
       tags: ["always"]
 
-    - name: Gather service facts
-      service_facts:
+    - name: Check if GDM is active  # noqa command-instead-of-module
+      command: systemctl is-active -q gdm.service
+      check_mode: false
+      changed_when: false
+      failed_when: false
+      register: __gdm_active
+      tags: ["always"]
+
+    - name: Check if SDDM is active  # noqa command-instead-of-module
+      command: systemctl is-active -q sddm.service
+      check_mode: false
+      changed_when: false
+      failed_when: false
+      register: __sddm_active
       tags: ["always"]
 
     - name: Set desktop_environment to GNOME
       set_fact:
         desktop_environment: "gnome"
-        kernel_params: "root=/dev/mapper/root rw rootflags=subvol=arch_gnome/@ {{ extra_kernel_params }}"
+        kernel_params: "root=/dev/mapper/root rw rootflags=subvol=arch_gnome/@ resume=/dev/mapper/root resume_offset=37889341 {{ extra_kernel_params }}"
         mkinitcpio_kernels:
           - name: linux
             label: "Arch GNOME"
           - name: linux-lts
             label: "Arch GNOME LTS"
-      when: ansible_facts.services.get('gdm.service', {}).get('status', '') == 'enabled'
+      when: __gdm_active.rc == 0
       tags: ["always"]
 
     - name: Set desktop_environment to KDE
@@ -43,7 +55,7 @@
             label: "Arch KDE"
           - name: linux-lts
             label: "Arch KDE LTS"
-      when: ansible_facts.services.get('sddm.service', {}).get('status', '') == 'enabled'
+      when: __sddm_active.rc == 0
       tags: ["always"]
 
     - name: Install packages (pacman)
@@ -192,6 +204,9 @@
       tags: ["ufw"]
 
     - role: install_aur
+      vars:
+        # No idea why this is needed
+        aur_packages: "{{ hostvars[inventory_hostname].aur_packages }}"
       when: ansible_distribution == 'Archlinux'
       tags: ["aur"]
 

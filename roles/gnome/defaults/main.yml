@@ -16,13 +16,53 @@ gnome_extensions:
   - 615   # AppIndicator
   - 906   # Sound Device Chooser
   - 3733  # Tiling Assistant
+  - 2645  # Brightness control using ddcutil
 
 gnome_dconf_settings:
   "/org/gnome/mutter/experimental-features": "['scale-monitor-framebuffer']"
   "/org/gnome/desktop/input-sources/sources": "[('xkb', 'us'), ('xkb', 'no')]"
   "/org/gnome/desktop/peripherals/mouse/accel-profile": "'flat'"
   "/org/gnome/desktop/wm/preferences/resize-with-right-button": "true"
+  "/org/gnome/desktop/wm/keybindings/close": "['<Super>q', '<Alt>F4']"
   "/org/gnome/desktop/wm/keybindings/switch-applications": "@as []"
   "/org/gnome/desktop/wm/keybindings/switch-applications-backward": "@as []"
   "/org/gnome/desktop/wm/keybindings/switch-windows": "['<Alt>Tab']"
   "/org/gnome/desktop/wm/keybindings/switch-windows-backward": "['<Shift><Alt>Tab']"
+  "/org/gnome/settings-daemon/plugins/media-keys/area-screenshot-clip": "['<Shift><Super>s']"
+
+gnome_custom_keybindings:
+  - binding: '<Super>Return'
+    command: 'kitty'
+    name: 'Kitty'
+
+  - binding: '<Alt><Super>b'
+    command: 'gtk-launch firefox'
+    name: 'Firefox'
+
+  - binding: '<Alt><Super><Shift>b'
+    command: 'gtk-launch firefox-work'
+    name: 'Firefox Work'
+
+  - binding: '<Alt><Super>c'
+    command: '~/.local/bin/code --new-window'
+    name: 'Code'
+
+  - binding: '<Alt><Super>f'
+    command: 'nautilus --new-window'
+    name: 'Nautilus'
+
+  - binding: '<Primary><Alt>1'
+    command: 'kitty ssh andrei@DreSRV-A'
+    name: 'Kitty DreSRV'
+
+  - binding: '<Primary><Alt>2'
+    command: 'kitty ssh root@DreSRV'
+    name: 'Kitty DreSRV root'
+
+  - binding: '<Primary><Alt>3'
+    command: 'kitty ssh andrei@dresrv.com-A'
+    name: 'Kitty dresrv.com'
+
+  - binding: '<Primary><Alt>4'
+    command: 'kitty ssh ws'
+    name: 'Kitty ws'
