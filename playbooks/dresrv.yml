@@ -1,7 +1,7 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 - name: Server playbook
-  gather_facts: false
+  gather_facts: true
   hosts: dresrv
   pre_tasks:
     - name: Run common role
@@ -12,10 +12,6 @@
     - name: Merge ports
       set_fact:
         ports: "{{ ports | combine(_ports, recursive=true) }}"
-      tags: ["always"]
-
-    - name: Gather facts
-      setup:
       tags: ["always"]
 
     - name: Merge Docker ports

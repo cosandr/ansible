@@ -1,23 +1,9 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 - name: Laptop playbook
-  gather_facts: false
+  gather_facts: true
   hosts: laptop
   pre_tasks:
-    - name: Run common role
-      import_role:
-        name: common
-      tags: ["always"]
-
-    - name: Merge ports
-      set_fact:
-        ports: "{{ ports | combine(_ports, recursive=true) }}"
-      tags: ["always"]
-
-    - name: Gather facts
-      setup:
-      tags: ["always"]
-
     - name: Check if GDM is active  # noqa command-instead-of-module
       command: systemctl is-active -q gdm.service
       check_mode: false

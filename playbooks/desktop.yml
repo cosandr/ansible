@@ -1,18 +1,9 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 - name: Desktop playbook
-  gather_facts: false
+  gather_facts: true
   hosts: desktop
   pre_tasks:
-    - name: Run common role
-      import_role:
-        name: common
-      tags: ["always"]
-
-    - name: Gather facts
-      setup:
-      tags: ["always"]
-
     - block:
         - name: Add prometheus servers to internal zone
           firewalld:

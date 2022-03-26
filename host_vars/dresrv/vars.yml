@@ -1,4 +1,7 @@
 ---
+
+ansible_connection: "{{ 'local' if (lookup('pipe', 'hostname') | lower) == (inventory_hostname | lower) else 'ssh' }}"
+
 _ports:
   adminer: 54322
   gitea: 3000

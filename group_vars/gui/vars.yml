@@ -1,5 +1,7 @@
 ---
 
+ansible_connection: "{{ 'local' if (lookup('pipe', 'hostname') | lower) == (inventory_hostname | lower) else 'ssh' }}"
+
 systemd_user: "{{ my_user | default('andrei') }}"
 systemd_user_conf: "/home/{{ systemd_user }}/.config/systemd/user"
 systemd_user_override: "/home/{{ systemd_user }}/.config/override"

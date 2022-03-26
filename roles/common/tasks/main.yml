@@ -1,7 +1,0 @@
----
-
-- name: Set local connection if needed
-  set_fact:
-    ansible_connection: local
-  when: (lookup('pipe', 'hostname') | lower) == (inventory_hostname | lower)
-  tags: ["set-local"]
