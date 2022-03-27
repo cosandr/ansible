@@ -2,6 +2,7 @@
 
 host_pacman_packages:
   - acpi_call-dkms
+  - fprintd
   - fwupd
   - intel-gpu-tools
   - intel-media-driver

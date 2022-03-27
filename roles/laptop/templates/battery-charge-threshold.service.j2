@@ -1,0 +1,14 @@
+[Unit]
+Description=Set battery charge thresholds
+StartLimitBurst=0
+
+[Service]
+Type=oneshot
+Restart=on-failure
+{% for b in battery_charge_threshold_list %}
+ExecStart=/bin/sh -c 'echo {{ battery_charge_threshold_start }} > /sys/class/power_supply/{{ b }}/charge_control_start_threshold'
+ExecStart=/bin/sh -c 'echo {{ battery_charge_threshold_end }} > /sys/class/power_supply/{{ b }}/charge_control_end_threshold'
+{% endfor %}
+
+[Install]
+WantedBy=multi-user.target

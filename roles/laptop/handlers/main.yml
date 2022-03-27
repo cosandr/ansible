@@ -25,3 +25,8 @@
   systemd:
     name: "root-resume.service"
     enabled: true
+
+- name: restart battery charge threshold service
+  systemd:
+    name: battery-charge-threshold.service
+    state: restarted

@@ -2,6 +2,7 @@
 
 desktop_environment: "sway"
 install_logind_config: "{{ desktop_environment in ['i3', 'sway'] }}"
+install_battery_charge_threshold: "{{ desktop_environment not in ['i3', 'sway'] }}"
 install_sleep_config: "{{ install_logind_config }}"
 install_suspend_hooks: true
 
@@ -31,3 +32,9 @@ logind_config: |
   HandleRebootKey=ignore
 
 systemd_sleep_config: ""
+
+battery_charge_threshold_list:
+  - BAT0
+
+battery_charge_threshold_start: 0
+battery_charge_threshold_end: 80

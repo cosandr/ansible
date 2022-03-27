@@ -77,6 +77,15 @@
     value: "{{ __kb_list_var | map('regex_replace', '(.+)',\"'\\1'\") | join(', ') }}"
   tags: ["bindings"]
 
+- name: Sync monitor settings
+  copy:
+    src: "/home/{{ my_user }}/.config/monitors.xml"
+    dest: /var/lib/gdm/.config/monitors.xml
+    owner: gdm
+    group: gdm
+    mode: 0644
+  tags: ["sync"]
+
 # - name: Get current keybindings
 #   become: true
 #   become_user: "{{ my_user }}"

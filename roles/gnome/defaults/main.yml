@@ -20,6 +20,7 @@ gnome_extensions:
 
 gnome_dconf_settings:
   "/org/gnome/mutter/experimental-features": "['scale-monitor-framebuffer']"
+  "/org/gnome/software/download-updates": "false"
   "/org/gnome/desktop/input-sources/sources": "[('xkb', 'us'), ('xkb', 'no')]"
   "/org/gnome/desktop/peripherals/mouse/accel-profile": "'flat'"
   "/org/gnome/desktop/wm/preferences/resize-with-right-button": "true"
