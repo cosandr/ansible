@@ -4,6 +4,9 @@ ports: {}
 
 ansible_managed: "Ansible managed"
 my_user: andrei
+my_groups:
+  - docker
+  - wheel
 my_email: "{{ vault_my_email }}"
 
 node_exporter_port: 9100

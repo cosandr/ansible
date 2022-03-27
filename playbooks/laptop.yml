@@ -270,3 +270,10 @@
         node_exporter_collectors: []
       tags: ["prometheus-stack", "node_exporter"]
 
+  post_tasks:
+    - name: Configure user groups
+      user:
+        name: "{{ my_user }}"
+        groups: "{{ my_groups }}"
+        append: true
+      tags: ["groups"]
