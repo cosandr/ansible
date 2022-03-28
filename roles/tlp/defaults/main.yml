@@ -7,8 +7,8 @@ network_manager: "systemd-networkd"
 touchpad_natural_scroll: true
 touchpad_tap_to_click: true
 
-tlp_start_charge: 80
-tlp_stop_charge: 90
+tlp_start_charge: 0
+tlp_stop_charge: 80
 tlp_pcie_ac: "default"
 tlp_pcie_bat: "powersave"
 tlp_devices_lan_con:
