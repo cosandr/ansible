@@ -4,6 +4,10 @@ firewalld_zones:
   - name: internal
     sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
 
+  - name: internal
+    sources:
+      - "{{ hostvars['laptop'].wireguard_ip }}"
+
 firewalld_services:
   - name: postgresql
     zone: internal
