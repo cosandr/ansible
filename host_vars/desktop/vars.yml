@@ -9,6 +9,7 @@ hwinfo_exporter_port: 10445
 
 node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
 borg_desktop_passphrase: "{{ vault_borg_desktop_passphrase }}"
+desktop_environment: "i3"
 
 __pacman_packages:
   - nvidia-docker

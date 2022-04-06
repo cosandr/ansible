@@ -226,6 +226,10 @@
         - desktop_environment == "i3"
       tags: ["xidlehook"]
 
+    - role: autorandr
+      when: desktop_environment in ["i3", "sway"]
+      tags: ["autorandr"]
+
     - role: gnome
       when:
         - ansible_distribution == 'Archlinux'

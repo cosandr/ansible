@@ -54,6 +54,10 @@
     - role: xorg
       tags: ["xorg"]
 
+    - role: autorandr
+      when: desktop_environment in ["i3", "sway"]
+      tags: ["autorandr"]
+
     - role: gnome-keyring
       tags: ["gnome-keyring"]
 
