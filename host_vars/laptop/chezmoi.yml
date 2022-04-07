@@ -3,31 +3,35 @@
 chezmoi_overrides:
   i3: |
     # Restore based on connected displays
-    mon=$(xrandr --query | grep -oP '\S+\s+connected' | cut -d' ' -f1)
     _hour=$(date +%H)
-    [[ $_hour -ge 8 && $_hour -lt 17 ]] && workhours=1 || workhours=0
-    if [[ $mon =~ DP-3$ && $mon =~ HDMI-1 ]]; then
-      if [[ $workhours -eq 1 ]]; then
-        WS["1"]="work"
-        WS["2"]="work"
-      else
-        WS["2"]="no-discord"
+    if [[ $_hour -ge 8 && $_hour -lt 17 ]]; then
+      workhours=1
+    else
+      workhours=0
+    fi
+
+    work_mon=0
+    home_mon=0
+    mapfile -t present_monitors < <(xrandr --listactivemonitors | awk -F ' ' '{if (NR!=1) {print $(NF)}}')
+    for m in "${present_monitors[@]}"; do
+      if [[ $m =~ ^DP-3-2$ || $m =~ ^HDMI-1$ ]]; then
+        work_mon=$(( work_mon + 1 ))
       fi
-    elif [[ $mon =~ DP-3-2$ && $mon =~ HDMI-1 ]]; then
-      if [[ $workhours -eq 1 ]]; then
-        WS["1"]="work"
-        WS["2"]="laptop-ext"
-        WS["3"]="laptop-ext"
-      else
-        WS["2"]="no-discord"
+      if [[ $m =~ ^DP-3$ || $m =~ ^HDMI-1$ ]]; then
+        home_mon=$(( home_mon + 1 ))
+      fi
+    done
+
+    if [[ $workhours -eq 1 ]]; then
+      WS["1"]="work"
+      if [[ $home_mon -eq 2 ]]; then
+        WS["2"]="work-home"
+      elif [[ $work_mon -eq 2 ]]; then
+        WS["2"]="work"
+        WS["3"]="work"
       fi
     else
-      if [[ $workhours -eq 1 ]]; then
-        WS["1"]="work"
-        WS["2"]="laptop-ext"
-      else
-        WS["1"]="laptop"
-      fi
+      WS["1"]="laptop"
     fi
   polybar: |
     MONITOR_MAP["eDP-1"]="laptop"
