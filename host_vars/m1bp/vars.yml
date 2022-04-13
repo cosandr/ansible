@@ -1,0 +1,3 @@
+---
+
+ansible_connection: "{{ 'local' if (lookup('pipe', 'hostname -s') | lower) == (inventory_hostname | lower) else 'ssh' }}"

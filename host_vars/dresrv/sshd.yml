@@ -1,10 +1,14 @@
 ---
 
-sshd_extra_config: |
-  Match Address {{ hostvars['desktop'].ansible_host }}
-      PermitRootLogin prohibit-password
+__sshd_allow_root:
+  - "{{ hostvars['desktop'].ansible_host }}"
+  - "{{ hostvars['laptop'].ansible_host }}"
+  - "{{ hostvars['laptop'].wireguard_ip }}"
+  - "{{ hostvars['m1bp'].ansible_host }}"
+  - "{{ hostvars['m1bp'].wireguard_ip }}"
 
-  Match Address {{ hostvars['laptop'].ansible_host }},{{ hostvars['laptop'].wireguard_ip }},10.0.50.34,10.4.20.34
+sshd_extra_config: |
+  Match Address {{ __sshd_allow_root | join(',') }}
       PermitRootLogin prohibit-password
 
   Match User {{ my_user }}

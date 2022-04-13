@@ -1,6 +1,6 @@
 ---
 
-- hosts: webgw, romsto, desktop, laptop
+- hosts: webgw, romsto, desktop, laptops
   gather_facts: false
   pre_tasks:
     - name: Run common role

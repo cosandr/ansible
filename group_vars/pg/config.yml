@@ -7,4 +7,6 @@ postgresql_hba_entries:
   - { type: host, database: all, user: all, address: "{{ hostvars['desktop'].ansible_host }}/32", auth_method: "md5" }
   - { type: host, database: all, user: all, address: "{{ hostvars['laptop'].ansible_host }}/32", auth_method: "md5" }
   - { type: host, database: all, user: all, address: "{{ hostvars['laptop'].wireguard_ip }}/32", auth_method: "md5" }
+  - { type: host, database: all, user: all, address: "{{ hostvars['m1bp'].ansible_host }}/32", auth_method: "md5" }
+  - { type: host, database: all, user: all, address: "{{ hostvars['m1bp'].wireguard_ip }}/32", auth_method: "md5" }
   - { type: host, database: all, user: all, address: "{{ home_net.vm.cidr }}", auth_method: "md5" }
