@@ -21,6 +21,7 @@ postgresql_packages:
   - postgresql14
   - postgresql14-server
   - postgresql14-contrib
+postgresql_log_timezone: "Europe/Oslo"
 
 postgresql_global_config_options:
   - option: listen_addresses
