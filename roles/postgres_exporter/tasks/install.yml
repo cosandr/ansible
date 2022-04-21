@@ -2,7 +2,7 @@
 - block:
     - name: Get latest release
       uri:
-        url: "https://api.github.com/repos/wrouesnel/postgres_exporter/releases/latest"
+        url: "https://api.github.com/repos/prometheus-community/postgres_exporter/releases/latest"
         method: GET
         return_content: true
         status_code: 200
@@ -22,11 +22,27 @@
   when:
     - postgres_exporter_version == "latest"
 
+- name: "Get checksum list"
+  set_fact:
+    __postgres_exporter_checksums: "{{ lookup('url', 'https://github.com/prometheus-community/postgres_exporter/releases/download/v' + postgres_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
+  run_once: true
+  check_mode: false
+  delegate_to: localhost
+
+- name: "Get checksum for {{ go_arch }} architecture"
+  set_fact:
+    __postgres_exporter_checksum: "{{ item.split(' ')[0] }}"
+  with_items: "{{ __postgres_exporter_checksums }}"
+  when:
+    - "('linux-' + go_arch + '.tar.gz') in item"
+  delegate_to: localhost
+
 - name: download postgres_exporter binary to local folder
   become: false
   get_url:
-    url: "https://github.com/wrouesnel/postgres_exporter/releases/download/v{{ postgres_exporter_version }}/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    url: "https://github.com/prometheus-community/postgres_exporter/releases/download/v{{ postgres_exporter_version }}/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
     dest: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    checksum: "sha256:{{ __postgres_exporter_checksum }}"
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5
