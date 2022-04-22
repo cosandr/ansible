@@ -136,3 +136,12 @@
         daemon_reload: true
 
   when: install_battery_charge_threshold | bool
+
+# https://old.reddit.com/r/linux/comments/u7zxa0/psa_for_intel_tiger_lake_dynamic_tuning_laptops/
+- name: Configure i915.perf_stream_paranoid
+  sysctl:
+    name: dev.i915.perf_stream_paranoid
+    value: "{{ i915_perf_stream_paranoid }}"
+    state: present
+    sysctl_file: /etc/sysctl.d/50-i915.conf
+  when: "'GenuineIntel' in ansible_processor"

@@ -38,3 +38,5 @@ battery_charge_threshold_list:
 
 battery_charge_threshold_start: 0
 battery_charge_threshold_end: 80
+
+i915_perf_stream_paranoid: 0
