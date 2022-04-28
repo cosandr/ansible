@@ -1,0 +1,16 @@
+---
+
+- name: restart systemd-resolved
+  systemd:
+    name: systemd-resolved
+    state: restarted
+
+- name: restart avahi
+  systemd:
+    name: avahi-daemon
+    state: restarted
+
+- name: restart cups
+  systemd:
+    name: cups
+    state: restarted

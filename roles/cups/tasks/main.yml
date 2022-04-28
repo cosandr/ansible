@@ -1,0 +1,69 @@
+---
+
+- name: Install packages
+  pacman:
+    name:
+      - avahi
+      - cups
+      - nss-mdns
+      - python-pysmbc
+    state: present
+  tags: ["install"]
+
+- name: Check if systemd-resolved is active # noqa command-instead-of-module
+  command: systemctl is-active -q systemd-resolved.service
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  register: __resolved_active
+  tags: ["resolved"]
+
+# https://man.archlinux.org/man/resolved.conf.5#OPTIONS
+- name: Disable mDNS in resolved
+  lineinfile:
+    path: "/etc/systemd/resolved.conf"
+    regexp: '^#?MulticastDNS'
+    line: 'MulticastDNS=no'
+  notify:
+    - restart systemd-resolved
+    - restart avahi
+    - restart cups
+  when: __resolved_active.rc == 0
+  tags: ["resolved"]
+
+# https://wiki.archlinux.org/title/Avahi#Hostname_resolution
+- name: Configure nsswitch.conf
+  lineinfile:
+    path: /etc/nsswitch.conf
+    regexp: '^hosts: mymachines'
+    line: 'hosts: mymachines mdns_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] files myhostname dns'
+  notify:
+    - restart avahi
+    - restart cups
+  tags: ["nsswitch"]
+
+- name: Enable and start services
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - avahi-daemon
+    - cups
+  tags: ["services"]
+
+- name: Check if firewalld is active  # noqa command-instead-of-module
+  command: systemctl is-active -q firewalld.service
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  register: __firewalld_active
+  tags: ["firewalld"]
+
+- name: Allow mdns through firewalld
+  firewalld:
+    service: mdns
+    zone: public
+    state: enabled
+  when: __firewalld_active.rc == 0
+  tags: ["firewalld"]

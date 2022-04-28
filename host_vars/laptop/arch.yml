@@ -10,6 +10,7 @@ host_pacman_packages:
   - libva-intel-driver
   - powertop
   - sof-firmware
+  - system-config-printer
   - upower
   - wireless-regdb
 

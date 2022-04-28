@@ -212,6 +212,10 @@
       when: desktop_environment in ["i3", "sway"]
       tags: ["tlp"]
 
+    - role: cups
+      when: ansible_distribution == 'Archlinux'
+      tags: ["cups"]
+
     # - role: xss-lock
     #   tags: ["xss-lock"]
 
