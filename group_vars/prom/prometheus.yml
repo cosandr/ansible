@@ -204,7 +204,7 @@ prometheus_alert_rules:
       severity: warning
     annotations:
       summary: '{% raw %}{{ $labels.instance }} low on memory{% endraw %}'
-      description: '{% raw %}Node memory is filling up ({{ $value }} left){% endraw %}'
+      description: '{% raw %}Node memory is filling up ({{ printf "%.2f" $value }}% left){% endraw %}'
   - alert: ContainerKilled
     expr: time() - container_last_seen > 60
     for: 10m

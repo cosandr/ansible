@@ -17,6 +17,8 @@ gnome_extensions:
   - 906   # Sound Device Chooser
   - 3733  # Tiling Assistant
   - 2645  # Brightness control using ddcutil
+  # /bin/sh -c "/usr/bin/checkupdates; /usr/bin/paru -Qua | grep -vF \[ignored\]"
+  - 1010  # Arch Linux Updates Indicator
 
 gnome_dconf_settings:
   "/org/gnome/mutter/experimental-features": "['scale-monitor-framebuffer']"
