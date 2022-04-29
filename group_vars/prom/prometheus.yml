@@ -61,12 +61,6 @@ prometheus_scrape_configs_static:
         labels:
           instance: "{{ inventory_hostname }}"
 
-  - job_name: "promscale"
-    static_configs:
-      - targets: ["localhost:9201"]
-        labels:
-          instance: "{{ inventory_hostname }}"
-
   - job_name: 'vmware_vcenter'
     metrics_path: '/metrics'
     scrape_interval: 1m

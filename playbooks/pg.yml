@@ -40,12 +40,6 @@
     - role: postgresql
       tags: ["pg"]
 
-    - role: timescaledb
-      tags: ["timescaledb"]
-
-    - role: promscale_extension
-      tags: ["promscale"]
-
     - role: postgres_exporter
       vars:
         postgres_service_name: "{{ postgresql_daemon }}"

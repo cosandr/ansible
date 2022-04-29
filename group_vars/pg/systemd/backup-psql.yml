@@ -65,7 +65,7 @@ __sd_backup_psql:
 
         set -e
 
-        sudo -u "$PG_USER" pg_dumpall -c --exclude-database=promscale | gzip > "${TMPDIR}/${FILENAME}"
+        sudo -u "$PG_USER" pg_dumpall -c | gzip > "${TMPDIR}/${FILENAME}"
 
         # remove all backups except the $KEEP latests
         BACKUPS=$(find "${DIR}" -name "${PREFIX}_*.gz" | wc -l | sed 's/\ //g')

@@ -30,5 +30,41 @@ postgresql_global_config_options:
     value: 'on'
   - option: ssl_ca_file
     value: 'root.crt'
+  # Memory
+  - option: shared_buffers
+    value: "{{ (ansible_memtotal_mb / 4) | int }}MB"
+  - option: effective_cache_size
+    value: "{{ (ansible_memtotal_mb * 0.75) | int }}MB"
+  - option: maintenance_work_mem
+    value: "{{ (ansible_memtotal_mb / 8) | int }}MB"
+  - option: work_mem
+    value: "{{ (ansible_memtotal_mb / 800) | int }}MB"
+  # Parallelism
+  - option: max_worker_processes
+    value: "{{ ((ansible_processor_vcpus * 4) - 1) | int }}"
+  - option: max_parallel_workers_per_gather
+    value: "{{ (ansible_processor_vcpus / 2) | int }}"
+  - option: max_parallel_workers
+    value: "{{ ansible_processor_vcpus }}"
+  # WAL
+  - option: wal_buffers
+    value: "16MB"
+  - option: min_wal_size
+    value: "512MB"
+  # Misc
+  - option: default_statistics_target
+    value: "500"
+  - option: random_page_cost
+    value: "1.1"
+  - option: checkpoint_completion_target
+    value: "0.9"
+  - option: max_locks_per_transaction
+    value: "64"
+  - option: autovacuum_max_workers
+    value: "10"
+  - option: autovacuum_naptime
+    value: "10"
+  - option: effective_io_concurrency
+    value: "256"
 
 postgres_exporter_port: "9187"
