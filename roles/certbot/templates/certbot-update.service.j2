@@ -5,5 +5,5 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-ExecStartPre={{ certbot_venv_path }}/bin/pip install --upgrade pip setuptools wheel
-ExecStart={{ certbot_venv_path }}/bin/pip install --upgrade {{ (certbot_pkgs + certbot_extra_pkgs) | join(' ') }}
+ExecStartPre={{ __certbot_venv_update_pre }}
+ExecStart={{ __certbot_venv_update }}

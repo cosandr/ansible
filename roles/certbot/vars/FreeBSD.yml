@@ -1,0 +1,5 @@
+---
+
+__certbot_bin_path: /usr/local/bin/certbot
+__python_bin_path: /usr/local/bin/python3.9
+__root_group: wheel

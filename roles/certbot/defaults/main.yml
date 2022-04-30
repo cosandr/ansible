@@ -1,5 +1,6 @@
 ---
 
+certbot_auto_renew: true
 certbot_email: ""
 certbot_venv_path: "/opt/certbot"
 certbot_pkgs: ["certbot"]
@@ -9,3 +10,7 @@ certbot_credentials_content: ""
 certbot_generate_command: ""  # excluding -d
 certbot_domains: []
   # - "example.com,*.example.com"
+
+__certbot_venv_update_pre: "{{ certbot_venv_path }}/bin/pip install --upgrade pip setuptools wheel"
+__certbot_venv_update: "{{ certbot_venv_path }}/bin/pip install --upgrade {{ (certbot_pkgs + certbot_extra_pkgs) | join(' ') }}"
+__certbot_renew: "{{ __certbot_bin_path }} renew -n"

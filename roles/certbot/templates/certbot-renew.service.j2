@@ -5,4 +5,4 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-ExecStart=/usr/bin/certbot renew -n
+ExecStart={{ __certbot_renew }}

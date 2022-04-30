@@ -20,7 +20,22 @@
   when: ansible_os_family == 'RedHat'
   tags: ["install"]
 
-- name: Setup venv
+- name: Install prerequisites
+  community.general.pkgng:
+    name:
+      - python39
+      - gcc   # Required to compile cryptography
+      - rust  # Required to compile cryptography
+      - augeas
+    state: present
+  when: ansible_os_family == 'FreeBSD'
+  tags: ["install"]
+
+- name: Include platform specific vars
+  include_vars: "{{ ansible_system }}.yml"
+  tags: ["install"]
+
+- name: Setup venv  # noqa package-latest
   pip:
     name:
       - pip
@@ -29,7 +44,7 @@
     umask: "0077"
     state: latest
     virtualenv: "{{ certbot_venv_path }}"
-    virtualenv_command: /usr/bin/python3.9 -m venv
+    virtualenv_command: "{{ __python_bin_path }} -m venv"
   tags: ["install"]
 
 - name: Install certbot
@@ -42,37 +57,16 @@
 - name: Ensure bin link exists
   file:
     src: "{{ certbot_venv_path }}/bin/certbot"
-    dest: /usr/bin/certbot
+    dest: "{{ __certbot_bin_path }}"
     state: link
   tags: ["install"]
 
-- name: Install services
-  template:
-    src: "certbot-{{ item }}.service.j2"
-    dest: "/etc/systemd/system/certbot-{{ item }}.service"
-    owner: root
-    group: root
-    mode: 0644
-  loop:
-    - "renew"
-    - "update"
-  notify:
-    - reload systemd
-  tags: ["install"]
-
-- name: Install renew timer
-  template:
-    src: "certbot-{{ item }}.timer.j2"
-    dest: "/etc/systemd/system/certbot-{{ item }}.timer"
-    owner: root
-    group: root
-    mode: 0644
-  loop:
-    - "renew"
-    - "update"
-  notify:
-    - reload systemd
-    - "enable and start {{ item }} timer"
+- name: Configure services if possible
+  include_tasks: "{{ item }}"
+  with_first_found:
+    - files: ["{{ ansible_system }}.yml"]
+      skip: true
+  when: certbot_auto_renew | bool
   tags: ["install"]
 
 - name: Ensure /etc/letsencrypt exists
@@ -80,14 +74,14 @@
     path: "/etc/letsencrypt"
     state: directory
     owner: root
-    group: root
+    group: "{{ __root_group }}"
     mode: 0755
 
 - name: Configure certbot
   copy:
     dest: "/etc/letsencrypt/cli.ini"
     owner: root
-    group: root
+    group: "{{ __root_group }}"
     mode: 0600
     content: |
       rsa-key-size = 4096
@@ -99,7 +93,7 @@
   copy:
     dest: "{{ certbot_credentials_path }}"
     owner: root
-    group: root
+    group: "{{ __root_group }}"
     mode: 0600
     content: "{{ certbot_credentials_content }}"
   when: certbot_credentials_content | length > 0

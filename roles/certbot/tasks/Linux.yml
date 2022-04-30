@@ -1,0 +1,30 @@
+---
+
+- name: Install services
+  template:
+    src: "certbot-{{ item }}.service.j2"
+    dest: "/etc/systemd/system/certbot-{{ item }}.service"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - "renew"
+    - "update"
+  notify:
+    - reload systemd
+  tags: ["install"]
+
+- name: Install renew timer
+  template:
+    src: "certbot-{{ item }}.timer.j2"
+    dest: "/etc/systemd/system/certbot-{{ item }}.timer"
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - "renew"
+    - "update"
+  notify:
+    - reload systemd
+    - "enable and start {{ item }} timer"
+  tags: ["install"]

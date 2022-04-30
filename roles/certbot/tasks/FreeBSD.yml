@@ -1,0 +1,14 @@
+---
+
+- name: Create crontab entry for certbot auto-update
+  cron:
+    name: certbot auto-update
+    special_time: monthly
+    job: "{{ __certbot_venv_update_pre }} && {{ __certbot_venv_update }}"
+
+- name: Create crontab entry for certbot auto-renew
+  cron:
+    name: certbot auto-renew
+    minute: "0"
+    hour: "*/12"
+    job: "{{ __certbot_renew }}"
