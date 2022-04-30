@@ -1,0 +1,21 @@
+---
+
+thanos_log_level: info
+
+thanos_user: prometheus
+thanos_group: prometheus
+
+compact_retention_raw: 30d
+compact_retention_5m: 90d
+compact_retention_1h: 1000d
+
+sidecar_services: ["prometheus.service"]
+compact_services: "{{ sidecar_services }}"
+
+thanos_s3_config:
+  type: S3
+  config:
+    bucket: "thanos"
+    endpoint: "{{ s3_url | regex_replace('^https?://', '') }}"
+    access_key: "thanos"
+    secret_key: "{{ hostvars['truenas'].s3_users['thanos'] }}"

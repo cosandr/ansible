@@ -4,10 +4,19 @@ ansible_user: root
 ansible_python_interpreter: /usr/bin/python3
 
 provisioned_disks:
-  - dev: "/dev/sdb"
+  - dev: "/dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:1:0"
     vols:
       - name: prometheus
         path: "/var/lib/prometheus"
+        shrink: false
+        size: "100%FREE"
+
+  - dev: "/dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:2:0"
+    vg: thanos
+    vols:
+      - name: vol01
+        path: "/var/lib/thanos"
+        opts: 'defaults,noatime'
         shrink: false
         size: "100%FREE"
 

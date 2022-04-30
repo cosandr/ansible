@@ -1,0 +1,28 @@
+---
+
+# Must manually create user, create thanos policy and assign it to user
+
+- hosts: prom
+  gather_facts: true
+  pre_tasks:
+    - name: Set TrueNAS DNS to use VM network
+      lineinfile:
+        path: /etc/hosts
+        regexp: "{{ __truenas_domain | regex_escape() }}"
+        line: "{{ hostvars['truenas'].local_ips.vm }} {{ __truenas_domain }}"
+      vars:
+        __truenas_domain: "truenas.{{ hostvars['webgw01'].domains[1] }}"
+      tags: ["hosts"]
+
+    - name: Create Thanos bucket
+      delegate_to: localhost
+      amazon.aws.s3_bucket:
+        access_key: "{{ hostvars['truenas'].s3_admin_access_key }}"
+        secret_key: "{{ hostvars['truenas'].s3_admin_secret_key }}"
+        s3_url: "{{ s3_url }}"
+        name: thanos
+      tags: ["bucket"]
+
+  roles:
+    - role: thanos
+      tags: ["thanos"]

@@ -47,6 +47,13 @@ mkdir -p ~/.ansible/plugins/connection
 wget -O ~/.ansible/plugins/connection/sshjail.py https://raw.githubusercontent.com/nerzhul/ansible-sshjail/patch-1/sshjail.py
 ```
 
+## S3
+
+```sh
+sudo pacman -S python-botocore python-boto3
+
+```
+
 ## TrueNAS node exporter
 
 1. Install node_exporter in a jail

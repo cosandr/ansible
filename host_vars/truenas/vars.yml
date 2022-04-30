@@ -9,3 +9,7 @@ local_ips:
   vm: "{{ home_net.vm.cidr | ipaddr('2') | ipaddr('address') }}"
   general: "{{ home_net.general.cidr | ipaddr('2') | ipaddr('address') }}"
   mgmt: "{{ home_net.mgmt.cidr | ipaddr('2') | ipaddr('address') }}"
+
+s3_admin_access_key: "{{ vault_s3_admin_access_key }}"
+s3_admin_secret_key: "{{ vault_s3_admin_secret_key }}"
+s3_users: "{{ vault_s3_users }}"
