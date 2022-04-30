@@ -12,4 +12,6 @@
   loop: "{{ provisioned_disks }}"
   loop_control:
     loop_var: disk
+  vars:
+    vg_name: "{{ disk.vg | default('data') }}"
   when: disk.vols is defined

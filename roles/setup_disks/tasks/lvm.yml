@@ -7,14 +7,14 @@
 
 - name: Create LVG
   lvg:
-    vg: "data"
+    vg: "{{ vg_name }}"
     pvs: "{{ disk.dev }}"
     pesize: "32"
     state: present
 
 - name: Create LVOLs
   lvol:
-    vg: data
+    vg: "{{ vg_name }}"
     lv: "{{ item.name }}"
     size: "{{ item.size | default('100%VG') }}"
     shrink: "{{ item.shrink | default(true) }}"
@@ -24,7 +24,7 @@
 - name: Create filesystems
   filesystem:
     fstype: "{{ item.fstype | default('ext4') }}"
-    dev: "/dev/mapper/data-{{ item.name }}"
+    dev: "/dev/mapper/{{ vg_name }}-{{ item.name }}"
     opts: "{{ item.mkfs_opts | default(omit) }}"
   loop: "{{ disk.vols }}"
 
@@ -41,7 +41,7 @@
 - name: Mount filesystems
   mount:
     path: "{{ item.path }}"
-    src: "/dev/mapper/data-{{ item.name }}"
+    src: "/dev/mapper/{{ vg_name }}-{{ item.name }}"
     fstype: "{{ item.fstype | default('ext4') }}"
     opts: "{{ item.opts | default(omit) }}"
     state: mounted
