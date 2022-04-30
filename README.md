@@ -38,6 +38,15 @@ ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -t stop,all_guest
 ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -l slb -t mount
 ```
 
+## sshjail
+
+```sh
+mkdir -p ~/.ansible/plugins/connection
+# use fork until PR is merged
+# wget -O ~/.ansible/plugins/connection/sshjail.py https://raw.githubusercontent.com/austinhyde/ansible-sshjail/master/sshjail.py
+wget -O ~/.ansible/plugins/connection/sshjail.py https://raw.githubusercontent.com/nerzhul/ansible-sshjail/patch-1/sshjail.py
+```
+
 ## GCP
 
 See [Ansible guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html) for more details.

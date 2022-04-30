@@ -1,0 +1,5 @@
+---
+
+ansible_ssh_user: root
+ansible_connection: sshjail
+ansible_python_interpreter: /usr/local/bin/python3

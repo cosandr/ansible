@@ -1,0 +1,15 @@
+#!/bin/bash
+
+cb_pre_update="$({{ __certbot_venv_update_pre }} 2>&1)"
+if [[ $? -ne 0 ]]; then
+    echo "$cb_pre_update" >&2
+    exit 1
+fi
+
+cb_update="$({{ __certbot_venv_update }} 2>&1)"
+if [[ $? -ne 0 ]]; then
+    echo "$cb_update" >&2
+    exit 1
+fi
+
+exit 0

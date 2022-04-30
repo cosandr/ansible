@@ -127,3 +127,110 @@
         state: "{{ item.state | default('present') }}"
       loop: "{{ truenas_config_sharing_nfs }}"
       tags: ["gitlab", "nfs"]
+
+- name: Setup certbot jail
+  hosts: truenas-certbot
+  pre_tasks:
+    - name: Install packages
+      community.general.pkgng:
+        name:
+          - bash
+          - vim
+        state: present
+      tags: ["certbot", "install"]
+
+  roles:
+    - role: certbot
+      tags: ["certbot"]
+
+  post_tasks:
+    - block:
+        - block:
+            - name: Create certbot dir
+              file:
+                path: /root/certbot
+                state: directory
+                owner: root
+                group: wheel
+                mode: 0750
+
+            - name: Download deploy_freenas.py
+              get_url:
+                url: https://raw.githubusercontent.com/danb35/deploy-freenas/master/deploy_freenas.py
+                dest: /root/certbot/deploy_freenas.py
+                owner: root
+                group: wheel
+                mode: 0750
+              tags: ["deploy"]
+
+            - name: Create deployment config
+              template:
+                src: "{{ inventory_dir }}/files/truenas/certbot-deploy.conf.j2"
+                dest: /root/certbot/deploy.conf
+                owner: root
+                group: wheel
+                mode: 0640
+              tags: ["deploy"]
+
+            - name: Create update.sh
+              template:
+                src: "{{ inventory_dir }}/files/truenas/certbot-update.sh.j2"
+                dest: /root/certbot/update.sh
+                owner: root
+                group: wheel
+                mode: 0750
+
+            - name: Create renew.sh
+              template:
+                src: "{{ inventory_dir }}/files/truenas/certbot-renew.sh.j2"
+                dest: /root/certbot/renew.sh
+                owner: root
+                group: wheel
+                mode: 0750
+
+          vars:
+            ansible_connection: ssh
+            ansible_host: "{{ local_ips.general }}"
+            ansible_user: root
+            ansible_python_interpreter: /usr/local/bin/python3
+            __exec: "/usr/local/bin/iocage exec certbot"
+            __certbot_venv_update_pre: "{{ __exec }} /opt/certbot/bin/pip install --upgrade pip setuptools wheel"
+            __certbot_venv_update: "{{ __exec }} /opt/certbot/bin/pip install --upgrade {{ (certbot_pkgs + certbot_extra_pkgs) | join(' ') }}"
+            __certbot_renew: "{{ __exec }} /opt/certbot/bin/certbot renew -n"
+          tags: ["scripts"]
+
+        - name: Add TrueNAS cron job for auto-update
+          spatiumcepa.truenas.truenas_api_cronjob:
+            model:
+              description: Certbot auto-update
+              command: "/root/certbot/update.sh"
+              enabled: true
+              schedule:
+                dom: "*"
+                dow: "*"
+                hour: "4"
+                minute: "0"
+                month: "*/1"
+              stderr: false
+              stdout: true
+              user: root
+
+        - name: Add TrueNAS cron job for auto-renew
+          delegate_to: truenas
+          spatiumcepa.truenas.truenas_api_cronjob:
+            model:
+              description: Certbot auto-renew
+              command: "/root/certbot/renew.sh"
+              enabled: true
+              schedule:
+                dom: "*"
+                dow: "*"
+                hour: "*/12"
+                minute: "25"
+                month: "*"
+              stderr: false
+              stdout: true
+              user: root
+
+      delegate_to: truenas
+      tags: ["certbot", "cron"]

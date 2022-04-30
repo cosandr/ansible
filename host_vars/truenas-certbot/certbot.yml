@@ -1,0 +1,18 @@
+---
+
+# Using TrueNAS cronjobs
+certbot_auto_renew: false
+
+certbot_email: "{{ hostvars['webgw01'].vault_certbot_email }}"
+certbot_pkgs: ["certbot"]
+certbot_extra_pkgs: ["certbot-dns-hetzner"]
+certbot_domains:
+  - "truenas.{{ hostvars['webgw01'].domains[1] }}"
+certbot_credentials_path: "/etc/letsencrypt/hetzner.ini"
+certbot_credentials_content: "{{ hostvars['webgw01'].certbot_credentials_content }}"
+
+certbot_generate_command: "{{ hostvars['webgw01'].certbot_generate_command }}"
+
+certbot_deploy_api_key: "{{ vault_certbot_deploy_api_key }}"
+certbot_deploy_fullchain_path: "/mnt/ssd/iocage/jails/certbot/root/etc/letsencrypt/live/{{ certbot_domains[0] }}/fullchain.pem"
+certbot_deploy_privkey_path: "/mnt/ssd/iocage/jails/certbot/root/etc/letsencrypt/live/{{ certbot_domains[0] }}/privkey.pem"
