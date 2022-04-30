@@ -1,0 +1,63 @@
+---
+
+- name: Install Thanos
+  include_tasks:
+    file: install.yml
+    apply:
+      tags: ["install"]
+  tags: ["install"]
+
+- name: Create thanos config directory
+  file:
+    path: "{{ thanos_conf_dir }}"
+    state: directory
+    owner: root
+    group: "{{ thanos_group }}"
+    mode: 0755
+
+- name: Create Thanos data directory
+  file:
+    path: "{{ thanos_work_dir }}"
+    state: directory
+    owner: "{{ thanos_user }}"
+    group: "{{ thanos_group }}"
+    mode: 0770
+
+- name: Write bucket config
+  copy:
+    content: "{{ thanos_s3_config | to_nice_yaml }}"
+    dest: "{{ thanos_objstore_config }}"
+    owner: root
+    group: "{{ thanos_group }}"
+    mode: 0640
+  when: thanos_s3_config
+
+- name: Copy Thanos services
+  template:
+    src: thanos.service.j2
+    dest: "/etc/systemd/system/thanos-{{ item.name }}.service"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ __thanos_services }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify:
+    - reload systemd
+    - restart thanos changed services
+  register: __copied_thanos_services
+
+- debug:
+    msg: "{{ __copied_thanos_services }}"
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Enable and start Thanos services
+  systemd:
+    name: "thanos-{{ item.name }}.service"
+    state: started
+    enabled: true
+  loop: "{{ __thanos_services }}"
+  loop_control:
+    label: "{{ item.name }}"

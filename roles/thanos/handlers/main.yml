@@ -1,0 +1,23 @@
+---
+
+- name: reload systemd
+  systemd:
+    daemon_reload: true
+
+- name: restart thanos changed services
+  systemd:
+    name: "thanos-{{ component.item.name }}.service"
+    state: restarted
+  loop: "{{ __copied_thanos_services.results }}"
+  loop_control:
+    loop_var: component
+    label: "{{ component }}"
+  when: component.changed
+
+- name: restart all thanos services
+  systemd:
+    name: "thanos-{{ item.name }}.service"
+    state: restarted
+  loop: "{{ __thanos_services }}"
+  loop_control:
+    label: "{{ item.name }}"

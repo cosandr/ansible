@@ -1,0 +1,76 @@
+---
+
+- block:
+    - name: copy thanos sysusers file
+      template:
+        src: thanos.sysusers.j2
+        dest: /usr/lib/sysusers.d/thanos.conf
+        owner: root
+        group: root
+        mode: 0644
+      register: __sysusers
+
+    - name: restart systemd-sysusers  # noqa no-handler
+      command: systemd-sysusers
+      when: __sysusers.changed
+  when: thanos_user == 'thanos' or thanos_group == 'thanos'
+
+- block:
+    - name: Get latest release
+      uri:
+        url: "https://api.github.com/repos/thanos-io/thanos/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      no_log: false
+      register: _latest_release
+      until: _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set thanos version to {{ _latest_release.json.tag_name[1:] }}"
+      set_fact:
+        thanos_version: "{{ _latest_release.json.tag_name[1:] }}"
+  delegate_to: localhost
+  when: thanos_version == "latest"
+
+- name: "Get checksum list"
+  set_fact:
+    __thanos_checksums: "{{ lookup('url', 'https://github.com/thanos-io/thanos/releases/download/v' + thanos_version + '/sha256sums.txt', wantlist=True) | list }}"
+  run_once: true
+  check_mode: false
+  delegate_to: localhost
+
+- name: download thanos binary to local folder
+  become: false
+  get_url:
+    url: "https://github.com/thanos-io/thanos/releases/download/v{{ thanos_version }}/thanos-{{ thanos_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp/thanos-{{ thanos_version }}.linux-{{ go_arch }}.tar.gz"
+    checksum: "sha256:{{ (__thanos_checksums | select('search', 'linux-' + go_arch + '.tar.gz') | first).split()[0] }}"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  # run_once: true # <-- this cannot be set due to multi-arch support
+  delegate_to: localhost
+  check_mode: false
+
+- name: unpack thanos binaries
+  become: false
+  unarchive:
+    src: "/tmp/thanos-{{ thanos_version }}.linux-{{ go_arch }}.tar.gz"
+    dest: "/tmp"
+    creates: "/tmp/thanos-{{ thanos_version }}.linux-{{ go_arch }}/thanos"
+  delegate_to: localhost
+  check_mode: false
+
+- name: propagate official thanos binary
+  copy:
+    src: "/tmp/thanos-{{ thanos_version }}.linux-{{ go_arch }}/thanos"
+    dest: "{{ thanos_binary_install_dir }}/thanos"
+    mode: 0755
+    owner: root
+    group: root
+  notify: restart all thanos services

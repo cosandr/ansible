@@ -1,0 +1,90 @@
+---
+
+thanos_version: latest
+
+thanos_user: thanos
+thanos_group: thanos
+
+thanos_log_level: warn
+thanos_binary_install_dir: "/usr/local/bin"
+thanos_conf_dir: "/etc/thanos"
+thanos_work_dir: "/var/lib/thanos"
+thanos_objstore_config: "{{ thanos_conf_dir }}/bucket_config.yml"
+thanos_s3_config: {}
+# thanos_s3_config:
+#   type: S3
+#   config:
+#     bucket: "thanos"
+#     endpoint: "example.com"
+#     access_key: "thanos"
+#     secret_key: "verysecretkey"
+
+sidecar_services: []
+sidecar_http_address: 127.0.0.1:19191
+sidecar_grpc_address: 127.0.0.1:10901
+sidecar_prom_url: http://localhost:9090
+sidecar_tsdb_path: "{{ prometheus_db_dir | default('/var/lib/prometheus') }}"
+
+store_services: []
+store_http_address: 127.0.0.1:19192
+store_grpc_address: 127.0.0.1:10902
+
+compact_services: []
+compact_http_address: 127.0.0.1:19193
+compact_retention_raw: 14d
+compact_retention_5m: 30d
+compact_retention_1h: 90d
+
+query_services:
+  - thanos-sidecar.service
+  - thanos-store.service
+query_http_address: 0.0.0.0:19194
+query_grpc_address: 127.0.0.1:10904
+query_endpoints:
+  - "{{ sidecar_grpc_address }}"
+  - "{{ store_grpc_address }}"
+
+__thanos_services:
+  - name: sidecar
+    services: "{{ sidecar_services }}"
+    args:
+      "http-address": "{{ sidecar_http_address }}"
+      "grpc-address": "{{ sidecar_grpc_address }}"
+      "prometheus.url": "{{ sidecar_prom_url }}"
+      "tsdb.path": "{{ sidecar_tsdb_path }}"
+      "objstore.config-file": "{{ thanos_objstore_config }}"
+
+  - name: store
+    services: "{{ store_services }}"
+    args:
+      "http-address": "{{ store_http_address }}"
+      "grpc-address": "{{ store_grpc_address }}"
+      "data-dir": "{{ thanos_work_dir }}/store"
+      "objstore.config-file": "{{ thanos_objstore_config }}"
+
+  - name: compact
+    services: "{{ compact_services }}"
+    args:
+      "http-address": "{{ compact_http_address }}"
+      "data-dir": "{{ thanos_work_dir }}/compact"
+      "objstore.config-file": "{{ thanos_objstore_config }}"
+      "retention.resolution-raw": "{{ compact_retention_raw }}"
+      "retention.resolution-5m": "{{ compact_retention_5m }}"
+      "retention.resolution-1h": "{{ compact_retention_1h }}"
+
+  - name: query
+    services: "{{ query_services }}"
+    args:
+      "http-address": "{{ query_http_address }}"
+      "grpc-address": "{{ query_grpc_address }}"
+    endpoints: "{{ query_endpoints }}"
+
+# sidecar --http-address=127.0.0.1:19191 --grpc-address=127.0.0.1:10901 --prometheus.url=http://localhost:9090 --tsdb.path=/var/lib/prometheus --objstore.config-file=/etc/thanos/bucket_config.yml
+
+# mkdir -p /var/lib/thanos
+
+# store --http-address=127.0.0.1:19192 --grpc-address=127.0.0.1:10902 --data-dir=/var/lib/thanos/store --objstore.config-file=/etc/thanos/bucket_config.yml
+
+# compact --http-address 127.0.0.1:19193 --data-dir /var/lib/thanos/compact --objstore.config-file=/etc/thanos/bucket_config.yml --retention.resolution-raw=14d --retention.resolution-5m=90d --retention.resolution-1h=1000d
+
+# query --http-address 0.0.0.0:19194 --grpc-address=127.0.0.1:10904 --store 127.0.0.1:10901 --store 127.0.0.1:10902
