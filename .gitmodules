@@ -28,3 +28,6 @@
 [submodule "roles/postgresql"]
 	path = roles/postgresql
 	url = git@github.com:cosandr/ansible-role-postgresql.git
+[submodule "roles/thanos"]
+	path = roles/thanos
+	url = git@github.com:cosandr/ansible-role-thanos.git
