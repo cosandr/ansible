@@ -1,0 +1,18 @@
+---
+
+gitlab_runner_token: ''
+gitlab_external_url: "https://gitlab.com"
+gitlab_runners:
+  - name: "Docker Runner"
+    executor: docker
+    tags: ["docker"]
+    args: '--run-untagged --locked=false --docker-image "alpine:latest"'
+
+  - name: "Docker Runner DIND"
+    executor: docker
+    tags: ["docker-dind"]
+    args: '--docker-privileged --locked=false --docker-image "docker:latest" --docker-volumes /certs/client'
+
+gitlab_runner_concurrent: "{{ gitlab_runners | length }}"
+
+__gitlab_runner_names: "{{ gitlab_runners | map(attribute='name') | list }}"

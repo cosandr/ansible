@@ -1,0 +1,78 @@
+---
+
+- name: Install SELinux libraries
+  dnf:
+    name:
+      - "python3-libselinux"
+      - "python3-policycoreutils"
+    state: present
+  when: ansible_selinux.status == "enabled"
+  tags: ["selinux"]
+
+- name: Install gitlab-runner repo
+  get_url:
+    dest: /etc/yum.repos.d/gitlab-runner.repo
+    url: "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/config_file.repo?os=centos&dist={{ ansible_distribution_major_version }}"
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution != 'Fedora'
+  tags: ["install"]
+
+- name: Install Gitlab Runner
+  dnf:
+    name: "gitlab-runner"
+    state: present
+  when: ansible_os_family == 'RedHat'
+  tags: ["install"]
+
+- name: Get configured runners
+  command: /usr/bin/gitlab-runner --log-format=json list
+  changed_when: false
+  check_mode: false
+  register: __runner_output
+  tags: ["gitlab-runner"]
+
+# Example element in __runner_output
+# {
+#     "Executor": "docker",
+#     "Token": "<redacted>",
+#     "URL": "https://gitlab.com/",
+#     "level": "info",
+#     "msg": "Docker Runner",
+#     "time": "2022-05-01T08:46:01Z"
+# }
+
+- name: Parse output
+  set_fact:
+    __runners: "{{ __runners | default([]) + [tmp_dict] }}"
+  vars:
+    tmp_dict: "{{ item | from_json }}"
+  loop: "{{ __runner_output.stderr_lines }}"
+  when: "'Executor' in tmp_dict"
+
+- name: Configure runners
+  command: >
+    /usr/bin/gitlab-runner register
+      --non-interactive
+      --url {{ gitlab_external_url | quote }}
+      --registration-token {{ item.token | default(gitlab_runner_token) | quote }}
+      --description {{ item.name | quote }}
+      --executor {{ item.executor | quote }}
+      --limit {{ item.limit | default(1) }}
+      --tag-list {{ item.tags | join(',') | quote }}
+      {{ item.args | default('') }}
+  loop: "{{ gitlab_runners }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: "item.name not in (__runners | default([]) | map(attribute='msg') | list)"
+  tags: ["register"]
+
+- name: Configure global max concurrent jobs
+  lineinfile:
+    path: "/etc/gitlab-runner/config.toml"
+    regexp: '^concurrent ='
+    line: "concurrent = {{ gitlab_runner_concurrent }}"
+  notify: restart gitlab-runner
