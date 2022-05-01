@@ -1,0 +1,9 @@
+---
+
+jail_properties:
+  boot: '0'
+  nat: '1'
+
+jail_packages:
+  - python3
+  - node_exporter

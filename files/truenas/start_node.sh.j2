@@ -1,0 +1,5 @@
+#!/bin/bash
+
+screen -d -m /mnt/ssd/iocage/jails/{{ jail_name }}/root/usr/local/bin/node_exporter \
+	--collector.filesystem.fs-types-exclude="^(devfs|fdescfs)$" \
+	--web.listen-address={{ hostvars['truenas'].local_ips.vm }}:9100

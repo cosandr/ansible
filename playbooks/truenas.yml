@@ -128,6 +128,65 @@
       loop: "{{ truenas_config_sharing_nfs }}"
       tags: ["gitlab", "nfs"]
 
+- name: Create jails
+  hosts: jails
+  gather_facts: false
+  tasks:
+    - block:
+        - name: Create jail
+          iocage:
+            name: "{{ jail_name }}"
+            state: present
+            release: "{{ jail_release }}"
+            properties: "{{ jail_properties }}"
+
+        - name: Ensure jail is running
+          iocage:
+            name: "{{ jail_name }}"
+            state: started
+          tags: ["start"]
+
+        - name: Bootstrap pkg
+          iocage:
+            name: "{{ jail_name }}"
+            state: exec
+            cmd: "pkg bootstrap -y"
+          tags: ["pkg", "bootstrap"]
+
+        - name: Install initial packages
+          iocage:
+            name: "{{ jail_name }}"
+            state: pkg
+            cmd: "install -y {{ jail_packages | join(' ') }}"
+          tags: ["pkg"]
+
+      tags: ["create"]
+      delegate_to: truenas
+      vars:
+        ansible_connection: ssh
+        ansible_host: "{{ local_ips.general }}"
+        ansible_user: root
+        ansible_python_interpreter: /usr/local/bin/python3
+
+- name: Setup node_exporter
+  hosts: truenas-node_exporter
+  gather_facts: false
+  tasks:
+    - name: Create start_node.sh
+      template:
+        src: "{{ inventory_dir }}/files/truenas/start_node.sh.j2"
+        dest: /root/start_node.sh
+        owner: root
+        group: wheel
+        mode: 0750
+      delegate_to: truenas
+      vars:
+        ansible_connection: ssh
+        ansible_host: "{{ local_ips.general }}"
+        ansible_user: root
+        ansible_python_interpreter: /usr/local/bin/python3
+      tags: ["start-node"]
+
 - name: Setup certbot jail
   hosts: truenas-certbot
   pre_tasks:

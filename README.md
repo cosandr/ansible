@@ -47,22 +47,17 @@ mkdir -p ~/.ansible/plugins/connection
 wget -O ~/.ansible/plugins/connection/sshjail.py https://raw.githubusercontent.com/nerzhul/ansible-sshjail/patch-1/sshjail.py
 ```
 
+## iocage
+
+```sh
+wget -O library/iocage.py https://raw.githubusercontent.com/fractalcells/ansible-iocage/master/iocage.py
+```
+
 ## S3
 
 ```sh
 sudo pacman -S python-botocore python-boto3
 
-```
-
-## TrueNAS node exporter
-
-1. Install node_exporter in a jail
-2. Create script on host `/root/start_node.sh`
-
-```sh
-#!/bin/bash
-
-screen -d -m /mnt/ssd/iocage/jails/test/root/usr/local/bin/node_exporter --web.listen-address=10.0.10.2:9100
 ```
 
 3. Add init/shutdown script in UI
