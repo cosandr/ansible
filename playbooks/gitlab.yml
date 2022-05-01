@@ -84,3 +84,26 @@
         name: registry-garbage-collect.timer
         state: started
         enabled: true
+
+- hosts: gitrun
+  pre_tasks:
+    - name: Set Gitlab URL fact
+      set_fact:
+        gitlab_external_url: "https://gitlab.{{ hostvars['gitlab01'].domain }}"
+      tags: ["runner"]
+
+  roles:
+    - role: setup_disks
+      tags: ["disk"]
+
+    - role: firewall_config
+      tags: ["firewall"]
+
+    - role: sshd
+      tags: ["sshd"]
+
+    - role: cosandr.dnf_automatic
+      tags: ["dnf_automatic"]
+
+    - role: gitlab_runner
+      tags: ["runner"]

@@ -21,6 +21,7 @@ truenas
 [servers:children]
 pg
 gitlab
+gitrun
 webgw
 localgw
 prom
@@ -37,6 +38,10 @@ mt-router ansible_host=10.0.50.1
 
 [gitlab]
 gitlab01 ansible_host=10.0.10.40
+
+[gitrun]
+gitrun01 ansible_host=10.0.10.41
+gitrun02 ansible_host=10.0.10.42
 
 [prom]
 prom01 ansible_host=10.0.10.21

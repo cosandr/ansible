@@ -1,0 +1,17 @@
+---
+
+ansible_user: root
+ansible_python_interpreter: /usr/bin/python3
+
+provisioned_disks:
+  - dev: "/dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:1:0"
+    vols:
+      - name: docker
+        path: "/var/lib/docker"
+        shrink: false
+        size: "100%FREE"
+
+docker_compose_install: false
+# Too many nested variables
+# gitlab_external_url: "{{ hostvars[groups['gitlab'][0]].gitlab_external_url }}"
+gitlab_runner_token: "{{ vault_gitlab_runner_token }}"
