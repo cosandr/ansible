@@ -69,27 +69,19 @@
   when:
     - nginx_exporter_version == "latest"
 
-- block:
-    - name: "Get checksum list"
-      set_fact:
-        __nginx_exporter_checksums: "{{ lookup('url', 'https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v' + nginx_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
-      run_once: true
-      check_mode: false
 
-    - name: "Get checksum for {{ go_arch }} architecture"
-      set_fact:
-        __nginx_exporter_checksum: "{{ item.split(' ')[0] }}"
-      with_items: "{{ __nginx_exporter_checksums }}"
-      when:
-        - "('linux_' + go_arch + '.tar.gz') in item"
-  delegate_to: localhost
+- name: "Get checksum list"
+  set_fact:
+    __nginx_exporter_checksums: "{{ lookup('url', 'https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v' + nginx_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
+  run_once: true
+  check_mode: false
 
 - name: download nginx_exporter binary to local folder
   become: false
   get_url:
     url: "https://github.com/nginxinc/nginx-prometheus-exporter/releases/download/v{{ nginx_exporter_version }}/nginx-prometheus-exporter_{{ nginx_exporter_version }}_linux_{{ go_arch }}.tar.gz"
     dest: "/tmp/nginx-prometheus-exporter_{{ nginx_exporter_version }}_linux_{{ go_arch }}.tar.gz"
-    checksum: "sha256:{{ __nginx_exporter_checksum }}"
+    checksum: "sha256:{{ (__nginx_exporter_checksums | select('search', 'linux-' + go_arch + '.tar.gz') | first).split()[0] }}"
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5

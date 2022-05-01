@@ -96,20 +96,12 @@
   check_mode: false
   delegate_to: localhost
 
-- name: "Get checksum for {{ go_arch }} architecture"
-  set_fact:
-    __node_exporter_checksum: "{{ item.split(' ')[0] }}"
-  with_items: "{{ __node_exporter_checksums }}"
-  when:
-    - "('linux-' + go_arch + '.tar.gz') in item"
-  delegate_to: localhost
-
 - name: download node_exporter binary to local folder
   become: false
   get_url:
     url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
     dest: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
-    checksum: "sha256:{{ __node_exporter_checksum }}"
+    checksum: "sha256:{{ (__node_exporter_checksums | select('search', 'linux-' + go_arch + '.tar.gz') | first).split()[0] }}"
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5
