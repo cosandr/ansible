@@ -107,3 +107,6 @@
 
     - role: gitlab_runner
       tags: ["runner"]
+
+    - role: node_exporter
+      tags: ["node_exporter"]
