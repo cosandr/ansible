@@ -31,3 +31,6 @@
 [submodule "roles/thanos"]
 	path = roles/thanos
 	url = git@github.com:cosandr/ansible-role-thanos.git
+[submodule "kubespray"]
+	path = kubespray
+	url = git@github.com:cosandr/kubespray.git

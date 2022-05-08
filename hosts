@@ -29,6 +29,7 @@ nextcloud
 backup
 plex
 elk
+k8s_cluster
 
 [pg]
 pg01 ansible_host=10.0.10.11
@@ -89,3 +90,6 @@ logkib01 ansible_host=10.0.10.30
 [jails]
 truenas-certbot
 truenas-node_exporter
+
+# Defined in kubespray module
+[k8s_cluster]

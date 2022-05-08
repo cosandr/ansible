@@ -1,0 +1,38 @@
+---
+
+- name: Configure Kubernetes nodes
+  gather_facts: true
+  hosts: k8s_cluster
+  tasks:
+    - name: Stop firewalld
+      systemd:
+        name: firewalld
+        state: stopped
+      tags: ["firewalld"]
+
+    - name: Disable firewalld
+      systemd:
+        name: firewalld
+        enabled: false
+      tags: ["firewalld"]
+
+    - name: Mask firewalld
+      systemd:
+        name: firewalld
+        masked: true
+      tags: ["firewalld"]
+
+  roles:
+    - role: sshd
+      tags: ["sshd"]
+
+    - role: cosandr.dnf_automatic
+      vars:
+        dnf_automatic_upgrade_type: "security"
+      tags: ["dnf_automatic"]
+
+    - role: node_exporter
+      vars:
+        node_exporter_config_firewall: false
+        node_exporter_web_listen_address: "{{ ansible_host }}:9100"
+      tags: ["node_exporter"]
