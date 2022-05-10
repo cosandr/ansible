@@ -141,6 +141,7 @@ pacman_i3_packages:
   - pavucontrol
   - picom
   - playerctl
+  - polybar
   - qt5ct
   - redshift
   - rofi
@@ -158,7 +159,6 @@ aur_i3_packages:
   - adwaita-qt
   - i3lock-color
   - i3lock-fancy-rapid-git
-  - polybar
 
 pacman_sway_packages:
   - gammastep
