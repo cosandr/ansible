@@ -24,3 +24,5 @@ smtp_port: "{{ smtp_config[domain].port }}"
 smtp_user: "{{ smtp_config[domain].user }}"
 web_root: "/var/www"
 pip_wheel_dir: "{{ web_root }}/pip"
+
+nginx_htpasswd: "{{ vault_nginx_htpasswd }}"

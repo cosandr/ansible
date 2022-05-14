@@ -68,6 +68,22 @@ server {
         autoindex on;
     }
 
+    location /discord/upload {
+        alias {{ web_root }}/main/discord;
+
+        auth_basic "Restricted";
+        auth_basic_user_file  /etc/nginx/discord_upload.htaccess;
+
+        dav_methods PUT DELETE;
+        dav_ext_methods PROPFIND;
+
+        dav_access user:rw group:rw all:r;
+        client_max_body_size 1G;
+        create_full_put_path off;
+        client_body_temp_path /var/www/dav-temp;
+        autoindex on;
+    }
+
 {% if nginx_upstreams | selectattr('name', 'search', 'notes_web') %}
     location ^~ /standardnotes-extensions {
 		autoindex off;

@@ -69,7 +69,55 @@
           {% endfor %}
           real_ip_header CF-Connecting-IP;
       tags: ["nginx", "cloudflare"]
+
+    - name: Set SELinux contexts for WebDAV
+      sefcontext:
+        target: "{{ item }}(/.*)?"
+        setype: httpd_sys_rw_content_t
+        state: present
+      loop: "{{ webdav_selinux_rw }}"
+      tags: ["nginx", "webdav"]
+
+    - name: Restore SELinux contexts
+      command: "restorecon -rv {{ item }}"
+      register: __restorecon
+      loop: "{{ webdav_selinux_rw }}"
+      changed_when: false
+      tags: ["nginx", "webdav"]
+
+    - name: Grant user nginx write access to discord
+      ansible.posix.acl:
+        path: /var/www/main/discord
+        entity: nginx
+        etype: user
+        permissions: rwx
+        recursive: true
+        state: present
+      tags: ["nginx", "discord"]
+
+    - name: Ensure passlib is installed
+      dnf:
+        name: python3-passlib
+        state: present
+      tags: ["nginx", "discord"]
+
+    - name: Create Discord htaccess file
+      community.general.htpasswd:
+        path: /etc/nginx/discord_upload.htaccess
+        name: "{{ item.name }}"
+        password: "{{ item.password }}"
+        owner: root
+        group: nginx
+        mode: 0640
+      loop: "{{ nginx_htpasswd['discord'] }}"
+      loop_control:
+        label: "{{ item.name }}"
+      tags: ["nginx", "discord"]
+
   vars:
+    webdav_selinux_rw:
+      - "/var/www/main/discord"
+      - "/var/www/dav-temp"
     cadvisor_version: "0.40.0"
     grafana_version: "latest"
     nginx_exporter_version: "latest"
