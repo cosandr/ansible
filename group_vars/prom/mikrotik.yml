@@ -1,0 +1,14 @@
+---
+
+mikrotik_exporter_listen_address: ":9436"
+mikrotik_exporter_port: "{{ mikrotik_exporter_listen_address.split(':')[1] }}"
+mikrotik_exporter_config:
+  devices: "{{ vault_mikrotik_exporter_devices }}"
+
+  features:
+    dhcp: true
+    routes: true
+    optics: true
+    health: true
+    firmware: true
+    monitor: true

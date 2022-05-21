@@ -95,6 +95,11 @@ prometheus_scrape_configs_static:
           instance: "SLB"
           __param_target: "10.0.100.105"
 
+  - job_name: "mikrotik"
+    scrape_interval: 5m
+    static_configs:
+      - targets: ["localhost:{{ mikrotik_exporter_port }}"]
+
   - job_name: "cadvisor"
     static_configs:
       - targets: ["{{ __dresrv.ansible_host }}:{{ __dresrv.cadvisor_port }}"]

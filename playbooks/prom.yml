@@ -59,6 +59,7 @@
             - "{{ prometheus_port }}"
             - "{{ ipmi_exporter_port }}"
             - "{{ pushgateway_port }}"
+            - "{{ mikrotik_exporter_port }}"
           notify: reload firewalld
 
       tags: ["firewalld"]
@@ -123,6 +124,9 @@
 
     - role: vmware_exporter
       tags: ["vmware_exporter"]
+
+    - role: mikrotik_exporter
+      tags: ["mikrotik_exporter"]
 
     - role: grafana
       tags: ["grafana"]
