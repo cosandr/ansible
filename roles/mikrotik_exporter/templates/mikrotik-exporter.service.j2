@@ -1,0 +1,19 @@
+[Unit]
+Description=Mikrotik exporter
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/mikrotik-exporter \
+    -config-file {{ mikrotik_exporter_config_file }} \
+{% if mikrotik_exporter_insecure %}
+    -insecure \
+{% endif %}
+{% if mikrotik_exporter_tls %}
+    -tls \
+{% endif %}
+    -port {{ mikrotik_exporter_listen_address }} \
+    -log-format {{ mikrotik_exporter_log_format }} \
+    -log-level {{ mikrotik_exporter_log_level }}
+
+[Install]
+WantedBy=default.target

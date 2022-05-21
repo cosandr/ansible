@@ -1,0 +1,10 @@
+---
+
+mikrotik_exporter_version: trunk
+mikrotik_exporter_config_file: "/etc/mikrotik-exporter.yml"
+mikrotik_exporter_insecure: true
+mikrotik_exporter_tls: true
+mikrotik_exporter_listen_address: ":9436"
+mikrotik_exporter_log_format: "text"
+mikrotik_exporter_log_level: "info"
+mikrotik_exporter_config: {}
