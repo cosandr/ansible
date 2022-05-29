@@ -15,12 +15,3 @@ sshd_extra_config: |
     StreamLocalBindUnlink yes
     AllowTcpForwarding yes
     X11Forwarding yes
-
-  # useradd -m -s /bin/false prom-tunnel
-  Match User prom-tunnel
-      AllowAgentForwarding no
-      AllowTcpForwarding yes
-      GatewayPorts yes
-      PermitTunnel no
-      X11Forwarding no
-      PermitOpen localhost:17766 localhost:27766 localhost:8100
