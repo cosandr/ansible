@@ -11,7 +11,7 @@ chezmoi_overrides:
   xorg: |
     DPI=120
     MONITOR_MAP["DP-2"]="--primary --mode 3840x2160 --rate 144"
-    MONITOR_MAP["DP-0"]="--above DP-4"
+    MONITOR_MAP["DP-0"]="--above DP-2"
     MONITOR_MAP["HDMI-0"]="--off"
   xinitrc: |
     QT_AUTO_SCREEN_SCALE_FACTOR="1"
