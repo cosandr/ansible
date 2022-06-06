@@ -56,6 +56,7 @@
             permanent: true
             state: enabled
           loop:
+            - "{{ alertmanager_port }}"
             - "{{ prometheus_port }}"
             - "{{ ipmi_exporter_port }}"
             - "{{ pushgateway_port }}"

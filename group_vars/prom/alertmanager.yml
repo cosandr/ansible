@@ -1,8 +1,9 @@
 ---
 
 alertmanager_version: latest
-alertmanager_web_listen_address: "127.0.0.1:9093"
-alertmanager_web_external_url: "http://{{ ansible_host }}:9093/"
+alertmanager_port: 9093
+alertmanager_web_listen_address: "0.0.0.0:{{ alertmanager_port }}"
+alertmanager_web_external_url: "http://{{ ansible_host }}:{{ alertmanager_port }}/"
 alertmanager_slack_api_url: "{{ vault_alertmanager_slack_api_url }}"
 # https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl
 alertmanager_receivers:
