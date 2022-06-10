@@ -26,7 +26,7 @@
       mount:
         src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/backup/gitlab"
         path: "{{ gitlab_backup_upload_connection.local_root }}"
-        opts: "defaults,vers=4,rw,noatime"
+        opts: "defaults,vers=4,rw,noatime,bg"
         state: mounted
         fstype: nfs
       tags: ["gitlab", "nfs"]

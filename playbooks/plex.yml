@@ -32,7 +32,7 @@
       mount:
         src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/media"
         path: "/tank/media"
-        opts: "defaults,vers=4,ro,noatime,noexec"
+        opts: "defaults,vers=4,ro,noatime,noexec,bg"
         state: mounted
         fstype: nfs
       tags: ["nfs"]

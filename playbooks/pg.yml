@@ -28,7 +28,7 @@
       mount:
         src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/backup/pgsql"
         path: "/mnt/backup-pgsql"
-        opts: "vers=4"
+        opts: "defaults,vers=4,rw,noatime,bg"
         state: mounted
         fstype: nfs
       tags: ["nfs"]

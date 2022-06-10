@@ -90,7 +90,7 @@
       mount:
         src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank"
         path: "/mnt/tank"
-        opts: "defaults,vers=4,ro,noatime"
+        opts: "defaults,vers=4,ro,noatime,bg"
         state: mounted
         fstype: nfs
       tags: ["nfs"]
@@ -99,7 +99,7 @@
       mount:
         src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/borg/repos"
         path: "{{ borg_pool }}"
-        opts: "defaults,vers=4,rw,noatime"
+        opts: "defaults,vers=4,rw,noatime,bg"
         state: mounted
         fstype: nfs
       tags: ["nfs"]
