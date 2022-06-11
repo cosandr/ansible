@@ -34,3 +34,6 @@
 [submodule "kubespray"]
 	path = kubespray
 	url = git@github.com:cosandr/kubespray.git
+[submodule "roles/blackbox_exporter"]
+	path = roles/blackbox_exporter
+	url = git@github.com:cosandr/ansible-blackbox-exporter.git

@@ -47,6 +47,17 @@ prometheus_node_static_config:
       instance: "{{ hostvars['truenas'].inventory_hostname }}"
       __metrics_path__: /metrics
 
+# Appended at runtime
+blackbox_exporter_targets_icmp_ipv4:
+  - "google.com"
+  - "1.1.1.1"
+  - "{{ hostvars['romsto'].ddns_domain }}"
+  - "{{ hostvars['webgw01'].ansible_host }}"
+  - "{{ hostvars['truenas'].local_ips.vm }}"
+
+blackbox_exporter_targets_http_ipv4:
+  - "https://google.com"
+  - "https://{{ grafana_domain }}"
 prometheus_scrape_configs_runtime: []
 # Workaround vars set during role runtime, prometheus_metrics_path for example
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_static + prometheus_scrape_configs_runtime }}"
@@ -83,6 +94,35 @@ prometheus_scrape_configs_static:
         target_label: instance
       - target_label: __address__
         replacement: "localhost:{{ vmware_exporter_port }}"
+
+  - job_name: 'blackbox_icmp4'
+    metrics_path: '/probe'
+    params:
+      module: [icmp_ipv4]
+    static_configs:
+      - targets: "{{ blackbox_exporter_targets_icmp_ipv4 }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "localhost:{{ blackbox_exporter_port }}"
+
+  - job_name: 'blackbox_http4'
+    scrape_interval: 1m
+    metrics_path: '/probe'
+    params:
+      module: [http_2xx_ipv4]
+    static_configs:
+      - targets: "{{ blackbox_exporter_targets_http_ipv4 }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "localhost:{{ blackbox_exporter_port }}"
 
   - job_name: "ipmi"
     params:

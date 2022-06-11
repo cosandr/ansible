@@ -104,6 +104,22 @@
           static_configs: "{{ __elastic_static_configs }}"
       tags: ["prometheus"]
 
+    - name: Add servers to blackbox ping probe
+      set_fact:
+        blackbox_exporter_targets_icmp_ipv4: "{{ blackbox_exporter_targets_icmp_ipv4 + [tmp_var] }}"
+      vars:
+        tmp_var: "{{ hostvars[item].wireguard_ip | default(hostvars[item].ansible_host) }}"
+      loop: "{{ groups['servers'] }}"
+      when: hostvars[item].wireguard_ip is defined or hostvars[item].ansible_host is defined
+      tags: ["prometheus"]
+
+    - name: Add static blackbox http probes
+      set_fact:
+        blackbox_exporter_targets_http_ipv4: "{{ blackbox_exporter_targets_http_ipv4 + [item] }}"
+      loop:
+        - "https://gitlab.{{ hostvars['gitlab01'].domain }}"
+      tags: ["prometheus"]
+
   roles:
     - role: setup_disks
       tags: ["disk"]
@@ -116,6 +132,9 @@
 
     - role: alertmanager
       tags: ["alertmanager"]
+
+    - role: blackbox_exporter
+      tags: ["blackbox_exporter"]
 
     - role: node_exporter
       tags: ["node_exporter"]
