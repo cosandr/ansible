@@ -52,6 +52,7 @@ win-aquaero ansible_host=10.0.20.10
 
 [localgw]
 localgw01 ansible_host=10.0.10.91
+romgw01 ansible_host=10.1.0.91
 
 [webgw]
 webgw01

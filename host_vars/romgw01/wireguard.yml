@@ -2,35 +2,24 @@
 
 wireguard_interface: "mt"
 wireguard_addresses:
-  - "10.4.20.91/24"
-  - "fd00:4:20::91/64"
-
-wireguard_dns_list:
-  - "{{ hostvars['mt-router'].wireguard_ip }}"
-  - "{{ hostvars['mt-router'].wireguard_ipv6 }}"
-  - "1.1.1.1"
-  - "8.8.8.8"
+  - "10.4.20.209/24"
+  - "fd00:4:20::209/64"
 
 wireguard_mt_allowed_ips:
   - "{{ hostvars['mt-router'].wireguard_ip }}/32"
-  - "{{ home_net.vm.cidr }}"
-  - "{{ hostvars['dresrv'].ansible_host }}/32"
-  - "{{ hostvars['mt-router'].wireguard_ipv6 }}/128"
-  - "{{ home_net.vm.cidr6 }}"
 
 wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_ip: "{{ wireguard_addresses[0] | ipaddr('address') }}"
 wireguard_ipv6: "{{ wireguard_addresses[1] | ipaddr('address') }}"
-wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"
 wireguard_private_key: "{{ vault_wireguard_private_key }}"
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
-wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
 
 wireguard_unmanaged_peers:
   mt:
     endpoint: "{{ hostvars['mt-router'].wireguard_endpoint }}"
     allowed_ips: "{{ wireguard_mt_allowed_ips | join(', ') }}"
     public_key: "{{ hostvars['mt-router'].wireguard_public_key }}"
-  romgw:
-    allowed_ips: "{{ hostvars['romgw01'].wireguard_ip }}/32"
-    public_key: "{{ hostvars['romgw01'].wireguard_public_key }}"
+  webgw:
+    endpoint: "{{ hostvars['webgw01'].wireguard_endpoint }}"
+    allowed_ips: "{{ hostvars['webgw01'].wireguard_ip }}/32"
+    public_key: "{{ hostvars['webgw01'].wireguard_public_key }}"

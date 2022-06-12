@@ -211,13 +211,24 @@
           notify: reload firewalld
           loop: "{{ firewalld_rich_rules }}"
 
-        - name: Add mt interface to internal zone
+        - name: Add Wireguard interface to internal zone
           firewalld:
             zone: "internal"
-            interface: "mt"
+            interface: "{{ wireguard_interface }}"
             permanent: true
             state: enabled
-          when: wireguard_address is defined
+          when: wireguard_interface is defined
+          notify: reload firewalld
+
+        - name: Allow wireguard through firewall
+          firewalld:
+            zone: "public"
+            port: "{{ wireguard_endpoint.split(':')[1] }}/udp"
+            permanent: true
+            state: enabled
+          when:
+            - wireguard_endpoint is defined
+            - wireguard_endpoint | length > 0
           notify: reload firewalld
 
         - name: Add prom server to internal zone

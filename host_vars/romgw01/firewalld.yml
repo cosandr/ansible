@@ -1,0 +1,5 @@
+---
+
+firewalld_masquerade_zones: []
+
+firewalld_rich_rules: []
