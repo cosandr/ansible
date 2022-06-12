@@ -133,8 +133,9 @@
       tags: ["node_exporter"]
 
     - role: filebeat
-      # "filebeat_config is defined" for some reason doesn't work
-      when: "'filebeat_config' in hostvars[inventory_hostname]"
+      when:
+        - filebeat_config is defined
+        - filebeat_config | length > 0
       tags: ["filebeat"]
 
     - role: certbot

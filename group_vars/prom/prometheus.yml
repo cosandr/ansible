@@ -231,6 +231,10 @@ prometheus_scrape_configs_static:
         labels:
           instance: "{{ hostvars['localgw01'].inventory_hostname }}"
 
+      - targets: ["{{ hostvars['romgw01'].wireguard_ip }}:{{ hostvars['romgw01'].nginx_exporter_port }}"]
+        labels:
+          instance: "{{ hostvars['romgw01'].inventory_hostname }}"
+
 prometheus_alert_rules:
   - alert: HostOutOfMemory
     expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
