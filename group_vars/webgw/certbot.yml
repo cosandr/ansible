@@ -2,19 +2,12 @@
 
 certbot_email: "{{ vault_certbot_email }}"
 certbot_extra_pkgs: ["certbot-dns-hetzner", "certbot-dns-cloudflare"]
-certbot_domains:
+certbot_domains_hetzner:
   - "{{ domains[0] }},*.{{ domains[0] }}"
   - "{{ domains[1] }},*.{{ domains[1] }}"
   - "{{ domains[2] }},*.{{ domains[2] }}"
   - "{{ domains[3] }},*.{{ domains[3] }}"
-certbot_credentials_path: "/etc/letsencrypt/hetzner.ini"
-certbot_credentials_content: |
-  dns_hetzner_api_token = {{ vault_dns_hetzner_api_token }}
 
-certbot_generate_command: >
-  certbot certonly
-  --authenticator dns-hetzner
-  --dns-hetzner-credentials {{ certbot_credentials_path }}
-  -n
-  --keep
-  --expand
+certbot_domains_cloudflare:
+  - "{{ domains[4] }},*.{{ domains[4] }}"
+  - "{{ domains[5] }},*.{{ domains[5] }}"

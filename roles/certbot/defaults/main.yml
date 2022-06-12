@@ -1,5 +1,6 @@
 ---
 
+certbot_install: true
 certbot_auto_renew: true
 certbot_email: ""
 certbot_venv_path: "/opt/certbot"

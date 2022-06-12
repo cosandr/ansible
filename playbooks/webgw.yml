@@ -138,12 +138,28 @@
       tags: ["filebeat"]
 
     - role: certbot
-      tags: ["certbot"]
+      vars:
+        certbot_domains: "{{ certbot_domains_hetzner }}"
+        certbot_credentials_path: "/etc/letsencrypt/hetzner.ini"
+        certbot_credentials_content: |
+          dns_hetzner_api_token = {{ vault_dns_hetzner_api_token }}
+
+        certbot_generate_command: >
+          certbot certonly
+          --authenticator dns-hetzner
+          --dns-hetzner-credentials {{ certbot_credentials_path }}
+          -n
+          --keep
+          --expand
+      when:
+        - certbot_domains_hetzner is defined
+        - certbot_domains_hetzner | length > 0
+      tags: ["certbot", "hetzner"]
 
     - role: certbot
       vars:
-        certbot_domains:
-          - "{{ domains[4] }},*.{{ domains[4] }}"
+        certbot_install: "{{ __certbot_installed is not defined }}"
+        certbot_domains: "{{ certbot_domains_cloudflare }}"
         certbot_credentials_path: "/etc/letsencrypt/cloudflare.ini"
         certbot_credentials_content: |
           dns_cloudflare_api_token = {{ vault_dns_cloudflare_api_token }}
@@ -155,7 +171,10 @@
           -n
           --keep
           --expand
-      tags: ["certbot-cloudflare"]
+      when:
+        - certbot_domains_cloudflare is defined
+        - certbot_domains_cloudflare | length > 0
+      tags: ["certbot", "cloudflare"]
 
     - role: nginx
       tags: ["nginx"]
