@@ -4,6 +4,7 @@ desktop_label: "{{ hostvars.desktop.inventory_hostname }}"
 laptop_label: "{{ hostvars.laptop.inventory_hostname }}"
 drepi_label: "{{ hostvars.drepi.inventory_hostname }}"
 server_label: "{{ hostvars.dresrv.inventory_hostname }}"
+romsto_label: "RomeoTV"
 __dresrv: "{{ hostvars['dresrv'] }}"
 
 prometheus_port: 9090
@@ -40,12 +41,14 @@ prometheus_node_static_config:
   - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].node_exporter_port }}"]
     labels:
       instance: "{{ drepi_label }}"
-      __metrics_path__: /metrics
 
   - targets: ["{{ hostvars['truenas'].local_ips.vm }}:9100"]
     labels:
       instance: "{{ hostvars['truenas'].inventory_hostname }}"
-      __metrics_path__: /metrics
+
+  - targets: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].node_exporter_port }}"]
+    labels:
+      instance: "{{ romsto_label }}"
 
 # Appended at runtime
 blackbox_exporter_targets_icmp_ipv4:
@@ -146,6 +149,10 @@ prometheus_scrape_configs_static:
         labels:
           instance: "{{ server_label }}"
 
+      - targets: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].cadvisor_port }}"]
+        labels:
+          instance: "{{ romsto_label }}"
+
   - job_name: "dht"
     static_configs:
       - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].dht_exporter_port }}"]
@@ -223,26 +230,6 @@ prometheus_scrape_configs_static:
       - targets: ["{{ hostvars['localgw01'].ansible_host }}:{{ hostvars['localgw01'].nginx_exporter_port }}"]
         labels:
           instance: "{{ hostvars['localgw01'].inventory_hostname }}"
-
-  - job_name: "romeo-tv"
-    scheme: https
-    scrape_interval: 30s
-    scrape_timeout: 20s
-    basic_auth:
-      username: "{{ hostvars.romsto.scrape_user }}"
-      password: "{{ hostvars.romsto.scrape_pass }}"
-    static_configs:
-      - targets: ['prom.{{ hostvars.romsto.domain }}']
-        labels:
-          job: "cadvisor"
-          instance: "RomeoTV"
-          __metrics_path__: /cadvisor
-
-      - targets: ['prom.{{ hostvars.romsto.domain }}']
-        labels:
-          job: "node"
-          instance: "RomeoTV"
-          __metrics_path__: /node
 
 prometheus_alert_rules:
   - alert: HostOutOfMemory
