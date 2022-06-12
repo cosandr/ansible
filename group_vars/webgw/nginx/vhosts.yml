@@ -20,3 +20,9 @@ nginx_vhosts:
   - filename: plex.conf
     server_name: plex
     template: "{{ inventory_dir }}/files/webgw/nginx/plex.conf.j2"
+
+  - filename: nextcloud_ta.conf
+    server_name: nextcloud_ta
+    upstream_name: nextcloud_ta
+    domain: "{{ domains[5] }}"
+    template: "{{ inventory_dir }}/files/webgw/nginx/nextcloud.conf.j2"

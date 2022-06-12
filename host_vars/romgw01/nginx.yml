@@ -1,0 +1,13 @@
+---
+
+nginx_upstreams:
+  - name: nextcloud_ta
+    servers: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].nextcloud_port }}"]
+    keepalive: 16
+
+nginx_vhosts:
+  - filename: nextcloud.conf
+    server_name: nextcloud
+    upstream_name: nextcloud_ta
+    domain: "{{ domains[5] }}"
+    template: "{{ inventory_dir }}/files/webgw/nginx/nextcloud.conf.j2"

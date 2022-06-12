@@ -20,3 +20,7 @@ nginx_upstreams:
   - name: plex
     servers: ["{{ hostvars['plex01'].ansible_host }}:{{ hostvars['plex01'].plex_port }}"]
     keepalive: 16
+
+  - name: nextcloud_ta
+    servers: ["{{ hostvars['romsto'].wireguard_ip }}:{{ hostvars['romsto'].nextcloud_port }}"]
+    keepalive: 16
