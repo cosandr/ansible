@@ -1,10 +1,7 @@
 ---
-ansible_ssh_common_args: '-o ProxyCommand="ssh -W %h:%p -q {{ vault_jump_user }}@{{ vault_jump_host }} -p {{ vault_jump_port }}"'
 
 ddns_domain: "{{ vault_ddns_domain }}"
 domain: "{{ vault_domain }}"
-scrape_pass: "{{ vault_scrape_pass }}"
-scrape_user: "{{ vault_scrape_user }}"
 ssh_port: "{{ vault_ssh_port }}"
 syncthing_port: "{{ vault_syncthing_port }}"
 cadvisor_port: "9101"

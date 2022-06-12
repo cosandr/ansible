@@ -243,12 +243,10 @@
         - name: Allow wireguard through firewall
           firewalld:
             zone: "public"
-            port: "{{ wireguard_endpoint.split(':')[1] }}/udp"
+            port: "{{ wireguard_port }}/udp"
             permanent: true
             state: enabled
-          when:
-            - wireguard_endpoint is defined
-            - wireguard_endpoint | length > 0
+          when: wireguard_port is defined
           notify: reload firewalld
 
         - name: Add prom server to internal zone

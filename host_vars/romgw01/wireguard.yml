@@ -1,5 +1,6 @@
 ---
 
+wireguard_port: "51821"
 wireguard_interface: "mt"
 wireguard_addresses:
   - "10.4.20.209/24"
