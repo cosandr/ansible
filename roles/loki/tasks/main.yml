@@ -1,0 +1,33 @@
+---
+
+- include_tasks: install.yml
+  tags: ["install"]
+
+- name: Ensure loki directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: loki
+    group: loki
+    mode: 0750
+  loop:
+    - "/etc/loki"
+    - "{{ loki_workdir }}"
+  tags: ["config"]
+
+- name: Copy config
+  template:
+    src: config.yml.j2
+    dest: /etc/loki/config.yml
+    owner: loki
+    group: loki
+    mode: 0640
+  notify: restart loki
+  tags: ["config"]
+
+- name: Enable and start loki
+  systemd:
+    name: loki.service
+    enabled: true
+    state: started
+    daemon_reload: true

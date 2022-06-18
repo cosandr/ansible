@@ -1,0 +1,22 @@
+---
+
+- hosts: loki
+  gather_facts: true
+  roles:
+    - role: setup_disks
+      tags: ["disk"]
+
+    - role: firewall_config
+      tags: ["firewall"]
+
+    - role: sshd
+      tags: ["sshd"]
+
+    - role: cosandr.dnf_automatic
+      tags: ["dnf_automatic"]
+
+    - role: node_exporter
+      tags: ["node_exporter"]
+
+    - role: loki
+      tags: ["loki"]

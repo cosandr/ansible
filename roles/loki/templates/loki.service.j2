@@ -1,0 +1,24 @@
+[Unit]
+Description=Loki is a horizontally-scalable, highly-available, multi-tenant log aggregation system
+Documentation=https://github.com/grafana/loki
+
+[Service]
+Restart=always
+User=loki
+Group=loki
+ExecStart=/usr/local/bin/loki -config.file=/etc/loki/config.yml
+ExecReload=/bin/kill -HUP $MAINPID
+TimeoutStopSec=20s
+SendSIGKILL=no
+
+PrivateUsers=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths={{ loki_workdir }}
+
+[Install]
+WantedBy=multi-user.target

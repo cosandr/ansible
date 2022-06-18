@@ -1,0 +1,11 @@
+---
+
+loki_version: "latest"
+loki_http_port: 3100
+loki_grpc_port: 9096
+loki_allow_ips: []
+loki_allow_zone: "public"
+loki_config_firewall: true
+
+loki_workdir: "/var/lib/loki"
+loki_alertmanager_url: "{{ alertmanager_web_external_url | default('http://localhost:9093') }}"
