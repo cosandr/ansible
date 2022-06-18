@@ -1,8 +1,16 @@
 ---
 
 loki_version: "latest"
-loki_http_port: 3100
-loki_grpc_port: 9096
+loki_log_level: "warn"
+
+loki_http_listen_address: "0.0.0.0:3100"
+__loki_http_address: "{{ loki_http_listen_address.split(':')[0] }}"
+__loki_http_port: "{{ loki_http_listen_address.split(':')[1] }}"
+
+loki_grpc_listen_address: "0.0.0.0:9096"
+__loki_grpc_address: "{{ loki_grpc_listen_address.split(':')[0] }}"
+__loki_grpc_port: "{{ loki_grpc_listen_address.split(':')[1] }}"
+
 loki_allow_ips: []
 loki_allow_zone: "public"
 loki_config_firewall: true

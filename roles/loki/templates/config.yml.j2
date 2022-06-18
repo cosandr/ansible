@@ -1,8 +1,11 @@
 auth_enabled: false
 
 server:
-  http_listen_port: {{ loki_http_port }}
-  grpc_listen_port: {{ loki_grpc_port }}
+  http_listen_address: {{ __loki_http_address }}
+  http_listen_port: {{ __loki_http_port }}
+  grpc_listen_address: {{ __loki_grpc_address }}
+  grpc_listen_port: {{ __loki_grpc_port }}
+  log_level: {{ loki_log_level }}
 
 common:
   path_prefix: {{ loki_workdir }}

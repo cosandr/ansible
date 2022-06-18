@@ -8,10 +8,10 @@ dependencies:
         - name: loki
           sources: "{{ (groups.get('loki', []) | difference(inventory_hostname)) | map('extract', hostvars, 'ansible_host') | list }}"
       firewall_rules:
-        - port: "{{ loki_grpc_port }}"
+        - port: "{{ __loki_grpc_port }}"
           zone: loki
 
-        - port: "{{ loki_http_port }}"
+        - port: "{{ __loki_http_port }}"
           zone: "{{ loki_allow_zone }}"
           sources: "{{ loki_allow_ips }}"
     when: loki_config_firewall | bool
