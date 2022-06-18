@@ -1,0 +1,21 @@
+[Unit]
+Description=promtail is the agent responsible for gathering logs and sending them to Loki.
+Documentation=https://github.com/grafana/loki/blob/master/docs/promtail.md
+
+[Service]
+Restart=always
+User=root
+ExecStart=/usr/local/bin/promtail -config.file=/etc/promtail/config.yml
+ExecReload=/bin/kill -HUP $MAINPID
+TimeoutStopSec=20s
+SendSIGKILL=no
+ReadOnlyPaths={{ promtail_read_paths }}
+ReadWritePaths={{ promtail_workdir }}
+PrivateUsers=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target

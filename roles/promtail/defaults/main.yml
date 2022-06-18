@@ -1,0 +1,47 @@
+---
+
+promtail_version: "latest"
+promtail_log_level: "warn"
+# Run as root so we can actually read log files
+promtail_user: "root"
+
+promtail_server_enabled: false
+promtail_http_listen_address: "0.0.0.0:9080"
+__promtail_http_address: "{{ promtail_http_listen_address.split(':')[0] }}"
+__promtail_http_port: "{{ promtail_http_listen_address.split(':')[1] }}"
+
+promtail_grpc_listen_address: "127.0.0.1:9095"
+__promtail_grpc_address: "{{ promtail_grpc_listen_address.split(':')[0] }}"
+__promtail_grpc_port: "{{ promtail_grpc_listen_address.split(':')[1] }}"
+
+promtail_allow_ips: []
+promtail_allow_zone: "public"
+promtail_config_firewall: true
+
+promtail_read_paths:
+  - "/var/log"
+
+promtail_workdir: "/var/lib/promtail"
+
+promtail_clients:
+  - url: http://localhost:3100/loki/api/v1/push
+    external_labels:
+      host: "{{ inventory_hostname }}"
+
+promtail_scrape_configs:
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*log
+
+  - job_name: journal
+    journal:
+      max_age: 12h
+      labels:
+        job: systemd-journal
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'

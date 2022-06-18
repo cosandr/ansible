@@ -1,0 +1,90 @@
+---
+
+- name: Setup promtail user
+  block:
+    - name: Copy Promtail sysusers file
+      copy:
+        content: |
+          u promtail - "Grafana Promtail user"
+        dest: /usr/lib/sysusers.d/promtail.conf
+        mode: 0644
+        owner: root
+        group: root
+      register: __sysusers
+
+    - name: Restart systemd-sysusers  # noqa no-handler
+      become: true
+      command: systemd-sysusers
+      when: __sysusers.changed
+  when: promtail_user == "promtail"
+
+- name: Get latest release tag
+  block:
+    - name: Get latest release
+      uri:
+        url: "https://api.github.com/repos/grafana/loki/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      no_log: false
+      register: _latest_release
+      until: _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set Promtail version to {{ _latest_release.json.tag_name[1:] }}"
+      set_fact:
+        promtail_version: "{{ _latest_release.json.tag_name[1:] }}"
+  when: promtail_version == "latest"
+
+- name: Get checksum list
+  set_fact:
+    __promtail_checksums: "{{ lookup('url', 'https://github.com/grafana/loki/releases/download/v' + promtail_version + '/SHA256SUMS', wantlist=True) | list }}"
+  run_once: true
+  check_mode: false
+  delegate_to: localhost
+
+- name: Download Promtail binary to local folder  # noqa risky-file-permissions
+  become: false
+  get_url:
+    url: "https://github.com/grafana/loki/releases/download/v{{ promtail_version }}/promtail-linux-{{ go_arch }}.zip"
+    dest: "/tmp/promtail-linux-{{ go_arch }}.zip"
+    checksum: "sha256:{{ (__promtail_checksums | select('search', 'promtail-linux-' + go_arch + '.zip') | first).split()[0] }}"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  # run_once: true # <-- this cannot be set due to multi-arch support
+  delegate_to: localhost
+  check_mode: false
+
+- name: Unpack Promtail binary
+  become: false
+  diff: false
+  unarchive:
+    src: "/tmp/promtail-linux-{{ go_arch }}.zip"
+    dest: "/tmp"
+    creates: "/tmp/promtail-linux-{{ go_arch }}"
+  delegate_to: localhost
+  check_mode: false
+
+- name: Install Promtail binary
+  diff: false
+  copy:
+    src: "/tmp/promtail-linux-{{ go_arch }}"
+    dest: "/usr/local/bin/promtail"
+    mode: 0755
+    owner: root
+    group: root
+  notify: restart promtail
+
+- name: Install service
+  template:
+    src: promtail.service.j2
+    dest: /etc/systemd/system/promtail.service
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart promtail

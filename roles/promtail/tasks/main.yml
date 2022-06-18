@@ -1,0 +1,33 @@
+---
+
+- include_tasks: install.yml
+  tags: ["install"]
+
+- name: Ensure promtail directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ promtail_user }}"
+    group: "{{ promtail_user }}"
+    mode: 0750
+  loop:
+    - "/etc/promtail"
+    - "{{ promtail_workdir }}"
+  tags: ["config"]
+
+- name: Copy config
+  template:
+    src: config.yml.j2
+    dest: /etc/promtail/config.yml
+    owner: "{{ promtail_user }}"
+    group: "{{ promtail_user }}"
+    mode: 0640
+  notify: restart promtail
+  tags: ["config"]
+
+- name: Enable and start promtail
+  systemd:
+    name: promtail.service
+    enabled: true
+    state: started
+    daemon_reload: true

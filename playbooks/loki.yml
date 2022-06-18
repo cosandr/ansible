@@ -20,3 +20,6 @@
 
     - role: loki
       tags: ["loki"]
+
+    - role: promtail
+      tags: ["promtail"]

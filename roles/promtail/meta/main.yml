@@ -1,0 +1,16 @@
+---
+
+dependencies:
+  - role: firewall_config
+    vars:
+      firewalld_services: []
+      firewalld_zones: []
+      firewall_rules:
+        - port: "{{ promtail_http_port }}"
+          zone: "{{ promtail_allow_zone }}"
+          sources: "{{ promtail_allow_ips }}"
+    when:
+      - promtail_config_firewall | bool
+      - promtail_server_enabled | bool
+      - __promtail_http_address != "127.0.0.1"
+    tags: ["firewall"]

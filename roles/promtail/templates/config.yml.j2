@@ -1,0 +1,19 @@
+server:
+{% if promtail_server_enabled | bool %}
+  http_listen_address: {{ __promtail_http_address }}
+  http_listen_port: {{ __promtail_http_port }}
+  grpc_listen_address: {{ __promtail_grpc_address }}
+  grpc_listen_port: {{ __promtail_grpc_port }}
+{% else %}
+  disable: true
+{% endif %}
+  log_level: {{ promtail_log_level }}
+
+positions:
+  filename: {{ promtail_workdir }}/positions.yaml
+
+clients:
+{{ promtail_clients | to_nice_yaml(indent=2) }}
+
+scrape_configs:
+{{ promtail_scrape_configs | to_nice_yaml(indent=2) }}
