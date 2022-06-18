@@ -1,0 +1,28 @@
+---
+
+promtail_clients:
+  - url: "http://{{ hostvars['loki01'].ansible_host }}:3100/loki/api/v1/push"
+    external_labels:
+      host: "{{ inventory_hostname }}"
+
+__promtail_scrape_config_map:
+  system:
+    job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/*log
+
+  journal:
+    job_name: journal
+    journal:
+      max_age: 12h
+      labels:
+        job: systemd-journal
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+
+promtail_scrape_configs: "{{ (__promtail_scrape_config_map.values() | list) + (__promtail_host_configs | default([])) }}"

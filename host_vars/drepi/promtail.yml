@@ -1,0 +1,5 @@
+---
+
+# ARM build doesn't support systemd journal
+promtail_scrape_configs:
+  - "{{ __promtail_scrape_config_map['system'] }}"
