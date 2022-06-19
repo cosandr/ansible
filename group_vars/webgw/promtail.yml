@@ -1,0 +1,88 @@
+---
+
+__promtail_host_configs:
+  - job_name: nginx
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          nginx_type: error
+          __path__: /var/log/nginx/error.log
+
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          nginx_type: error
+          __path__: "{{ nginx_sites_logs }}/error-*log"
+
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          nginx_type: access
+          __path__: /var/log/nginx/access.log
+
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          nginx_type: access
+          __path__: "{{ nginx_sites_logs }}/access-*log"
+
+    pipeline_stages:
+      - match:
+          selector: '{job="nginx", nginx_type="error"}'
+          stages:
+            - regex:
+                # 2022/06/12 17:31:20 [error] 49426#49426: *2 connect() failed
+                expression: '^(?P<timestamp>\w{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) \[(?P<level>\w+)\] (?P<pid>\d+)#(?P<tid>\d+): (?P<message>.*)'
+
+            - labels:
+                level: ""
+                pid: ""
+                tid: ""
+
+            - timestamp:
+                source: timestamp
+                format: "2006/01/02 15:04:05"
+                location: "{{ sys_timezone }}"
+
+            - output:
+                source: message
+
+      - match:
+          selector: '{job="nginx", nginx_type="access"}'
+          stages:
+            - regex:
+                # 10.1.0.91 - - [12/Jun/2022:19:16:38 +0200] "GET / HTTP/2.0" 500 289 "-" "curl/7.61.1" "-"
+                expression: '(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<timestamp>\w{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4})\] "(?P<method>[A-Z]+) (?P<request>.*?)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>.*?)" "(?P<http_user_agent>.*?)" "(?P<http_x_forwarded_for>.*?)"'
+
+            - labels:
+                remote_addr: ""
+                method: ""
+                status: ""
+
+            - static_labels:
+                level: debug
+
+            - metrics:
+                body_bytes_sent:
+                  type: Gauge
+                  description: "Bytes sent in body"
+                  source: body_bytes_sent
+                  config:
+                    action: set
+
+            - timestamp:
+                source: timestamp
+                format: "02/Jan/2006:15:04:05 -0700"
+                location: "{{ sys_timezone }}"
+
+            - template:
+                source: message
+                template: '{% raw %}user="{{ .remote_user }}" request="{{ .request }}" referer="{{ .http_referer }}" user_agent="{{ .http_user_agent }}" x_forwarded_for="{{ .http_x_forwarded_for }}"{% endraw %}'
+
+            - output:
+                source: message

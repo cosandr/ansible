@@ -15,3 +15,6 @@ smtp_config: "{{ vault_smtp_config }}"
 firewall_frontend: 'firewalld'
 node_exporter_config_firewall: true
 node_exporter_allow_ips: "{{ groups['prom'] | map('extract', hostvars, 'ansible_host') | list }}"
+
+# Fetch with timedatectl -p Timezone --value show
+sys_timezone: "Europe/Oslo"

@@ -15,10 +15,10 @@ __promtail_host_configs:
 
       - regex:
           # 2022-05-07 23:49:34,816:INFO:MrBot: Unix session initialized.
-          expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}):(?P<log_level>[A-Z]+):(?P<component>[^:]*): (?P<message>(?s:.*))$'
+          expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}):(?P<level>[A-Z]+):(?P<component>[^:]*): (?P<message>(?s:.*))$'
 
       - labels:
-          log_level: ""
+          level: ""
           component: ""
 
       - timestamp:
