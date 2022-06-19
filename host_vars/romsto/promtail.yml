@@ -1,0 +1,37 @@
+---
+
+promtail_bin_path: /pstore/promtail/bin/promtail
+promtail_conf_path: /pstore/promtail/config.yml
+promtail_workdir: /pstore/promtail/work
+
+promtail_scrape_configs:
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: varlogs
+          __path__: /var/log/syslog
+    pipeline_stages:
+      - match:
+          selector: '{job="varlogs"}'
+          stages:
+            - regex:
+                # Jun 19 11:39:07 HOSTNAME avahi-daemon[4496]: Interface veth020e27e.IPv6 no longer relevant for mDNS.
+                # Jun 19 11:39:07 HOSTNAME kernel: br-1e2feda210eb: port 1(veth020e27e) entered disabled state
+                expression: '^(?P<timestamp>\w{3} \d{2} \d{2}:\d{2}:\d{2}) (?P<hostname>\w+) (?P<program>\w+)(?P<pid>\[\d+\])?: (?P<message>.*)'
+
+            - labels:
+                program: ""
+                pid: ""
+                timestamp: ""
+
+            - timestamp:
+                source: timestamp
+                format: "Jan 02 15:04:05"
+                location: "Europe/Oslo"
+
+            - output:
+                source: message
+
+  - "{{ __promtail_scrape_config_map['docker'] }}"

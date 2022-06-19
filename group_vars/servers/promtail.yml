@@ -25,4 +25,21 @@ __promtail_scrape_config_map:
       - source_labels: ['__journal__systemd_unit']
         target_label: 'unit'
 
-promtail_scrape_configs: "{{ (__promtail_scrape_config_map.values() | list) + (__promtail_host_configs | default([])) }}"
+  docker:
+    job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+        refresh_interval: 60s
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        regex: '/(.*)'
+        target_label: 'container'
+    pipeline_stages:
+      - static_labels:
+          job: docker
+
+__promtail_default_scrape_configs:
+  - "{{ __promtail_scrape_config_map['system'] }}"
+  - "{{ __promtail_scrape_config_map['journal'] }}"
+
+promtail_scrape_configs: "{{ __promtail_default_scrape_configs + (__promtail_host_configs | default([])) }}"

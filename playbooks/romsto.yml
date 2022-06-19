@@ -83,25 +83,53 @@
     - role: nginx_site
       tags: ["nginx_site"]
 
-    - role: filebeat
-      tags: ["filebeat"]
-  post_tasks:
-    - block:
-        - name: Compress filebeat
-          archive:
-            path:
-              - "{{ filebeat_config_path }}"
-              - "{{ filebeat_home_path }}"
-              - "{{ sysv_path }}/rc.filebeat"
-              - "{{ ca_path }}"
-            dest: /pstore/filebeat.tar.gz
+    - role: promtail
+      tags: ["promtail"]
 
-        - name: Setup filebeat on boot
+    # - role: filebeat
+    #   tags: ["filebeat"]
+  post_tasks:
+    # - name: Ensure filebeat is persistent
+    #   block:
+    #     - name: Compress filebeat
+    #       archive:
+    #         path:
+    #           - "{{ filebeat_config_path }}"
+    #           - "{{ filebeat_home_path }}"
+    #           - "{{ sysv_path }}/rc.filebeat"
+    #           - "{{ ca_path }}"
+    #         dest: /pstore/filebeat.tar.gz
+    #         owner: root
+    #         group: root
+    #         mode: 0644
+
+    #     - name: Setup filebeat on boot
+    #       blockinfile:
+    #         path: /boot/config/go
+    #         marker: "# {mark} filebeat"
+    #         block: |
+    #           tar zxf /pstore/filebeat.tar.gz -C /
+    #           install -o root -g root -dm755 {{ filebeat_log_path }}
+    #           {{ sysv_path }}/rc.filebeat start
+    #       tags: ["filebeat", "go"]
+
+    - name: Ensure promtail is persistent
+      block:
+        - name: Copy promtail rc file
+          copy:
+            src: /etc/rc.d/rc.promtail
+            remote_src: true
+            dest: /pstore/promtail/rc.promtail
+            owner: root
+            group: root
+            mode: 0755
+
+        - name: Setup promtail on boot
           blockinfile:
             path: /boot/config/go
-            marker: "# {mark} filebeat"
+            marker: "# {mark} promtail"
             block: |
-              tar zxf /pstore/filebeat.tar.gz -C /
-              install -o root -g root -dm755 {{ filebeat_log_path }}
-              {{ sysv_path }}/rc.filebeat start
-          tags: ["filebeat", "go"]
+              install -o root -g root -m755 /pstore/promtail/rc.promtail /etc/rc.d/rc.promtail
+              /etc/rc.d/rc.promtail start
+
+      tags: ["promtail", "go"]
