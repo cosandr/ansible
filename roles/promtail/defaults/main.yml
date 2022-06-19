@@ -20,6 +20,8 @@ promtail_config_firewall: true
 
 promtail_read_paths:
   - "/var/log"
+  - "/run/log"
+  - "/run/systemd/journal"
 
 promtail_workdir: "/var/lib/promtail"
 

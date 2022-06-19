@@ -87,4 +87,6 @@
     owner: root
     group: root
     mode: 0644
-  notify: restart promtail
+  notify:
+    - reload systemd
+    - restart promtail
