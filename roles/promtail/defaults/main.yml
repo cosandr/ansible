@@ -47,3 +47,8 @@ promtail_scrape_configs:
     relabel_configs:
       - source_labels: ['__journal__systemd_unit']
         target_label: 'unit'
+
+__is_sysv: "{{ ansible_service_mgr != 'systemd' | default(false) }}"
+
+promtail_bin_path: /usr/local/bin/promtail
+promtail_conf_path: /etc/promtail/config.yml

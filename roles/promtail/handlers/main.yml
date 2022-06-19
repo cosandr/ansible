@@ -3,8 +3,15 @@
 - name: reload systemd
   systemd:
     daemon_reload: true
+  when: not __is_sysv
 
 - name: restart promtail
-  systemd:
+  service:
     name: promtail
     state: restarted
+  when: ansible_os_family != 'Slackware'
+
+- name: restart promtail [Slackware]
+  listen: restart promtail
+  command: /etc/rc.d/rc.promtail restart
+  when: ansible_os_family == 'Slackware'

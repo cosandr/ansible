@@ -1,0 +1,37 @@
+#!/bin/sh
+#
+# /etc/rc.d/rc.promtail
+#
+# Start/stop/restart the promtail daemon, the agent responsible for gathering logs and sending them to Loki.
+{{ ansible_managed | comment }}
+
+promtail_start() {
+  if [ -x {{ promtail_bin_path }} ]; then
+    {{ promtail_bin_path }} -config.file={{ promtail_conf_path }} &
+  fi
+}
+
+promtail_stop() {
+    killall promtail
+}
+
+promtail_restart() {
+  promtail_stop
+  sleep 1
+  promtail_start
+}
+
+case "$1" in
+'start')
+  promtail_start
+  ;;
+'stop')
+  promtail_stop
+  ;;
+'restart')
+  promtail_restart
+  ;;
+*)
+  echo "Usage: $0 {start|stop|restart}"
+esac
+

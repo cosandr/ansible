@@ -70,17 +70,25 @@
   delegate_to: localhost
   check_mode: false
 
+- name: Ensure promtail bin path exists
+  file:
+    path: "{{ promtail_bin_path | dirname }}"
+    state: directory
+    owner: "{{ promtail_user }}"
+    group: "{{ promtail_user }}"
+    mode: 0755
+
 - name: Install Promtail binary
   diff: false
   copy:
     src: "/tmp/promtail-linux-{{ go_arch }}"
-    dest: "/usr/local/bin/promtail"
+    dest: "{{ promtail_bin_path }}"
     mode: 0755
     owner: root
     group: root
   notify: restart promtail
 
-- name: Install service
+- name: Install systemd service
   template:
     src: promtail.service.j2
     dest: /etc/systemd/system/promtail.service
@@ -90,3 +98,13 @@
   notify:
     - reload systemd
     - restart promtail
+  when: not __is_sysv
+
+- name: Install sysv service
+  template:
+    src: rc.promtail.j2
+    dest: "/etc/rc.d/rc.promtail"
+    owner: root
+    group: root
+    mode: 0755
+  when: __is_sysv

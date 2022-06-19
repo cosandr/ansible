@@ -11,23 +11,30 @@
     group: "{{ promtail_user }}"
     mode: 0750
   loop:
-    - "/etc/promtail"
+    - "{{ promtail_conf_path | dirname }}"
     - "{{ promtail_workdir }}"
   tags: ["config"]
 
 - name: Copy config
   template:
     src: config.yml.j2
-    dest: /etc/promtail/config.yml
+    dest: "{{ promtail_conf_path }}"
     owner: "{{ promtail_user }}"
     group: "{{ promtail_user }}"
     mode: 0640
   notify: restart promtail
   tags: ["config"]
 
+- name: Flush handlers
+  meta: flush_handlers
+
 - name: Enable and start promtail
-  systemd:
-    name: promtail.service
+  service:
+    name: promtail
     enabled: true
     state: started
-    daemon_reload: true
+  when: ansible_os_family != 'Slackware'
+
+- name: Start promtail [Slackware]
+  command: /etc/rc.d/rc.promtail start
+  when: ansible_os_family == 'Slackware'
