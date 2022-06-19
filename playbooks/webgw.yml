@@ -106,6 +106,30 @@
         - ansible_selinux.status == "enabled"
       tags: ["nginx"]
 
+    - name: Add logrotate config for sites
+      copy:
+        content: |
+          {{ nginx_sites_logs }}/*.log {
+                  daily
+                  missingok
+                  rotate 7
+                  compress
+                  delaycompress
+                  notifempty
+                  create 640 nginx adm
+                  sharedscripts
+                  postrotate
+                          if [ -f /var/run/nginx.pid ]; then
+                                  kill -USR1 `cat /var/run/nginx.pid`
+                          fi
+                  endscript
+          }
+        dest: /etc/logrotate.d/nginx_sites
+        owner: root
+        group: root
+        mode: 0644
+      tags: ["nginx", "logrotate"]
+
     - name: Set fail2ban facts
       set_fact:
         fail2ban_ignoreip: "{{ (__f2b_extra_ignore + hostvars['laptop'].wireguard_mt_allowed_ips) | flatten }}"
