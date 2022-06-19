@@ -7,6 +7,10 @@ firewalld_zones:
     sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
 
   - name: internal
+    # Allow wireguard
+    sources: "10.4.20.0/24"
+
+  - name: internal
     # Allow prometheus
     sources: "{{ node_exporter_allow_ips }}"
 

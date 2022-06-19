@@ -11,6 +11,7 @@ wireguard_mt_allowed_ips:
   - "{{ hostvars['dresrv'].ansible_host }}/32"
   - "{{ hostvars['prom01'].ansible_host }}/32"
   - "{{ hostvars['backup01'].ansible_host }}/32"
+  - "{{ hostvars['loki01'].ansible_host }}/32"
   # - "{{ hostvars['mt-router'].wireguard_ipv6 }}/128"
 
 wireguard_address: "{{ wireguard_addresses | join(', ') }}"
