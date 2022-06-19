@@ -1,4 +1,32 @@
 ---
 
 __promtail_host_configs:
+  - job_name: mrbot
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: mrbot
+          __path__: "{{ container_data }}/mrbot/src/mrbot.log"
+    pipeline_stages:
+      - multiline:
+          firstline: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}:'
+          max_wait_time: 3s
+
+      - regex:
+          # 2022-05-07 23:49:34,816:INFO:MrBot: Unix session initialized.
+          expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}):(?P<log_level>[A-Z]+):(?P<component>[^:]*): (?P<message>(?s:.*))$'
+
+      - labels:
+          log_level: ""
+          component: ""
+
+      - timestamp:
+          source: timestamp
+          format: "2006-01-02 15:04:05,000"
+          location: "Europe/Oslo"
+
+      - output:
+          source: message
+
   - "{{ __promtail_scrape_config_map['docker'] }}"
