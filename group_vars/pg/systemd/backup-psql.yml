@@ -6,8 +6,8 @@ __sd_backup_psql:
     content: |
       [Unit]
       Description=PostgreSQL backup
-      After={{ postgresql_daemon }}
-      Requires={{ postgresql_daemon }}
+      After={{ postgresql_daemon }}.service
+      Requires={{ postgresql_daemon }}.service
       RequiresMountsFor=/mnt/backup-pgsql
 
       [Service]
@@ -16,7 +16,7 @@ __sd_backup_psql:
       Environment=KEEP=3
       Environment=PERMS=640
       Environment=PERMS_USER=root
-      Environment=PERMS_GROUP=1000  # my user
+      Environment=PERMS_GROUP=1000
       ExecStart={{ systemd_script_install_path }}/backup-psql
 
       [Install]
