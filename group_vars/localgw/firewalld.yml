@@ -1,7 +1,7 @@
 ---
 
 # 91h == 145d
-ansible_host6: "{{ home_net.vm.cidr6 | ipaddr('145') | ipaddr('address') }}"
+ansible_host6: "{{ home_net.vm.cidr6 | ansible.utils.ipaddr('145') | ansible.utils.ipaddr('address') }}"
 
 firewalld_masquerade_zones:
   - "public"

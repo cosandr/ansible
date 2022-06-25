@@ -9,13 +9,13 @@
 # https://stackoverflow.com/questions/52291149/ansible-to-get-the-netmask-in-cidr
 - name: Set network/prefix fact (IPv4)
   set_fact:
-    ipv4_network: "{{ ip4 | ipaddr('network/prefix') }}"
+    ipv4_network: "{{ ip4 | ansible.utils.ipaddr('network/prefix') }}"
   vars:
     ip4: "{{ ansible_default_ipv4.address }}/{{ ansible_default_ipv4.netmask }}"
 
 - name: Set network/prefix fact (IPv6)
   set_fact:
-    ipv6_network: "{{ ip6 | ipaddr('network/prefix') }}"
+    ipv6_network: "{{ ip6 | ansible.utils.ipaddr('network/prefix') }}"
   vars:
     ip6: "{{ ansible_default_ipv6.address }}/{{ ansible_default_ipv6.prefix }}"
   when:

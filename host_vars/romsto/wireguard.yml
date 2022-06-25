@@ -15,7 +15,7 @@ wireguard_mt_allowed_ips:
   # - "{{ hostvars['mt-router'].wireguard_ipv6 }}/128"
 
 wireguard_address: "{{ wireguard_addresses | join(', ') }}"
-wireguard_ip: "{{ wireguard_addresses[0] | ipaddr('address') }}"
+wireguard_ip: "{{ wireguard_addresses[0] | ansible.utils.ipaddr('address') }}"
 wireguard_private_key: "{{ vault_wireguard_private_key }}"
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
 
