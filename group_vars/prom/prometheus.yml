@@ -84,6 +84,39 @@ prometheus_scrape_configs_static:
         labels:
           instance: "{{ inventory_hostname }}"
 
+  - job_name: 'thanos'
+    static_configs:
+      - targets:
+          - "localhost:19191"
+          - "localhost:19192"
+          - "localhost:19193"
+          - "localhost:19194"
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '.*:(\d+)'
+        target_label: instance
+        replacement: "{{ inventory_hostname }}:${1}"
+
+      - source_labels: [__address__]
+        regex: '.*:19191'
+        target_label: thanos_svc
+        replacement: "sidecar"
+
+      - source_labels: [__address__]
+        regex: '.*:19192'
+        target_label: thanos_svc
+        replacement: "store"
+
+      - source_labels: [__address__]
+        regex: '.*:19193'
+        target_label: thanos_svc
+        replacement: "compact"
+
+      - source_labels: [__address__]
+        regex: '.*:19194'
+        target_label: thanos_svc
+        replacement: "query"
+
   - job_name: 'vmware_vcenter'
     metrics_path: '/metrics'
     scrape_interval: 1m
@@ -215,6 +248,12 @@ prometheus_scrape_configs_static:
       - targets: ["{{ hostvars['pg01'].ansible_host }}:{{ hostvars['pg01'].postgres_exporter_port }}"]
         labels:
           instance: "{{ hostvars['pg01'].inventory_hostname }}"
+
+  - job_name: 'loki'
+    static_configs:
+      - targets: ["{{ hostvars['loki01'].ansible_host }}:3100"]
+        labels:
+          instance: "{{ hostvars['loki01'].inventory_hostname }}"
 
   - job_name: 'nginx'
     scrape_interval: 60s
