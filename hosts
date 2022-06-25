@@ -29,7 +29,7 @@ loki
 nextcloud
 backup
 plex
-elk
+# elk
 k8s_cluster
 
 [pg]
