@@ -1,0 +1,26 @@
+groups:
+- name: IPMI Exporter
+  rules:
+  - alert: IpmiCpuTempHigh
+    expr: ipmi_temperature_celsius{name="CPU Temp"} > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: CPU Temperature high [{{ $value }}C] on {{ $labels.instance }}
+
+  - alert: IpmiVrmTempHigh
+    expr: ipmi_temperature_celsius{name=~"VRM.*"} > 90
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: '{{ $labels.name }} temperature high [{{ $value }}C] on {{ $labels.instance }}'
+
+  - alert: IpmiDimmTempHigh
+    expr: ipmi_temperature_celsius{name=~"DIMM.*"} > 60
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: '{{ $labels.name }} temperature high [{{ $value }}C] on {{ $labels.instance }}'

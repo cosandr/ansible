@@ -1,0 +1,18 @@
+groups:
+- name: IoT Devices
+  rules:
+  - alert: SensorDown
+    expr: iot_up == 0
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: Sensor {{ $labels.instance }} in room {{ $labels.room }} down
+
+  - alert: BmeSensorDown
+    expr: (time() - push_time_seconds{exported_job="bme"}) > 120
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: Sensor {{ $labels.exported_instance }} in room {{ $labels.room }} down

@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "**/*.yml": "ansible"
+        "**/*.yml": "ansible",
+        "files/prometheus/alerts/*.rules": "yaml"
     },
     "python.pythonPath": "/usr/bin/python3",
     "ansibleVaultInline.encryptVaultId": ""
