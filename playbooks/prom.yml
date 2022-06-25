@@ -84,25 +84,25 @@
       loop: "{{ groups['servers'] | difference(__exclude_auto_node) }}"
       tags: ["prometheus"]
 
-    - name: Set elastic exporters fact
-      set_fact:
-        __elastic_static_configs: "{{ __elastic_static_configs | default([]) + [tmp_dict] }}"
-      vars:
-        tmp_dict:
-          targets: ["{{ hostvars[item].ansible_host }}:{{ hostvars[item].elastic_exporter_port }}"]
-          labels:
-            instance: "{{ hostvars[item].inventory_hostname }}"
-      loop: "{{ groups['elasticsearch'] }}"
-      tags: ["prometheus"]
+    # - name: Set elastic exporters fact
+    #   set_fact:
+    #     __elastic_static_configs: "{{ __elastic_static_configs | default([]) + [tmp_dict] }}"
+    #   vars:
+    #     tmp_dict:
+    #       targets: ["{{ hostvars[item].ansible_host }}:{{ hostvars[item].elastic_exporter_port }}"]
+    #       labels:
+    #         instance: "{{ hostvars[item].inventory_hostname }}"
+    #   loop: "{{ groups['elasticsearch'] }}"
+    #   tags: ["prometheus"]
 
-    - name: Add elastic job to scrape config
-      set_fact:
-        prometheus_scrape_configs_runtime: "{{ prometheus_scrape_configs_runtime + [tmp_dict] }}"
-      vars:
-        tmp_dict:
-          job_name: "elasticsearch"
-          static_configs: "{{ __elastic_static_configs }}"
-      tags: ["prometheus"]
+    # - name: Add elastic job to scrape config
+    #   set_fact:
+    #     prometheus_scrape_configs_runtime: "{{ prometheus_scrape_configs_runtime + [tmp_dict] }}"
+    #   vars:
+    #     tmp_dict:
+    #       job_name: "elasticsearch"
+    #       static_configs: "{{ __elastic_static_configs }}"
+    #   tags: ["prometheus"]
 
     - name: Add servers to blackbox ping probe
       set_fact:
