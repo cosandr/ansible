@@ -24,3 +24,13 @@ alertmanager_route:
   group_interval: 5m
   repeat_interval: 168h
   receiver: discord
+  routes:
+    - group_by: ["job"]
+      group_wait: 10m
+      matchers:
+        - job=~"blackbox.*"
+
+    - group_wait: 2h
+      matchers:
+        - alertname="ContainerCpuUsage"
+        - name="plex"
