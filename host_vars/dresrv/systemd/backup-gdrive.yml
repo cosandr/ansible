@@ -5,6 +5,7 @@ __gdrive_exclude:
   - 'external-os/**'
   - 'vcenter/**'
   - 'truenas/**'
+  - 'macrium/**'
 
 __sd_backup_gdrive:
   name: backup-gdrive
