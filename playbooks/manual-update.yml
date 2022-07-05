@@ -20,6 +20,16 @@
       register: __apt_result
       when: ansible_os_family == 'Debian'
 
+    - name: Print dnf results
+      debug:
+        msg: "{{ __dnf_result.results }}"
+      when: __dnf_result is defined
+
+    - name: Print apt results
+      debug:
+        msg: "{{ __apt_result.stdout_lines }}"
+      when: __apt_result is defined
+
     # - name: Reboot if required [dnf]
     #   async: 30
     #   poll: 0
