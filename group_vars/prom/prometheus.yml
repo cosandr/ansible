@@ -161,8 +161,6 @@ prometheus_scrape_configs_static:
         replacement: "localhost:{{ blackbox_exporter_port }}"
 
   - job_name: "ipmi"
-    params:
-      module: ['default']
     metrics_path: /ipmi
     scrape_interval: 1m
     static_configs:
@@ -170,6 +168,12 @@ prometheus_scrape_configs_static:
         labels:
           instance: "SLB"
           __param_target: "10.0.100.105"
+          __param_module: "slb"
+      - targets: ["localhost:{{ ipmi_exporter_port }}"]
+        labels:
+          instance: "XN01"
+          __param_target: "10.0.100.111"
+          __param_module: "xn01"
 
   - job_name: "mikrotik"
     scrape_interval: 5m
