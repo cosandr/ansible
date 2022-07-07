@@ -167,12 +167,12 @@ prometheus_scrape_configs_static:
       - targets: ["localhost:{{ ipmi_exporter_port }}"]
         labels:
           instance: "SLB"
-          __param_target: "10.0.100.105"
+          __param_target: "slb.ipmi.hlab.no"
           __param_module: "slb"
       - targets: ["localhost:{{ ipmi_exporter_port }}"]
         labels:
           instance: "XN01"
-          __param_target: "10.0.100.111"
+          __param_target: "xn01.ipmi.hlab.no"
           __param_module: "xn01"
 
   - job_name: "mikrotik"
