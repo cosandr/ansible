@@ -2,7 +2,7 @@
 
 plugin: community.vmware.vmware_vm_inventory
 strict: False
-hostname: 10.0.100.5
+hostname: 10.0.100.21
 username: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           62646637373638363336366435623261333930306336653831353530353761306436613762653131

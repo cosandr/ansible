@@ -74,7 +74,8 @@ backup01 ansible_host=10.0.10.8 ansible_user=root
 plex01 ansible_host=10.0.10.65 ansible_user=root
 
 [esxi_hosts]
-slb ansible_host=10.0.100.5
+xn01 ansible_host=10.0.100.11
+slb  ansible_host=10.0.100.21
 
 [elk:children]
 elasticsearch
