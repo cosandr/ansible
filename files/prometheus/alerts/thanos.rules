@@ -28,7 +28,7 @@ groups:
       description: "Thanos compaction has failing storage operations\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
   - alert: ThanosCompactNotRun
-    expr: (time() - thanos_objstore_bucket_last_successful_upload_time{thanos_svc="compact"}) > 24*60*60
+    expr: (time() - process_start_time_seconds{thanos_svc="compact"}) > 86400 and ignoring(bucket) (time() - thanos_objstore_bucket_last_successful_upload_time{thanos_svc="compact"}) > 86400
     for: 0m
     labels:
       severity: warning
