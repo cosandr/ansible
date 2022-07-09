@@ -1,5 +1,102 @@
 ---
 
+- name: Setup ESXi remount
+  hosts: truenas
+  gather_facts: false
+  vars:
+    __ssh_vars: &ssh_vars
+      ansible_connection: ssh
+      ansible_user: root
+      ansible_host: "{{ local_ips.general }}"
+      ansible_python_interpreter: /usr/local/bin/python3
+  tasks:
+    - name: Generate SSH key
+      vars: *ssh_vars
+      community.crypto.openssh_keypair:
+        path: /root/.ssh/id_rsa
+        comment: "root@{{ inventory_hostname }}.hlab.no"
+      register: __root_key
+      tags: ["ssh"]
+
+    - name: Copy SSH key to ESXi host
+      delegate_to: "{{ item }}"
+      ansible.posix.authorized_key:
+        user: root
+        comment: "{{ __root_key.comment }}"
+        key: "{{ __root_key.public_key }}"
+        path: "/etc/ssh/keys-root/authorized_keys"
+      loop: "{{ groups['esxi_hosts'] }}"
+      tags: ["ssh"]
+
+    - name: Scan ESXi host keys
+      vars: *ssh_vars
+      command: "ssh-keyscan {{ hostvars[item].ansible_host }},{{ item }}.{{ hostvars[item].domain }}"
+      check_mode: false
+      changed_when: false
+      loop: "{{ groups['esxi_hosts'] }}"
+      register: __host_keys
+      tags: ["ssh"]
+
+    - name: Ensure host keys are in known_hosts
+      vars: *ssh_vars
+      blockinfile:
+        path: /root/.ssh/known_hosts
+        create: true
+        mode: 0644
+        block: |
+          {% for h in __host_keys.results %}
+          {{ h.stdout }}
+          {% endfor %}
+      tags: ["ssh"]
+
+    - name: Create esxi folder
+      vars: *ssh_vars
+      ansible.builtin.file:
+        path: /root/esxi
+        state: directory
+        owner: root
+        group: wheel
+        mode: 0750
+
+    - name: Copy list of hosts
+      vars: *ssh_vars
+      ansible.builtin.copy:
+        content: |
+          esxi_hosts=({{ groups['esxi_hosts'] | map('extract', hostvars, 'ansible_host') | join(' ') }})
+        dest: /root/esxi/hosts
+        owner: root
+        group: wheel
+        mode: 0640
+      tags: ["hosts"]
+
+    - name: Copy scripts
+      vars: *ssh_vars
+      ansible.builtin.copy:
+        src: "{{ inventory_dir }}/files/truenas/{{ item.src }}"
+        dest: "/root/esxi/{{ item.dest }}"
+        owner: root
+        group: wheel
+        mode: 0750
+      loop:
+        - src: "esxi-remount-nfs.sh"
+          dest: "remount-nfs.sh"
+        - src: "esxi-common.sh"
+          dest: "common"
+        - src: "esxi-start-vm.sh"
+          dest: "start-vm.sh"
+        - src: "esxi-stop-vm.sh"
+          dest: "stop-vm.sh"
+        - src: "esxi-startup.sh"
+          dest: "startup.sh"
+        - src: "esxi-shutdown.sh"
+          dest: "shutdown.sh"
+        - src: "esxi-stop-all-datastore-vms.sh"
+          dest: "stop-all-datastore-vms.shh"
+      tags: ["script"]
+
+  tags: ["esxi-nfs"]
+
+
 - name: Create tank NFS shares
   hosts: truenas
   gather_facts: false
