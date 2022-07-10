@@ -9,6 +9,7 @@ borg_backups:
     backup_name: "prom"
     paths:
       - "/var/lib/prometheus"
+      - "/var/lib/thanos"
     create_args:
       - "--stats"
       - "--show-rc"
@@ -18,6 +19,6 @@ borg_backups:
     prune_args:
       - "--list"
       - "--show-rc"
-      - "--keep-daily 1"
+      - "--keep-daily 3"
       - "--keep-weekly 2"
-      - "--keep-monthly 3"
+      - "--keep-monthly 1"
