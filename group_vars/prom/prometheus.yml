@@ -57,10 +57,15 @@ blackbox_exporter_targets_icmp_ipv4:
   - "{{ hostvars['romsto'].ddns_domain }}"
   - "{{ hostvars['webgw01'].ansible_host }}"
   - "{{ hostvars['truenas'].local_ips.vm }}"
+  # Home assistant glow
+  - "10.0.50.53"
+  # Home assistant
+  - "10.0.50.48"
 
 blackbox_exporter_targets_http_ipv4:
   - "https://google.com"
   - "https://{{ grafana_domain }}"
+  - "http://ha.hlab.no:8123"
 prometheus_scrape_configs_runtime: []
 # Workaround vars set during role runtime, prometheus_metrics_path for example
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_static + prometheus_scrape_configs_runtime }}"
@@ -83,6 +88,18 @@ prometheus_scrape_configs_static:
       - targets: ["localhost:{{ pushgateway_port }}"]
         labels:
           instance: "{{ inventory_hostname }}"
+
+  - job_name: "hass"
+    scrape_interval: 30s
+    metrics_path: /api/prometheus
+
+    authorization:
+      credentials: "{{ vault_ha_token }}"
+
+    static_configs:
+      - targets: ['10.0.50.48:8123']
+        labels:
+          instance: "ha.hlab.no"
 
   - job_name: 'thanos'
     static_configs:

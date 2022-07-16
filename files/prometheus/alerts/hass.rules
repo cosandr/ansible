@@ -1,0 +1,10 @@
+groups:
+- name: Home Assistant
+  rules:
+  - alert: HassBatteryLow
+    expr: hass_sensor_battery_percent < 20
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: Sensor {{ $labels.friendly_name }} has low battery {{ $value }}
