@@ -65,7 +65,7 @@ blackbox_exporter_targets_icmp_ipv4:
 blackbox_exporter_targets_http_ipv4:
   - "https://google.com"
   - "https://{{ grafana_domain }}"
-  - "http://ha.hlab.no:8123"
+  - "https://ha.hlab.no"
 prometheus_scrape_configs_runtime: []
 # Workaround vars set during role runtime, prometheus_metrics_path for example
 prometheus_scrape_configs: "{{ prometheus_scrape_configs_static + prometheus_scrape_configs_runtime }}"
@@ -96,8 +96,9 @@ prometheus_scrape_configs_static:
     authorization:
       credentials: "{{ vault_ha_token }}"
 
+    scheme: https
     static_configs:
-      - targets: ['10.0.50.48:8123']
+      - targets: ['ha.hlab.no:443']
         labels:
           instance: "ha.hlab.no"
 
