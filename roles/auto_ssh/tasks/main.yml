@@ -2,40 +2,40 @@
 
 - name: Ensure SSH dir exists on source
   ansible.builtin.file:
-    path: "{{ src_ssh_dir }}"
+    path: "{{ ssh_src_dir }}"
     state: directory
-    owner: "{{ src_ssh_user }}"
-    group: "{{ src_ssh_user }}"
+    owner: "{{ ssh_src_user }}"
+    group: "{{ ssh_src_user }}"
     mode: 0700
 
 - name: Ensure SSH dir exists on targets
   delegate_to: "{{ item }}"
   ansible.builtin.file:
-    path: "{{ dest_ssh_dir }}"
+    path: "{{ ssh_dest_dir }}"
     state: directory
-    owner: "{{ dest_ssh_user }}"
-    group: "{{ dest_ssh_user }}"
+    owner: "{{ ssh_dest_user }}"
+    group: "{{ ssh_dest_user }}"
     mode: 0700
-  loop: "{{ dest_hosts }}"
+  loop: "{{ ssh_dest_hosts }}"
 
 - name: Generate SSH keys
   community.crypto.openssh_keypair:
-    path: "{{ src_ssh_dir }}/id_{{ ssh_key_type }}"
+    path: "{{ ssh_src_dir }}/id_{{ ssh_key_type }}"
     comment: "{{ ssh_key_comment }}"
     type: "{{ ssh_key_type }}"
-    owner: "{{ src_ssh_user }}"
-    group: "{{ src_ssh_user }}"
+    owner: "{{ ssh_src_user }}"
+    group: "{{ ssh_src_user }}"
   register: __ssh_key
 
 - name: Copy SSH keys
   delegate_to: "{{ item }}"
   ansible.posix.authorized_key:
-    user: "{{ dest_ssh_user }}"
+    user: "{{ ssh_dest_user }}"
     comment: "{{ __ssh_key.comment }}"
     key: "{{ __ssh_key.public_key }}"
     key_options: "{{ ssh_key_options | default(omit) }}"
-    path: "{{ dest_ssh_dir }}/authorized_keys"
-  loop: "{{ dest_hosts }}"
+    path: "{{ ssh_dest_dir }}/authorized_keys"
+  loop: "{{ ssh_dest_hosts }}"
 
 - name: Initialize target names list
   delegate_to: "{{ item }}"
@@ -44,7 +44,7 @@
     __target_host_names:
       - "{{ hostvars[item].ansible_host }}"
       - "{{ hostvars[item].inventory_hostname }}"
-  loop: "{{ dest_hosts }}"
+  loop: "{{ ssh_dest_hosts }}"
 
 - name: Add domain if available
   delegate_to: "{{ item }}"
@@ -53,7 +53,7 @@
     __target_host_names: "{{ __target_host_names + [tmp] }}"
   vars:
     tmp: "{{ hostvars[item].inventory_hostname }}.{{ hostvars[item].domain }}"
-  loop: "{{ dest_hosts }}"
+  loop: "{{ ssh_dest_hosts }}"
   when:
     - hostvars[item].domain is defined
     - hostvars[item].domain | length > 0
@@ -62,12 +62,12 @@
   ansible.builtin.command: "ssh-keyscan {{ hostvars[item].__target_host_names | join(',') }}"
   check_mode: false
   changed_when: false
-  loop: "{{ dest_hosts }}"
+  loop: "{{ ssh_dest_hosts }}"
   register: __host_keys
 
 - name: Ensure host keys are in known_hosts
   ansible.builtin.blockinfile:
-    path: "{{ src_ssh_dir }}/known_hosts"
+    path: "{{ ssh_src_dir }}/known_hosts"
     marker: "# {mark} auto-ssh {{ ssh_key_comment }}"
     create: true
     mode: 0644

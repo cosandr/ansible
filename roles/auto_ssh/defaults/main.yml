@@ -1,13 +1,13 @@
 ---
 
 ssh_key_type: ed25519
-ssh_key_comment: "{{ src_ssh_user }}@{{ inventory_hostname }}"
+ssh_key_comment: "{{ ssh_src_user }}@{{ inventory_hostname }}"
 ssh_key_options: ""
 
 
-src_ssh_dir: "/root/.ssh"
-src_ssh_user: "root"
+ssh_src_dir: "/root/.ssh"
+ssh_src_user: "root"
 
-dest_ssh_dir: "/root/.ssh"
-dest_ssh_user: "root"
-dest_hosts: []
+ssh_dest_dir: "/root/.ssh"
+ssh_dest_user: "root"
+ssh_dest_hosts: []
