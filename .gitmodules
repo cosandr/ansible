@@ -40,3 +40,6 @@
 [submodule "roles/pg_repo"]
 	path = roles/pg_repo
 	url = git@github.com:cosandr/ansible-role-pg_repo.git
+[submodule "roles/pgbackrest"]
+	path = roles/pgbackrest
+	url = git@github.com:cosandr/ansible-role-pgbackrest.git
