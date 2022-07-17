@@ -26,10 +26,12 @@ postgresql_log_timezone: "Europe/Oslo"
 postgresql_global_config_options:
   - option: listen_addresses
     value: '*'
+    quoted: true
   - option: ssl
     value: 'on'
   - option: ssl_ca_file
     value: 'root.crt'
+    quoted: true
   # Memory
   - option: shared_buffers
     value: "{{ (ansible_memtotal_mb / 4) | int }}MB"
@@ -66,5 +68,15 @@ postgresql_global_config_options:
     value: "10"
   - option: effective_io_concurrency
     value: "256"
+  # Pgbackrest
+  - option: archive_command
+    value: "pgbackrest --stanza=main archive-push %p"
+    quoted: true
+  - option: archive_mode
+    value: "on"
+  - option: max_wal_senders
+    value: "3"
+  - option: wal_level
+    value: "replica"
 
 postgres_exporter_port: "9187"

@@ -8,6 +8,9 @@ firewalld_zones:
     sources:
       - "{{ hostvars['laptop'].wireguard_ip }}"
 
+  - name: internal
+    sources: "{{ groups['pgbackrest'] | map('extract', hostvars, 'ansible_host') }}"
+
 firewalld_services:
   - name: postgresql
     zone: internal

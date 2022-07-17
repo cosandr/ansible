@@ -19,7 +19,7 @@ romsto  ansible_host=10.1.0.6   ansible_user=root
 truenas
 
 [servers:children]
-pg
+db
 gitlab
 gitrun
 webgw
@@ -32,8 +32,15 @@ plex
 # elk
 k8s_cluster
 
+[db:children]
+pg
+pgbackrest
+
 [pg]
 pg01 ansible_host=10.0.10.11
+
+[pgbackrest]
+pgbak01 ansible_host=10.0.10.9
 
 [mikrotik]
 mt-router ansible_host=10.0.50.1

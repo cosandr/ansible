@@ -1,0 +1,10 @@
+---
+
+__promtail_host_configs:
+  - job_name: pgbackrest
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: pgbackrest
+          __path__: /var/log/pgbackrest/*log

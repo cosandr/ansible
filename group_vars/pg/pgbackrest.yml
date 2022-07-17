@@ -1,0 +1,10 @@
+---
+
+pgbackrest_stanzas:
+  - name: main
+    pg_config:
+      - path: "/var/lib/pgsql/{{ postgresql_version }}/data"
+
+pgbackrest_repos:
+  - host: "{{ hostvars['pgbak01'].ansible_host }}"
+    host-user: "postgres"
