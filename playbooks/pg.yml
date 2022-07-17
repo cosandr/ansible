@@ -3,16 +3,6 @@
 - hosts: truenas
   gather_facts: false
   vars:
-    pg_share:
-      paths: ["/mnt/tank/backup/pgsql"]
-      comment: ""
-      hosts: "{{ groups['pg'] | map('extract', hostvars, 'ansible_host') }}"
-      alldirs: true
-      ro: false
-      quiet: false
-      maproot_user: root
-      maproot_group: wheel
-      enabled: true
     pgbackrest_share:
       paths: ["/mnt/tank/backup/pgbackrest"]
       comment: "Pgbackrest shares"
@@ -29,7 +19,6 @@
         model: "{{ item }}"
         state: present
       loop:
-        - "{{ pg_share }}"
         - "{{ pgbackrest_share }}"
 
 - hosts: db
@@ -59,15 +48,6 @@
   gather_facts: true
   vars:
     postgres_exporter_version: "latest"
-  pre_tasks:
-    - name: Mount NFS share
-      mount:
-        src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/backup/pgsql"
-        path: "/mnt/backup-pgsql"
-        opts: "defaults,vers=4,rw,noatime,bg"
-        state: mounted
-        fstype: nfs
-      tags: ["nfs"]
 
   roles:
     - role: postgresql
@@ -77,9 +57,6 @@
       vars:
         postgres_service_name: "{{ postgresql_daemon }}"
       tags: ["prometheus-stack", "postgres_exporter"]
-
-    - role: systemd
-      tags: ["systemd"]
 
 - hosts: pgbackrest
   pre_tasks:
