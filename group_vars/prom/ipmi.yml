@@ -8,8 +8,3 @@ ipmi_exporter_modules:
     pass: "{{ vault_ipmi_exporter_pass.slb }}"
     driver: "LAN_2_0"
     privilege: "admin"
-  xn01:
-    user: "exporter"
-    pass: "{{ vault_ipmi_exporter_pass.xn01 }}"
-    driver: "LAN_2_0"
-    privilege: "admin"
