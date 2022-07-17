@@ -23,12 +23,16 @@
     - name: Print dnf results
       debug:
         msg: "{{ __dnf_result.results }}"
-      when: __dnf_result is defined
+      when:
+        - __dnf_result is defined
+        - __dnf_result.results | default([])
 
     - name: Print apt results
       debug:
         msg: "{{ __apt_result.stdout_lines }}"
-      when: __apt_result is defined
+      when:
+         - __apt_result is defined
+         - __apt_result.stdout_lines | default([])
 
     # - name: Reboot if required [dnf]
     #   async: 30
