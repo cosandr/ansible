@@ -61,7 +61,17 @@
             - "{{ ipmi_exporter_port }}"
             - "{{ pushgateway_port }}"
             - "{{ mikrotik_exporter_port }}"
-            - "{{ promtail_syslog_port }}"
+          notify: reload firewalld
+
+        - name: Allow syslog port to internal zone
+          firewalld:
+            zone: internal
+            port: "{{ promtail_syslog_port }}/{{ item }}"
+            permanent: true
+            state: enabled
+          loop: ["tcp", "udp"]
+          loop_control:
+            label: "{{ promtail_syslog_port }}/{{ item }}"
           notify: reload firewalld
 
       tags: ["firewalld"]
