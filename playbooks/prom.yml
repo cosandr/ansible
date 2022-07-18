@@ -61,6 +61,7 @@
             - "{{ ipmi_exporter_port }}"
             - "{{ pushgateway_port }}"
             - "{{ mikrotik_exporter_port }}"
+            - "{{ promtail_syslog_port }}"
           notify: reload firewalld
 
       tags: ["firewalld"]
