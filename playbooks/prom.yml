@@ -61,6 +61,7 @@
             - "{{ ipmi_exporter_port }}"
             - "{{ pushgateway_port }}"
             - "{{ mikrotik_exporter_port }}"
+            - "{{ promtail_syslog_port }}"
           notify: reload firewalld
 
         - name: Allow rsyslog port to internal zone
@@ -109,6 +110,15 @@
                            KeepAlive="on")
               }
           notify: restart rsyslog
+
+        - name: Allow rsyslog remote connections
+          seboolean:
+            name: nis_enabled
+            state: true
+            persistent: true
+          when:
+            - ansible_os_family == 'RedHat'
+            - ansible_selinux.status == "enabled"
 
       tags: ["rsyslog"]
 
