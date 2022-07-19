@@ -63,18 +63,54 @@
             - "{{ mikrotik_exporter_port }}"
           notify: reload firewalld
 
-        - name: Allow syslog port to internal zone
+        - name: Allow rsyslog port to internal zone
           firewalld:
             zone: internal
-            port: "{{ promtail_syslog_port }}/{{ item }}"
+            port: "514/{{ item }}"
             permanent: true
             state: enabled
           loop: ["tcp", "udp"]
           loop_control:
-            label: "{{ promtail_syslog_port }}/{{ item }}"
+            label: "514/{{ item }}"
           notify: reload firewalld
 
       tags: ["firewalld"]
+
+    - name: Configure rsyslog
+      block:
+        - name: Install rsyslog
+          dnf:
+            name: rsyslog
+            state: present
+
+        - name: Configure rsyslog
+          copy:
+            dest: /etc/rsyslog.d/promtail.conf
+            owner: root
+            group: root
+            mode: 0644
+            content: |
+              module(load="imudp")
+              input(type="imudp" port="514"
+                    name="udp")
+
+              module(load="imtcp")
+              input(type="imtcp" port="514"
+                    name="tcp")
+
+              # Only forward remote logs
+              if ($inputname == "tcp" or $inputname == "udp") then {
+                *.* action(type="omfwd"
+                           protocol="tcp"
+                           target="127.0.0.1"
+                           port="{{ promtail_syslog_port }}"
+                           Template="RSYSLOG_SyslogProtocol23Format"
+                           TCP_Framing="octet-counted"
+                           KeepAlive="on")
+              }
+          notify: restart rsyslog
+
+      tags: ["rsyslog"]
 
     - name: Install requirements for aquaero exporter
       dnf:
@@ -173,3 +209,8 @@
       service:
         name: firewalld
         state: reloaded
+
+    - name: restart rsyslog
+      service:
+        name: rsyslog
+        state: restarted
