@@ -1,0 +1,24 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Vmware Exporter
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=vmware_exporter
+Group=vmware_exporter
+ExecStart={{ __vmware_exporter_bin_path }} \
+    --config {{ vmware_exporter_config_file }} \
+    --address {{ vmware_exporter_listen_address }} \
+    --port {{ vmware_exporter_port }} \
+    --loglevel {{ vmware_exporter_log_level }}
+
+Restart=always
+NoNewPrivileges=true
+ProtectHome=read-only
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target

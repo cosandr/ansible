@@ -1,0 +1,4 @@
+---
+
+__vmware_exporter_bin_path: /usr/bin/vmware_exporter
+__python_bin_path: /usr/bin/python3.9

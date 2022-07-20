@@ -1,0 +1,51 @@
+---
+
+- name: copy vmware_exporter sysusers file
+  template:
+    src: vmware_exporter.sysusers.j2
+    dest: /usr/lib/sysusers.d/vmware_exporter.conf
+    mode: 0644
+    owner: root
+    group: root
+  register: __sysusers
+
+- name: restart systemd-sysusers  # noqa no-handler
+  become: true
+  command: systemd-sysusers
+  when: __sysusers.changed
+
+- name: Install prerequisites
+  apt:
+    name:
+      - python3.9
+      - python3.9-venv
+    update_cache: true
+    state: present
+  when: ansible_os_family == 'Debian'
+
+- name: Install prerequisites
+  dnf:
+    name: python39
+    state: present
+  when: ansible_os_family == 'RedHat'
+
+- name: Setup venv  # noqa package-latest
+  pip:
+    name:
+      - pip
+      - setuptools
+      - wheel
+    state: latest
+    virtualenv: "{{ vmware_exporter_venv_path }}"
+    virtualenv_command: "{{ __python_bin_path }} -m venv"
+
+- name: Install vmware_exporter
+  pip:
+    name: vmware_exporter
+    virtualenv: "{{ vmware_exporter_venv_path }}"
+
+- name: Ensure bin link exists
+  file:
+    src: "{{ vmware_exporter_venv_path }}/bin/vmware_exporter"
+    dest: "{{ __vmware_exporter_bin_path }}"
+    state: link

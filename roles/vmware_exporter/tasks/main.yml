@@ -1,41 +1,35 @@
 ---
 
+- name: Include installation tasks
+  include_tasks:
+    file: install.yml
+    apply:
+      tags: ["install"]
+  tags: ["install"]
+
+- name: Install vmware exporter service
+  template:
+    src: vmware_exporter.service.j2
+    dest: /etc/systemd/system/vmware_exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload systemd
+    - restart vmware exporter
+
 - name: Configure vmware exporter
   copy:
     content: "{{ vmware_exporter_config | to_nice_yaml(indent=2) }}"
     dest: "{{ vmware_exporter_config_file }}"
-    setype: container_file_t
     owner: root
-    group: root
-    mode: 0600
+    group: vmware_exporter
+    mode: 0640
   tags: ["configure"]
   notify: restart vmware exporter
 
-- name: Install podman
-  dnf:
-    name: podman
-    state: present
-  tags: ["podman", "install"]
-
-- name: Create container
-  containers.podman.podman_container:
-    name: "{{ vmware_exporter_container_name }}"
-    image: "pryorda/vmware_exporter:{{ vmware_exporter_version }}"
-    command: "-c /etc/vmware_exporter.yml"
-    published_ports:
-      - "{{ vmware_exporter_listen_address }}:{{ vmware_exporter_port }}:9272"
-    volume:
-      - "{{ vmware_exporter_config_file }}:/etc/vmware_exporter.yml:ro"
-    state: started
-    restart_policy: "always"
-    generate_systemd:
-      path: /etc/systemd/system
-      restart_policy: "always"
-  notify: restart vmware exporter
-  tags: ["configure"]
-
-- name: Ensure service is enabled and started
+- name: enable and start vmware exporter
   systemd:
-    name: "container-{{ vmware_exporter_container_name }}"
+    name: vmware_exporter
     state: started
     enabled: true
