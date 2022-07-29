@@ -4,6 +4,7 @@ collections:
   - name: ansible.posix
   - name: ansible.utils
   - name: community.general
+    version: '>=5.2'
 
   - name: git@github.com:cosandr/ansible-collection-spatiumcepa-truenas.git
     version: master
