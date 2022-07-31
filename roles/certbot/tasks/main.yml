@@ -37,6 +37,18 @@
     content: "{{ certbot_credentials_content }}"
   when: certbot_credentials_content | length > 0
 
+- name: Copy renew hooks
+  copy:
+    content: "{{ item.content }}"
+    dest: "/etc/letsencrypt/renewal-hooks/{{ item.type }}/{{ item.name }}"
+    owner: root
+    group: "{{ __root_group }}"
+    mode: 0750
+  loop: "{{ certbot_renew_hooks }}"
+  loop_control:
+    label: "{{ item.type }} - {{ item.name }}"
+  tags: ["hooks"]
+
 - name: Get certificates
   command: "{{ certbot_generate_command }} -d '{{ item }}'"
   register: output

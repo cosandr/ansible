@@ -11,3 +11,10 @@ certbot_domains_hetzner:
 certbot_domains_cloudflare:
   - "{{ domains[4] }},*.{{ domains[4] }}"
   - "{{ domains[5] }},*.{{ domains[5] }}"
+
+certbot_renew_hooks:
+  - name: restart-nginx
+    type: deploy
+    content: |
+      #/bin/sh
+      systemctl restart nginx
