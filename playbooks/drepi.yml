@@ -211,9 +211,6 @@
     - role: motion
       tags: ["motion"]
 
-    - role: dht_exporter
-      tags: ["dht_exporter"]
-
     - role: node_exporter
       tags: ["node_exporter"]
 

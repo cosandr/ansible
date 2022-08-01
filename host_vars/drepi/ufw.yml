@@ -12,6 +12,4 @@ ufw_local_rules:
     - { port: "2049", proto: "udp" }   # NFS client
     - { port: "2049", proto: "tcp" }   # NFS client
     - { port: "{{ node_exporter_port }}", proto: "tcp", src: "{{ home_net.general.cidr }}" }  # node - general
-    - { port: "{{ dht_exporter_port }}", proto: "tcp", src: "{{ home_net.general.cidr }}" }   # dht - general
     - { port: "{{ node_exporter_port }}", proto: "tcp", src: "{{ hostvars['prom01'].ansible_host }}" }  # node - general
-    - { port: "{{ dht_exporter_port }}", proto: "tcp", src: "{{ hostvars['prom01'].ansible_host }}" }   # dht - general

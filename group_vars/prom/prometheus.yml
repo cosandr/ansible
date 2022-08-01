@@ -203,12 +203,6 @@ prometheus_scrape_configs_static:
         labels:
           instance: "{{ romsto_label }}"
 
-  - job_name: "dht"
-    static_configs:
-      - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].dht_exporter_port }}"]
-        labels:
-          instance: "{{ drepi_label }}"
-
   - job_name: "bme"
     static_configs:
       - targets:
