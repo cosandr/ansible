@@ -3,6 +3,8 @@ __pycache__
 *.retry
 *.pyc
 .cache/
+.vscode/
+!.vscode/settings.json
 roles/geerlingguy.*
 roles/cosandr.*
 roles/cloudalchemy.*
