@@ -8,3 +8,11 @@ groups:
       severity: warning
     annotations:
       summary: Sensor {{ $labels.friendly_name }} has low battery {{ $value }}
+
+  - alert: HassHousePowerDown
+    expr: hass_sensor_power_w{entity="sensor.house_power_consumption"} == 0
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: House power consumption is reporting 0W
