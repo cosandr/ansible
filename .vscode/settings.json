@@ -3,6 +3,7 @@
         "**/*.yml": "ansible",
         "files/prometheus/alerts/*.rules": "yaml"
     },
-    "python.pythonPath": "/usr/bin/python3",
+    "python.defaultInterpreterPath": "/usr/bin/python3",
+    "ansible.python.interpreterPath": "/usr/bin/python3",
     "ansibleVaultInline.encryptVaultId": ""
 }
