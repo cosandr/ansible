@@ -1,6 +1,7 @@
 ---
 
-nginx_upstreams:
+
+__nginx_upstreams_common:
   - name: gitlab
     servers: ["{{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_nginx_listen_port }}"]
     keepalive: 16
@@ -21,6 +22,9 @@ nginx_upstreams:
     servers: ["{{ hostvars['plex01'].ansible_host }}:{{ hostvars['plex01'].plex_port }}"]
     keepalive: 16
 
+__nginx_upstreams_host:
   - name: nextcloud_ta
     servers: ["{{ hostvars['romsto'].wireguard_ip }}:{{ hostvars['romsto'].nextcloud_port }}"]
     keepalive: 16
+
+nginx_upstreams: "{{ (__nginx_upstreams_common | default([])) + (__nginx_upstreams_host | default([])) }}"
