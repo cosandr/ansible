@@ -3,3 +3,7 @@
 firewalld_masquerade_zones: []
 
 firewalld_rich_rules: []
+
+firewalld_http_zones:
+  - public
+  - internal
