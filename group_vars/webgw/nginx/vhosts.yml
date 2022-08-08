@@ -25,7 +25,7 @@ __nginx_vhosts_host:
   - filename: nextcloud_ta.conf
     server_name: nextcloud_ta
     upstream_name: nextcloud_ta
-    domain: "{{ domains[5] }}"
+    domain: "{{ domains['ti'] }}"
     template: "{{ inventory_dir }}/files/webgw/nginx/nextcloud.conf.j2"
 
 nginx_vhosts: "{{ (__nginx_vhosts_common | default([])) + (__nginx_vhosts_host | default([])) }}"

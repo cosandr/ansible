@@ -11,7 +11,7 @@
         regexp: "{{ __truenas_domain | regex_escape() }}"
         line: "{{ hostvars['truenas'].local_ips.vm }} {{ __truenas_domain }}"
       vars:
-        __truenas_domain: "truenas.{{ hostvars['webgw01'].domains[1] }}"
+        __truenas_domain: "truenas.{{ domains['hb'] }}"
       tags: ["hosts"]
 
     - name: Create Thanos bucket

@@ -3,4 +3,4 @@
 certbot_extra_pkgs: ["certbot-dns-cloudflare"]
 certbot_domains_hetzner: []
 certbot_domains_cloudflare:
-  - "{{ domains[5] }},*.{{ domains[5] }}"
+  - "{{ domains['ti'] }},*.{{ domains['ti'] }}"

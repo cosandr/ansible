@@ -13,11 +13,11 @@ nginx_vhosts:
   - filename: nextcloud.conf
     server_name: nextcloud
     upstream_name: nextcloud_ta
-    domain: "{{ domains[5] }}"
+    domain: "{{ domains['ti'] }}"
     template: "{{ inventory_dir }}/files/webgw/nginx/nextcloud.conf.j2"
 
   - filename: photoprism.conf
     server_name: photoprism
     upstream_name: photoprism_ta
-    domain: "{{ domains[5] }}"
+    domain: "{{ domains['ti'] }}"
     template: "{{ inventory_dir }}/files/webgw/nginx/photoprism.conf.j2"

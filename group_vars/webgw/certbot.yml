@@ -3,14 +3,11 @@
 certbot_email: "{{ vault_certbot_email }}"
 certbot_extra_pkgs: ["certbot-dns-hetzner", "certbot-dns-cloudflare"]
 certbot_domains_hetzner:
-  - "{{ domains[0] }},*.{{ domains[0] }}"
-  - "{{ domains[1] }},*.{{ domains[1] }}"
-  - "{{ domains[2] }},*.{{ domains[2] }}"
-  - "{{ domains[3] }},*.{{ domains[3] }}"
+  - "{{ domains['hb'] }},*.{{ domains['hb'] }}"
 
 certbot_domains_cloudflare:
-  - "{{ domains[4] }},*.{{ domains[4] }}"
-  - "{{ domains[5] }},*.{{ domains[5] }}"
+  - "{{ domains['dv'] }},*.{{ domains['dv'] }}"
+  - "{{ domains['ti'] }},*.{{ domains['ti'] }}"
 
 certbot_renew_hooks:
   - name: restart-nginx

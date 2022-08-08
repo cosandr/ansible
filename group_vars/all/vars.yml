@@ -1,5 +1,7 @@
 ---
 
+domains: "{{ vault_domains }}"
+
 ports: {}
 
 ansible_managed: "Ansible managed"
@@ -25,4 +27,4 @@ locale_conf:
 
 systemd_script_install_path: "/usr/local/bin/systemd"
 
-s3_url: "https://truenas.{{ hostvars['webgw01'].domains[1] }}:9000"
+s3_url: "https://truenas.{{ domains['hb'] }}:9000"

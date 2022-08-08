@@ -2,8 +2,7 @@
 
 ansible_port: 5622
 
-domains: "{{ vault_domains }}"
-domain: "{{ domains[0] }}"
+domain: "{{ domains['hb'] }}"
 
 __f2b_extra_ignore:
   - "127.0.0.1/8"

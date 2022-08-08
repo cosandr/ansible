@@ -19,7 +19,7 @@ node_exporter_port: "{{ node_exporter_web_listen_address.split(':')[1] }}"
 
 gitlab_config_template: "{{ inventory_dir }}/files/gitlab/gitlab.rb.j2"
 
-domain: "{{ hostvars['webgw01'].domains[4] }}"
+domain: "{{ domains['dv'] }}"
 
 gitlab_backup_keep_time: 604800  # 7 days
 gitlab_backup_upload_remote_directory: "."
