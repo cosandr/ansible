@@ -217,43 +217,15 @@
     - role: unattended-upgrades
       tags: ["unattended-upgrades"]
 
-    - role: journalbeat
-      become: true
-      tags: ["journalbeat"]
-
   post_tasks:
     - block:
-      - name: Install smbclient
-        package:
-          name: smbclient
-          state: present
-        tags: ["install"]
-
-      - name: Ensure smb credentials dir exists
-        file:
-          path: "{{ motion_smb_cred_file | dirname }}"
-          state: directory
-          owner: root
-          group: root
-          mode: 0700
-
-      - name: Add motion smb credentials
-        copy:
-          content: |
-            username=motion
-            password={{ motion_smb_pass }}
-          dest: "{{ motion_smb_cred_file }}"
-          owner: root
-          group: root
-          mode: 0600
-
       - name: Mount motion share
         mount:
-          path: /mnt/motion
-          src: "//{{ hostvars.dresrv.ansible_host }}/motion"
-          fstype: cifs
+          src: "{{ hostvars['truenas'].local_ips.general }}:/mnt/tank/media/motion"
+          path: "/mnt/motion"
+          opts: "defaults,vers=4,rw,noatime,bg"
           state: mounted
-          opts: "credentials={{ motion_smb_cred_file }},nofail,uid=motion,gid=adm,file_mode=0640,dir_mode=0750"
+          fstype: nfs
       become: true
       tags: ["motion"]
     - block:
@@ -301,25 +273,3 @@
         when: sasl_password.changed
       become: true
       tags: ["postfix"]
-
-    - name: Create daily reboot timer
-      become: true
-      copy:
-        dest: "/etc/systemd/system/sched-reboot.timer"
-        owner: root
-        group: root
-        mode: 0644
-        content: |
-          [Unit]
-          Description=Reboot Daily around 03:00
-          [Timer]
-          RandomizedDelaySec=10m
-          OnCalendar=*-*-* 03:00:00
-          Unit=reboot.target
-
-          [Install]
-          WantedBy=timers.target
-      notify:
-        - reload systemd
-        - enable and start daily reboot timer
-      tags: ["scheduled-reboot"]
