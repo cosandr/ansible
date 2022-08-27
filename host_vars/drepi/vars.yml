@@ -1,4 +1,6 @@
 ---
+
+hostname_configure_etc_hosts: true
 _ports: {}
 smtp_host: "{{ vault_smtp_host }}"
 smtp_pass: "{{ vault_smtp_pass }}"
