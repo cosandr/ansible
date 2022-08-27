@@ -15,9 +15,15 @@
   retries: 5
   check_mode: false
 
-- name: find raspberry pi release
+- name: find raspberry pi release (32bit)
   set_fact:
     __motion_download_url: "{{ (_latest_release.json.assets |  selectattr('name', 'search', 'pi_') | list | first).browser_download_url }}"
+  when: ansible_architecture != "aarch64"
+
+- name: find raspberry pi release (64bit)
+  set_fact:
+    __motion_download_url: "{{ (_latest_release.json.assets |  selectattr('name', 'search', ansible_distribution_release + '.*arm64') | list | first).browser_download_url }}"
+  when: ansible_architecture == "aarch64"
 
 - name: download deb file
   become: false
