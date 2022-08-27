@@ -14,7 +14,7 @@ m1bp    ansible_host=10.0.50.34
 
 [servers]
 dresrv  ansible_host=10.0.50.22 ansible_user=root
-drepi   ansible_host=10.0.50.21 ansible_user=pi
+drepi   ansible_host=10.0.50.21 ansible_user=andrei
 romsto  ansible_host=10.1.0.6   ansible_user=root
 truenas
 
