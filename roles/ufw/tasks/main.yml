@@ -67,7 +67,9 @@
     proto: "{{ item.proto }}"
   loop: "{{ ufw_local_rules }}"
   notify: reload ufw
-  when: ipv6_network is defined
+  when:
+    - ipv6_network is defined
+    - ufw_ipv6_enabled
 
 - name: Add custom rules
   ufw:
@@ -89,6 +91,7 @@
     - ansible_default_ipv6 is defined
     - ansible_default_ipv6.address is defined
     - ufw_allow_dhcpv6
+    - ufw_ipv6_enabled
   notify: reload ufw
 
 - name: Enable ufw

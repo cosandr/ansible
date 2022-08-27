@@ -1,6 +1,7 @@
 ---
 
 ufw_allow_dhcpv6: true
+ufw_ipv6_enabled: true
 ufw_trusted_sources: []
 ufw_local_rules: []
 ufw_custom_rules: []
