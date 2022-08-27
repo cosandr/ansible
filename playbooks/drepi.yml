@@ -119,9 +119,8 @@
     - role: hostname
       tags: ["hostname"]
 
-    - role: ufw
-      when: firewall_frontend == "ufw"
-      tags: ["ufw"]
+    - role: firewall_config
+      tags: ["ufw", "firewall"]
 
     - role: motion
       tags: ["motion"]

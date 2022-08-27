@@ -1,0 +1,21 @@
+---
+
+firewall_rules:
+  # Network printers
+  - port: 5353
+    protocol: udp
+
+firewalld_zones:
+  - name: public
+    interfaces:
+      - wlan0
+      - enp0s31f6
+      - enp84s0u1
+
+  - name: home
+    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+
+firewalld_services:
+  - name: ssh
+    zone: public
+    state: absent

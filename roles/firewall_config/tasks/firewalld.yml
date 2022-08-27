@@ -1,75 +1,75 @@
 ---
 
 - name: Create configured zones
-  firewalld:
+  ansible.posix.firewalld:
     zone: "{{ item.name }}"
     permanent: true
     state: present
-  notify: reload firewalld
+  notify: Reload firewalld
   loop: "{{ firewalld_zones }}"
   loop_control:
     label: "{{ item.name }}"
 
-- name: flush handlers
-  meta: flush_handlers
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Add zone sources
-  firewalld:
+  ansible.posix.firewalld:
     zone: "{{ item.0.name }}"
     source: "{{ item.1 }}"
     permanent: true
     state: "{{ (item.0.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
-  notify: reload firewalld
+  notify: Reload firewalld
   loop: "{{ firewalld_zones | subelements('sources', skip_missing=True) }}"
   loop_control:
     label: "{{ item.0.name }} - {{ item.1 }}"
 
 - name: Add zone interfaces
-  firewalld:
+  ansible.posix.firewalld:
     zone: "{{ item.0.name }}"
     interface: "{{ item.1 }}"
     permanent: true
     state: "{{ (item.0.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
-  notify: reload firewalld
+  notify: Reload firewalld
   loop: "{{ firewalld_zones | subelements('interfaces', skip_missing=True) }}"
   loop_control:
     label: "{{ item.0.name }} - {{ item.1 }}"
 
 - name: Configure services
-  firewalld:
+  ansible.posix.firewalld:
     service: "{{ item.name }}"
     zone: "{{ item.zone | default('public') }}"
     permanent: true
     state: "{{ (item.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
-  notify: reload firewalld
+  notify: Reload firewalld
   loop: "{{ firewalld_services }}"
 
 - name: Configure simple firewalld rules
-  firewalld:
+  ansible.posix.firewalld:
     zone: "{{ item.zone | default('public') }}"
     port: "{{ item.port }}/{{ item.protocol | default('tcp') }}"
     permanent: true
     state: "{{ (item.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
   loop: "{{ firewall_rules }}"
-  notify: reload firewalld
+  notify: Reload firewalld
   when:
     - item.sources is not defined or item.sources | length == 0
     - item.source is not defined or item.source == 'any'
 
-- name: Configure rich firewalld rules
-  firewalld:
+- name: Configure rich firewalld rules  # noqa line-length
+  ansible.posix.firewalld:
     zone: "{{ item.zone | default('public') }}"
     rich_rule: "rule family={{ item.family | default('ipv4') }} source address={{ item.source }} port port={{ item.port }} protocol={{ item.protocol | default('tcp') }} accept"
     permanent: true
     state: "{{ (item.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
   loop: "{{ firewall_rules }}"
-  notify: reload firewalld
+  notify: Reload firewalld
   when:
     - item.sources is not defined or item.sources | length == 0
     - item.source is defined and item.source != 'any'
 
-- name: Configure rich firewalld rules [multiple sources]
-  firewalld:
+- name: Configure rich firewalld rules [multiple sources]  # noqa line-length
+  ansible.posix.firewalld:
     zone: "{{ item.0.zone | default('public') }}"
     rich_rule: "rule family={{ item.0.family | default('ipv4') }} source address={{ item.1 }} port port={{ item.0.port }} protocol={{ item.0.protocol | default('tcp') }} accept"
     permanent: true
@@ -77,4 +77,4 @@
   loop: "{{ firewall_rules | subelements('sources', skip_missing=True) }}"
   loop_control:
     label: "{{ item.0.port }} - {{ item.1 }}"
-  notify: reload firewalld
+  notify: Reload firewalld

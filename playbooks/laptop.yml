@@ -185,10 +185,6 @@
     - role: vscode
       tags: ["vscode"]
 
-    - role: ufw
-      when: ansible_os_family == 'Debian'
-      tags: ["ufw"]
-
     - role: install_aur
       vars:
         # No idea why this is needed

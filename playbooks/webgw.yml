@@ -138,10 +138,6 @@
     - role: sshd
       tags: ["sshd"]
 
-    - role: ufw
-      when: ansible_os_family == 'Debian'
-      tags: ["ufw"]
-
     - role: fail2ban
       tags: ["fail2ban"]
 

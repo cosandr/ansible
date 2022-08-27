@@ -67,18 +67,3 @@ fstab: |
 sbctl_sign_files:
   - "{{ esp_mount }}/EFI/BOOT/BOOTX64.EFI"
   - "{{ esp_mount }}/EFI/arch/fwupdx64.efi"
-
-firewalld_zones:
-  - name: public
-    interfaces:
-      - wlan0
-      - enp0s31f6
-      - enp84s0u1
-
-  - name: home
-    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
-
-firewalld_services:
-  - name: ssh
-    zone: public
-    state: absent

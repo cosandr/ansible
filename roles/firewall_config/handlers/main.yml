@@ -1,11 +1,10 @@
 ---
 
-- name: reload firewalld
-  systemd:
+- name: Reload firewalld
+  ansible.builtin.systemd:
     name: firewalld
     state: reloaded
 
-- name: reload ufw
-  systemd:
-    name: ufw
+- name: Reload ufw
+  community.general.ufw:
     state: reloaded

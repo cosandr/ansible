@@ -1,0 +1,27 @@
+---
+
+firewall_install: true
+
+firewall_rules:
+  - port: 22
+    source: "{{ home_net.general.cidr }}"
+
+  - port: 8081
+    source: "{{ home_net.general.cidr }}"
+
+  - port: 2049
+    protocol: tcp
+    source: "{{ hostvars['truenas'].local_ips.general }}"
+
+  - port: 2049
+    protocol: udp
+    source: "{{ hostvars['truenas'].local_ips.general }}"
+
+  - port: "{{ node_exporter_port }}"
+    source: "{{ hostvars['prom01'].ansible_host }}"
+
+ufw_trusted_sources:
+  - "{{ hostvars['desktop'].ansible_host }}"
+  - "{{ hostvars['laptop'].ansible_host }}"
+  - "{{ hostvars['laptop'].wireguard_ip }}"
+  - "{{ hostvars['m1bp'].wireguard_ip }}"

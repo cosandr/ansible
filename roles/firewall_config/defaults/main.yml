@@ -4,3 +4,10 @@ firewall_frontend: ""
 firewall_rules: []
 firewalld_zones: []
 firewalld_services: []
+firewall_install: false
+
+ufw_default_incoming: "deny"
+ufw_default_outgoing: "allow"
+ufw_before_rules: ""
+ufw_trusted_sources: []
+ufw_allow_dhcpv6: true

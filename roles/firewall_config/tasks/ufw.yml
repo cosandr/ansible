@@ -1,7 +1,33 @@
 ---
 
+- name: Configure ufw defaults
+  community.general.ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+  loop:
+    - {direction: "incoming", policy: "{{ ufw_default_incoming }}"}
+    - {direction: "outgoing", policy: "{{ ufw_default_outgoing }}"}
+  notify: Reload ufw
+
+- name: Add before rules
+  ansible.builtin.blockinfile:
+    dest: /etc/ufw/before.rules
+    insertbefore: ^# don't delete the 'COMMIT' line or these rules won't be processed
+    block: "{{ ufw_before_rules }}"
+    state: present
+  when: ufw_before_rules | length > 0
+  notify: Reload ufw
+
+- name: Add trusted sources
+  community.general.ufw:
+    direction: "in"
+    rule: "allow"
+    src: "{{ item }}"
+  loop: "{{ ufw_trusted_sources }}"
+  notify: Reload ufw
+
 - name: Add ufw rules
-  ufw:
+  community.general.ufw:
     direction: "{{ item.direction | default('in') }}"
     rule: "{{ (item.state | default('present') == 'present') | ternary('allow', 'deny') }}"
     src: "{{ item.source | default('any') }}"
@@ -9,9 +35,10 @@
     proto: "{{ item.protocol | default('tcp') }}"
   loop: "{{ firewall_rules }}"
   when: item.sources is not defined or item.sources | length == 0
+  notify: Reload ufw
 
 - name: Add ufw rules [multiple sources]
-  ufw:
+  community.general.ufw:
     direction: "{{ item.0.direction | default('in') }}"
     rule: "{{ (item.0.state | default('present') == 'present') | ternary('allow', 'deny') }}"
     src: "{{ item.1 | default('any') }}"
@@ -20,3 +47,18 @@
   loop: "{{ firewall_rules | subelements('sources', skip_missing=True) }}"
   loop_control:
     label: "{{ item.0.port }} - {{ item.1 }}"
+  notify: Reload ufw
+
+- name: Allow DHCPv6 client from local network
+  community.general.ufw:
+    direction: "in"
+    rule: "allow"
+    src: "fe80::/64"
+    port: "546"
+    proto: "udp"
+  when: ufw_allow_dhcpv6
+
+- name: Enable ufw
+  community.general.ufw:
+    state: enabled
+  tags: ["enable"]

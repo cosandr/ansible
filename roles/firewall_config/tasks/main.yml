@@ -1,13 +1,21 @@
 ---
 
+- name: Install firewall [{{ firewall_frontend }}]
+  ansible.builtin.package:
+    name: "{{ firewall_frontend }}"
+    state: present
+  when:
+    - firewall_frontend
+    - firewall_install
+
 - name: Detect firewall in use
-  include_tasks: detect.yml
+  ansible.builtin.include_tasks: detect.yml
   when: not firewall_frontend
 
 - name: Configure firewalld
-  include_tasks: firewalld.yml
+  ansible.builtin.include_tasks: firewalld.yml
   when: firewall_frontend == "firewalld"
 
 - name: Configure ufw
-  include_tasks: ufw.yml
+  ansible.builtin.include_tasks: ufw.yml
   when: firewall_frontend == "ufw"
