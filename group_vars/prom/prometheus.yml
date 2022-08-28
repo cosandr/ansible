@@ -61,6 +61,7 @@ blackbox_exporter_targets_icmp_ipv4:
   - "10.0.50.53"
   # Home assistant
   - "10.0.50.48"
+  - "kube-vip.{{ domains['hb'] }}"
 
 blackbox_exporter_targets_http_ipv4:
   - "https://google.com"
