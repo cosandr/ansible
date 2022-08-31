@@ -6,7 +6,7 @@ dependencies:
       firewalld_services: []
       firewalld_zones: []
       firewall_rules:
-        - port: "{{ promtail_http_port }}"
+        - port: "{{ __promtail_http_port }}"
           zone: "{{ promtail_allow_zone }}"
           sources: "{{ promtail_allow_ips }}"
     when:
