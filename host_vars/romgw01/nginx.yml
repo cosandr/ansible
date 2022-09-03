@@ -10,7 +10,7 @@ nginx_upstreams:
     keepalive: 16
 
   - name: ha_ta
-    servers: ["{{ hostvars['romsto'].ansible_host }}:8123"]
+    servers: ["10.1.0.48:8123"]
     keepalive: 16
 
 nginx_vhosts:
