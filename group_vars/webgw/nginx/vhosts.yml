@@ -1,6 +1,10 @@
 ---
 
 __nginx_vhosts_common:
+  - filename: default_reject.conf
+    server_name: default_reject
+    template: "{{ inventory_dir }}/files/webgw/nginx/default_reject.conf.j2"
+
   - filename: gitlab.conf
     server_name: gitlab
     template: "{{ inventory_dir }}/files/webgw/nginx/gitlab.conf.j2"
