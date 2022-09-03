@@ -1,6 +1,6 @@
 {{ ansible_managed | comment }}
 {% if nginx_upstreams | selectattr('name', 'search', 'grafana') %}
-{% set domain = domains[1] %}
+{% set domain = domains['hb'] %}
 server {
     listen 80;
     listen [::]:80;
