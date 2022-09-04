@@ -97,9 +97,22 @@ prometheus_scrape_configs_static:
 
     scheme: https
     static_configs:
-      - targets: ['ha.hlab.no:443']
+      - targets: ["ha.{{ domains['hb'] }}:443"]
         labels:
-          instance: "ha.hlab.no"
+          instance: "ha.{{ domains['hb'] }}"
+
+  - job_name: "hass_ti"
+    scrape_interval: 30s
+    metrics_path: /api/prometheus
+
+    authorization:
+      credentials: "{{ vault_ha_ta_token }}"
+
+    scheme: https
+    static_configs:
+      - targets: ["ha.{{ domains['ti'] }}:443"]
+        labels:
+          instance: "ha.{{ domains['ti'] }}"
 
   - job_name: 'thanos'
     static_configs:
