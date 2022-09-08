@@ -1,11 +1,20 @@
 ---
 
+domain: "{{ domains['hb'] }}"
 hostname_configure_etc_hosts: true
 _ports: {}
-smtp_host: "{{ vault_smtp_host }}"
-smtp_pass: "{{ vault_smtp_pass }}"
-smtp_port: "{{ vault_smtp_port }}"
-smtp_user: "{{ vault_smtp_user }}"
+
+smtp_credentials: "{{ vault_smtp_credentials }}"
+smtp_relay_domains:
+  - name: "{{ domains['hb'] }}"
+    relay_host: "{{ smtp_credentials['hb'].relay_host }}"
+    user: "{{ smtp_credentials['hb'].user }}"
+    password: "{{ smtp_credentials['hb'].password }}"
+
+  - name: "{{ domains['dv'] }}"
+    relay_host: "{{ smtp_credentials['dv'].relay_host }}"
+    user: "{{ smtp_credentials['dv'].user }}"
+    password: "{{ smtp_credentials['dv'].password }}"
 
 dht_exporter_gpio_pin: "17"
 dht_exporter_port: "8001"
