@@ -167,27 +167,13 @@
             - regexp: "^#?smtp_sasl_auth_enable"
               line: "smtp_sasl_auth_enable = yes"
             - regexp: "^#?smtp_sasl_security_options"
-              line: "smtp_sasl_security_options = noanonymous, noplaintext"
+              line: "smtp_sasl_security_options = noanonymous"
             - regexp: "^#?smtp_sasl_password_maps"
               line: "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd"
             - regexp: "^#?smtp_tls_CAfile"
               line: "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt"
-            - regexp: "^#?smtp_pix_workarounds"
-              line: "smtp_pix_workarounds = delay_dotcrlf"
-            - regexp: "^#?smtp_sasl_mechanism_filter"
-              line: "smtp_sasl_mechanism_filter ="
-            - regexp: "^#?smtp_sasl_tls_security_options"
-              line: "smtp_sasl_tls_security_options = $smtp_sasl_security_options"
-            - regexp: "^#?smtp_sasl_type"
-              line: "smtp_sasl_type = cyrus"
             - regexp: "^#?smtp_sender_dependent_authentication"
               line: "smtp_sender_dependent_authentication = yes"
-            - regexp: "^#?smtpd_sasl_path"
-              line: "smtpd_sasl_path = smtpd"
-            - regexp: "^#?smtpd_sasl_type"
-              line: "smtpd_sasl_type = cyrus"
-            - regexp: "^#?soft_bounce"
-              line: "soft_bounce = no"
             - regexp: "^#?transport_maps"
               line: "transport_maps = hash:/etc/postfix/transport"
             - regexp: "^#?unknown_local_recipient_reject_code"
@@ -217,7 +203,7 @@
             mode: 0600
             content: |
               {% for d in smtp_relay_domains %}
-              .{{ d.name }}    smtp:[{{ d.relay_host }}]:587
+              .{{ d.name }}    smtp:[{{ d.relay_host }}]:{{ d.port | default(587) }}
               {% endfor %}
           notify:
             - Regenerate transport.db
@@ -231,7 +217,7 @@
             mode: 0600
             content: |
               {% for d in smtp_relay_domains %}
-              @{{ d.name }}    [{{ d.relay_host }}]:587
+              @{{ d.name }}    [{{ d.relay_host }}]:{{ d.port | default(587) }}
               {% endfor %}
           notify:
             - Regenerate relayhost_map.db
