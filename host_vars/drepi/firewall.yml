@@ -6,6 +6,12 @@ firewall_rules:
   - port: 22
     source: "{{ home_net.general.cidr }}"
 
+  - port: 25
+    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+
+  - port: 25
+    sources: "{{ home_net | dict2items | json_query('[].value.cidr6') }}"
+
   - port: 8081
     source: "{{ home_net.general.cidr }}"
 

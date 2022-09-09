@@ -1,0 +1,53 @@
+---
+
+smtp_credentials: "{{ vault_smtp_credentials }}"
+postfix_relay_domains:
+  - name: "{{ domains['hb'] }}"
+    relay_host: "{{ smtp_credentials['hb'].relay_host }}"
+    user: "{{ smtp_credentials['hb'].user }}"
+    password: "{{ smtp_credentials['hb'].password }}"
+
+  - name: "{{ domains['dv'] }}"
+    relay_host: "{{ smtp_credentials['dv'].relay_host }}"
+    user: "{{ smtp_credentials['dv'].user }}"
+    password: "{{ smtp_credentials['dv'].password }}"
+
+postfix_hostname: "{{ inventory_hostname }}.{{ domain }}"
+postfix_relay_hosts: "{{ postfix_relay_domains | map(attribute='relay_host') | unique | map('regex_replace', '^(.*)$', '[\\1]') | list }}"
+__postfix_relay_domains:
+  - "{{ postfix_relay_domains | map(attribute='relay_host') | unique | list }}"
+  - "{{ postfix_relay_domains | map(attribute='name') | list }}"
+
+__postfix_networks:
+  - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+  - "{{ home_net | dict2items | json_query('[].value.cidr6') | map('regex_replace', '^(.*)/([0-9]+)$', '[\\1]/\\2') | list }}"
+
+postfix_networks: "{{ __postfix_networks | flatten }}"
+
+postfix_main_config:
+  - regexp: "^#?mydomain"
+    line: "mydomain = {{ domain }}"
+  - regexp: "^#?myorigin"
+    line: "myorigin = $mydomain"
+  - regexp: "^#?relay_domains"
+    line: "relay_domains = {{ __postfix_relay_domains | flatten | join(', ') }}"
+  - regexp: "^#?sender_dependent_relayhost_maps"
+    line: "sender_dependent_relayhost_maps = hash:/etc/postfix/relayhost_map"
+  - regexp: "^#?smtp_use_tls"
+    line: "smtp_use_tls = yes"
+  - regexp: "^#?smtp_sasl_auth_enable"
+    line: "smtp_sasl_auth_enable = yes"
+  - regexp: "^#?smtp_sasl_security_options"
+    line: "smtp_sasl_security_options = noanonymous"
+  - regexp: "^#?smtp_sasl_password_maps"
+    line: "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd"
+  - regexp: "^#?smtp_tls_CAfile"
+    line: "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt"
+  - regexp: "^#?smtp_sender_dependent_authentication"
+    line: "smtp_sender_dependent_authentication = yes"
+  - regexp: "^#?transport_maps"
+    line: "transport_maps = hash:/etc/postfix/transport"
+  - regexp: "^#?unknown_local_recipient_reject_code"
+    line: "unknown_local_recipient_reject_code = 550"
+  - regexp: "^#?virtual_alias_maps"
+    line: "virtual_alias_maps = hash:/etc/postfix/virtual"

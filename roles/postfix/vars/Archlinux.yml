@@ -1,0 +1,6 @@
+---
+
+__postfix_packages:
+  - postfix
+  - cyrus-sasl
+  - s-nail

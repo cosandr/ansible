@@ -1,0 +1,18 @@
+---
+
+- name: Regenerate virtual.db
+  ansible.builtin.command: "/usr/sbin/postmap /etc/postfix/virtual"
+
+- name: Regenerate transport.db
+  ansible.builtin.command: "/usr/sbin/postmap /etc/postfix/transport"
+
+- name: Regenerate relayhost_map.db
+  ansible.builtin.command: "/usr/sbin/postmap /etc/postfix/relayhost_map"
+
+- name: Regenerate sasl_passwd.db
+  ansible.builtin.command: "/usr/sbin/postmap /etc/postfix/sasl_passwd"
+
+- name: Restart postfix
+  ansible.builtin.systemd:
+    name: postfix
+    state: restarted

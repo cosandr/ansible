@@ -1,0 +1,122 @@
+---
+
+- name: Include OS-specific variables.
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+
+- name: Install postfix packages
+  ansible.builtin.package:
+    name: "{{ __postfix_packages }}"
+    state: present
+  tags: ["install"]
+
+- name: Basic postfix configuration
+  ansible.builtin.lineinfile:
+    dest: "/etc/postfix/main.cf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop:
+    - regexp: "^#?myhostname"
+      line: "myhostname = {{ postfix_hostname }}"
+    - regexp: "^#?mynetworks"
+      line: "mynetworks = {{ __postfix_networks | flatten | join(', ') }}"
+    - regexp: "^#?inet_interfaces"
+      line: "inet_interfaces = {{ postfix_interfaces | join(', ') }}"
+  loop_control:
+    label: "{{ item.line }}"
+  notify: Restart postfix
+
+- name: Configure relayhosts
+  ansible.builtin.lineinfile:
+    dest: "/etc/postfix/main.cf"
+    regexp: "^#?relayhost"
+    line: "relayhost = {{ postfix_relay_hosts | join(', ') }}"
+    state: present
+  when: postfix_relay_hosts | length > 0
+  notify: Restart postfix
+
+- name: Configure postfix main.cf options
+  ansible.builtin.lineinfile:
+    dest: "/etc/postfix/main.cf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ postfix_main_config }}"
+  loop_control:
+    label: "{{ item.line }}"
+  notify: Restart postfix
+
+- name: Ensure virtual file exists
+  ansible.builtin.file:
+    state: touch
+    path: /etc/postfix/virtual
+    owner: root
+    group: root
+    mode: 0600
+    modification_time: preserve
+    access_time: preserve
+  when:
+    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/virtual')
+  notify:
+    - Regenerate virtual.db
+    - Restart postfix
+
+- name: Configure postfix transport
+  ansible.builtin.copy:
+    dest: /etc/postfix/transport
+    owner: root
+    group: root
+    mode: 0600
+    content: |
+      {% for d in postfix_relay_domains %}
+      .{{ d.name }}    smtp:[{{ d.relay_host }}]:{{ d.port | default(587) }}
+      {% endfor %}
+  when:
+    - postfix_relay_domains
+    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/transport')
+  notify:
+    - Regenerate transport.db
+    - Restart postfix
+
+- name: Configure postfix relayhost_map
+  ansible.builtin.copy:
+    dest: /etc/postfix/relayhost_map
+    owner: root
+    group: root
+    mode: 0600
+    content: |
+      {% for d in postfix_relay_domains %}
+      @{{ d.name }}    [{{ d.relay_host }}]:{{ d.port | default(587) }}
+      {% endfor %}
+  when:
+    - postfix_relay_domains
+    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/relayhost_map')
+  notify:
+    - Regenerate relayhost_map.db
+    - Restart postfix
+
+- name: Configure postfix sasl_password
+  ansible.builtin.copy:
+    dest: /etc/postfix/sasl_passwd
+    owner: root
+    group: root
+    mode: 0600
+    content: |
+      {% for d in postfix_relay_domains %}
+      @{{ d.name }}    {{ d.user }}:{{ d.password }}
+      {% endfor %}
+  when:
+    - postfix_relay_domains
+    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/sasl_passwd')
+  notify:
+    - Regenerate sasl_passwd.db
+    - Restart postfix
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start postfix
+  ansible.builtin.systemd:
+    name: postfix
+    state: started
+    enabled: true
