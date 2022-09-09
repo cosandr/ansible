@@ -20,6 +20,12 @@ firewall_rules:
   - port: "{{ node_exporter_port }}"
     source: "{{ hostvars['prom01'].ansible_host }}"
 
+  # RouterOS neighbour discovery
+  - port: 5678
+    source: "fe80::/64"
+    protocol: "udp"
+
+ufw_allow_dhcpv6: true
 ufw_trusted_sources:
   - "{{ hostvars['desktop'].ansible_host }}"
   - "{{ hostvars['laptop'].ansible_host }}"
