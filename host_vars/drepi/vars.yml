@@ -19,6 +19,7 @@ firewalld_trusted_sources: "{{ vault_firewalld_trusted_sources }}"
 firewall_frontend: "ufw"
 
 unattended_mail: "{{ my_email }}"
+unattended_mail_only_on_error: true
 unattended_remove_unused_dependencies: true
 unattended_remove_new_unused_dependencies: true
 unattended_automatic_reboot: true
