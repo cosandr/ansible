@@ -1,0 +1,16 @@
+---
+
+- name: Enable CRB (Non-RHEL 9+)
+  ansible.builtin.command: dnf config-manager --set-enabled crb
+  changed_when: false
+  when: ansible_distribution_major_version | int >= 9
+
+- name: Enable PowerTools (Non-RHEL 8)
+  ansible.builtin.command: dnf config-manager --set-enabled powertools
+  changed_when: false
+  when: ansible_distribution_major_version | int == 8
+
+- name: Install EPEL
+  ansible.builtin.dnf:
+    name: epel-release
+    state: present

@@ -2,20 +2,10 @@
 - name: Include OS-specific variables.
   include_vars: "{{ ansible_os_family }}.yml"
 
-- block:
-    - name: Install epel
-      dnf:
-        name: epel-release
-        state: present
-
-    - name: Enable epel and powertools
-      command: dnf config-manager --set-enabled epel,powertools
-      changed_when: false
-
-  when:
-    - ansible_distribution != 'Fedora'
-    - ansible_os_family == 'RedHat'
-    - ansible_distribution_major_version | int >= 8
+- name: Install EPEL
+  ansible.builtin.include_role:
+    name: epel
+  when: ansible_os_family == 'RedHat'
 
 - name: Install borg
   package:

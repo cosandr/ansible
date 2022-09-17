@@ -45,9 +45,8 @@
       tags: ["selinux"]
 
     - name: Install epel
-      dnf:
-        name: epel-release
-        state: present
+      ansible.builtin.include_role:
+        name: epel
       tags: ["install"]
       when: ansible_os_family == 'RedHat'
 
