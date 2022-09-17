@@ -1,7 +1,22 @@
 ---
 
+- name: Install EPEL
+  ansible.builtin.include_role:
+    name: epel
+  when:
+    - ansible_distribution != 'Fedora'
+    - ansible_os_family == 'RedHat'
+
+- name: Install networkd and resolved
+  package:
+    name:
+      - systemd-networkd
+      - systemd-resolved
+    state: present
+  # They are part of the systemd package on Arch
+  when: ansible_distribution != "Archlinux"
+
 - name: Copy networkd configs
-  become: true
   copy:
     dest: "/etc/systemd/network/{{ item.key }}.network"
     owner: root
@@ -11,10 +26,9 @@
       {{ ansible_managed | comment }}
       {{ item.value }}
   with_dict: "{{ networkd_config }}"
-  notify: restart systemd-networkd
+  notify: Restart systemd-networkd
 
 - name: Copy networkd netdevs
-  become: true
   copy:
     dest: "/etc/systemd/network/{{ item.key }}.netdev"
     owner: root
@@ -24,7 +38,28 @@
       {{ ansible_managed | comment }}
       {{ item.value }}
   with_dict: "{{ networkd_netdevs }}"
-  notify: restart systemd-networkd
+  notify: Restart systemd-networkd
+
+- name: Check if NetworkManager is active  # noqa command-instead-of-module
+  command: systemctl is-active -q NetworkManager.service
+  check_mode: false
+  changed_when: false
+  failed_when: false
+  register: __nm_active
+  tags: ["always"]
+
+- name: Disable NM
+  block:
+    - name: Stop NetworkManager
+      systemd:
+        name: NetworkManager
+        state: stopped
+
+    - name: Disable NetworkManager
+      systemd:
+        name: NetworkManager
+        enabled: false
+  when: __nm_active.rc == 0
 
 - name: Enable and start systemd-networkd/resolved
   systemd:
