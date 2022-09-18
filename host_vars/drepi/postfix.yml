@@ -19,7 +19,7 @@ __postfix_relay_domains:
   - "{{ postfix_relay_domains | map(attribute='name') | list }}"
 
 __postfix_networks:
-  - "10.4.20.0/24"
+  - "{{ wg_net.mt.cidr }}"
   - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
   - "{{ home_net | dict2items | json_query('[].value.cidr6') | map('regex_replace', '^(.*)/([0-9]+)$', '[\\1]/\\2') | list }}"
 

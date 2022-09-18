@@ -3,8 +3,8 @@
 wireguard_port: "51821"
 wireguard_interface: "mt"
 wireguard_addresses:
-  - "10.4.20.209/24"
-  - "fd00:4:20::209/64"
+  - "{{ wg_net.mt.cidr | ansible.utils.ipaddr('209') }}"
+  - "{{ wg_net.mt.cidr6 | ansible.utils.ipaddr('0x209' | int(base=16)) }}"
 
 wireguard_mt_allowed_ips:
   - "{{ hostvars['mt-router'].wireguard_ip }}/32"

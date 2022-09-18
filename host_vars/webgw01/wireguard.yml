@@ -2,8 +2,8 @@
 
 wireguard_interface: "mt"
 wireguard_addresses:
-  - "10.4.20.91/24"
-  - "fd00:4:20::91/64"
+  - "{{ wg_net.mt.cidr | ansible.utils.ipaddr('91') }}"
+  - "{{ wg_net.mt.cidr6 | ansible.utils.ipaddr('0x91' | int(base=16)) }}"
 
 wireguard_dns_list:
   - "{{ hostvars['mt-router'].wireguard_ip }}"

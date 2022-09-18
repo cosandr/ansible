@@ -46,7 +46,7 @@
             state: enabled
           loop:
             - "{{ hostvars['laptop'].wireguard_ip }}"
-            - "10.4.20.34"
+            - "{{ hostvars['m1bp'].wireguard_ip }}"
           notify: reload firewalld
 
         - name: Allow ports to internal zone

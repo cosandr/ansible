@@ -3,8 +3,8 @@
 wireguard_port: "51820"
 wireguard_interface: "wg0"
 wireguard_addresses:
-  - "10.4.20.206/24"
-  # - "fd00:4:20::206/64"
+  - "{{ wg_net.mt.cidr | ansible.utils.ipaddr('206') }}"
+  # - "{{ wg_net.mt.cidr6 | ansible.utils.ipaddr('0x206' | int(base=16)) }}"
 
 wireguard_mt_allowed_ips:
   - "{{ hostvars['mt-router'].wireguard_ip }}/32"
@@ -33,7 +33,7 @@ wireguard_endpoint: ""
 wireguard_persistent_keepalive: "30"
 wireguard_postup:
   - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} started'
-  - iptables -t nat -A POSTROUTING -s "10.4.20.0/24" -o br0 -j MASQUERADE
+  - iptables -t nat -A POSTROUTING -s "{{ wg_net.mt.cidr }}" -o br0 -j MASQUERADE
 wireguard_postdown:
   - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} stopped'
-  - iptables -t nat -D POSTROUTING -s "10.4.20.0/24" -o br0 -j MASQUERADE
+  - iptables -t nat -D POSTROUTING -s "{{ wg_net.mt.cidr }}" -o br0 -j MASQUERADE
