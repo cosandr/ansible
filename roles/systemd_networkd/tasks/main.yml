@@ -26,6 +26,8 @@
       {{ ansible_managed | comment }}
       {{ item.value }}
   with_dict: "{{ networkd_config }}"
+  loop_control:
+    label: "{{ item.key }}"
   notify: Restart systemd-networkd
 
 - name: Copy networkd netdevs
@@ -38,6 +40,8 @@
       {{ ansible_managed | comment }}
       {{ item.value }}
   with_dict: "{{ networkd_netdevs }}"
+  loop_control:
+    label: "{{ item.key }}"
   notify: Restart systemd-networkd
 
 - name: Check if NetworkManager is active  # noqa command-instead-of-module
