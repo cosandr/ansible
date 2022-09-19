@@ -1,5 +1,62 @@
 ---
 
-# ARM build doesn't support systemd journal
 promtail_scrape_configs:
-  - "{{ __promtail_scrape_config_map['system'] }}"
+  - job_name: raspbian
+    static_configs:
+      - labels:
+          job: mail
+          log_type: syslog
+          __path__: /var/log/mail.log
+
+      - labels:
+          job: varlogs
+          log_type: syslog
+          __path__: /var/log/user.log
+
+      - labels:
+          job: varlogs
+          log_type: syslog
+          __path__: /var/log/ufw.log
+
+      - labels:
+          job: varlogs
+          log_type: syslog
+          __path__: /var/log/syslog
+
+      - labels:
+          job: varlogs
+          log_type: syslog
+          __path__: /var/log/kern.log
+
+      - labels:
+          job: varlogs
+          log_type: syslog
+          __path__: /var/log/daemon.log
+
+      - labels:
+          job: varlogs
+          log_type: syslog
+          __path__: /var/log/auth.log
+
+    pipeline_stages:
+      - match:
+          selector: '{log_type="syslog"}'
+          stages:
+            - regex:
+                # Sep 18 11:09:59 drepi postfix/postfix-script[32377]: starting the Postfix mail system
+                expression: '^(?P<timestamp>\w{3} \d{2} \d{2}:\d{2}:\d{2}) (?P<host>\w+) (?P<program>\S+?)(\[(?P<pid>\d+)\])?: (?P<message>.*)'
+
+            - labels:
+                host: ""
+                program: ""
+
+            - labeldrop:
+                - log_type
+
+            - timestamp:
+                source: timestamp
+                format: "Jan 02 15:04:05"
+                location: "{{ sys_timezone }}"
+
+            - output:
+                source: message
