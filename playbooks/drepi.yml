@@ -131,6 +131,9 @@
     - role: unattended-upgrades
       tags: ["unattended-upgrades"]
 
+    - role: certbot
+      tags: ["certbot"]
+
     - role: postfix
       tags: ["postfix"]
 
