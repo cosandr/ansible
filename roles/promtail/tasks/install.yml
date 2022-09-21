@@ -108,3 +108,13 @@
     group: root
     mode: 0755
   when: __is_sysv
+
+- name: Configure logrotate for promtail
+  template:
+    src: "logrotate.conf.j2"
+    dest: "/etc/logrotate.d/promtail"
+    owner: root
+    group: root
+    mode: 0644
+  when: __is_sysv
+  tags: ["logrotate"]

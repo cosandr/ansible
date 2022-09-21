@@ -6,13 +6,17 @@
 {{ ansible_managed | comment }}
 
 promtail_start() {
+  if pidof promtail >/dev/null; then
+    echo "promtail is already running..."
+    exit 0
+  fi
   if [ -x {{ promtail_bin_path }} ]; then
-    {{ promtail_bin_path }} -config.file={{ promtail_conf_path }} &
+    nohup {{ promtail_bin_path }} -config.file={{ promtail_conf_path }} >> {{ promtail_log_file }} 2>&1 &
   fi
 }
 
 promtail_stop() {
-    killall promtail
+  killall promtail
 }
 
 promtail_restart() {

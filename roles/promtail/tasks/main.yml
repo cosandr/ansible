@@ -37,4 +37,6 @@
 
 - name: Start promtail [Slackware]
   command: /etc/rc.d/rc.promtail start
+  register: __sysv_start
+  changed_when: "'already running' not in __sysv_start.stdout"
   when: ansible_os_family == 'Slackware'
