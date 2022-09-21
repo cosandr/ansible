@@ -160,17 +160,9 @@
     - role: certbot
       vars:
         certbot_domains: "{{ certbot_domains_hetzner }}"
-        certbot_credentials_path: "/etc/letsencrypt/hetzner.ini"
-        certbot_credentials_content: |
-          dns_hetzner_api_token = {{ vault_dns_hetzner_api_token }}
-
-        certbot_generate_command: >
-          certbot certonly
-          --authenticator dns-hetzner
-          --dns-hetzner-credentials {{ certbot_credentials_path }}
-          -n
-          --keep
-          --expand
+        certbot_credentials_path: "{{ certbot_credentials_path_hetzner }}"
+        certbot_credentials_content: "{{ certbot_credentials_content_hetzner }}"
+        certbot_generate_command: "{{ certbot_generate_command_hetzner }}"
       when:
         - certbot_domains_hetzner is defined
         - certbot_domains_hetzner | length > 0
@@ -180,17 +172,9 @@
       vars:
         certbot_install: "{{ __certbot_installed is not defined }}"
         certbot_domains: "{{ certbot_domains_cloudflare }}"
-        certbot_credentials_path: "/etc/letsencrypt/cloudflare.ini"
-        certbot_credentials_content: |
-          dns_cloudflare_api_token = {{ vault_dns_cloudflare_api_token }}
-
-        certbot_generate_command: >
-          certbot certonly
-          --authenticator dns-cloudflare
-          --dns-cloudflare-credentials {{ certbot_credentials_path }}
-          -n
-          --keep
-          --expand
+        certbot_credentials_path: "{{ certbot_credentials_path_cloudflare }}"
+        certbot_credentials_content: "{{ certbot_credentials_content_cloudflare }}"
+        certbot_generate_command: "{{ certbot_generate_command_cloudflare }}"
       when:
         - certbot_domains_cloudflare is defined
         - certbot_domains_cloudflare | length > 0

@@ -1,0 +1,27 @@
+---
+
+certbot_dns_hetzner_api_token: "{{ vault_dns_hetzner_api_token }}"
+certbot_credentials_path_hetzner: "/etc/letsencrypt/hetzner.ini"
+certbot_credentials_content_hetzner: |
+  dns_hetzner_api_token = {{ certbot_dns_hetzner_api_token }}
+
+certbot_generate_command_hetzner: >
+  certbot certonly
+  --authenticator dns-hetzner
+  --dns-hetzner-credentials {{ certbot_credentials_path_hetzner }}
+  -n
+  --keep
+  --expand
+
+certbot_dns_cloudflare_api_token: "{{ vault_dns_cloudflare_api_token }}"
+certbot_credentials_path_cloudflare: "/etc/letsencrypt/cloudflare.ini"
+certbot_credentials_content_cloudflare: |
+  dns_cloudflare_api_token = {{ certbot_dns_cloudflare_api_token }}
+
+certbot_generate_command_cloudflare: >
+  certbot certonly
+  --authenticator dns-cloudflare
+  --dns-cloudflare-credentials {{ certbot_credentials_path_cloudflare }}
+  -n
+  --keep
+  --expand
