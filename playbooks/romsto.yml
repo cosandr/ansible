@@ -124,12 +124,22 @@
             group: root
             mode: 0755
 
+        - name: Copy promtail logrotate config
+          copy:
+            src: /etc/logrotate.d/promtail
+            remote_src: true
+            dest: /pstore/promtail/promtail.logrotate
+            owner: root
+            group: root
+            mode: 0644
+
         - name: Setup promtail on boot
           blockinfile:
             path: /boot/config/go
             marker: "# {mark} promtail"
             block: |
               install -o root -g root -m755 /pstore/promtail/rc.promtail /etc/rc.d/rc.promtail
+              install -o root -g root -m644 /pstore/promtail/promtail.logrotate /etc/logrotate.d/promtail
               /etc/rc.d/rc.promtail start
 
       tags: ["promtail", "go"]
