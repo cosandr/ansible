@@ -89,6 +89,14 @@
 
       tags: ["locale"]
 
+    - name: Configure dhcpcd
+      ansible.builtin.blockinfile:
+        block: "{{ dhcpcd_config }}"
+        dest: /etc/dhcpcd.conf
+      notify: Restart dhcpcd
+      tags: ["dhcpcd"]
+      when: dhcpcd_config | default('')
+
   roles:
     - role: sshd
       vars:
@@ -129,9 +137,20 @@
         - wireguard_address | length > 0
       tags: ["wireguard"]
 
+    - role: serial_proxy
+      tags: ["serial"]
+      when:
+        - serial_proxy_src is defined
+        - serial_proxy_src | length > 0
+
   handlers:
     - name: Reboot
       ansible.builtin.reboot: {}
 
     - name: Update locale
       ansible.builtin.command: "/usr/sbin/update-locale LANG={{ system_locale }}"
+
+    - name: Restart dhcpcd
+      ansible.builtin.systemd:
+        name: dhcpcd.service
+        state: restarted

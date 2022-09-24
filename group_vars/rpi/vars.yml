@@ -1,5 +1,7 @@
 ---
 
+ansible_become: true
+
 system_timezone: "Europe/Oslo"
 system_locale: "en_US.UTF-8"
 

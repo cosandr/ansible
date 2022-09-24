@@ -1,0 +1,18 @@
+---
+
+__ssh_sources:
+  - "{{ wg_net.mt.cidr }}"
+  - "{{ wg_net.mt.cidr6 }}"
+  - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+  - "{{ home_net | dict2items | json_query('[].value.cidr6') }}"
+  - "10.1.0.0/24"
+
+firewall_rules:
+  - port: 22
+    sources: "{{ __ssh_sources | flatten }}"
+
+  - port: "{{ wireguard_port }}"
+    protocol: udp
+
+  - port: "{{ serial_proxy_port }}"
+    source: "10.1.0.48"

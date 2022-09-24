@@ -1,0 +1,4 @@
+---
+
+serial_proxy_src: "/dev/ttyUSB0"
+serial_proxy_port: 8888
