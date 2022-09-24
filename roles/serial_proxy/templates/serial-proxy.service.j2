@@ -4,7 +4,7 @@ After=network-online.target
 ConditionPathExists={{ serial_proxy_src }}
 
 [Service]
-ExecStart=/usr/bin/socat {{ serial_proxy_src }},rawer,tcp-listen:{{ serial_proxy_port }},reuseaddr,b{{ serial_proxy_baud }}
+ExecStart=/usr/bin/socat tcp-listen:{{ serial_proxy_port }},reuseaddr,fork FILE:{{ serial_proxy_src }},rawer,b{{ serial_proxy_baud }}
 
 [Install]
 WantedBy=default.target
