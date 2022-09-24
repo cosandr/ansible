@@ -1,0 +1,6 @@
+---
+
+firewall_frontend: 'firewalld'
+# Allow SSH by default so I don't accidentally lock myself out
+firewall_rules:
+  - port: 22
