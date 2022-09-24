@@ -1,11 +1,9 @@
 #!/usr/bin/env -S ansible-playbook
 ---
-- name: SSH
-  hosts: drepi
-  gather_facts: true
-  vars:
-    ansible_ssh_pass: raspberry  # fresh install
-  tasks:
+
+- name: Raspberry Pi playbook
+  hosts: rpi
+  pre_tasks:
     # Set up ssh
     # https://github.com/hannseman/ansible-raspbian
     - name: Add SSH keys
@@ -13,33 +11,8 @@
         user: "{{ ansible_user }}"
         key: "{{ item }}"
         state: present
-      with_items: "{{ ssh_authorized_keys }}"
+      loop: "{{ ssh_authorized_keys }}"
       tags: ["ssh"]
-
-  roles:
-    - role: sshd
-      vars:
-        _sshd_pkg: "openssh-server"
-      become: true
-      tags: ["sshd"]
-
-- name: Raspberry Pi 4 playbook
-  gather_facts: false
-  become: true
-  hosts: drepi
-  vars:
-    system_timezone: "Europe/Oslo"
-    system_locale: "en_US.UTF-8"
-  pre_tasks:
-    - name: Run common role
-      become: false
-      ansible.builtin.import_role:
-        name: common
-      tags: ["always"]
-
-    - name: Gather facts
-      ansible.builtin.setup:
-      tags: ["always"]
 
     - name: Configure motion
       block:
@@ -73,6 +46,7 @@
         #     state: present
         #   notify: Reboot
 
+      when: motion_is_rpi | default(false)
       tags: ["motion"]
 
   tasks:
@@ -116,6 +90,11 @@
       tags: ["locale"]
 
   roles:
+    - role: sshd
+      vars:
+        _sshd_pkg: "openssh-server"
+      tags: ["sshd"]
+
     - role: hostname
       tags: ["hostname"]
 
@@ -123,6 +102,7 @@
       tags: ["ufw", "firewall"]
 
     - role: motion
+      when: motion_is_rpi | default(false)
       tags: ["motion"]
 
     - role: node_exporter
@@ -132,10 +112,22 @@
       tags: ["unattended-upgrades"]
 
     - role: certbot
+      when:
+        - certbot_domains is defined
+        - certbot_domains | length > 0
       tags: ["certbot"]
 
     - role: postfix
+      when:
+        - postfix_main_config is defined
+        - postfix_main_config | length > 0
       tags: ["postfix"]
+
+    - role: wireguard
+      when:
+        - wireguard_address is defined
+        - wireguard_address | length > 0
+      tags: ["wireguard"]
 
   handlers:
     - name: Reboot

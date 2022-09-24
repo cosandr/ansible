@@ -1,0 +1,17 @@
+---
+
+system_timezone: "Europe/Oslo"
+system_locale: "en_US.UTF-8"
+
+node_exporter_port: "9100"
+node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
+node_exporter_collectors:
+  - systemd
+
+unattended_mail: "{{ my_email }}"
+unattended_mail_only_on_error: true
+unattended_remove_unused_dependencies: true
+unattended_remove_new_unused_dependencies: true
+unattended_automatic_reboot: true
+unattended_origins_patterns:
+  - 'origin=Raspbian,codename=${distro_codename},label=Raspbian'

@@ -1,4 +1,0 @@
----
-
-journalbeat_es_hosts: ["{{ hostvars['dresrv'].ansible_host }}:9200"]
-journalbeat_api_key: "{{ vault_journalbeat_api_key }}"

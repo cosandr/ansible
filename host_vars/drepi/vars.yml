@@ -8,23 +8,9 @@ dht_exporter_gpio_pin: "17"
 dht_exporter_port: "8001"
 dht_exporter_room: "Hallway"
 
-node_exporter_port: "9100"
-node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
-node_exporter_collectors:
-  - systemd
-ssh_authorized_keys:
-  - "{{ hostvars.desktop.ssh_keys.andrei }}"
-  - "{{ hostvars.laptop.ssh_keys.andrei }}"
 firewalld_trusted_sources: "{{ vault_firewalld_trusted_sources }}"
 firewall_frontend: "ufw"
 
-unattended_mail: "{{ my_email }}"
-unattended_mail_only_on_error: true
-unattended_remove_unused_dependencies: true
-unattended_remove_new_unused_dependencies: true
-unattended_automatic_reboot: true
-unattended_origins_patterns:
-  - 'origin=Raspbian,codename=${distro_codename},label=Raspbian'
 motion_is_rpi: true
 motion_smb_pass: "{{ vault_motion_smb_pass }}"
 motion_scripts:

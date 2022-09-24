@@ -18,3 +18,7 @@ node_exporter_allow_ips: "{{ groups['prom'] | map('extract', hostvars, 'ansible_
 
 # Fetch with timedatectl -p Timezone --value show
 sys_timezone: "Europe/Oslo"
+
+ssh_authorized_keys:
+  - "{{ hostvars['desktop'].ssh_keys.andrei }}"
+  - "{{ hostvars['laptop'].ssh_keys.andrei }}"

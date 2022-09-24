@@ -1,7 +1,5 @@
 ---
 
-firewall_install: true
-
 __smtp_sources:
   - "{{ wg_net.mt.cidr }}"
   - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
@@ -39,7 +37,6 @@ firewall_rules:
     source: "fe80::/64"
     protocol: "udp"
 
-ufw_allow_dhcpv6: true
 ufw_trusted_sources:
   - "{{ hostvars['desktop'].ansible_host }}"
   - "{{ hostvars['laptop'].ansible_host }}"

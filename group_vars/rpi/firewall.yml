@@ -1,0 +1,5 @@
+---
+
+firewall_install: true
+firewall_frontend: 'ufw'
+ufw_allow_dhcpv6: true
