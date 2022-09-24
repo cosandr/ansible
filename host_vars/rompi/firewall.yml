@@ -6,6 +6,7 @@ __ssh_sources:
   - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
   - "{{ home_net | dict2items | json_query('[].value.cidr6') }}"
   - "10.1.0.0/24"
+  - "192.168.100.5"
 
 firewall_rules:
   - port: 22
@@ -15,4 +16,5 @@ firewall_rules:
     protocol: udp
 
   - port: "{{ serial_proxy_port }}"
-    source: "10.1.0.48"
+    # Sad double NAT noises
+    source: "192.168.100.5"
