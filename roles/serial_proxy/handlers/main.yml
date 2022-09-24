@@ -1,0 +1,11 @@
+---
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart serial proxy
+  ansible.builtin.systemd:
+    name: serial-proxy.service
+    state: started
+    enabled: true

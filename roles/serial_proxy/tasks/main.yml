@@ -1,0 +1,27 @@
+---
+
+- name: Install socat
+  ansible.builtin.package:
+    name: socat
+    state: present
+  tags: ["install"]
+
+- name: Install service
+  ansible.builtin.template:
+    src: serial-proxy.service.j2
+    dest: /etc/systemd/system/serial-proxy.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reload systemd
+    - Restart serial proxy
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start serial proxy
+  ansible.builtin.systemd:
+    name: serial-proxy.service
+    state: started
+    enabled: true
