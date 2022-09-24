@@ -1,17 +1,37 @@
 ---
 
-- name: Install prerequisites
-  apt:
-    name:
-      - python3.9
-      - python3.9-venv
-      - libaugeas0
-    update_cache: true
-    state: present
+- name: Debian tasks
+  block:
+    - name: Debian 10 tasks
+      block:
+        - name: Set Python fact for 3.7
+          set_fact:
+            __python_bin_path: /usr/bin/python3.7
+
+        - name: Install prerequisites (Debian <=10)
+          apt:
+            name:
+              - python3
+              - python3-venv
+              - libaugeas0
+            update_cache: true
+            state: present
+      when: ansible_distribution_major_version | int < 11
+
+    - name: Install prerequisites (Debian >=11)
+      apt:
+        name:
+          - python3.9
+          - python3.9-venv
+          - libaugeas0
+        update_cache: true
+        state: present
+      when: ansible_distribution_major_version | int >= 11
+
   when: ansible_os_family == 'Debian'
   tags: ["install"]
 
-- name: Install prerequisites
+- name: Install prerequisites (RedHat)
   dnf:
     name:
       - python39
@@ -20,7 +40,7 @@
   when: ansible_os_family == 'RedHat'
   tags: ["install"]
 
-- name: Install prerequisites
+- name: Install prerequisites (FreeBSD)
   community.general.pkgng:
     name:
       - python39
@@ -41,6 +61,16 @@
     state: latest
     virtualenv: "{{ certbot_venv_path }}"
     virtualenv_command: "{{ __python_bin_path }} -m venv"
+  tags: ["install"]
+
+# 38 builds from source on Python 3.7
+- name: Install cryptography<38 (Debian 10)
+  pip:
+    name: cryptography<38
+    virtualenv: "{{ certbot_venv_path }}"
+  when:
+    - ansible_os_family == 'Debian'
+    - ansible_distribution_major_version | int < 11
   tags: ["install"]
 
 - name: Install certbot
