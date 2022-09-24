@@ -33,6 +33,7 @@ k8s_cluster
 
 [rpi]
 drepi   ansible_host=10.0.50.21    ansible_user=andrei
+oldpi   ansible_host=10.0.50.23    ansible_user=andrei
 rompi   ansible_host=192.168.100.3 ansible_user=andrei
 
 [db:children]

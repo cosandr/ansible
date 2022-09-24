@@ -1,0 +1,22 @@
+---
+
+__ssh_sources:
+  - "{{ wg_net.mt.cidr }}"
+  - "{{ wg_net.mt.cidr6 }}"
+  - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+  - "{{ home_net | dict2items | json_query('[].value.cidr6') }}"
+
+firewall_rules:
+  - port: 22
+    sources: "{{ __ssh_sources | flatten }}"
+
+  # RouterOS neighbour discovery
+  - port: 5678
+    source: "fe80::/64"
+    protocol: "udp"
+
+ufw_trusted_sources:
+  - "{{ hostvars['desktop'].ansible_host }}"
+  - "{{ hostvars['laptop'].ansible_host }}"
+  - "{{ hostvars['laptop'].wireguard_ip }}"
+  - "{{ hostvars['m1bp'].wireguard_ip }}"
