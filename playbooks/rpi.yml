@@ -138,10 +138,8 @@
       tags: ["wireguard"]
 
     - role: serial_proxy
+      when: "'serial_proxy_src' in hostvars[inventory_hostname]"
       tags: ["serial"]
-      when:
-        - serial_proxy_src is defined
-        - serial_proxy_src | length > 0
 
   handlers:
     - name: Reboot
