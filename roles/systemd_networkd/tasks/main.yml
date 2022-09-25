@@ -3,9 +3,12 @@
 - name: Install EPEL
   ansible.builtin.include_role:
     name: epel
+    apply:
+      tags: ["install"]
   when:
     - ansible_distribution != 'Fedora'
     - ansible_os_family == 'RedHat'
+  tags: ["install"]
 
 - name: Install networkd and resolved
   package:
@@ -15,6 +18,7 @@
     state: present
   # They are part of the systemd package on Arch
   when: ansible_distribution != "Archlinux"
+  tags: ["install"]
 
 - name: Copy networkd configs
   copy:
