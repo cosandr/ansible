@@ -8,6 +8,7 @@
       - drepi
       - romsto
       - truenas
+      - oldpi
   pre_tasks:
     - block:
         - name: Disable some default services
@@ -166,7 +167,7 @@
         blackbox_exporter_targets_icmp_ipv4: "{{ blackbox_exporter_targets_icmp_ipv4 + [tmp_var] }}"
       vars:
         tmp_var: "{{ hostvars[item].wireguard_ip | default(hostvars[item].ansible_host) }}"
-      loop: "{{ groups['servers'] }}"
+      loop: "{{ groups['servers'] | difference(__exclude_auto_node) }}"
       when: hostvars[item].wireguard_ip is defined or hostvars[item].ansible_host is defined
       tags: ["prometheus"]
 

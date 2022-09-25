@@ -55,6 +55,7 @@ blackbox_exporter_targets_icmp_ipv4:
   - "google.com"
   - "1.1.1.1"
   - "{{ hostvars['romsto'].ddns_domain }}"
+  - "{{ hostvars['romsto'].wireguard_ip }}"
   - "{{ hostvars['webgw01'].ansible_host }}"
   - "{{ hostvars['truenas'].local_ips.vm }}"
   # Home assistant
