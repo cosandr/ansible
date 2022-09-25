@@ -1,0 +1,6 @@
+---
+
+firewall_rules:
+  - port: "{{ serial_proxy_port }}"
+    zone: home
+    source: "10.0.50.48"

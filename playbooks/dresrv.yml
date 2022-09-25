@@ -138,6 +138,12 @@
     - role: sudo
       tags: ["sudo"]
 
+    - role: firewall_config
+      tags: ["firewall"]
+
+    - role: serial_proxy
+      tags: ["serial"]
+
     - role: fail2ban
       tags: ["fail2ban"]
 
