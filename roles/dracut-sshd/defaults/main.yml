@@ -1,5 +1,9 @@
 ---
 
-dracut_ssh_authorized_keys: ""
+dracut_ssh_command: "/usr/bin/systemd-tty-ask-password-agent --watch"
+dracut_ssh_authorized_keys: []
 dracut_ssh_port: "2222"
 dracut_ssh_networkd: true
+dracut_ssh_networkd_conf:
+  - "*.netdev"
+  - "*.network"

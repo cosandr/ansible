@@ -1,14 +1,14 @@
 ---
 
 - name: Install dracut-network
-  package:
+  ansible.builtin.package:
     name: dracut-network
     state: present
   tags: ["install"]
 
 - name: Clone dracut-sshd
   delegate_to: localhost
-  git:
+  ansible.builtin.git:
     dest: /tmp/dracut-sshd
     repo: "https://github.com/gsauthof/dracut-sshd"
     version: "master"
@@ -17,7 +17,7 @@
   tags: ["install"]
 
 - name: Copy 46sshd
-  copy:
+  ansible.builtin.copy:
     src: /tmp/dracut-sshd/46sshd
     dest: /usr/lib/dracut/modules.d
     owner: root
@@ -26,9 +26,11 @@
   notify: dracut regenerate all
   tags: ["install"]
 
-- block:
+- name: Configure authorized_keys
+  when: dracut_ssh_authorized_keys | length > 0
+  block:
     - name: Create config dir
-      file:
+      ansible.builtin.file:
         path: /etc/dracut-sshd
         state: directory
         owner: root
@@ -36,60 +38,43 @@
         mode: 0700
 
     - name: Copy dracut SSH keys
-      copy:
+      ansible.builtin.template:
+        src: authorized_keys.j2
         dest: /etc/dracut-sshd/authorized_keys
         owner: root
         group: root
         mode: 0600
-        content: "{{ dracut_ssh_authorized_keys }}"
       notify: dracut regenerate all
-  when: dracut_ssh_authorized_keys | length > 0
 
 - name: Configure Dracut SSHD port
-  copy:
+  ansible.builtin.template:
+    src: dracut-sshd.j2
     dest: /etc/sysconfig/dracut-sshd
     owner: root
     group: root
     mode: 0644
-    content: "SSHD_OPTS=\"-p {{ dracut_ssh_port }}\"\n"
   notify: dracut regenerate all
 
 - name: Generate Dracut RSA host key
-  command: ssh-keygen -q -t rsa -f /etc/ssh/dracut_ssh_host_rsa_key -C "" -N ""
-  args:
-    creates: /etc/ssh/dracut_ssh_host_rsa_key
+  community.crypto.openssh_keypair:
+    path: /etc/ssh/dracut_ssh_host_rsa_key
+    type: rsa
+    size: 2048
+    comment: "dracut@{{ inventory_hostname }}"
   notify: dracut regenerate all
 
-- name: Ensure wired network config exists
-  copy:
-    dest: /etc/systemd/network/wired.network
-    owner: root
-    group: root
-    mode: 0644
-    force: false
-    content: |
-      [Match]
-      Name=e*
-
-      [Network]
-      DHCP=ipv4
-  when: dracut_ssh_networkd
-  notify: dracut regenerate all
-
-- name: Enable Dracut network
-  copy:
+- name: Copy Dracut networkd config
+  ansible.builtin.template:
+    src: 90-networkd.conf.j2
     dest: /etc/dracut.conf.d/90-networkd.conf
     owner: root
     group: root
     mode: 0644
-    content: |
-      install_items+=" /etc/systemd/network/wired.network "
-      add_dracutmodules+=" systemd-networkd "
   when: dracut_ssh_networkd
   notify: dracut regenerate all
 
-- name: Enable Dracut network
-  copy:
+- name: Copy Dracut network-manager
+  ansible.builtin.copy:
     dest: /etc/dracut.conf.d/90-network.conf
     owner: root
     group: root

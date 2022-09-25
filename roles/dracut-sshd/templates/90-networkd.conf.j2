@@ -1,0 +1,3 @@
+install_items+=" {{ dracut_ssh_networkd_conf | map('regex_replace', '^(.*)$', '/etc/systemd/network/\\1') | join(' ') }} "
+add_dracutmodules+=" systemd-networkd "
+

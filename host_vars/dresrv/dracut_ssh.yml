@@ -1,5 +1,5 @@
 ---
 dracut_ssh_networkd: false
-dracut_ssh_authorized_keys: |
-  no-port-forwarding,no-agent-forwarding,no-X11-forwarding,command="/usr/bin/systemd-tty-ask-password-agent --watch" {{ hostvars.desktop.ssh_keys.andrei }}
-  no-port-forwarding,no-agent-forwarding,no-X11-forwarding,command="/usr/bin/systemd-tty-ask-password-agent --watch" {{ hostvars.laptop.ssh_keys.andrei }}
+dracut_ssh_authorized_keys:
+  - "{{ hostvars.desktop.ssh_keys.andrei }}"
+  - "{{ hostvars.laptop.ssh_keys.andrei }}"
