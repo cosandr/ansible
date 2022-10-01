@@ -35,3 +35,6 @@
   roles:
     - role: systemd_networkd
       tags: ["networkd"]
+
+    - role: dracut-sshd
+      tags: ["dracut-sshd"]
