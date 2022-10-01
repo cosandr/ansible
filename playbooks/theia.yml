@@ -1,6 +1,37 @@
 ---
 
 - hosts: theia
+  pre_tasks:
+    - name: Install packages [RHEL]
+      ansible.builtin.dnf:
+        name: "{{ dnf_rhel_packages }}"
+        state: present
+      when:
+        - ansible_os_family == 'RedHat'
+        - ansible_distribution != 'Fedora'
+      tags: ["install"]
+
+    - name: Configure cpupower
+      ansible.builtin.lineinfile:
+        path: /etc/sysconfig/cpupower
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - regexp: '^CPUPOWER_START_OPTS='
+          line: 'CPUPOWER_START_OPTS="frequency-set -g {{ cpupower_start_governor }}"'
+        - regexp: '^CPUPOWER_STOP_OPTS='
+          line: 'CPUPOWER_STOP_OPTS="frequency-set -g {{ cpupower_stop_governor }}"'
+      loop_control:
+        label: "{{ item.regexp }}"
+      tags: ["cpupower"]
+
+    - name: Enable and start cpupower service
+      ansible.builtin.systemd:
+        name: cpupower.service
+        enabled: true
+        state: started
+      tags: ["cpupower"]
+
   roles:
     - role: systemd_networkd
       tags: ["networkd"]

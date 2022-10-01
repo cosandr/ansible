@@ -1,0 +1,51 @@
+---
+
+dnf_rhel_packages:
+  - ansible
+  - ansible-lint
+  - autoconf
+  - automake
+  - bash-completion
+  - binutils
+  - efibootmgr
+  - ethtool
+  - file
+  - findutils
+  - firewalld
+  - gawk
+  - gcc
+  - gettext
+  - git
+  - gzip
+  - htop
+  - iotop
+  - ipmitool
+  - jq
+  - libtool
+  - lm_sensors
+  - make
+  - man-db
+  - ncdu
+  - net-tools
+  - netcat
+  - ntfs-3g
+  - openssh
+  - p7zip
+  - patch
+  - pkgconf
+  - powertop
+  - python3-aiohttp
+  - python3-llfuse  # borg mount
+  - python3-netaddr
+  - python3-websockets
+  - ShellCheck
+  - smartmontools
+  - sshfs
+  - sshpass
+  - sudo
+  - telnet
+  - tmux
+  - usbutils
+  - vim
+  - which
+  - zsh
