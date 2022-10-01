@@ -38,3 +38,6 @@
 
     - role: dracut-sshd
       tags: ["dracut-sshd"]
+
+    - role: clevis
+      tags: ["clevis"]
