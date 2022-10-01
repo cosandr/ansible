@@ -1,0 +1,4 @@
+---
+
+- name: Dracut rebuild
+  ansible.builtin.command: dracut -f

@@ -1,0 +1,9 @@
+---
+
+clevis_zfs: false
+clevis_config:
+  pcr_bank: "sha256"
+  pcr_ids: "0,7"
+clevis_keyfile_content: ""
+clevis_keyfile: /etc/clevis-rpool.key
+clevis_dracut_include_keyfile: "{{ clevis_keyfile_content | default(false) }}"
