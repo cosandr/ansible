@@ -1,0 +1,215 @@
+---
+
+# https://wiki.debian.org/Bonding#Configuring_the_bond_device
+# https://serverfault.com/questions/1106863/bridge-on-a-bonded-interface-with-systemd-networkd
+# https://www.reddit.com/r/linux/comments/30hk8e/creating_a_bridge_for_virtual_machines_using/
+
+networkd_netdevs:
+  - bond0: |
+      [NetDev]
+      Name=bond0
+      Description=Trunk bond interface
+      Kind=bond
+      MTUBytes=9000
+
+      [Bond]
+      Mode=802.3ad
+      TransmitHashPolicy=layer2+3
+      MIIMonitorSec=1s
+      LACPTransmitRate=fast
+
+  - bond0.2: |
+      [NetDev]
+      Name=bond0.2
+      Kind=vlan
+      MTUBytes=9000
+
+      [VLAN]
+      Id=2
+
+  - bond0.10: |
+      [NetDev]
+      Name=bond0.10
+      Kind=vlan
+      MTUBytes=1500
+
+      [VLAN]
+      Id=10
+
+  - bond0.20: |
+      [NetDev]
+      Name=bond0.20
+      Kind=vlan
+      MTUBytes=1500
+
+      [VLAN]
+      Id=20
+
+  - bond0.50: |
+      [NetDev]
+      Name=bond0.50
+      Kind=vlan
+      MTUBytes=1500
+
+      [VLAN]
+      Id=50
+
+  - bond0.100: |
+      [NetDev]
+      Name=bond0.100
+      Kind=vlan
+      MTUBytes=1500
+
+      [VLAN]
+      Id=100
+
+  - SAN: |
+      [NetDev]
+      Name=SAN
+      Kind=bridge
+      MTUBytes=9000
+
+  - VM: |
+      [NetDev]
+      Name=VM
+      Kind=bridge
+      MTUBytes=1500
+
+  - NOINET: |
+      [NetDev]
+      Name=NOINET
+      Kind=bridge
+      MTUBytes=1500
+
+  - GENERAL: |
+      [NetDev]
+      Name=GENERAL
+      Kind=bridge
+      MTUBytes=1500
+
+  - MGMT: |
+      [NetDev]
+      Name=MGMT
+      Kind=bridge
+      MTUBytes=1500
+
+networkd_config:
+  - bond0: |
+      [Match]
+      Name=bond0
+
+      [Network]
+      VLAN=bond0.2
+      VLAN=bond0.10
+      VLAN=bond0.20
+      VLAN=bond0.50
+      VLAN=bond0.100
+      LinkLocalAddressing=no
+      IPv6AcceptRA=no
+
+  - bond0.2: |
+      [Match]
+      Name=bond0.2
+
+      [Network]
+      Bridge=SAN
+
+  - bond0.10: |
+      [Match]
+      Name=bond0.10
+
+      [Network]
+      Bridge=VM
+
+  - bond0.20: |
+      [Match]
+      Name=bond0.20
+
+      [Network]
+      Bridge=NOINET
+
+  - bond0.50: |
+      [Match]
+      Name=bond0.50
+
+      [Network]
+      Bridge=GENERAL
+
+  - bond0.100: |
+      [Match]
+      Name=bond0.100
+
+      [Network]
+      Bridge=MGMT
+
+  - enp1s0f0: |
+      [Match]
+      Name=enp1s0f0
+
+      [Network]
+      Description=Trunk bond interface 1
+      Bond=bond0
+
+  - enp1s0f1: |
+      [Match]
+      Name=enp1s0f1
+
+      [Network]
+      Description=Trunk bond interface 2
+      Bond=bond0
+
+  - SAN: |
+      [Match]
+      Name=SAN
+
+      [Network]
+      Address=10.0.2.252/24
+
+      [Route]
+      Scope=link
+
+  - VM: |
+      [Match]
+      Name=VM
+
+      [Network]
+      Address={{ home_net.vm.cidr | ansible.utils.ipaddr('252') }}
+
+      [Route]
+      Scope=link
+
+  - NOINET: |
+      [Match]
+      Name=NOINET
+
+      [Network]
+      Address=10.0.20.252/24
+
+      [Route]
+      Scope=link
+
+  - GENERAL: |
+      [Match]
+      Name=GENERAL
+
+      [Network]
+      Address={{ home_net.general.cidr | ansible.utils.ipaddr('252') }}
+      DNS={{ home_net.general.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
+      DNS=1.1.1.1
+      DNS=8.8.8.8
+
+      [Route]
+      Gateway={{ home_net.general.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
+      Metric=512
+      Scope=global
+
+  - MGMT: |
+      [Match]
+      Name=MGMT
+
+      [Network]
+      Address={{ home_net.mgmt.cidr | ansible.utils.ipaddr('252') }}
+
+      [Route]
+      Gateway={{ home_net.mgmt.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
+      Metric=1024
