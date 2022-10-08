@@ -43,3 +43,6 @@
 [submodule "roles/pgbackrest"]
 	path = roles/pgbackrest
 	url = git@github.com:cosandr/ansible-role-pgbackrest.git
+[submodule "roles/libvirt_vm"]
+	path = roles/libvirt_vm
+	url = git@github.com:cosandr/ansible-role-libvirt-vm.git

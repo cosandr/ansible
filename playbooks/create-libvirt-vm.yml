@@ -1,0 +1,14 @@
+---
+
+- name: Create KVM VMs
+  hosts: libvirt
+  gather_facts: false
+  pre_tasks:
+    - name: Gather host facts
+      delegate_to: "{{ vm_host }}"
+      ansible.builtin.setup:
+      tags: ["always"]
+
+  roles:
+    - role: libvirt_vm
+      delegate_to: "{{ vm_host }}"

@@ -32,6 +32,26 @@
         state: started
       tags: ["cpupower"]
 
+  tasks:
+    - name: Install libvirt KVM
+      ansible.builtin.dnf:
+        name:
+          - qemu-kvm
+          - libvirt
+          - virt-manager
+          - virt-install
+          - guestfs-tools
+          - python3-libvirt
+        state: present
+      tags: ["libvirt", "install"]
+
+    - name: Enable and start libvirtd
+      ansible.builtin.systemd:
+        name: libvirtd.service
+        state: started
+        enabled: true
+      tags: ["libvirt"]
+
   roles:
     - role: systemd_networkd
       tags: ["networkd"]
@@ -44,3 +64,6 @@
 
     - role: chezmoi
       tags: ["chezmoi"]
+
+    - role: libvirt_vm
+      tags: ["vms"]
