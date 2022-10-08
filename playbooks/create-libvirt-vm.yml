@@ -9,6 +9,22 @@
       ansible.builtin.setup:
       tags: ["always"]
 
+    - name: Add extra disks
+      ansible.builtin.set_fact:
+        vm_extra_disks: "{{ vm_extra_disks + [tmp_dict] }}"
+      loop: "{{ vm_data_disks }}"
+      loop_control:
+        label: "{{ tmp_dict.name }}"
+        index_var: index
+      vars:
+        disk_name: "data{{ '%02d' % (index + 1) }}"
+        tmp_dict:
+          name: "{{ inventory_hostname }}-{{ disk_name }}.qcow2"
+          device: "disk"
+          capacity: "{{ item }}"
+          serial: "{{ disk_name }}"
+      tags: ["always"]
+
   roles:
     - role: libvirt_vm
       delegate_to: "{{ vm_host }}"

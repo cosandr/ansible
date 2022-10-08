@@ -1,6 +1,25 @@
 ---
 
 libvirt_vm_engine: "kvm"
+
+vm_host: "theia"
+vm_cpus: 4
+vm_mem: 4096
+vm_template: "rocky9_packer.qcow2"
+vm_os_id: "http://rockylinux.org/rocky/9"
+vm_extra_disks: []
+
+vm_data_disks: []
+# vm_data_disks: ["200G", "150G"]
+
+vm_root_size: "20G"
+vm_root_disk:
+  name: '{{ inventory_hostname }}-root01.qcow2'
+  device: 'disk'
+  capacity: "{{ vm_root_size }}"
+  clone_image: "{{ vm_template }}"
+  serial: "root01"
+
 vm_default_nic:
   type: bridge
   source:
@@ -12,3 +31,16 @@ vm_default_nic:
     - "{{ home_net.vm.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
     - 1.1.1.1
     - 8.8.8.8
+
+vm_default_definition:
+  state: present
+  name: "{{ inventory_hostname }}"
+  domain: "{{ vm_default_nic.domain }}"
+  memory_mb: "{{ vm_mem }}"
+  vcpus: "{{ vm_cpus }}"
+  boot_firmware: efi
+  os_id: "{{ vm_os_id }}"
+  volumes: "{{ [vm_root_disk] + vm_extra_disks }}"
+  interfaces: ["{{ vm_default_nic }}"]
+
+libvirt_vms: ["{{ vm_default_definition }}"]

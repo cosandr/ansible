@@ -2,23 +2,5 @@
 
 vm_host: "theia"
 
-libvirt_vms:
-  - state: present
-    name: 'minio'
-    domain: "{{ vm_default_nic.domain }}"
-    memory_mb: 4096
-    vcpus: 4
-    boot_firmware: efi
-    os_id: "http://rockylinux.org/rocky/9"
-    volumes:
-      - name: '{{ inventory_hostname }}-root.qcow2'
-        device: 'disk'
-        capacity: '20G'
-        clone_image: 'rocky9_packer.qcow2'
-
-      # - name: '{{ inventory_hostname }}-data01.qcow2'
-      #   device: 'disk'
-      #   capacity: '200G'
-
-    interfaces:
-      - "{{ vm_default_nic }}"
+vm_data_disks:
+  - "200G"
