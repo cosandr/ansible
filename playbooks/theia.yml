@@ -41,3 +41,6 @@
 
     - role: clevis
       tags: ["clevis"]
+
+    - role: chezmoi
+      tags: ["chezmoi"]
