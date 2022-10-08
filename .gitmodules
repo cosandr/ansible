@@ -46,3 +46,6 @@
 [submodule "roles/libvirt_vm"]
 	path = roles/libvirt_vm
 	url = git@github.com:cosandr/ansible-role-libvirt-vm.git
+[submodule "roles/minio"]
+	path = roles/minio
+	url = https://github.com/minio/ansible-minio.git

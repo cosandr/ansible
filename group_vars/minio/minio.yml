@@ -1,0 +1,32 @@
+---
+
+minio_client_release: "RELEASE.2022-10-06T01-20-06Z"
+minio_server_release: "RELEASE.2022-10-05T14-58-27Z"
+
+minio_server_port: 9091
+minio_console_port: 9001
+
+# Used by minio role to check that the UI is running
+minio_hostname: "{{ inventory_hostname }}"
+
+minio_root_username: "{{ vault_minio_root_username }}"
+minio_root_password: "{{ vault_minio_root_password }}"
+
+minio_install_server: true
+minio_install_client: true
+
+minio_client_config:
+  version: "10"
+  aliases:
+    local:
+      url: "http://localhost:{{ minio_server_port }}"
+      accessKey: "{{ minio_root_username }}"
+      secretKey: "{{ minio_root_password }}"
+      api: "S3v4"
+      path: "auto"
+    truenas:
+      url: "{{ s3_url }}"
+      accessKey: "{{ hostvars['truenas'].s3_admin_access_key }}"
+      secretKey: "{{ hostvars['truenas'].s3_admin_secret_key }}"
+      api: "S3v4"
+      path: "auto"

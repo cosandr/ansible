@@ -1,0 +1,9 @@
+---
+
+provisioned_disks:
+  - dev: "/dev/disk/by-id/virtio-data01"
+    vols:
+      - name: minio
+        path: "/var/lib/minio"
+        shrink: false
+        size: "100%FREE"

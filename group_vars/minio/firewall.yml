@@ -1,0 +1,32 @@
+---
+
+firewalld_zones:
+  - name: internal
+    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+
+  - name: internal
+    sources: "{{ wg_net | dict2items | json_query('[].value.cidr') }}"
+
+firewalld_services:
+  - name: cockpit
+    zone: public
+    state: absent
+
+  - name: cockpit
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: public
+    state: absent
+
+firewall_rules:
+  - port: "{{ minio_server_port }}"
+    zone: internal
+
+  - port: "{{ minio_console_port }}"
+    zone: internal

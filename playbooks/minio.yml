@@ -1,0 +1,29 @@
+---
+
+- name: Provision minio
+  hosts: minio
+  roles:
+    - role: setup_disks
+      tags: ["disk"]
+
+    - role: firewall_config
+      tags: ["firewall"]
+
+    - role: sshd
+      tags: ["sshd"]
+
+    - role: cosandr.dnf_automatic
+      tags: ["dnf_automatic"]
+
+    - role: minio
+      tags: ["minio"]
+
+  post_tasks:
+    - name: Write client config
+      ansible.builtin.copy:
+        content: "{{ minio_client_config | to_nice_json(indent=2) }}"
+        dest: "/root/.mc/config.json"
+        owner: root
+        group: root
+        mode: 0600
+      tags: ["minio", "config"]
