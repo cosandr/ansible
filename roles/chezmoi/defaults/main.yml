@@ -1,7 +1,8 @@
 ---
 
-chezmoi_version: "2.4.0"
+chezmoi_version: latest
 chezmoi_user: "{{ my_user | default('andrei') }}"
 chezmoi_user_override: "/home/{{ chezmoi_user }}/.config/override"
 
 chezmoi_overwrite: false
+chezmoi_overrides: {}
