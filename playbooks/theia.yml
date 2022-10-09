@@ -86,6 +86,9 @@
     - role: chezmoi
       tags: ["chezmoi"]
 
+    - role: sanoid
+      tags: ["sanoid"]
+
     - role: libvirt_vm
       tags: ["vms"]
 
