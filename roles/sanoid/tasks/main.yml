@@ -2,7 +2,7 @@
 # Variable setup.
 - name: Include OS-specific variables.
   include_vars: "{{ ansible_os_family }}.yml"
-  tags: ["sanoid", "syncoid"]
+  tags: ["install"]
 
 - name: Fail if unconfigured
   fail:
@@ -10,11 +10,14 @@
   when:
     - sanoid_backup_modules is not defined or sanoid_backup_modules | length == 0
 
-- import_tasks: "download.yml"
-  tags: ["sanoid", "syncoid"]
+- name: Include download tasks
+  ansible.builtin.include_tasks: "download.yml"
+  tags: ["install"]
 
-- import_tasks: "install.yml"
-  tags: ["sanoid", "syncoid"]
+- name: Include install tasks
+  ansible.builtin.include_tasks: "install.yml"
+  tags: ["install"]
 
-- import_tasks: "configure.yml"
-  tags: ["sanoid", "syncoid"]
+- name: Include configure tasks
+  ansible.builtin.include_tasks: "configure.yml"
+  tags: ["configure"]

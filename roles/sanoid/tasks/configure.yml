@@ -7,7 +7,7 @@
     group: root
     mode: 0644
   loop: "{{ lookup('fileglob', 'templates/*.service.j2', wantlist=True) }}"
-  notify: reload systemd
+  notify: Reload systemd
 
 - name: Install systemd timers
   template:
@@ -17,7 +17,7 @@
     group: root
     mode: 0644
   loop: "{{ lookup('fileglob', 'templates/*.timer.j2', wantlist=True) }}"
-  notify: reload systemd
+  notify: Reload systemd
 
 - name: Install config file
   template:
@@ -27,16 +27,20 @@
     group: root
     mode: 0644
 
-- block:
-  - name: "Enable sanoid-prune.service and sanoid.timer"
-    service:
-      name: "{{ item }}"
-      enabled: yes
-    with_items: ["sanoid-prune.service", "sanoid.timer"]
+- name: Enable units
+  block:
+    - name: "Enable sanoid-prune.service and sanoid.timer"
+      service:
+        name: "{{ item }}"
+        enabled: true
+      with_items: ["sanoid-prune.service", "sanoid.timer"]
 
-  - name: "Start sanoid.timer"
-    service:
-      name: "sanoid.timer"
-      state: "started"
-  
+    - name: Flush handlers
+      ansible.builtin.meta: flush_handlers
+
+    - name: "Start sanoid.timer"
+      service:
+        name: "sanoid.timer"
+        state: "started"
+
   when: sanoid_enable_units
