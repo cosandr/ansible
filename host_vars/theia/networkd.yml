@@ -163,7 +163,7 @@ networkd_config:
       Name=SAN
 
       [Network]
-      Address=10.0.2.252/24
+      Address=10.0.2.2/24
 
       [Route]
       Scope=link
@@ -173,7 +173,7 @@ networkd_config:
       Name=VM
 
       [Network]
-      Address={{ home_net.vm.cidr | ansible.utils.ipaddr('252') }}
+      Address={{ home_net.vm.cidr | ansible.utils.ipaddr('2') }}
 
       [Route]
       Scope=link
@@ -183,7 +183,7 @@ networkd_config:
       Name=NOINET
 
       [Network]
-      Address=10.0.20.252/24
+      Address=10.0.20.2/24
 
       [Route]
       Scope=link
@@ -193,7 +193,7 @@ networkd_config:
       Name=GENERAL
 
       [Network]
-      Address={{ home_net.general.cidr | ansible.utils.ipaddr('252') }}
+      Address={{ home_net.general.cidr | ansible.utils.ipaddr('2') }}
       DNS={{ home_net.general.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
       DNS=1.1.1.1
       DNS=8.8.8.8
@@ -208,7 +208,7 @@ networkd_config:
       Name=MGMT
 
       [Network]
-      Address={{ home_net.mgmt.cidr | ansible.utils.ipaddr('252') }}
+      Address={{ home_net.mgmt.cidr | ansible.utils.ipaddr('2') }}
 
       [Route]
       Gateway={{ home_net.mgmt.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}

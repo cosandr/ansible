@@ -35,34 +35,34 @@ nfs_shares:
   # TODO: Generate this from inventory?
   - path: /mnt/tank
     options: "rw,no_root_squash"
-    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+    sources: "{{ __nfs_all_dataset_hosts | flatten }}"
   - path: /mnt/tank/archive
     options: "rw,no_root_squash"
-    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+    sources: "{{ __nfs_all_dataset_hosts | flatten }}"
   - path: /mnt/tank/backup
     options: "rw,no_root_squash"
-    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+    sources: "{{ __nfs_all_dataset_hosts | flatten }}"
   - path: /mnt/tank/downloads
     options: "rw,no_root_squash"
-    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+    sources: "{{ __nfs_all_dataset_hosts | flatten }}"
   - path: /mnt/tank/games
     options: "rw,no_root_squash"
-    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+    sources: "{{ __nfs_all_dataset_hosts | flatten }}"
   - path: /mnt/tank/media
     options: "rw,no_root_squash"
-    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+    sources: "{{ __nfs_all_dataset_hosts | flatten }}"
   - path: /mnt/tank/media/photo
     options: "rw,no_root_squash"
-    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+    sources: "{{ __nfs_all_dataset_hosts | flatten }}"
   - path: /mnt/tank/media/motion
     options: "rw,no_root_squash"
-    soures: "{{ (__nfs_all_dataset_hosts | flatten) + [hostvars['drepi'].ansible_host] }}"
+    sources: "{{ (__nfs_all_dataset_hosts | flatten) + [hostvars['drepi'].ansible_host] }}"
   - path: /mnt/tank/yes
     options: "rw,no_root_squash"
-    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+    sources: "{{ __nfs_all_dataset_hosts | flatten }}"
   - path: /mnt/tank/borg
     options: "rw,no_root_squash"
-    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+    sources: "{{ __nfs_all_dataset_hosts | flatten }}"
   # Plex shares
   - path: /mnt/tank/media
     options: "ro,no_root_squash"

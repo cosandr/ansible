@@ -52,12 +52,33 @@
         enabled: true
       tags: ["libvirt"]
 
+    - name: Configure NFS shares
+      ansible.builtin.blockinfile:
+        path: /etc/exports
+        content: |
+          {% for s in nfs_shares %}
+          {{ s.path }}{% for h in s.sources %} {{ h }}({{ s.options }}){% endfor %}
+
+          {% endfor %}
+      notify: Reload NFS shares
+      tags: ["nfs"]
+
+    - name: Enable and start NFS server
+      ansible.builtin.systemd:
+        name: nfs-server.service
+        state: started
+        enabled: true
+      tags: ["nfs"]
+
   roles:
     - role: systemd_networkd
       tags: ["networkd"]
 
     - role: dracut-sshd
       tags: ["dracut-sshd"]
+
+    - role: firewall_config
+      tags: ["firewall"]
 
     - role: clevis
       tags: ["clevis"]
@@ -70,3 +91,7 @@
 
     - role: node_exporter
       tags: ["node_exporter"]
+
+  handlers:
+    - name: Reload NFS shares
+      ansible.builtin.command: exportfs -ar
