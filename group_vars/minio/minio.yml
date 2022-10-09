@@ -3,7 +3,9 @@
 minio_client_release: "RELEASE.2022-10-06T01-20-06Z"
 minio_server_release: "RELEASE.2022-10-05T14-58-27Z"
 
+minio_server_ip: 127.0.0.1
 minio_server_port: 9091
+minio_console_ip: 127.0.0.1
 minio_console_port: 9001
 
 # Used by minio role to check that the UI is running

@@ -24,9 +24,10 @@ firewalld_services:
     zone: public
     state: absent
 
-firewall_rules:
-  - port: "{{ minio_server_port }}"
+  - name: http
     zone: internal
 
-  - port: "{{ minio_console_port }}"
+  - name: https
     zone: internal
+
+firewall_rules: []

@@ -1,0 +1,24 @@
+---
+
+nginx_certs_dir: "/etc/nginx/certs"
+
+nginx_upstreams:
+  - name: minio-console
+    servers: ["localhost:{{ minio_console_port }}"]
+    keepalive: 16
+  - name: minio-api
+    servers: ["localhost:{{ minio_server_port }}"]
+    keepalive: 16
+
+nginx_vhosts:
+  - filename: default_reject.conf
+    server_name: default_reject
+    template: "{{ inventory_dir }}/files/webgw/nginx/default_reject.conf.j2"
+
+  - filename: console.conf
+    server_name: console
+    template: "{{ inventory_dir }}/files/minio/console.conf.j2"
+
+  - filename: server.conf
+    server_name: server
+    template: "{{ inventory_dir }}/files/minio/server.conf.j2"

@@ -18,6 +18,12 @@
     - role: minio
       tags: ["minio"]
 
+    - role: nginx_pre
+      tags: ["nginx"]
+
+    - role: nginx
+      tags: ["nginx"]
+
   post_tasks:
     - name: Write client config
       ansible.builtin.copy:
