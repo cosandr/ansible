@@ -50,85 +50,6 @@
       tags: ["install"]
       when: ansible_os_family == 'RedHat'
 
-    - name: Ensure nginx directories exist
-      file:
-        path: "{{ item }}"
-        state: directory
-        owner: root
-        group: root
-        mode: 0755
-      loop:
-        - "{{ nginx_dhparam | dirname }}"
-        - "{{ nginx_sites_logs }}"
-      tags: ["nginx"]
-
-    - name: Download dhparam
-      get_url:
-        url: https://ssl-config.mozilla.org/ffdhe2048.txt
-        dest: "{{ nginx_dhparam }}"
-        mode: 0644
-        owner: root
-        group: root
-      tags: ["nginx"]
-
-    - name: Install nginx repo
-      copy:
-        dest: /etc/yum.repos.d/nginx.repo
-        content: |
-          [nginx-stable]
-          name=nginx stable repo
-          baseurl=http://nginx.org/packages/centos/$releasever/$basearch/
-          gpgcheck=1
-          enabled=1
-          gpgkey=https://nginx.org/keys/nginx_signing.key
-          module_hotfixes=true
-
-          [nginx-mainline]
-          name=nginx mainline repo
-          baseurl=http://nginx.org/packages/mainline/centos/$releasever/$basearch/
-          gpgcheck=1
-          enabled=0
-          gpgkey=https://nginx.org/keys/nginx_signing.key
-          module_hotfixes=true
-        owner: root
-        group: root
-        mode: 0644
-      tags: ["nginx"]
-
-    - name: Allow nginx proxy
-      seboolean:
-        name: httpd_can_network_connect
-        state: true
-        persistent: true
-      when:
-        - ansible_os_family == 'RedHat'
-        - ansible_selinux.status == "enabled"
-      tags: ["nginx"]
-
-    - name: Add logrotate config for sites
-      copy:
-        content: |
-          {{ nginx_sites_logs }}/*.log {
-                  daily
-                  missingok
-                  rotate 7
-                  compress
-                  delaycompress
-                  notifempty
-                  create 640 nginx adm
-                  sharedscripts
-                  postrotate
-                          if [ -f /var/run/nginx.pid ]; then
-                                  kill -USR1 `cat /var/run/nginx.pid`
-                          fi
-                  endscript
-          }
-        dest: /etc/logrotate.d/nginx_sites
-        owner: root
-        group: root
-        mode: 0644
-      tags: ["nginx", "logrotate"]
-
     - name: Set fail2ban facts
       set_fact:
         fail2ban_ignoreip: "{{ (__f2b_extra_ignore + hostvars['laptop'].wireguard_mt_allowed_ips) | flatten }}"
@@ -179,6 +100,9 @@
         - certbot_domains_cloudflare is defined
         - certbot_domains_cloudflare | length > 0
       tags: ["certbot", "cloudflare"]
+
+    - role: nginx_pre
+      tags: ["nginx"]
 
     - role: nginx
       tags: ["nginx"]
