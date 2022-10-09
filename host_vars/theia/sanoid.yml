@@ -1,4 +1,21 @@
 ---
+
+syncoid_timers:
+  - name: rpool
+    src: rpool/redhat
+    dest: tank/backup/theia/rpool
+    oncalendar: Daily
+    options:
+      - "--recursive"
+      - "--no-sync-snap"
+
+  - name: vm
+    src: ssd/vm
+    dest: tank/backup/truenas/ssd/vm
+    oncalendar: Weekly
+    options:
+      - "--no-sync-snap"
+
 sanoid_timer_minutes: 30
 
 sanoid_backup_modules:
@@ -56,6 +73,10 @@ sanoid_backup_modules:
     autoprune: true
 
   "tank/backup/truenas":
+    recursive: true
+    use_template: "ignore"
+
+  "tank/backup/theia":
     recursive: true
     use_template: "ignore"
 
