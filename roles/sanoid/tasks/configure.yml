@@ -1,46 +1,96 @@
 ---
 - name: Install systemd services
-  template:
+  ansible.builtin.template:
     src: "{{ item }}"
     dest: "{{ sanoid_unit_dir }}/{{ item | basename | regex_replace('(.*)\\.j2$', '\\1') }}"
     owner: root
     group: root
     mode: 0644
-  loop: "{{ lookup('fileglob', 'templates/*.service.j2', wantlist=True) }}"
+  loop:
+    - sanoid-prune.service.j2
+    - sanoid.service.j2
   notify: Reload systemd
 
-- name: Install systemd timers
-  template:
-    src: "{{ item }}"
-    dest: "{{ sanoid_unit_dir }}/{{ item | basename | regex_replace('(.*)\\.j2$', '\\1') }}"
+- name: Install sanoid timer
+  ansible.builtin.template:
+    src: "sanoid.timer.j2"
+    dest: "{{ sanoid_unit_dir }}/sanoid.timer"
     owner: root
     group: root
     mode: 0644
-  loop: "{{ lookup('fileglob', 'templates/*.timer.j2', wantlist=True) }}"
   notify: Reload systemd
 
 - name: Install config file
-  template:
+  ansible.builtin.template:
     src: "templates/sanoid.conf.j2"
     dest: "{{ sanoid_config_dir }}/sanoid.conf"
     owner: root
     group: root
     mode: 0644
 
-- name: Enable units
-  block:
-    - name: "Enable sanoid-prune.service and sanoid.timer"
-      service:
-        name: "{{ item }}"
-        enabled: true
-      with_items: ["sanoid-prune.service", "sanoid.timer"]
+- name: Register previously copied configuration files
+  ansible.builtin.find:
+    paths: "/etc/systemd/system"
+    patterns:
+      - "syncoid-*.service"
+      - "syncoid-*.timer"
+  register: _timers_present
+  when: syncoid_provisioning_synced
 
+- name: Copy syncoid services and timers
+  ansible.builtin.template:
+    src: "syncoid.{{ item.0 }}.j2"
+    dest: "/etc/systemd/system/{{ svc_name }}"
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    svc_name: "syncoid-{{ item.1.name }}.{{ item.0 }}"
+  notify: Reload systemd
+  register: _timers_copied
+  with_nested:
+    - ["service", "timer"]
+    - "{{ syncoid_timers }}"
+  loop_control:
+    label: "{{ svc_name }}"
+
+- name: Set list facts
+  ansible.builtin.set_fact:
+    _timers_present_list: "{{ _timers_present | json_query('files[*].path') | default([]) }}"
+    _timers_copied_list: "{{ _timers_copied.results | json_query('[*].dest') | default([]) }}"
+  when: syncoid_provisioning_synced
+
+- name: Remove configs not present on deployer machine (synchronize)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ _timers_present_list | difference(_timers_copied_list) }}"
+  when: syncoid_provisioning_synced
+
+- name: Enable units
+  when: sanoid_enable_units
+  block:
     - name: Flush handlers
       ansible.builtin.meta: flush_handlers
 
-    - name: "Start sanoid.timer"
-      service:
-        name: "sanoid.timer"
-        state: "started"
+    - name: Enable sanoid-prune
+      ansible.builtin.systemd:
+        name: sanoid-prune.service
+        enabled: true
 
-  when: sanoid_enable_units
+    - name: Enable and start syncoid timers
+      ansible.builtin.systemd:
+        name: "{{ svc_name }}"
+        state: started
+        enabled: true
+      vars:
+        svc_name: "syncoid-{{ item.name }}.timer"
+      loop: "{{ syncoid_timers }}"
+      loop_control:
+        label: "{{ svc_name }}"
+
+    - name: Enable and start sanoid.timer
+      ansible.builtin.systemd:
+        name: sanoid.timer
+        state: started
+        enabled: true

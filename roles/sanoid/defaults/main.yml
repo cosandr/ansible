@@ -48,3 +48,12 @@ sanoid_backup_templates: {}
 #   yearly = 0
 #   autosnap = yes
 #   autoprune = yes
+
+syncoid_provisioning_synced: true
+syncoid_timers: []
+  # - name: vm
+  #   src: ssd/vm
+  #   dest: tank/backup/vm
+  #   oncalendar: Weekly
+  #   options:
+  #     - "--no-sync-snap"

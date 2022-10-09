@@ -1,0 +1,16 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Sync {{ item.1.name }}
+Requires=zfs.target
+After=zfs.target
+
+[Service]
+ExecStart={{ sanoid_bin_dir }}/syncoid \
+    --quiet \
+{% for o in item.1.options %}
+    {{ o }} \
+{% endfor %}
+    "{{ item.1.src }}" "{{ item.1.dest }}"
+
+[Install]
+WantedBy=multi-user.target

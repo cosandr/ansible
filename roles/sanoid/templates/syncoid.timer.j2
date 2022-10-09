@@ -1,0 +1,10 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Sync {{ item.1.name }} timer
+
+[Timer]
+OnCalendar={{ item.1.oncalendar }}
+Persistent=true
+
+[Install]
+WantedBy=timers.target
