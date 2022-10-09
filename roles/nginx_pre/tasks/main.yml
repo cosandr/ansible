@@ -12,6 +12,16 @@
     - "{{ nginx_sites_logs }}"
   tags: ["nginx"]
 
+- name: Create nginx certs dir
+  ansible.builtin.file:
+    path: "{{ nginx_certs_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+  when: nginx_certs_dir
+  tags: ["nginx"]
+
 - name: Download dhparam
   ansible.builtin.get_url:
     url: https://ssl-config.mozilla.org/ffdhe2048.txt
