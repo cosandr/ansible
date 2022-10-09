@@ -1,0 +1,75 @@
+---
+
+__esxi_hosts: "{{ groups['esxi_hosts'] | map('extract', hostvars, 'local_ips') | map(attribute='san') | list }}"
+
+__nfs_all_dataset_hosts:
+  - "{{ groups['backup'] | map('extract', hostvars, 'ansible_host') | list }}"
+  - "{{ groups['desktops'] | map('extract', hostvars, 'ansible_host') | list }}"
+  - "{{ hostvars['dresrv'].ansible_host }}"
+
+nfs_shares:
+  # ESXi shares
+  - path: /mnt/tank/archive/disk-images
+    options: "rw,no_root_squash"
+    sources: "{{ __esxi_hosts }}"
+  - path: /mnt/ssd/vm
+    options: "rw,no_root_squash"
+    sources: "{{ __esxi_hosts }}"
+  - path: /mnt/tank/esxi
+    options: "rw,no_root_squash"
+    sources: "{{ __esxi_hosts }}"
+  # Backup shares
+  - path: /mnt/tank/backup/pgsql
+    options: "rw,no_root_squash"
+    sources: "{{ groups['pg'] | map('extract', hostvars, 'ansible_host') | list }}"
+  - path: /mnt/tank/backup/vcenter
+    options: "rw,no_root_squash"
+    sources: ["10.0.100.10"]
+  - path: /mnt/tank/backup/gitlab
+    options: "rw,no_root_squash"
+    sources: "{{ groups['gitlab'] | map('extract', hostvars, 'ansible_host') | list }}"
+  - path: /mnt/tank/backup/pgbackrest
+    options: "rw,no_root_squash"
+    sources: "{{ groups['pgbackrest'] | map('extract', hostvars, 'ansible_host') | list }}"
+  # All dataset shares
+  # TODO: Generate this from inventory?
+  - path: /mnt/tank
+    options: "rw,no_root_squash"
+    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+  - path: /mnt/tank/archive
+    options: "rw,no_root_squash"
+    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+  - path: /mnt/tank/backup
+    options: "rw,no_root_squash"
+    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+  - path: /mnt/tank/downloads
+    options: "rw,no_root_squash"
+    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+  - path: /mnt/tank/games
+    options: "rw,no_root_squash"
+    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+  - path: /mnt/tank/media
+    options: "rw,no_root_squash"
+    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+  - path: /mnt/tank/media/photo
+    options: "rw,no_root_squash"
+    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+  - path: /mnt/tank/media/motion
+    options: "rw,no_root_squash"
+    soures: "{{ (__nfs_all_dataset_hosts | flatten) + [hostvars['drepi'].ansible_host] }}"
+  - path: /mnt/tank/yes
+    options: "rw,no_root_squash"
+    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+  - path: /mnt/tank/borg
+    options: "rw,no_root_squash"
+    soures: "{{ __nfs_all_dataset_hosts | flatten }}"
+  # Plex shares
+  - path: /mnt/tank/media
+    options: "ro,no_root_squash"
+    sources: "{{ groups['plex'] | map('extract', hostvars, 'ansible_host') | list }}"
+  - path: /mnt/tank/media/photo
+    options: "ro,no_root_squash"
+    sources: "{{ groups['plex'] | map('extract', hostvars, 'ansible_host') | list }}"
+  - path: /mnt/tank/media/motion
+    options: "ro,no_root_squash"
+    sources: "{{ groups['plex'] | map('extract', hostvars, 'ansible_host') | list }}"

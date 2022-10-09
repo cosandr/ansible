@@ -3,6 +3,9 @@
 esxi_username: "{{ vault_esxi_username }}"
 esxi_password: "{{ vault_esxi_password }}"
 
+local_ips:
+  san: "10.0.2.21"
+
 nfs_datastores:
   - name: TrueNAS-VM
     server: 172.16.200.20
