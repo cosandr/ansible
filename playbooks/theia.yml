@@ -70,6 +70,19 @@
         enabled: true
       tags: ["nfs"]
 
+    - name: Install systemd-timesyncd
+      ansible.builtin.dnf:
+        name: systemd-timesyncd
+        state: present
+      tags: ["timesyncd"]
+
+    - name: Enable and start systemd-timesyncd
+      ansible.builtin.systemd:
+        name: systemd-timesyncd.service
+        state: started
+        enabled: true
+      tags: ["timesyncd"]
+
   roles:
     - role: systemd_networkd
       tags: ["networkd"]
