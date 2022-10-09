@@ -50,7 +50,7 @@
   delegate_to: "{{ item }}"
   delegate_facts: true
   ansible.builtin.set_fact:
-    __target_host_names: "{{ __target_host_names + [tmp] }}"
+    __target_host_names: "{{ hostvars[item].__target_host_names + [tmp] }}"
   vars:
     tmp: "{{ hostvars[item].inventory_hostname }}.{{ hostvars[item].domain }}"
   loop: "{{ ssh_dest_hosts }}"
