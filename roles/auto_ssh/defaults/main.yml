@@ -11,3 +11,5 @@ ssh_src_user: "root"
 ssh_dest_dir: "/root/.ssh"
 ssh_dest_user: "root"
 ssh_dest_hosts: []
+
+ssh_conf_hosts: false

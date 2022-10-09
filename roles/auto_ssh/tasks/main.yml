@@ -75,3 +75,14 @@
       {% for h in __host_keys.results | sort %}
       {{ h.stdout }}
       {% endfor %}
+
+- name: Add target host names to /etc/hosts
+  ansible.builtin.blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} auto-ssh {{ ssh_key_comment }}"
+    block: |
+      {% for h in ssh_dest_hosts %}
+      {{ hostvars[h].ansible_host }} {{ hostvars[h].__target_host_names | difference([hostvars[h].ansible_host]) | unique | join(' ') }}
+      {% endfor %}
+  when: ssh_conf_hosts
+  tags: ["hosts"]
