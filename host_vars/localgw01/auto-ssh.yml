@@ -1,0 +1,8 @@
+---
+
+ssh_src_dir: "/root/.ssh"
+ssh_src_user: "root"
+ssh_dest_dir: "/root/.ssh"
+ssh_dest_user: "root"
+ssh_key_options: ''
+ssh_dest_hosts: "{{ groups['minio'] }}"

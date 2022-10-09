@@ -69,6 +69,10 @@
       when: ansible_os_family == 'RedHat'
       tags: ["dnf_automatic"]
 
+    - role: auto_ssh
+      when: ssh_dest_hosts | default([])
+      tags: ["auto-ssh"]
+
     - role: node_exporter
       tags: ["node_exporter"]
 

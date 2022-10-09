@@ -1,0 +1,22 @@
+---
+
+__host_certbot_renew_hooks:
+  - name: sync-certs
+    type: deploy
+    content: |
+      #!/bin/bash
+
+      set -e
+
+      copy_cert() {
+          for d in $RENEWED_DOMAINS; do
+              if [[ $d == "$2" ]]; then
+                  scp /etc/letsencrypt/live/"${d}"/fullchain.pem "$1":/etc/nginx/certs/"${d}".pem
+                  scp /etc/letsencrypt/live/"${d}"/privkey.pem "$1":/etc/nginx/certs/"${d}".key
+                  ssh "$1" systemctl restart nginx
+              fi
+          done
+      }
+      {% for h in groups['minio'] %}
+      copy_cert "root@{{ hostvars[h].ansible_host }}" "{{ hostvars[h].domain }}"
+      {% endfor %}
