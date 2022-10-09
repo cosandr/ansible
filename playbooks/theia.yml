@@ -67,3 +67,6 @@
 
     - role: libvirt_vm
       tags: ["vms"]
+
+    - role: node_exporter
+      tags: ["node_exporter"]

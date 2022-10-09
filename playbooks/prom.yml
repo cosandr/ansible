@@ -8,6 +8,7 @@
       - drepi
       - romsto
       - truenas
+      - theia
       - oldpi
   pre_tasks:
     - block:

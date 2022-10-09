@@ -18,8 +18,6 @@ prometheus_global:
   scrape_interval: 15s
   scrape_timeout: 10s
   evaluation_interval: 15s
-prometheus_remote_write:
-  - url: "http://127.0.0.1:9201/write"
 prometheus_alertmanager_config:
   - scheme: http
     static_configs:
@@ -42,9 +40,9 @@ prometheus_node_static_config:
     labels:
       instance: "{{ drepi_label }}"
 
-  - targets: ["{{ hostvars['truenas'].local_ips.vm }}:9100"]
+  - targets: ["{{ hostvars['theia'].local_ips.vm }}:9100"]
     labels:
-      instance: "{{ hostvars['truenas'].inventory_hostname }}"
+      instance: "{{ hostvars['theia'].inventory_hostname }}"
 
   - targets: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].node_exporter_port }}"]
     labels:
@@ -57,7 +55,6 @@ blackbox_exporter_targets_icmp_ipv4:
   - "{{ hostvars['romsto'].ddns_domain }}"
   - "{{ hostvars['romsto'].wireguard_ip }}"
   - "{{ hostvars['webgw01'].ansible_host }}"
-  - "{{ hostvars['truenas'].local_ips.vm }}"
   # Home assistant
   - "10.0.50.48"
   - "kube-vip.{{ domains['hb'] }}"

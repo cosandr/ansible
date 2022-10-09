@@ -1,5 +1,7 @@
 ---
 
+node_exporter_config_firewall: false
+
 firewalld_zones:
   - name: internal
     sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
@@ -30,4 +32,7 @@ firewalld_services:
   - name: https
     zone: internal
 
-firewall_rules: []
+firewall_rules:
+  - port: "{{ node_exporter_port }}"
+    zone: internal
+    sources: "{{ node_exporter_allow_ips }}"

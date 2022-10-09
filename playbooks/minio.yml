@@ -24,6 +24,9 @@
     - role: nginx
       tags: ["nginx"]
 
+    - role: node_exporter
+      tags: ["node_exporter"]
+
   post_tasks:
     - name: Write client config
       ansible.builtin.copy:
