@@ -18,4 +18,4 @@ thanos_s3_config:
     bucket: "thanos"
     endpoint: "{{ s3_url | regex_replace('^https?://', '') }}"
     access_key: "thanos"
-    secret_key: "{{ hostvars['truenas'].s3_users['thanos'] }}"
+    secret_key: "{{ hostvars['minio01'].s3_users['thanos'] }}"

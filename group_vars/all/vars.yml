@@ -27,4 +27,4 @@ locale_conf:
 
 systemd_script_install_path: "/usr/local/bin/systemd"
 
-s3_url: "https://truenas.{{ domains['hb'] }}:9000"
+s3_url: "https://s3.{{ domains['hb'] }}"
