@@ -104,6 +104,9 @@
     - role: clevis
       tags: ["clevis"]
 
+    - role: fzf
+      tags: ["fzf"]
+
     - role: chezmoi
       tags: ["chezmoi"]
 

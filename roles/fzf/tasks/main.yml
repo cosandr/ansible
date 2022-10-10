@@ -1,0 +1,18 @@
+---
+
+- name: Install using package manager
+  ansible.builtin.package:
+    name: fzf
+    state: present
+  when: ansible_os_family == 'Archlinux' or
+        ansible_os_family == 'Debian' or
+        ansible_distribution == 'Fedora'
+  tags: ["install"]
+
+- name: Install from source
+  ansible.builtin.include_tasks: from_source.yml
+  when:
+    - ansible_os_family != 'Archlinux'
+    - ansible_os_family != 'Debian'
+    - ansible_distribution != 'Fedora'
+  tags: ["install"]

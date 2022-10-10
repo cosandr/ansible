@@ -1,0 +1,84 @@
+---
+
+- name: Get latest release tag
+  when: fzf_version == "latest"
+  block:
+    - name: Get latest release
+      ansible.builtin.uri:
+        url: "https://api.github.com/repos/junegunn/fzf/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      no_log: false
+      register: _latest_release
+      until: _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set fzf version to {{ _latest_release.json.tag_name }}"
+      ansible.builtin.set_fact:
+        fzf_version: "{{ _latest_release.json.tag_name }}"
+
+- name: Set checksum and filename facts
+  ansible.builtin.set_fact:
+    __fzf_checksums: "{{ lookup('url', 'https://github.com/junegunn/fzf/releases/download/' + fzf_version + '/fzf_' + fzf_version + '_checksums.txt', wantlist=True) | list }}"
+    __fzf_filename: "fzf-{{ fzf_version }}-linux_{{ go_arch }}.tar.gz"
+  run_once: true
+  check_mode: false
+  delegate_to: localhost
+
+- name: Download fzf binary to local folder  # noqa risky-file-permissions
+  become: false
+  ansible.builtin.get_url:
+    url: "https://github.com/junegunn/fzf/releases/download/{{ fzf_version }}/{{ __fzf_filename }}"
+    dest: "/tmp/{{ __fzf_filename }}"
+    checksum: "sha256:{{ (__fzf_checksums | select('search', __fzf_filename) | first).split()[0] }}"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  # run_once: true # <-- this cannot be set due to multi-arch support
+  delegate_to: localhost
+  check_mode: false
+
+- name: Unpack fzf binary
+  become: false
+  diff: false
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ __fzf_filename }}"
+    dest: "/tmp"
+    creates: "/tmp/fzf"
+  delegate_to: localhost
+  check_mode: false
+
+- name: Install fzf binary
+  diff: false
+  ansible.builtin.copy:
+    src: "/tmp/fzf"
+    dest: "/usr/local/bin/fzf"
+    mode: 0755
+    owner: root
+    group: root
+
+- name: Create fzf data directory
+  ansible.builtin.file:
+    path: /usr/share/fzf
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Download ZSH completion files
+  diff: false
+  ansible.builtin.get_url:
+    url: "https://raw.githubusercontent.com/junegunn/fzf/{{ fzf_version }}/shell/{{ item }}"
+    dest: /usr/share/fzf/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  loop:
+    - key-bindings.zsh
+    - completion.zsh
+  when: fzf_install_zsh
