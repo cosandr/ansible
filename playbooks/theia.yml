@@ -83,6 +83,14 @@
         enabled: true
       tags: ["timesyncd"]
 
+    - name: Enable zpool scrub timers
+      ansible.builtin.systemd:
+        name: "zfs-scrub-{{ item.schedule }}@{{ item.pool }}.timer"
+        state: started
+        enabled: true
+      loop: "{{ zfs_scrub_timers | default([]) }}"
+      tags: ["zfs", "scrub"]
+
   roles:
     - role: systemd_networkd
       tags: ["networkd"]
