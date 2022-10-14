@@ -104,6 +104,9 @@
     - role: clevis
       tags: ["clevis"]
 
+    - role: samba
+      tags: ["samba"]
+
     - role: fzf
       tags: ["fzf"]
 

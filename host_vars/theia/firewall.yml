@@ -31,4 +31,7 @@ firewalld_services:
   - name: nfs3
     zone: public
 
+  - name: samba
+    zone: public
+
 firewall_rules: []
