@@ -25,6 +25,7 @@ samba_extra_global_options:
   "unix extensions": false
   "unix password sync": true
   "pam password change": true
+  "include": "registry"
 
 samba_shares:
   homes:

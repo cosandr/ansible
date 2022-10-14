@@ -8,6 +8,8 @@ syncoid_timers:
     options:
       - "--recursive"
       - "--no-sync-snap"
+      - '--exclude=".*\\/var\\/(cache|log|tmp)"'
+      - '--exclude=".*\\/var\\/lib\\/(containers|docker)"'
 
   - name: vm
     src: ssd/vm
