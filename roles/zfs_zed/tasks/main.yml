@@ -1,0 +1,48 @@
+- name: Configure zed.rc for email
+  ansible.builtin.lineinfile:
+    path: /etc/zfs/zed.d/zed.rc
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  when: zfs_zed_email_address
+  loop:
+    - regexp: '^#?ZED_EMAIL_PROG'
+      line: 'ZED_EMAIL_PROG="mail"'
+    - regexp: '^#?ZED_EMAIL_ADDR'
+      line: 'ZED_EMAIL_ADDR="{{ zfs_zed_email_address }}"'
+  loop_control:
+    label: "{{ item.regexp }}"
+  notify: Restart zfs-zed
+
+- name: Disable zed.rc email
+  ansible.builtin.lineinfile:
+    path: /etc/zfs/zed.d/zed.rc
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    backrefs: true
+  when: not zfs_zed_email_address
+  loop:
+    - regexp: '^#?ZED_EMAIL_PROG(.*)'
+      line: '#ZED_EMAIL_PROG\1'
+    - regexp: '^#?ZED_EMAIL_ADDR(.*)'
+      line: '#ZED_EMAIL_ADDR\1'
+  loop_control:
+    label: "{{ item.regexp }}"
+  notify: Restart zfs-zed
+
+- name: Configure notify interval
+  ansible.builtin.lineinfile:
+    path: /etc/zfs/zed.d/zed.rc
+    regexp: "^#?ZED_NOTIFY_INTERVAL_SECS"
+    line: "ZED_NOTIFY_INTERVAL_SECS={{ zfs_zed_notify_interval }}"
+  notify: Restart zfs-zed
+
+- name: Configure zed.rc extra options
+  ansible.builtin.lineinfile:
+    path: /etc/zfs/zed.d/zed.rc
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ zfs_zed_options }}"
+  loop_control:
+    label: "{{ item.regexp }}"
+  notify: Restart zfs-zed

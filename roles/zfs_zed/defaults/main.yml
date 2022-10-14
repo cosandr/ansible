@@ -1,0 +1,5 @@
+---
+
+zfs_zed_email_address: ""
+zfs_zed_notify_interval: 3600
+zfs_zed_options: []

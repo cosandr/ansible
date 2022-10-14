@@ -107,6 +107,9 @@
     - role: fzf
       tags: ["fzf"]
 
+    - role: zfs_zed
+      tags: ["zfs", "zed"]
+
     - role: chezmoi
       tags: ["chezmoi"]
 
