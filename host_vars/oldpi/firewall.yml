@@ -14,9 +14,3 @@ firewall_rules:
   - port: 5678
     source: "fe80::/64"
     protocol: "udp"
-
-ufw_trusted_sources:
-  - "{{ hostvars['desktop'].ansible_host }}"
-  - "{{ hostvars['laptop'].ansible_host }}"
-  - "{{ hostvars['laptop'].wireguard_ip }}"
-  - "{{ hostvars['m1bp'].wireguard_ip }}"

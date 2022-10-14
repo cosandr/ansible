@@ -4,3 +4,12 @@ firewall_frontend: 'firewalld'
 # Allow SSH by default so I don't accidentally lock myself out
 firewall_rules:
   - port: 22
+
+firewall_trusted_sources:
+  - "{{ hostvars['desktop'].ansible_host }}"
+  - "{{ hostvars['laptop'].ansible_host }}"
+  - "{{ hostvars['laptop'].wireguard_ip }}"
+  - "{{ hostvars['m1bp'].ansible_host }}"
+  - "{{ hostvars['m1bp'].wireguard_ip }}"
+
+ufw_trusted_sources: "{{ firewall_trusted_sources }}"
