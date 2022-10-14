@@ -38,6 +38,7 @@ dnf_rhel_packages:
   - python3-llfuse  # borg mount
   - python3-netaddr
   - python3-websockets
+  - policycoreutils-python-utils
   - ShellCheck
   - smartmontools
   - sshfs
