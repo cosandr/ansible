@@ -1,4 +1,5 @@
 ---
+
 - name: Install config file
   template:
     src: "templates/smb.conf.j2"
@@ -6,6 +7,16 @@
     owner: root
     group: root
     mode: 0644
+    validate: "testparm -s %s"
   notify:
-    - validate samba configuration
     - restart samba
+
+- name: Configure samba sebooleans
+  ansible.posix.seboolean:
+    name: "{{ item.name | default(item) }}"
+    state: "{{ item.state | default(true) }}"
+    persistent: true
+  loop: "{{ samba_sebooleans }}"
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_selinux.status == "enabled"

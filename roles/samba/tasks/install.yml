@@ -1,5 +1,5 @@
 ---
 - name: Install samba
   package:
-    name: "{{ __samba_package_name }}"
+    name: "{{ __samba_packages }}"
     state: present

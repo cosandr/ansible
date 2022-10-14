@@ -4,7 +4,7 @@
     workgroup = {{ samba_workgroup }}
     server role = {{ samba_server_role }}
 {% if samba_hosts_allow | length > 0 %}
-    hosts allow = {% for host in samba_hosts_allow %}{{ host }} {% endfor %}
+    hosts allow = {{ samba_hosts_allow | join(' ') }}
 {% endif %}
 
     logging = {{ samba_logging }}
@@ -13,7 +13,7 @@
     max log size = {{ samba_max_log_size }}
 {% endif %}
 {% if samba_interfaces | length > 0 %}
-    interfaces = {% for iface in samba_interfaces %}{{ iface }} {% endfor %}
+    interfaces = {{ samba_interfaces | join(' ') }}
 {% endif %}
 
 {% for name, value in samba_extra_global_options.items() %}

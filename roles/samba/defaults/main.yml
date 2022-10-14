@@ -7,6 +7,11 @@ samba_server_role: standalone server
 
 samba_hosts_allow: []
 
+samba_users: []
+
+samba_sebooleans:
+  - samba_enable_home_dirs
+
 samba_logging: systemd
 
 # Used when logging is 'file'

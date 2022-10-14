@@ -11,3 +11,14 @@
 
 - import_tasks: "configure.yml"
   tags: ["configure"]
+
+- name: Configure users
+  ansible.builtin.import_tasks: users.yml
+  when: samba_users
+  tags: ["users"]
+
+- name: Enable and start samba
+  ansible.builtin.service:
+    name: smb
+    state: started
+    enabled: true

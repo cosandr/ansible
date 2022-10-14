@@ -1,3 +1,5 @@
 ---
 
-__samba_package_name: samba
+__samba_packages:
+  - samba
+  - samba-client
