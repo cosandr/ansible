@@ -38,11 +38,29 @@
 - name: Configure services
   ansible.posix.firewalld:
     service: "{{ item.name }}"
-    zone: "{{ item.zone | default('public') }}"
+    zone: "{{ zone }}"
     permanent: true
     state: "{{ (item.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
   notify: Reload firewalld
+  vars:
+    zone: "{{ item.zone | default('public') }}"
   loop: "{{ firewalld_services }}"
+  loop_control:
+    label: "{{ item.name }} [{{ zone }}]"
+  when: item.sources is not defined or item.sources | length == 0
+
+- name: Configure rich firewalld services  # noqa line-length
+  ansible.posix.firewalld:
+    zone: "{{ zone }}"
+    rich_rule: "rule family={{ item.0.family | default('ipv4') }} source address={{ item.1 }} service name=\"{{ item.0.name }}\" accept"
+    permanent: true
+    state: "{{ (item.0.state | default('present') == 'present') | ternary('enabled', 'disabled') }}"
+  vars:
+    zone: "{{ item.0.zone | default('public') }}"
+  loop: "{{ firewalld_services | subelements('sources', skip_missing=True) }}"
+  loop_control:
+    label: "{{ item.0.name }} [{{ zone }}] - {{ item.1 }}"
+  notify: Reload firewalld
 
 - name: Configure simple firewalld rules
   ansible.posix.firewalld:

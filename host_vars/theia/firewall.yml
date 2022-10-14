@@ -34,4 +34,8 @@ firewalld_services:
   - name: samba
     zone: public
 
+  - name: cockpit
+    zone: public
+    sources: "{{ firewall_trusted_sources }}"
+
 firewall_rules: []
