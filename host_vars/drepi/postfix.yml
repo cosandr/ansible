@@ -17,7 +17,7 @@ postfix_relay_domains:
     password: "{{ smtp_credentials['dv'].password }}"
 
 postfix_hostname: "{{ inventory_hostname }}.{{ domain }}"
-postfix_relay_hosts: "{{ postfix_relay_domains | map(attribute='relay_host') | unique | map('regex_replace', '^(.*)$', '[\\1]') | list }}"
+postfix_relay_hosts: []
 __postfix_relay_domains:
   - "{{ postfix_relay_domains | map(attribute='relay_host') | unique | list }}"
   - "{{ postfix_relay_domains | map(attribute='name') | list }}"

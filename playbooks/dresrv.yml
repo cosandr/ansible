@@ -135,6 +135,9 @@
     - role: sshd
       tags: ["sshd"]
 
+    - role: postfix
+      tags: ["postfix"]
+
     - role: sudo
       tags: ["sudo"]
 

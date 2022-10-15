@@ -26,3 +26,5 @@ web_root: "/var/www"
 pip_wheel_dir: "{{ web_root }}/pip"
 
 nginx_htpasswd: "{{ vault_nginx_htpasswd }}"
+
+postfix_hostname: "{{ domain }}"
