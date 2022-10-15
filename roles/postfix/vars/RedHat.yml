@@ -3,4 +3,4 @@
 __postfix_packages:
   - postfix
   - cyrus-sasl-plain
-  - mailx
+  - s-nail
