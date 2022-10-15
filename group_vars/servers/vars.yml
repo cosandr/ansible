@@ -21,3 +21,5 @@ sys_timezone: "Europe/Oslo"
 ssh_authorized_keys:
   - "{{ hostvars['desktop'].ssh_keys.andrei }}"
   - "{{ hostvars['laptop'].ssh_keys.andrei }}"
+
+domain: "vm.{{ domains['hb'] }}"

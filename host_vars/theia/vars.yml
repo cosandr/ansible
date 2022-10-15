@@ -1,5 +1,7 @@
 ---
 
+domain: "{{ domains['hb'] }}"
+
 cpupower_start_governor: powersave
 cpupower_stop_governor: ondemand
 

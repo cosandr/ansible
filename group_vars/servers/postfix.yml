@@ -1,0 +1,17 @@
+---
+
+postfix_hostname: "{{ inventory_hostname }}.{{ domain }}"
+postfix_interfaces:
+  - localhost
+
+# Localhost is included by default by the role
+postfix_networks: []
+
+postfix_relay_hosts:
+  - "[{{ hostvars['drepi'].postfix_hostname }}]:587"
+
+postfix_main_config:
+  - regexp: "^#?smtp_use_tls"
+    line: "smtp_use_tls = yes"
+  - regexp: "^#?smtp_tls_security_level"
+    line: "smtp_tls_security_level = may"
