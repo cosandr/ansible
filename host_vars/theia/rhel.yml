@@ -23,6 +23,7 @@ dnf_rhel_packages:
   - jq
   - libtool
   - lm_sensors
+  - lsof
   - make
   - man-db
   - ncdu
@@ -33,12 +34,13 @@ dnf_rhel_packages:
   - p7zip
   - patch
   - pkgconf
+  - policycoreutils-python-utils
   - powertop
   - python3-aiohttp
   - python3-llfuse  # borg mount
   - python3-netaddr
   - python3-websockets
-  - policycoreutils-python-utils
+  - rubygems
   - ShellCheck
   - smartmontools
   - sshfs

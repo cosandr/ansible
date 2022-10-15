@@ -107,6 +107,14 @@
       notify: Restart smartd
       tags: ["smartd"]
 
+    - name: Install tmuxinator
+      community.general.gem:
+        name: tmuxinator
+        state: present
+        norc: true
+        user_install: false
+      tags: ["tmuxinator"]
+
   roles:
     - role: systemd_networkd
       tags: ["networkd"]

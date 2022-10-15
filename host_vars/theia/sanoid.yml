@@ -10,9 +10,10 @@ syncoid_timers:
       - "--no-sync-snap"
       - '--exclude=".*\\/var\\/(cache|log|tmp)"'
       - '--exclude=".*\\/var\\/lib\\/(containers|docker)"'
+      - '--exclude="rpool\\/redhat\\/esxi"'
 
   - name: vm
-    src: ssd/vm
+    src: rpool/redhat/esxi
     dest: tank/backup/truenas/ssd/vm
     oncalendar: Weekly
     options:
@@ -50,9 +51,6 @@ sanoid_backup_modules:
   "rpool/redhat/var/lib/docker":
     use_template: "ignore"
 
-  "ssd/vm":
-    use_template: "main"
-
   "tank":
     recursive: true
     process_children_only: true
@@ -76,11 +74,11 @@ sanoid_backup_modules:
 
   "tank/backup/truenas":
     recursive: true
-    use_template: "ignore"
+    use_template: "prune_lts"
 
   "tank/backup/theia":
     recursive: true
-    use_template: "ignore"
+    use_template: "prune_lts"
 
 sanoid_backup_templates:
   "main":
@@ -105,3 +103,12 @@ sanoid_backup_templates:
     autoprune: false
     autosnap: false
     monitor: false
+
+  "prune_lts":
+    autoprune: true
+    autosnap: false
+    frequently: 0
+    hourly: 3
+    daily: 10
+    monthly: 3
+    yearly: 0
