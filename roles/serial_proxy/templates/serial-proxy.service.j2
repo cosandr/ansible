@@ -1,10 +1,10 @@
 [Unit]
-Description=Serial proxy using socat
+Description={{ item.name | title }} serial proxy using socat
 After=network-online.target
-ConditionPathExists={{ serial_proxy_src }}
+ConditionPathExists={{ item.src }}
 
 [Service]
-ExecStart=/usr/bin/socat tcp-listen:{{ serial_proxy_port }},reuseaddr,fork FILE:{{ serial_proxy_src }},rawer,b{{ serial_proxy_baud }}
+ExecStart=/usr/bin/socat tcp-listen:{{ item.port }},reuseaddr,fork FILE:{{ item.src }},rawer,b{{ item.baud | default(2400) }}
 
 [Install]
 WantedBy=default.target

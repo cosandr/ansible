@@ -6,13 +6,25 @@
     state: present
   tags: ["install"]
 
-- name: Install service
+- name: Remove old service
+  ansible.builtin.file:
+    path: "/etc/systemd/system/serial-proxy.service"
+    state: absent
+  notify:
+    - Reload systemd
+    - Stop old serial proxy service
+
+- name: Install services
   ansible.builtin.template:
     src: serial-proxy.service.j2
-    dest: /etc/systemd/system/serial-proxy.service
+    dest: "/etc/systemd/system/serial-proxy-{{ item.name }}.service"
     owner: root
     group: root
     mode: 0644
+  loop: "{{ serial_proxies }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: __installed_svc
   notify:
     - Reload systemd
     - Restart serial proxy
@@ -22,6 +34,9 @@
 
 - name: Enable and start serial proxy
   ansible.builtin.systemd:
-    name: serial-proxy.service
+    name: "serial-proxy-{{ item.name }}.service"
     state: started
     enabled: true
+  loop: "{{ serial_proxies }}"
+  loop_control:
+    label: "{{ item.name }}"

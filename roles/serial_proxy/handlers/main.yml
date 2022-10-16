@@ -1,11 +1,20 @@
 ---
 
+- name: Stop old serial proxy service
+  ansible.builtin.systemd:
+    name: serial-proxy.service
+    state: stopped
+
 - name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: true
 
 - name: Restart serial proxy
   ansible.builtin.systemd:
-    name: serial-proxy.service
+    name: "serial-proxy-{{ item.item.name }}.service"
     state: started
     enabled: true
+  loop: "{{ __installed_svc.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.changed
