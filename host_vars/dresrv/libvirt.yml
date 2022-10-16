@@ -1,0 +1,21 @@
+---
+
+vm_cpus: 8
+vm_mem: 16384
+
+vm_template: "rocky_packer.qcow2"
+vm_os_id: "http://rockylinux.org/rocky/8"
+
+vm_root_size: "500G"
+
+vm_default_nic:
+  type: bridge
+  source:
+    dev: 'GENERAL'
+  address: "{{ ansible_host }}"
+  domain: "{{ domains['dv'] }}"
+  gateway: "{{ home_net.general.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
+  dns_servers:
+    - "{{ home_net.general.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
+    - 1.1.1.1
+    - 8.8.8.8

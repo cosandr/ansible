@@ -18,21 +18,25 @@ romsto  ansible_host=10.1.0.6     ansible_user=root
 theia   ansible_host=10.0.50.2  ansible_user=root
 
 [servers:children]
-db
 webgw
 localgw
-prom
-loki
-nextcloud
-backup
-plex
 rpi
 libvirt
 
+[libvirt]
+localgw01
+
 [libvirt:children]
+backup
+db
 gitlab
 gitrun
+home_assistant
+loki
 minio
+nextcloud
+plex
+prom
 
 [rpi]
 drepi   ansible_host=10.0.50.21    ansible_user=andrei
@@ -108,3 +112,6 @@ logkib01 ansible_host=10.0.10.30
 
 [minio]
 minio01 ansible_host=10.0.10.7
+
+[home_assistant]
+home-assistant ansible_host=10.0.50.48

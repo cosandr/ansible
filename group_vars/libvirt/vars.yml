@@ -32,15 +32,20 @@ vm_default_nic:
     - 1.1.1.1
     - 8.8.8.8
 
+vm_nics: ["{{ vm_default_nic }}"]
+
 vm_default_definition:
   state: present
+  machine: q35
+  start: false
+  customize: false
   name: "{{ inventory_hostname }}"
-  domain: "{{ vm_default_nic.domain }}"
+  domain: "{{ vm_default_nic.domain | default(false) }}"
   memory_mb: "{{ vm_mem }}"
   vcpus: "{{ vm_cpus }}"
   boot_firmware: efi
   os_id: "{{ vm_os_id }}"
   volumes: "{{ [vm_root_disk] + vm_extra_disks }}"
-  interfaces: ["{{ vm_default_nic }}"]
+  interfaces: "{{ vm_nics }}"
 
 libvirt_vms: ["{{ vm_default_definition }}"]

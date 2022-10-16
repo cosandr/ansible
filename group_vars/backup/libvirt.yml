@@ -1,0 +1,9 @@
+---
+
+vm_cpus: 8
+vm_mem: 8192
+
+vm_template: "rocky_packer.qcow2"
+vm_os_id: "http://rockylinux.org/rocky/8"
+
+vm_root_size: "20G"
