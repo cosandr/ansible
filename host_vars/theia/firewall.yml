@@ -38,4 +38,7 @@ firewalld_services:
     zone: public
     sources: "{{ firewall_trusted_sources }}"
 
-firewall_rules: []
+firewall_rules:
+  - port: "{{ (serial_proxies | selectattr('name', 'eq', 'conbee') | first).port }}"
+    zone: public
+    source: "10.0.50.48"

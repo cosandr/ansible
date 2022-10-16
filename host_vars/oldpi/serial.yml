@@ -1,0 +1,6 @@
+---
+
+serial_proxies:
+  - name: pwr
+    src: "/dev/serial/by-id/usb-Prolific_Technology_Inc._USB-Serial_Controller_CGDCn114J20-if00-port0"
+    port: 8888

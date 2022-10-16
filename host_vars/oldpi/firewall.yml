@@ -10,6 +10,9 @@ firewall_rules:
   - port: 22
     sources: "{{ __ssh_sources | flatten }}"
 
+  - port: "{{ (serial_proxies | selectattr('name', 'eq', 'pwr') | first).port }}"
+    source: "10.0.50.48"
+
   # RouterOS neighbour discovery
   - port: 5678
     source: "fe80::/64"

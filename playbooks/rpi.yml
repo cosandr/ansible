@@ -138,7 +138,9 @@
       tags: ["wireguard"]
 
     - role: serial_proxy
-      when: "'serial_proxy_src' in hostvars[inventory_hostname]"
+      when:
+        - "'serial_proxies' in hostvars[inventory_hostname]"
+        - serial_proxies | length > 0
       tags: ["serial"]
 
   handlers:

@@ -146,6 +146,9 @@
     - role: sanoid
       tags: ["sanoid"]
 
+    - role: serial_proxy
+      tags: ["serial"]
+
     - role: libvirt_vm
       tags: ["vms"]
 
