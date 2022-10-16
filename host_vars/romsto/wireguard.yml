@@ -9,6 +9,7 @@ wireguard_addresses:
 wireguard_mt_allowed_ips:
   - "{{ hostvars['mt-router'].wireguard_ip }}/32"
   - "{{ hostvars['dresrv'].ansible_host }}/32"
+  - "{{ hostvars['drepi'].ansible_host }}/32"
   - "{{ hostvars['prom01'].ansible_host }}/32"
   - "{{ hostvars['backup01'].ansible_host }}/32"
   - "{{ hostvars['loki01'].ansible_host }}/32"
@@ -24,13 +25,15 @@ wireguard_unmanaged_peers:
     endpoint: "{{ hostvars['mt-router'].wireguard_endpoint }}"
     allowed_ips: "{{ wireguard_mt_allowed_ips | join(', ') }}"
     public_key: "{{ hostvars['mt-router'].wireguard_public_key }}"
+    persistent_keepalive: "{{ wireguard_persistent_keepalive }}"
   webgw:
     endpoint: "{{ hostvars['webgw01'].wireguard_endpoint }}"
     allowed_ips: "{{ hostvars['webgw01'].wireguard_ip }}/32"
     public_key: "{{ hostvars['webgw01'].wireguard_public_key }}"
+    persistent_keepalive: "{{ wireguard_persistent_keepalive }}"
 
 wireguard_endpoint: ""
-wireguard_persistent_keepalive: "30"
+wireguard_persistent_keepalive: 300
 wireguard_postup:
   - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} started'
   - iptables -t nat -A POSTROUTING -s "{{ wg_net.mt.cidr }}" -o br0 -j MASQUERADE
