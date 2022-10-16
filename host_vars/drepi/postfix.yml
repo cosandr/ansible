@@ -16,6 +16,11 @@ postfix_relay_domains:
     user: "{{ smtp_credentials['dv'].user }}"
     password: "{{ smtp_credentials['dv'].password }}"
 
+  - name: "{{ domains['ti'] }}"
+    relay_host: "{{ smtp_credentials['ti'].relay_host }}"
+    user: "{{ smtp_credentials['ti'].user }}"
+    password: "{{ smtp_credentials['ti'].password }}"
+
 postfix_hostname: "{{ inventory_hostname }}.{{ domain }}"
 postfix_relay_hosts: []
 __postfix_relay_domains:
