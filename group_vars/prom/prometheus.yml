@@ -57,7 +57,6 @@ blackbox_exporter_targets_icmp_ipv4:
   - "{{ hostvars['webgw01'].ansible_host }}"
   # Home assistant
   - "10.0.50.48"
-  - "kube-vip.{{ domains['hb'] }}"
 
 blackbox_exporter_targets_http_ipv4:
   - "https://google.com"
