@@ -26,9 +26,3 @@ minio_client_config:
       secretKey: "{{ minio_root_password }}"
       api: "S3v4"
       path: "auto"
-    truenas:
-      url: "https://truenas.{{ domains['hb'] }}:9000"
-      accessKey: "{{ hostvars['truenas'].s3_admin_access_key }}"
-      secretKey: "{{ hostvars['truenas'].s3_admin_secret_key }}"
-      api: "S3v4"
-      path: "auto"

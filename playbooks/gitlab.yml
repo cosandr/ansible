@@ -24,7 +24,7 @@
   post_tasks:
     - name: Mount backup NFS share
       mount:
-        src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/backup/gitlab"
+        src: "{{ hostvars['theia'].local_ips.vm }}:/mnt/tank/backup/gitlab"
         path: "{{ gitlab_backup_upload_connection.local_root }}"
         opts: "defaults,vers=4,rw,noatime,bg"
         state: mounted

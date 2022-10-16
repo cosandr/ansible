@@ -1,6 +1,6 @@
 ---
 
-- hosts: servers, !truenas, !romsto
+- hosts: servers, !romsto
   gather_facts: true
   become: true
   tasks:

@@ -16,7 +16,6 @@ m1bp    ansible_host=10.0.50.34
 dresrv  ansible_host=10.0.50.22   ansible_user=root
 romsto  ansible_host=10.1.0.6     ansible_user=root
 theia   ansible_host=10.0.50.2  ansible_user=root
-truenas
 
 [servers:children]
 db
@@ -110,10 +109,6 @@ logkib01 ansible_host=10.0.10.30
 
 [minio]
 minio01 ansible_host=10.0.10.7
-
-[jails]
-truenas-certbot
-truenas-node_exporter
 
 # Defined in kubespray module
 [k8s_cluster]

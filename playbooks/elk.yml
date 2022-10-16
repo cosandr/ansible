@@ -49,7 +49,6 @@
       - dresrv
       - drepi  # filebeat role doesn't support arm yet
       - romsto
-      - truenas
   tasks:
     - name: Add hosts with filebeat configured
       run_once: true

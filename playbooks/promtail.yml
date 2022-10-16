@@ -1,7 +1,7 @@
 ---
 
 - name: Prepare target hosts group
-  hosts: servers, !truenas
+  hosts: servers
   gather_facts: true
   roles:
     - role: promtail

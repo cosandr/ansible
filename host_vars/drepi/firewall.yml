@@ -23,11 +23,11 @@ firewall_rules:
 
   - port: 2049
     protocol: tcp
-    source: "{{ hostvars['truenas'].local_ips.general }}"
+    source: "{{ hostvars['theia'].local_ips.general }}"
 
   - port: 2049
     protocol: udp
-    source: "{{ hostvars['truenas'].local_ips.general }}"
+    source: "{{ hostvars['theia'].local_ips.general }}"
 
   - port: "{{ node_exporter_port }}"
     source: "{{ hostvars['prom01'].ansible_host }}"

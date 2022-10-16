@@ -1,25 +1,6 @@
 ---
 
-- hosts: truenas
-  gather_facts: false
-  vars:
-    pgbackrest_share:
-      paths: ["/mnt/tank/backup/pgbackrest"]
-      comment: "Pgbackrest shares"
-      hosts: "{{ groups['pgbackrest'] | map('extract', hostvars, 'ansible_host') }}"
-      alldirs: true
-      ro: false
-      quiet: false
-      maproot_user: root
-      maproot_group: wheel
-      enabled: true
-  tasks:
-    - name: Configure shares
-      spatiumcepa.truenas.truenas_api_sharing_nfs:
-        model: "{{ item }}"
-        state: present
-      loop:
-        - "{{ pgbackrest_share }}"
+# TODO: Configure NFS share on Theia for /mnt/tank/backup/pgbackrest
 
 - hosts: db
   roles:
@@ -62,7 +43,7 @@
   pre_tasks:
     - name: Mount NFS share
       mount:
-        src: "{{ hostvars['truenas'].local_ips.vm }}:/mnt/tank/backup/pgbackrest"
+        src: "{{ hostvars['theia'].local_ips.vm }}:/mnt/tank/backup/pgbackrest"
         path: "/var/lib/pgbackrest"
         opts: "defaults,vers=4,rw,noatime,bg"
         state: mounted
