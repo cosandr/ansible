@@ -19,8 +19,6 @@ theia   ansible_host=10.0.50.2  ansible_user=root
 
 [servers:children]
 db
-gitlab
-gitrun
 webgw
 localgw
 prom
@@ -32,6 +30,8 @@ rpi
 libvirt
 
 [libvirt:children]
+gitlab
+gitrun
 minio
 
 [rpi]
