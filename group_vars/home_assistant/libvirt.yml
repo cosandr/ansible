@@ -4,7 +4,7 @@ vm_cpus: 4
 vm_mem: 4096
 
 vm_template: "rocky_packer.qcow2"
-vm_os_id: "http://rockylinux.org/rocky/8"
+vm_os_id: "http://libosinfo.org/linux/2022"
 
 vm_root_size: "20G"
 

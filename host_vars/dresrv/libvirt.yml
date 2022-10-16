@@ -4,7 +4,7 @@ vm_cpus: 8
 vm_mem: 16384
 
 vm_template: "rocky_packer.qcow2"
-vm_os_id: "http://rockylinux.org/rocky/8"
+vm_os_id: "http://fedoraproject.org/fedora/35"
 
 vm_root_size: "500G"
 

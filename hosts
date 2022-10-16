@@ -24,6 +24,7 @@ rpi
 libvirt
 
 [libvirt]
+dresrv
 localgw01
 
 [libvirt:children]
