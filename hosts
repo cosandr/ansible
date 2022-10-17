@@ -1,21 +1,18 @@
-[all:vars]
-ansible_python_interpreter=/usr/bin/python3
-
 [gui:children]
 desktops
 laptops
 
 [desktops]
-desktop ansible_host=10.0.50.4 ansible_user=root
+desktop ansible_host=10.0.50.4
 
 [laptops]
-laptop  ansible_host=10.0.50.5 ansible_user=root
+laptop  ansible_host=10.0.50.5
 m1bp    ansible_host=10.0.50.34
 
 [servers]
-dresrv  ansible_host=10.0.50.22   ansible_user=root
-romsto  ansible_host=10.1.0.6     ansible_user=root
-theia   ansible_host=10.0.50.2  ansible_user=root
+dresrv  ansible_host=10.0.50.22
+romsto  ansible_host=10.1.0.6
+theia   ansible_host=10.0.50.2
 
 [servers:children]
 webgw
@@ -84,13 +81,13 @@ webgw01
 localgw
 
 [nextcloud]
-nextcloud01 ansible_host=10.0.10.60 ansible_user=root
+nextcloud01 ansible_host=10.0.10.60
 
 [backup]
-backup01 ansible_host=10.0.10.8 ansible_user=root
+backup01 ansible_host=10.0.10.8
 
 [plex]
-plex01 ansible_host=10.0.10.65 ansible_user=root
+plex01 ansible_host=10.0.10.65
 
 [esxi_hosts]
 slb  ansible_host=10.0.100.21

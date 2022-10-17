@@ -9,9 +9,6 @@ provisioned_disks:
         size: "100%FREE"
         mode: "0700"
 
-ansible_user: root
-ansible_python_interpreter: /usr/bin/python3
-
 postgresql_version: 14
 postgresql_daemon: "postgresql-{{ postgresql_version }}"
 postgresql_bin_path: "/usr/pgsql-{{ postgresql_version }}/bin"

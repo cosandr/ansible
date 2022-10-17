@@ -1,8 +1,5 @@
 ---
 
-ansible_user: root
-ansible_python_interpreter: /usr/bin/python3
-
 ansible_host6: "{{ home_net.vm.cidr6 | ansible.utils.ipaddr('0x40' | int(base=16)) | ansible.utils.ipaddr('address') }}"
 
 provisioned_disks:
