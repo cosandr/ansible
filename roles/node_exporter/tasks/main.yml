@@ -21,6 +21,9 @@
       become: true
       tags: ["firewall"]
   vars:
+    ufw_before_rules: ""
+    ufw_trusted_sources: []
+    firewalld_services: []
     firewalld_zones: []
     firewall_rules:
       - port: "{{ node_exporter_web_listen_address.split(':')[1] }}"

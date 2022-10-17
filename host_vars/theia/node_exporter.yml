@@ -1,0 +1,7 @@
+---
+
+node_exporter_no_collectors:
+  - mdadm
+  - xfs
+  - bcache
+  - textfile

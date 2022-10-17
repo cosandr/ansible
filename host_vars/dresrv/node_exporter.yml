@@ -1,5 +1,5 @@
 ---
 
-node_exporter_web_listen_address: "127.0.0.1:{{ node_exporter_port }}"
+node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
 node_exporter_collectors:
   - systemd
