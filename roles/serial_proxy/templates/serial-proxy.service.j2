@@ -4,6 +4,8 @@ After=network-online.target
 ConditionPathExists={{ item.src }}
 
 [Service]
+Restart=on-failure
+RestartSec=30
 ExecStart=/usr/bin/socat tcp-listen:{{ item.port }},reuseaddr,fork FILE:{{ item.src }},rawer,b{{ item.baud | default(2400) }}
 
 [Install]
