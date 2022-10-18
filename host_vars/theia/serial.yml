@@ -1,6 +1,0 @@
----
-
-serial_proxies:
-  - name: conbee
-    src: "/dev/serial/by-id/usb-dresden_elektronik_ingenieurtechnik_GmbH_ConBee_II_DE2490943-if00"
-    port: 8888
