@@ -198,13 +198,6 @@ prometheus_scrape_configs_static:
         labels:
           instance: "{{ romsto_label }}"
 
-  - job_name: "bme"
-    static_configs:
-      - targets:
-          - "10.0.50.51:80"
-          - "10.0.50.54:80"
-          - "10.0.50.55:80"
-
   - job_name: "node"
     static_configs: "{{ prometheus_node_static_config }}"
 
