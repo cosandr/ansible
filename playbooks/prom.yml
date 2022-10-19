@@ -200,9 +200,6 @@
     - role: ipmi_exporter
       tags: ["ipmi_exporter"]
 
-    - role: vmware_exporter
-      tags: ["vmware_exporter"]
-
     - role: mikrotik_exporter
       tags: ["mikrotik_exporter"]
 

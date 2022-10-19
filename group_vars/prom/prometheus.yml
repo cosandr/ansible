@@ -144,20 +144,6 @@ prometheus_scrape_configs_static:
         target_label: thanos_svc
         replacement: "query"
 
-  - job_name: 'vmware_vcenter'
-    metrics_path: '/metrics'
-    scrape_interval: 1m
-    static_configs:
-      - targets:
-          - "{{ vault_vsphere_host }}"
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: "localhost:{{ vmware_exporter_port }}"
-
   - job_name: 'blackbox_icmp4'
     metrics_path: '/probe'
     params:
