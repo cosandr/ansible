@@ -3,8 +3,8 @@
 ipmi_exporter_port: 9290
 ipmi_exporter_web_listen_address: "0.0.0.0:{{ ipmi_exporter_port }}"
 ipmi_exporter_modules:
-  slb:
+  theia:
     user: "exporter"
-    pass: "{{ vault_ipmi_exporter_pass.slb }}"
+    pass: "{{ vault_ipmi_exporter_pass.theia }}"
     driver: "LAN_2_0"
     privilege: "admin"

@@ -179,9 +179,9 @@ prometheus_scrape_configs_static:
     static_configs:
       - targets: ["localhost:{{ ipmi_exporter_port }}"]
         labels:
-          instance: "SLB"
-          __param_target: "slb.ipmi.hlab.no"
-          __param_module: "slb"
+          instance: "theia"
+          __param_target: "theia.ipmi.hlab.no"
+          __param_module: "theia"
 
   - job_name: "mikrotik"
     scrape_interval: 5m
