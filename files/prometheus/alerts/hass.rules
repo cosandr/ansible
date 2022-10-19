@@ -16,3 +16,26 @@ groups:
       severity: warning
     annotations:
       summary: House power consumption is reporting 0W
+
+  - alert: HassPowerSensorStuck
+    expr: (sum_over_time(hass_sensor_power_w[30m]) / 60 == hass_sensor_power_w) and (hass_sensor_power_w != 0)
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: Power sensor {{ $labels.friendly_name }} appears to be stuck
+
+  - alert: HassTemperatureSensorStuck
+    expr: |
+        (
+            sum_over_time(hass_sensor_temperature_celsius{entity!~".*device.*$"}[30m]) / 60
+            ==
+            hass_sensor_temperature_celsius{entity!~".*device.*$"}
+        ) and (
+            hass_sensor_temperature_celsius{entity!~".*device.*$"} != 0
+        )
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: Temperature sensor {{ $labels.friendly_name }} appears to be stuck
