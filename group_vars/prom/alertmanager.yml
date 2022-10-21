@@ -18,6 +18,7 @@ alertmanager_receivers:
           - title: 'Description'
             value: '{% raw %}{{ if .Alerts }}{{ range .Alerts }}{{ .Annotations.description }}{{ printf "\n" }}{{ end }}{{ else }}{{ .CommonAnnotations.description }}{{ end }}{% endraw %}'
             short: false
+
 alertmanager_route:
   group_by: ['instance', 'job']
   group_wait: 30s
@@ -34,3 +35,11 @@ alertmanager_route:
       matchers:
         - alertname="ContainerCpuUsage"
         - name="plex"
+
+alertmanager_inhibit_rules:
+  # Only fire one out of memory alert
+  - source_matchers:
+      - alertname = HostHighMemoryUsage
+    target_matchers:
+      - alertname = HostOutOfMemory
+    equal: ['instance']

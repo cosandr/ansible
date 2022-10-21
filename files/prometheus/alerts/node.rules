@@ -2,13 +2,23 @@ groups:
 - name: Node Exporter
   rules:
   - alert: HostOutOfMemory
-    expr: node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100 < 10
+    # Available memory doesn't work with ZFS ARC
+    expr: node_memory_MemAvailable_bytes{instance!~".*(theia).*"} / node_memory_MemTotal_bytes{instance!~".*(theia).*"} * 100 < 10
     for: 2m
     labels:
       severity: warning
     annotations:
       summary: '{{ $labels.instance }} low on memory'
       description: Node memory is filling up ({{ printf "%.2f" $value }}% left)
+
+  - alert: HostHighMemoryUsage
+    expr: node_memory_Active_bytes / node_memory_MemTotal_bytes * 100 > 90
+    for: 2m
+    labels:
+      severity: warning
+    annotations:
+      summary: '{{ $labels.instance }} high memory usage'
+      description: Node memory is filling up ({{ printf "%.2f" $value }}% active)
 
   - alert: HostSystemdServiceCrashed
     expr: node_systemd_unit_state{state="failed", name!="dnf-makecache.service"} == 1
