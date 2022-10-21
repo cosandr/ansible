@@ -29,7 +29,6 @@ backup
 db
 gitlab
 gitrun
-home_assistant
 loki
 minio
 nextcloud
@@ -107,6 +106,3 @@ logkib01 ansible_host=10.0.10.30
 
 [minio]
 minio01 ansible_host=10.0.10.7
-
-[home_assistant]
-home-assistant ansible_host=10.0.50.48
