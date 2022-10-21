@@ -1,6 +1,6 @@
 ---
 
-pushgateway_version: 1.4.2
+pushgateway_version: 1.4.3
 pushgateway_port: "9091"
 pushgateway_web_listen_address: "0.0.0.0:{{ pushgateway_port }}"
 pushgateway_web_external_url: "http://{{ ansible_host }}:{{ pushgateway_port }}/"
