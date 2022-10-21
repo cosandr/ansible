@@ -158,6 +158,8 @@ prometheus_scrape_configs_static:
         target_label: instance
       - target_label: __address__
         replacement: "localhost:{{ blackbox_exporter_port }}"
+      - source_labels: [instance]
+        target_label: __host_ip
 
   - job_name: 'blackbox_http4'
     scrape_interval: 1m
@@ -201,6 +203,10 @@ prometheus_scrape_configs_static:
 
   - job_name: "node"
     static_configs: "{{ prometheus_node_static_config }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __host_ip
+        regex: '([^:]+):\d+'
 
   - job_name: "aquaero"
     scrape_interval: 30s

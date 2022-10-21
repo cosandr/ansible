@@ -43,3 +43,17 @@ alertmanager_inhibit_rules:
     target_matchers:
       - alertname = HostOutOfMemory
     equal: ['instance']
+
+  # Silence slow probe is probe failed
+  - source_matchers:
+      - alertname = BlackboxProbeFailed
+    target_matchers:
+      - alertname = BlackboxSlowProbe
+    equal: ['instance']
+
+  # Inhibit blackbox if node is down
+  - source_matchers:
+      - alertname = InstanceDown
+    target_matchers:
+      - job =~ "blackbox.*"
+    equal: ['__host_ip']
