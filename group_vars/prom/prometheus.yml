@@ -204,9 +204,6 @@ prometheus_scrape_configs_static:
   - job_name: "aquaero"
     scrape_interval: 30s
     static_configs:
-      - targets: ["{{ hostvars['win-aquaero'].ansible_host }}:{{ hostvars['win-aquaero'].aquaero_exporter_port }}"]
-        labels:
-          instance: "SLB"
       - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].aquaero_exporter_port }}"]
         labels:
           instance: "{{ desktop_label }}"
@@ -230,10 +227,6 @@ prometheus_scrape_configs_static:
       - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].wmi_exporter_port }}"]
         labels:
           instance: "{{ desktop_label }}"
-
-      - targets: ["{{ hostvars['win-aquaero'].ansible_host }}:{{ hostvars['win-aquaero'].wmi_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['win-aquaero'].inventory_hostname }}"
 
   - job_name: "hwinfo"
     static_configs:

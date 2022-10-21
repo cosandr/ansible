@@ -20,8 +20,7 @@
       add_host:
         name: "{{ item }}"
         group: esxi
-      loop:
-        - "win-aquaero"
+      loop: []
       when: "'all_guests' not in ansible_run_tags"
       tags: ["always"]
 
