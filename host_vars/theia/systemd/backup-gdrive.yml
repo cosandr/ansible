@@ -6,18 +6,18 @@ __sd_backup_gdrive:
     content: |
       [Unit]
       Description=Backup important files to Google Drive
-      After=network-online.target
-      Requires=network-online.target
-      ConditionPathExists={{ container_data }}/syncthing/data
+      After=network-online.target mnt-tank.mount
+      Requires=network-online.target mnt-tank.mount
+      ConditionPathExists=/mnt/tank/backup
 
       [Service]
       Type=simple
-      ExecStart=rclone sync -v {{ container_data }}/syncthing/data gsecret:syncthing
+      ExecStart=rclone sync -v --exclude-if-present .rclone_ignore /mnt/tank/backup gsecret:tank-backup
 
       [Install]
       WantedBy=multi-user.target
 
-  # Daily at 05:00
+  # Daily at 05:30
   timer:
     enabled: true
     state: started
@@ -27,7 +27,7 @@ __sd_backup_gdrive:
 
       [Timer]
       Persistent=yes
-      OnCalendar=*-*-* 05:00:00
+      OnCalendar=*-*-* 05:30:00
 
       [Install]
       WantedBy=timers.target

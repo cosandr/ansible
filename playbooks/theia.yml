@@ -115,6 +115,13 @@
         user_install: false
       tags: ["tmuxinator"]
 
+    # Requires EPEL
+    - name: Install rclone
+      ansible.builtin.dnf:
+        name: rclone
+        state: present
+      tags: ["rclone"]
+
   roles:
     - role: systemd_networkd
       tags: ["networkd"]
@@ -151,6 +158,9 @@
 
     - role: libvirt_vm
       tags: ["vms"]
+
+    - role: systemd
+      tags: ["systemd", "rclone"]
 
     - role: node_exporter
       tags: ["node_exporter"]
