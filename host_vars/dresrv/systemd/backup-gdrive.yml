@@ -1,13 +1,5 @@
 ---
 
-__gdrive_exclude:
-  - 'PS3-Backup/**'
-  - 'external-os/**'
-  - 'vcenter/**'
-  - 'truenas/**'
-  - 'macrium/**'
-  - 'theia/**'
-
 __sd_backup_gdrive:
   name: backup-gdrive
   service:
@@ -22,7 +14,7 @@ __sd_backup_gdrive:
       [Service]
       Type=oneshot
       ExecStart=rclone sync -v {{ container_data }}/syncthing/data gsecret:syncthing
-      ExecStart=rclone sync -v --exclude '{{ '{' }}{{ __gdrive_exclude | join(',') }}{{ '}' }}' /tank/backup gsecret:tank-backup
+      ExecStart=rclone sync -v --exclude-if-present .rclone_ignore /tank/backup gsecret:tank-backup
 
       [Install]
       WantedBy=multi-user.target
