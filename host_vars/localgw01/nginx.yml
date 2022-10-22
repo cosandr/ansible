@@ -1,0 +1,11 @@
+---
+
+__nginx_upstreams_host:
+  - name: syncthing
+    servers: ["{{ hostvars['theia'].local_ips.vm }}:8384"]
+
+__nginx_vhosts_host:
+  - filename: syncthing.conf
+    server_name: syncthing
+    upstream_name: syncthing
+    template: "{{ inventory_dir }}/files/webgw/nginx/syncthing.conf.j2"
