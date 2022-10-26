@@ -1,5 +1,8 @@
 ---
 
+node_exporter_collectors:
+  - systemd
+
 node_exporter_no_collectors:
   - mdadm
   - xfs
