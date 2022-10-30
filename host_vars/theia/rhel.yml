@@ -52,3 +52,6 @@ dnf_rhel_packages:
   - vim
   - which
   - zsh
+  - rsync
+  - libxml2-devel
+  - libxslt-devel

@@ -10,6 +10,7 @@ dht_exporter_room: "Hallway"
 
 firewalld_trusted_sources: "{{ vault_firewalld_trusted_sources }}"
 firewall_frontend: "ufw"
+motion_port: 8081
 
 motion_is_rpi: true
 motion_smb_pass: "{{ vault_motion_smb_pass }}"
@@ -43,7 +44,7 @@ motion_default_config:
   picture_quality: "90"
   stream_localhost: "off"
   stream_maxrate: "2"
-  stream_port: "8081"
+  stream_port: "{{ motion_port }}"
   stream_quality: "80"
   threshold: "3000"
   threshold_tune: "1"

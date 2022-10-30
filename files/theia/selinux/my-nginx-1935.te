@@ -1,0 +1,12 @@
+
+module my-nginx-1935 1.0;
+
+require {
+	type httpd_t;
+	type flash_port_t;
+	class tcp_socket name_bind;
+}
+
+#============= httpd_t ==============
+
+allow httpd_t flash_port_t:tcp_socket name_bind;

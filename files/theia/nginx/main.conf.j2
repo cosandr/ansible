@@ -1,0 +1,56 @@
+{{ ansible_managed | comment }}
+server {
+    listen {{ nginx_listen_address }}:{{ nginx_ports[item.server_name] }};
+
+    root {{ web_root }}/main;
+    index index.html index.php index.cgi;
+
+    access_log {{ nginx_sites_logs }}/access-www.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-www.{{ domain }}.log {{ nginx_error_log_options }};
+
+    location ~ \.php$ {
+        include /etc/nginx/fastcgi_params;
+        fastcgi_pass php-fpm;
+        # fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+
+    location / {
+        try_files $uri $uri/ $uri.html $uri.php$is_args$query_string;
+    }
+
+    # Disable hidden files
+    location ~ /\. {
+        deny all;
+        return 403;
+    }
+
+    # Block private
+    location /private {
+        deny all;
+        return 403;
+    }
+
+    location /pip {
+        alias {{ pip_wheel_dir | default(web_root + '/pip') }};
+        autoindex on;
+    }
+
+    {# # TODO: This needs to go into the mrbot-web container
+    location /discord/upload {
+        alias {{ web_root }}/main/discord;
+
+        auth_basic "Restricted";
+        auth_basic_user_file  /etc/nginx/discord_upload.htaccess;
+
+        dav_methods PUT DELETE;
+        dav_ext_methods PROPFIND;
+
+        dav_access user:rw group:rw all:r;
+        client_max_body_size 1G;
+        create_full_put_path off;
+        client_body_temp_path /var/www/dav-temp;
+        autoindex on;
+    } #}
+}

@@ -13,6 +13,8 @@ _ports:
 cadvisor_port: 8081
 node_exporter_port: 9100
 nginx_exporter_port: 9113
+jellyfin_port: 8096
+mrbot_web_port: 8001
 
 domain: "{{ vault_domain }}"
 ddns_domain: "{{ vault_ddns_domain }}"
@@ -22,8 +24,6 @@ smtp_host: "{{ smtp_config[domain].host }}"
 smtp_pass: "{{ smtp_config[domain].pass }}"
 smtp_port: "{{ smtp_config[domain].port }}"
 smtp_user: "{{ smtp_config[domain].user }}"
-web_root: "/var/www"
-pip_wheel_dir: "{{ web_root }}/pip"
 
 nginx_htpasswd: "{{ vault_nginx_htpasswd }}"
 

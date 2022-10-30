@@ -22,6 +22,34 @@ __nginx_upstreams_common:
     servers: ["{{ hostvars['plex01'].ansible_host }}:{{ hostvars['plex01'].plex_port }}"]
     keepalive: 16
 
+  - name: dv-main
+    servers: ["{{ hostvars['theia'].local_ips.vm }}:{{ hostvars['theia'].nginx_ports['main'] }}"]
+
+  - name: mrbot_web
+    servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].mrbot_web_port }}"]
+
+  - name: jellyfin
+    servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].jellyfin_port }}"]
+
+  - name: vouch
+    servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].vouch_listen_port }}"]
+
+  # - name: transmission
+  #   servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].transmission_port }}"]
+  #   keepalive: 16
+
+  # - name: sonarr
+  #   servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].sonarr_port }}"]
+  #   keepalive: 16
+
+  # - name: firefox
+  #   servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].firefox_port }}"]
+  #   keepalive: 16
+
+  # - name: vscode
+  #   servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].vscode_port }}"]
+  #   keepalive: 16
+
 __nginx_upstreams_host:
   - name: nextcloud_ta
     servers: ["{{ hostvars['romsto'].wireguard_ip }}:{{ hostvars['romsto'].nextcloud_port }}"]

@@ -142,17 +142,17 @@ networkd_config:
       [Network]
       Bridge=MGMT
 
-  - enp1s0f0: |
+  - enp43s0f0: |
       [Match]
-      Name=enp1s0f0
+      Name=enp43s0f0
 
       [Network]
       Description=Trunk bond interface 1
       Bond=bond0
 
-  - enp1s0f1: |
+  - enp43s0f1: |
       [Match]
-      Name=enp1s0f1
+      Name=enp43s0f1
 
       [Network]
       Description=Trunk bond interface 2
@@ -177,6 +177,10 @@ networkd_config:
 
       [Route]
       Scope=link
+
+      [Route]
+      Gateway={{ home_net.vm.cidr | ansible.utils.ipaddr('1') }}
+      Destination={{ hostvars['webgw01'].wireguard_ip }}/32
 
   - NOINET: |
       [Match]

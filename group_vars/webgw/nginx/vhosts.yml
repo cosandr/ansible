@@ -17,6 +17,18 @@ __nginx_vhosts_common:
     server_name: grafana
     template: "{{ inventory_dir }}/files/webgw/nginx/grafana.conf.j2"
 
+  - filename: admin.conf
+    server_name: admin
+    template: "{{ inventory_dir }}/files/webgw/nginx/admin.conf.j2"
+
+  - filename: jellyfin.conf
+    server_name: jellyfin
+    template: "{{ inventory_dir }}/files/webgw/nginx/jellyfin.conf.j2"
+
+  - filename: dv-main.conf
+    server_name: www
+    template: "{{ inventory_dir }}/files/webgw/nginx/dv-main.conf.j2"
+
   - filename: nextcloud.conf
     server_name: nextcloud
     template: "{{ inventory_dir }}/files/webgw/nginx/nextcloud.conf.j2"

@@ -1,19 +1,20 @@
 {{ ansible_managed | comment }}
-{% set ddns_domain = inventory_hostname + '.hlab.no' %}
 server {
     listen 80;
     listen [::]:80;
-    server_name {{ ddns_domain }};
+    server_name {{ inventory_hostname }}.{{ domain }};
 
     root {{ web_root }}/direct;
 
-    access_log {{ nginx_sites_logs }}/access-{{ ddns_domain }}.log {{ nginx_access_log_options }};
-    error_log {{ nginx_sites_logs }}/error-{{ ddns_domain }}.log {{ nginx_error_log_options }};
+    access_log {{ nginx_sites_logs }}/access-{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-{{ domain }}.log {{ nginx_error_log_options }};
 
     location /adminer {
         index index.php;
         try_files $uri $uri/ /index.php?$args;
-        allow {{ ansible_default_ipv4.network }}/24;
+        {% for a in firewall_trusted_sources %}
+        allow {{ a }};
+        {% endfor %}
         deny all;
     }
 
@@ -24,7 +25,9 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        allow {{ ansible_default_ipv4.network }}/24;
+        {% for a in firewall_trusted_sources %}
+        allow {{ a }};
+        {% endfor %}
         deny all;
     }
 {% endif %}

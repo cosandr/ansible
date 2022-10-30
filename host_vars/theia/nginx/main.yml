@@ -1,7 +1,11 @@
 ---
+
+nginx_listen_address: "{{ local_ips.vm }}"
+nginx_ports:
+  main: 8013
+
 nginx_modules_path: "/usr/lib64/nginx/modules"
 nginx_modules_conf_path: "/usr/share/nginx/modules"
-nginx_cloudflare_real_ips: "/etc/nginx/cloudflare.conf"
 nginx_rtmp_port: 1935
 
 nginx_access_log_options: "main buffer=16k flush=2m"
@@ -17,7 +21,6 @@ nginx_extra_conf_options: |
 
 nginx_extra_http_options: |
   autoindex off;
-  include       {{ nginx_cloudflare_real_ips }};
   map $http_upgrade $connection_upgrade {
       default upgrade;
       ''      close;

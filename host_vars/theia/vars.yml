@@ -9,3 +9,6 @@ local_ips:
   vm: "{{ home_net.vm.cidr | ansible.utils.ipaddr('2') | ansible.utils.ipaddr('address') }}"
   general: "{{ home_net.general.cidr | ansible.utils.ipaddr('2') | ansible.utils.ipaddr('address') }}"
   mgmt: "{{ home_net.mgmt.cidr | ansible.utils.ipaddr('2') | ansible.utils.ipaddr('address') }}"
+
+web_root: "/var/www"
+pip_wheel_dir: "{{ web_root }}/pip"

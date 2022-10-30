@@ -1,7 +1,7 @@
 ---
 
-vouch_listen_address: 127.0.0.1
-vouch_listen_port: "{{ ports.vouch }}"
+vouch_listen_address: "{{ ansible_host }}"
+vouch_listen_port: 8682
 vouch_user: "{{ nginx_user }}"
 
 vouch_domains:

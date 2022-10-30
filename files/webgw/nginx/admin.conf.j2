@@ -1,16 +1,30 @@
 {{ ansible_managed | comment }}
+{% set domain = domains['dv'] %}
+server {
+    listen 80;
+    listen [::]:80;
+    server_name {{ item.server_name }}.{{ domain }};
+    return 301 https://$host$request_uri;
+}
+
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
-    server_name admin.{{ domain }};
+    server_name {{ item.server_name }}.{{ domain }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+    ssl_dhparam {{ nginx_dhparam }};
+
     large_client_header_buffers 4 16k;
 
-    ssl_certificate {{ nginx_ssl_cert_main }};
-    ssl_certificate_key {{ nginx_ssl_key_main }};
+    access_log {{ nginx_sites_logs }}/access-{{ item.server_name }}.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-{{ item.server_name }}.{{ domain }}.log {{ nginx_error_log_options }};
 
-    include proxy_params;
-    access_log {{ nginx_sites_logs }}/access-admin.{{ domain }}.log {{ nginx_access_log_options }};
-    error_log {{ nginx_sites_logs }}/error-admin.{{ domain }}.log {{ nginx_error_log_options }};
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
 
     auth_request /vouch-validate;
 
@@ -22,13 +36,14 @@ server {
 
     # If the user is not logged in, redirect them to Vouch's login URL
     location @error401 {
-        return 302 https://login.{{ domain }}/login?url=https://$http_host$request_uri&vouch-failcount=$auth_resp_failcount&X-Vouch-Token=$auth_resp_jwt&error=$auth_resp_err;
+        return 302 https://{{ item.server_name }}.{{ domain }}/login?url=https://$http_host$request_uri&vouch-failcount=$auth_resp_failcount&X-Vouch-Token=$auth_resp_jwt&error=$auth_resp_err;
     }
 
     location / {
         return 404;
     }
 
+{% if nginx_upstreams | selectattr('name', 'search', 'motion') %}
     location /motion/ {
         proxy_pass http://motion/;
         proxy_set_header Host $http_host;
@@ -36,6 +51,7 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+{% endif %}
 {% if nginx_upstreams | selectattr('name', 'search', 'transmission') %}
     location /transmission {
         proxy_pass          http://transmission;

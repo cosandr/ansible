@@ -42,3 +42,7 @@ firewall_rules:
   - port: 8384
     zone: public
     sources: "{{ proxy_hosts }}"
+
+  - port: "{{ nginx_ports['main'] }}"
+    zone: public
+    sources: "{{ proxy_hosts }}"

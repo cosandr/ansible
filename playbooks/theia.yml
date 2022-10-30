@@ -164,6 +164,29 @@
 
       tags: ["syncthing"]
 
+    - name: Install php-fpm
+      ansible.builtin.dnf:
+        name:
+          - php
+          - php-cli
+          - php-common
+          - php-fpm
+          - php-gd
+          - php-intl
+          - php-mbstring
+          - php-opcache
+          - php-pdo
+          - php-pecl-imagick
+          - php-pecl-zip
+          - php-pgsql
+          - php-process
+          - php-sodium
+          - php-xml
+        state: present
+      tags: ["php"]
+
+    # TODO: Install SELinux modules
+
   roles:
     - role: systemd_networkd
       tags: ["networkd"]
@@ -203,6 +226,12 @@
 
     - role: systemd
       tags: ["systemd", "rclone"]
+
+    - role: nginx_pre
+      tags: ["nginx"]
+
+    - role: nginx
+      tags: ["nginx"]
 
     - role: node_exporter
       tags: ["node_exporter"]

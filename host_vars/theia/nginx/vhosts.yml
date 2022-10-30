@@ -1,0 +1,14 @@
+---
+
+nginx_vhosts:
+  - filename: default_reject.conf
+    server_name: default_reject
+    template: "{{ inventory_dir }}/files/webgw/nginx/default_reject.conf.j2"
+
+  - filename: direct.conf
+    server_name: direct
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/direct.conf.j2"
+
+  - filename: main.conf
+    server_name: main
+    template: "{{ inventory_dir }}/files/{{ inventory_hostname }}/nginx/main.conf.j2"
