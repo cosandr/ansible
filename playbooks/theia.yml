@@ -32,6 +32,16 @@
         state: started
       tags: ["cpupower"]
 
+    - name: Ensure /var/log/journal exists
+      ansible.builtin.file:
+        path: /var/log/journal
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      notify: Reload systemd-journal
+      tags: ["journald"]
+
   tasks:
     - name: Install libvirt KVM
       ansible.builtin.dnf:
@@ -237,6 +247,9 @@
       tags: ["node_exporter"]
 
   handlers:
+    - name: Reload systemd-journal
+      ansible.builtin.command: killall -USR1 systemd-journal
+
     - name: Restart smartd
       ansible.builtin.systemd:
         name: smartd.service
