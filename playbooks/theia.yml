@@ -228,6 +228,9 @@
     - role: sanoid
       tags: ["sanoid"]
 
+    - role: cosandr.dnf_automatic
+      tags: ["dnf_automatic"]
+
     - role: serial_proxy
       tags: ["serial"]
 

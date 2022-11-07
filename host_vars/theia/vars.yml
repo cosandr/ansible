@@ -12,3 +12,11 @@ local_ips:
 
 web_root: "/var/www"
 pip_wheel_dir: "{{ web_root }}/pip"
+
+dnf_automatic_excludes:
+  - "kernel*"
+  - "kmod*"
+  - "systemd*"
+  - "zfs*"
+  - "libvirt*"
+  - "qemu*"
