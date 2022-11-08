@@ -54,6 +54,15 @@ groups:
       summary: Prometheus AlertManager configuration reload failure (instance {{ $labels.instance }})
       description: "AlertManager configuration reload error\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
+  - alert: PrometheusAlertmanagerConfigNotSynced
+    expr: count(count_values("config_hash", alertmanager_config_hash)) > 1
+    for: 0m
+    labels:
+      severity: warning
+    annotations:
+      summary: Prometheus AlertManager config not synced (instance {{ $labels.instance }})
+      description: "Configurations of AlertManager cluster instances are out of sync\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
   - alert: PrometheusNotConnectedToAlertmanager
     expr: prometheus_notifications_alertmanagers_discovered < 1
     for: 0m

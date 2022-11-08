@@ -2,83 +2,9 @@
 
 - hosts: prom
   gather_facts: true
-  vars:
-    __exclude_auto_node:
-      - dresrv
-      - drepi
-      - romsto
-      - theia
-      - oldpi
   pre_tasks:
-    - block:
-        - name: Disable some default services
-          firewalld:
-            zone: "{{ item.zone }}"
-            service: "{{ item.service }}"
-            permanent: true
-            state: disabled
-          loop:
-            - zone: public
-              service: cockpit
-            - zone: internal
-              service: cockpit
-            - zone: internal
-              service: samba-client
-            - zone: internal
-              service: samba-client
-          notify: reload firewalld
-
-        - name: Add home networks to internal zone
-          firewalld:
-            zone: internal
-            source: "{{ item.cidr }}"
-            permanent: true
-            state: enabled
-          loop: "{{ home_net.values() }}"
-          loop_control:
-            label: "{{ item.cidr }}"
-          notify: reload firewalld
-
-        - name: Add some wireguard clients to internal zone
-          firewalld:
-            zone: internal
-            source: "{{ item }}"
-            permanent: true
-            state: enabled
-          loop:
-            - "{{ hostvars['laptop'].wireguard_ip }}"
-            - "{{ hostvars['m1bp'].wireguard_ip }}"
-          notify: reload firewalld
-
-        - name: Allow ports to internal zone
-          firewalld:
-            zone: internal
-            port: "{{ item }}/tcp"
-            permanent: true
-            state: enabled
-          loop:
-            - "{{ alertmanager_port }}"
-            - "{{ prometheus_port }}"
-            - "{{ ipmi_exporter_port }}"
-            - "{{ pushgateway_port }}"
-            - "{{ mikrotik_exporter_port }}"
-            - "{{ promtail_syslog_port }}"
-          notify: reload firewalld
-
-        - name: Allow rsyslog port to internal zone
-          firewalld:
-            zone: internal
-            port: "514/{{ item }}"
-            permanent: true
-            state: enabled
-          loop: ["tcp", "udp"]
-          loop_control:
-            label: "514/{{ item }}"
-          notify: reload firewalld
-
-      tags: ["firewalld"]
-
     - name: Configure rsyslog
+      when: promtail_syslog_port
       block:
         - name: Install rsyslog
           dnf:
@@ -123,67 +49,16 @@
 
       tags: ["rsyslog"]
 
-    - name: Install requirements for aquaero exporter
-      dnf:
-        name:
-          - python3
-          - python3-pip
-          - usbutils
-        state: present
-
-    - name: Add servers to node scrape config
-      set_fact:
-        prometheus_node_static_config: "{{ prometheus_node_static_config + [tmp_dict] }}"
-      vars:
-        tmp_dict:
-          targets: ["{{ hostvars[item].wireguard_ip | default(hostvars[item].ansible_host) }}:{{ hostvars[item].node_exporter_port }}"]
-          labels:
-            instance: "{{ hostvars[item].inventory_hostname }}"
-      loop: "{{ groups['servers'] | difference(__exclude_auto_node) | sort }}"
-      tags: ["prometheus"]
-
-    # - name: Set elastic exporters fact
-    #   set_fact:
-    #     __elastic_static_configs: "{{ __elastic_static_configs | default([]) + [tmp_dict] }}"
-    #   vars:
-    #     tmp_dict:
-    #       targets: ["{{ hostvars[item].ansible_host }}:{{ hostvars[item].elastic_exporter_port }}"]
-    #       labels:
-    #         instance: "{{ hostvars[item].inventory_hostname }}"
-    #   loop: "{{ groups['elasticsearch'] }}"
-    #   tags: ["prometheus"]
-
-    # - name: Add elastic job to scrape config
-    #   set_fact:
-    #     prometheus_scrape_configs_runtime: "{{ prometheus_scrape_configs_runtime + [tmp_dict] }}"
-    #   vars:
-    #     tmp_dict:
-    #       job_name: "elasticsearch"
-    #       static_configs: "{{ __elastic_static_configs }}"
-    #   tags: ["prometheus"]
-
-    - name: Add servers to blackbox ping probe
-      set_fact:
-        blackbox_exporter_targets_icmp_ipv4: "{{ blackbox_exporter_targets_icmp_ipv4 + [tmp_var] }}"
-      vars:
-        tmp_var: "{{ hostvars[item].wireguard_ip | default(hostvars[item].ansible_host) }}"
-      loop: "{{ groups['servers'] | difference(__exclude_auto_node) | sort }}"
-      when: hostvars[item].wireguard_ip is defined or hostvars[item].ansible_host is defined
-      tags: ["prometheus"]
-
-    - name: Add static blackbox http probes
-      set_fact:
-        blackbox_exporter_targets_http_ipv4: "{{ blackbox_exporter_targets_http_ipv4 + [item] }}"
-      loop:
-        - "https://gitlab.{{ hostvars['gitlab01'].domain }}"
-      tags: ["prometheus"]
-
   roles:
     - role: setup_disks
       tags: ["disk"]
 
     - role: firewalld_webgw
-      tags: ["firewalld"]
+      when: webgw_ports
+      tags: ["firewall"]
+
+    - role: firewall_config
+      tags: ["firewall"]
 
     - role: prometheus
       tags: ["prometheus"]
@@ -198,26 +73,25 @@
       tags: ["node_exporter"]
 
     - role: ipmi_exporter
+      when: ipmi_exporter_modules
       tags: ["ipmi_exporter"]
 
     - role: mikrotik_exporter
+      when: mikrotik_exporter_config
       tags: ["mikrotik_exporter"]
 
     - role: grafana
+      when: grafana_database
       tags: ["grafana"]
 
     - role: cosandr.dnf_automatic
       tags: ["dnf_automatic"]
 
     - role: cloudalchemy.pushgateway
+      when: pushgateway_port
       tags: ["pushgateway"]
 
   handlers:
-    - name: reload firewalld
-      service:
-        name: firewalld
-        state: reloaded
-
     - name: restart rsyslog
       service:
         name: rsyslog

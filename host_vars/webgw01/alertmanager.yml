@@ -1,0 +1,3 @@
+---
+
+alertmanager_web_listen_address: "{{ wireguard_ip }}:{{ alertmanager_port }}"

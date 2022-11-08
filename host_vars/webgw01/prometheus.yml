@@ -1,0 +1,15 @@
+---
+
+prometheus_storage_retention: "7d"
+prometheus_config_flags_extra: {}
+prometheus_web_listen_address: "{{ wireguard_ip }}:{{ prometheus_port }}"
+
+blackbox_exporter_targets_icmp_ipv4: []
+__prom_node_group: "prom"
+__extra_prometheus_scrape_configs: []
+
+prometheus_node_static_config: []
+
+prometheus_alert_rules_files:
+  - "{{ inventory_dir }}/files/prometheus/alerts/blackbox.rules"
+  - "{{ inventory_dir }}/files/prometheus/alerts/prometheus.rules"

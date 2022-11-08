@@ -2,7 +2,7 @@
 
 # Must manually create user, create thanos policy and assign it to user
 
-- hosts: prom
+- hosts: prom, !webgw
   gather_facts: true
   pre_tasks:
     - name: Create Thanos bucket

@@ -5,3 +5,12 @@ ansible_host6: "{{ vault_ansible_host6 }}"
 ansible_user: "{{ vault_ansible_user }}"
 
 sys_timezone: "Etc/UTC"
+
+# Override vars from prom group_vars
+grafana_database: {}
+ipmi_exporter_modules: {}
+mikrotik_exporter_config: {}
+promtail_syslog_port: ""
+pushgateway_port: ""
+webgw_ports: []
+provisioned_disks: []

@@ -1,0 +1,21 @@
+---
+
+# Override vars in other groups the host might be in
+firewalld_zones: []
+firewalld_services: []
+firewall_rules:
+  # Alertmanager cluster, thanks masquarade
+  - port: "{{ alertmanager_port }}"
+    zone: internal
+    source: "{{ hostvars['mt-router'].wireguard_ip }}"
+  - port: "{{ prometheus_port }}"
+    zone: internal
+    source: "{{ hostvars['mt-router'].wireguard_ip }}"
+  - port: "{{ alertmanager_peer_port }}"
+    protocol: tcp
+    zone: internal
+    source: "{{ hostvars['mt-router'].wireguard_ip }}"
+  - port: "{{ alertmanager_peer_port }}"
+    protocol: udp
+    zone: internal
+    source: "{{ hostvars['mt-router'].wireguard_ip }}"

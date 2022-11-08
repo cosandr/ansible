@@ -2,9 +2,17 @@
 
 alertmanager_version: latest
 alertmanager_port: 9093
+alertmanager_peer_port: 9094
 alertmanager_web_listen_address: "0.0.0.0:{{ alertmanager_port }}"
-alertmanager_web_external_url: "http://{{ ansible_host }}:{{ alertmanager_port }}/"
+alertmanager_web_external_url: "http://{{ wireguard_ip | default(ansible_host) }}:{{ alertmanager_port }}/"
 alertmanager_slack_api_url: "{{ vault_alertmanager_slack_api_url }}"
+
+alertmanager_cluster:
+  listen-address: "{{ wireguard_ip | default(ansible_host) }}:{{ alertmanager_peer_port }}"
+  peers: "{{ __prom_node_ips | difference([wireguard_ip | default(ansible_host)]) |
+    map('regex_replace', '$', ':' + (alertmanager_peer_port | string)) | list }}"
+  peer-timeout: 45s
+
 # https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl
 alertmanager_receivers:
   - name: discord

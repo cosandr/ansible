@@ -6,6 +6,21 @@ drepi_label: "{{ hostvars.drepi.inventory_hostname }}"
 server_label: "{{ hostvars.dresrv.inventory_hostname }}"
 romsto_label: "RomeoTV"
 __dresrv: "{{ hostvars['dresrv'] }}"
+__prom_node_group: "servers"
+
+__exclude_auto_node:
+  - dresrv
+  - drepi
+  - romsto
+  - theia
+  - oldpi
+
+__prom_node_ips: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['prom'] -%}
+  {{- tmp.append(hostvars[h].wireguard_ip | default(hostvars[h].ansible_host)) -}}
+  {%- endfor -%}
+  {{ tmp }}
 
 prometheus_version: latest
 prometheus_port: 9090
@@ -15,20 +30,17 @@ prometheus_config_flags_extra:
   "storage.tsdb.min-block-duration": "2h"
   "storage.tsdb.max-block-duration": "2h"
 prometheus_web_listen_address: "0.0.0.0:{{ prometheus_port }}"
+prometheus_web_external_url: "http://{{ wireguard_ip | default(ansible_host) }}:{{ prometheus_port }}"
 prometheus_global:
   scrape_interval: 15s
   scrape_timeout: 10s
   evaluation_interval: 15s
+
 prometheus_alertmanager_config:
-  - scheme: http
-    static_configs:
-      - targets: ["localhost:{{ alertmanager_web_listen_address.split(':')[1] }}"]
+  - static_configs:
+      - targets: "{{ __prom_node_ips | map('regex_replace', '$', ':' + (alertmanager_port | string)) | list }}"
 
 prometheus_node_static_config:
-  - targets: ["localhost:{{ node_exporter_port }}"]
-    labels:
-      instance: "{{ inventory_hostname }}"
-
   - targets: ["{{ __dresrv.ansible_host }}:{{ __dresrv.node_exporter_port }}"]
     labels:
       instance: "{{ server_label }}"
@@ -63,23 +75,91 @@ blackbox_exporter_targets_http_ipv4:
   - "https://google.com"
   - "https://{{ grafana_domain }}"
   - "https://ha.hlab.no"
-prometheus_scrape_configs_runtime: []
-# Workaround vars set during role runtime, prometheus_metrics_path for example
-prometheus_scrape_configs: "{{ prometheus_scrape_configs_static + prometheus_scrape_configs_runtime }}"
-prometheus_scrape_configs_static:
+  - "https://gitlab.{{ hostvars['gitlab01'].domain }}"
+
+__prom_am_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['prom'] -%}
+  {{- tmp.append(
+    {
+      "targets": [hostvars[h].wireguard_ip | default(hostvars[h].ansible_host) + ":" + hostvars[h].alertmanager_port | string],
+      "labels": {
+        "instance": hostvars[h].inventory_hostname
+      }
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_prom_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['prom'] -%}
+  {{- tmp.append(
+    {
+      "targets": [hostvars[h].wireguard_ip | default(hostvars[h].ansible_host) + ":" + hostvars[h].prometheus_port | string],
+      "labels": {
+        "instance": hostvars[h].inventory_hostname
+      }
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_node_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_node_group] | difference(__exclude_auto_node) | sort -%}
+  {{- tmp.append(
+    {
+      "targets": [hostvars[h].wireguard_ip | default(hostvars[h].ansible_host) + ":" + hostvars[h].node_exporter_port | string],
+      "labels": {
+        "instance": hostvars[h].inventory_hostname
+      }
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_blackbox_icmp_targets: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_node_group] | difference(__exclude_auto_node) | sort -%}
+  {{- tmp.append(hostvars[h].wireguard_ip | default(hostvars[h].ansible_host)) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+prometheus_scrape_configs: "{{ (__common_prometheus_scrape_configs | default([])) + (__extra_prometheus_scrape_configs | default([])) }}"
+
+__common_prometheus_scrape_configs:
   - job_name: "alertmanager"
-    static_configs:
-      - targets: ["localhost:{{ alertmanager_web_listen_address.split(':')[1] }}"]
-        labels:
-          instance: "{{ inventory_hostname }}"
+    static_configs: "{{ __prom_am_configs }}"
 
   - job_name: "prometheus"
     metrics_path: "{{ prometheus_metrics_path }}"
-    static_configs:
-      - targets: ["localhost:{{ prometheus_port }}"]
-        labels:
-          instance: "{{ inventory_hostname }}"
+    static_configs: "{{ __prom_prom_configs }}"
 
+  - job_name: 'blackbox_icmp4'
+    metrics_path: '/probe'
+    params:
+      module: [icmp_ipv4]
+    static_configs:
+      - targets: "{{ blackbox_exporter_targets_icmp_ipv4 + __prom_blackbox_icmp_targets }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "localhost:{{ blackbox_exporter_port }}"
+      - source_labels: [instance]
+        target_label: __host_ip
+
+  - job_name: "node"
+    static_configs: "{{ prometheus_node_static_config + __prom_node_configs }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __host_ip
+        regex: '([^:]+):\d+'
+
+__extra_prometheus_scrape_configs:
   - job_name: "pushgateway"
     static_configs:
       - targets: ["localhost:{{ pushgateway_port }}"]
@@ -145,22 +225,6 @@ prometheus_scrape_configs_static:
         target_label: thanos_svc
         replacement: "query"
 
-  - job_name: 'blackbox_icmp4'
-    metrics_path: '/probe'
-    params:
-      module: [icmp_ipv4]
-    static_configs:
-      - targets: "{{ blackbox_exporter_targets_icmp_ipv4 }}"
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: "localhost:{{ blackbox_exporter_port }}"
-      - source_labels: [instance]
-        target_label: __host_ip
-
   - job_name: 'blackbox_http4'
     scrape_interval: 1m
     metrics_path: '/probe'
@@ -200,13 +264,6 @@ prometheus_scrape_configs_static:
       - targets: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].cadvisor_port }}"]
         labels:
           instance: "{{ romsto_label }}"
-
-  - job_name: "node"
-    static_configs: "{{ prometheus_node_static_config }}"
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __host_ip
-        regex: '([^:]+):\d+'
 
   - job_name: "aquaero"
     scrape_interval: 30s

@@ -1,0 +1,67 @@
+---
+
+webgw_zone: '0-webgw'
+__am_fw_sources: "{{ __prom_node_ips | difference([wireguard_ip | default(ansible_host)]) }}"
+
+firewalld_zones:
+  - name: internal
+    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+
+  # Only add Wireguard IPs, others are already included in home_net
+  - name: internal
+    sources: "{{ firewall_trusted_sources | ansible.utils.ipaddr(wg_net.mt.cidr) }}"
+
+firewalld_services:
+  - name: cockpit
+    zone: public
+    state: absent
+
+  - name: cockpit
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: public
+    state: absent
+
+firewall_rules:
+  - port: "{{ node_exporter_port }}"
+    zone: public
+    sources: "{{ __am_fw_sources }}"
+  - port: "{{ alertmanager_port }}"
+    zone: internal
+  - port: "{{ prometheus_port }}"
+    zone: internal
+  - port: "{{ ipmi_exporter_port }}"
+    zone: internal
+  - port: "{{ pushgateway_port }}"
+    zone: internal
+  - port: "{{ mikrotik_exporter_port }}"
+    zone: internal
+  - port: "{{ promtail_syslog_port }}"
+    zone: internal
+  - port: 514
+    protocol: tcp
+    zone: internal
+  - port: 514
+    protocol: udp
+    zone: internal
+  # Alertmanager cluster
+  - port: "{{ alertmanager_port }}"
+    zone: "{{ webgw_zone }}"
+    sources: "{{ __am_fw_sources }}"
+  - port: "{{ prometheus_port }}"
+    zone: "{{ webgw_zone }}"
+    sources: "{{ __am_fw_sources }}"
+  - port: "{{ alertmanager_peer_port }}"
+    protocol: tcp
+    zone: "{{ webgw_zone }}"
+    sources: "{{ __am_fw_sources }}"
+  - port: "{{ alertmanager_peer_port }}"
+    protocol: udp
+    zone: "{{ webgw_zone }}"
+    sources: "{{ __am_fw_sources }}"
