@@ -1,7 +1,7 @@
 ---
 
 provisioned_disks:
-  - dev: "/dev/disk/by-path/pci-0000:03:00.0-scsi-0:0:1:0"
+  - dev: "/dev/disk/by-id/virtio-data01"
     vols:
       - name: docker
         path: "/var/lib/docker"
