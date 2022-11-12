@@ -23,6 +23,7 @@ libvirt
 [libvirt]
 dresrv
 localgw01
+prom01
 
 [libvirt:children]
 backup
@@ -33,7 +34,6 @@ loki
 minio
 nextcloud
 plex
-prom
 
 [rpi]
 drepi   ansible_host=10.0.50.21    ansible_user=andrei

@@ -22,6 +22,12 @@
       tags: ["systemd"]
 
   post_tasks:
+    # Required for gitlab backup to work
+    - name: Ensure tar is installed
+      ansible.builtin.dnf:
+        name: tar
+        state: present
+
     - name: Mount backup NFS share
       mount:
         src: "{{ hostvars['theia'].local_ips.vm }}:/mnt/tank/backup/gitlab"

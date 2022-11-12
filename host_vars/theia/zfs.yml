@@ -8,8 +8,5 @@ zfs_scrub_timers:
   - pool: rpool
     schedule: weekly
 
-  - pool: ssd
-    schedule: weekly
-
   - pool: tank
     schedule: weekly
