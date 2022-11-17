@@ -1,12 +1,13 @@
 {{ ansible_managed | comment }}
+{% set domain = domains['dv'] %}
 server {
     listen {{ nginx_listen_address }}:{{ nginx_ports[item.server_name] }};
 
     root {{ web_root }}/main;
     index index.html index.php index.cgi;
 
-    access_log {{ nginx_sites_logs }}/access-www.{{ domain }}.log {{ nginx_access_log_options }};
-    error_log {{ nginx_sites_logs }}/error-www.{{ domain }}.log {{ nginx_error_log_options }};
+    access_log {{ nginx_sites_logs }}/access-{{ item.server_name }}.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-{{ item.server_name }}.{{ domain }}.log {{ nginx_error_log_options }};
 
     location ~ \.php$ {
         include /etc/nginx/fastcgi_params;
@@ -32,8 +33,8 @@ server {
         return 403;
     }
 
-    location /pip {
-        alias {{ pip_wheel_dir | default(web_root + '/pip') }};
+    location /pip/ {
+        alias {{ pip_wheel_dir | default(web_root + '/pip') }}/;
         autoindex on;
     }
 

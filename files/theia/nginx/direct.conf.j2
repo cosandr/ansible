@@ -2,12 +2,12 @@
 server {
     listen 80;
     listen [::]:80;
-    server_name {{ inventory_hostname }}.{{ domain }};
+    server_name {{ item.server_name }}.{{ domain }};
 
     root {{ web_root }}/direct;
 
-    access_log {{ nginx_sites_logs }}/access-{{ domain }}.log {{ nginx_access_log_options }};
-    error_log {{ nginx_sites_logs }}/error-{{ domain }}.log {{ nginx_error_log_options }};
+    access_log {{ nginx_sites_logs }}/access-{{ item.server_name }}.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-{{ item.server_name }}.{{ domain }}.log {{ nginx_error_log_options }};
 
     location /adminer {
         index index.php;

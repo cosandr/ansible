@@ -2,7 +2,7 @@
 
 nginx_listen_address: "{{ local_ips.vm }}"
 nginx_ports:
-  main: 8013
+  www: 8013
 
 nginx_modules_path: "/usr/lib64/nginx/modules"
 nginx_modules_conf_path: "/usr/share/nginx/modules"
