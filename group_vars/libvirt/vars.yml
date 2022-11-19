@@ -37,8 +37,10 @@ vm_nics: ["{{ vm_default_nic }}"]
 vm_default_definition:
   state: present
   machine: q35
-  start: false
-  customize: false
+  start: true
+  customize: true
+  enable_console: true
+  enable_vnc: false
   name: "{{ inventory_hostname }}"
   domain: "{{ vm_default_nic.domain | default(false) }}"
   memory_mb: "{{ vm_mem }}"
