@@ -1,0 +1,80 @@
+---
+
+- name: Enable serial console output
+  hosts: libvirt
+  gather_facts: false
+  pre_tasks:
+    - name: Grub prep
+      tags: ["grub"]
+      block:
+        - name: Check for grub config
+          ansible.builtin.stat:
+            path: "/etc/default/grub"
+          register: __grub_conf
+
+        - name: Look for grub.cfg
+          ansible.builtin.find:
+            paths: /boot/efi/EFI
+            patterns: 'grub.cfg'
+            recurse: true
+          register: __grub_search
+
+        - name: Set grub.cfg path
+          ansible.builtin.set_fact:
+            grub_cfg_path: "{{ __grub_search.files[0].path }}"
+          when: __grub_search.matched > 0
+
+  tasks:
+    - name: Configure grub timeout
+      ansible.builtin.lineinfile:
+        dest: "/etc/default/grub"
+        regexp: '^GRUB_TIMEOUT'
+        line: "GRUB_TIMEOUT=2"
+        state: present
+      when: __grub_conf.stat.exists
+      notify: Regenerate grub
+      tags: ["grub"]
+
+    - name: Add kernel options
+      ansible.builtin.lineinfile:
+        dest: "/etc/default/grub"
+        regexp: '^GRUB_CMDLINE_LINUX'
+        line: GRUB_CMDLINE_LINUX="console=tty0 console=ttyS0,115200n8 no_timer_check crashkernel=auto"
+        state: present
+      when: __grub_conf.stat.exists
+      notify: Regenerate grub
+      tags: ["grub"]
+
+    - name: Disable kdump
+      ansible.builtin.systemd:
+        name: kdump.service
+        state: stopped
+        enabled: false
+      register: __svc
+      failed_when:
+        - __svc.failed
+        - "'Could not find the requested service' not in __svc.msg"
+      tags: ["kdump"]
+
+    - name: Migrate to q35 machine type
+      tags: ["q35"]
+      block:
+        - name: Rename network script
+          ansible.builtin.command:
+            cmd: mv /etc/sysconfig/network-scripts/ifcfg-ens1 /etc/sysconfig/network-scripts/ifcfg-enp1s0
+            creates: /etc/sysconfig/network-scripts/ifcfg-enp1s0
+            removes: /etc/sysconfig/network-scripts/ifcfg-ens1
+
+        - name: Rename ens1 to enp1s0
+          ansible.builtin.replace:
+            path: "{{ item }}"
+            regexp: ens1
+            replace: enp1s0
+          loop:
+            - /etc/sysconfig/network-scripts/ifcfg-enp1s0
+            - /etc/sysconfig/network
+
+  handlers:
+    - name: Regenerate grub
+      ansible.builtin.command: "grub2-mkconfig -o {{ grub_cfg_path }}"
+      when: "grub_cfg_path is defined"
