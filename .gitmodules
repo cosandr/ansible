@@ -49,3 +49,6 @@
 [submodule "roles/minio"]
 	path = roles/minio
 	url = https://github.com/minio/ansible-minio.git
+[submodule "roles/epel"]
+	path = roles/epel
+	url = git@github.com:cosandr/ansible-role-epel.git
