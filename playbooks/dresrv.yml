@@ -122,6 +122,29 @@
     grafana_version: "latest"
     nginx_exporter_version: "latest"
     node_exporter_version: "latest"
+  tasks:
+    - name: Setup syncthing
+      tags: ["syncthing"]
+      block:
+        - name: Configure syncthing
+          community.general.xml:
+            path: /srv/containers/syncthing/data/config/config.xml
+            xpath: "{{ item.xpath }}"
+            value: "{{ item.value }}"
+            state: present
+          loop:
+            # Bind to local IP when running container
+            - xpath: /configuration/gui/address
+              value: "0.0.0.0:8384"
+            - xpath: /configuration/options/listenAddress
+              value: "tcp://0.0.0.0:22000"
+            - xpath: /configuration/options/globalAnnounceEnabled
+              value: "false"
+            - xpath: /configuration/options/relaysEnabled
+              value: "false"
+            - xpath: /configuration/options/natEnabled
+              value: "false"
+          notify: Restart syncthing
   roles:
     - role: samba
       tags: ["samba"]
@@ -173,3 +196,10 @@
 
     - role: node_exporter
       tags: ["prometheus-stack", "node_exporter"]
+
+  handlers:
+    - name: Restart syncthing
+      community.docker.docker_container:
+        name: syncthing
+        state: started
+        restart: true

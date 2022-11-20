@@ -132,48 +132,6 @@
         state: present
       tags: ["rclone"]
 
-    # Requires EPEL
-    - name: Setup syncthing
-      block:
-        - name: Install syncthing
-          ansible.builtin.dnf:
-            name: syncthing
-            state: present
-
-        - name: Create syncthing system user
-          ansible.builtin.user:
-            name: syncthing
-            home: /var/lib/syncthing
-            create_home: true
-            system: true
-
-        - name: Enable and start syncthing
-          ansible.builtin.systemd:
-            name: syncthing@syncthing.service
-            state: started
-            enabled: true
-
-        - name: Configure syncthing
-          community.general.xml:
-            path: /var/lib/syncthing/.config/syncthing/config.xml
-            xpath: "{{ item.xpath }}"
-            value: "{{ item.value }}"
-            state: present
-          loop:
-            - xpath: /configuration/gui/address
-              value: "{{ local_ips.vm }}:8384"
-            - xpath: /configuration/options/listenAddress
-              value: "tcp://{{ local_ips.general }}:22000"
-            - xpath: /configuration/options/globalAnnounceEnabled
-              value: "false"
-            - xpath: /configuration/options/relaysEnabled
-              value: "false"
-            - xpath: /configuration/options/natEnabled
-              value: "false"
-          notify: Restart syncthing
-
-      tags: ["syncthing"]
-
     - name: Install php-fpm
       ansible.builtin.dnf:
         name:
@@ -256,11 +214,6 @@
     - name: Restart smartd
       ansible.builtin.systemd:
         name: smartd.service
-        state: restarted
-
-    - name: Restart syncthing
-      ansible.builtin.systemd:
-        name: syncthing@syncthing.service
         state: restarted
 
     - name: Restore tank SELinux context
