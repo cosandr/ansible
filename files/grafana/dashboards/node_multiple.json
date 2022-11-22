@@ -153,7 +153,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "9.1.3",
+      "pluginVersion": "9.3.0-beta1",
       "targets": [
         {
           "datasource": {
@@ -708,10 +708,12 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "node_hwmon_temp_celsius{chip=\"thermal_thermal_zone0\", instance=~\"$instance\", job=\"$job\"}",
+          "expr": "node_hwmon_temp_celsius + on(chip, instance) group_left(chip_name) (0 * node_hwmon_chip_names{chip_name=~\"^(k10.*|coretemp$|cpu_thermal)\"})",
           "interval": "",
           "legendFormat": "{{ instance }} - {{ sensor }}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -756,7 +758,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "9.1.3",
+      "pluginVersion": "9.3.0-beta1",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -853,7 +855,7 @@
             "spanNulls": false,
             "stacking": {
               "group": "A",
-              "mode": "normal"
+              "mode": "none"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -869,6 +871,10 @@
               {
                 "color": "green",
                 "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 50
               },
               {
                 "color": "red",
@@ -912,12 +918,14 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$instance\", job=\"$job\"}[1m])) by (mode, instance) * 100 / scalar(count(node_cpu_seconds_total{instance=~\"$instance\", job=\"$job\", mode=\"user\"}))",
+          "expr": "sum(rate(node_cpu_seconds_total{instance=~\"$instance\", job=\"$job\", mode!=\"idle\"}[1m])) by (instance) * 100 / scalar(count(node_cpu_seconds_total{instance=~\"$instance\", job=\"$job\", mode=\"user\"}))",
           "interval": "",
           "intervalFactor": 4,
-          "legendFormat": "{{ instance }} - {{ mode }}",
+          "legendFormat": "{{ instance }}",
           "metric": "node_cpu_seconds_total",
+          "range": true,
           "refId": "A",
           "step": 10
         }
@@ -1065,7 +1073,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "8.2.0",
+      "pluginVersion": "9.3.0-beta1",
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
@@ -1178,6 +1186,8 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -1199,18 +1209,21 @@
             "spanNulls": true,
             "stacking": {
               "group": "A",
-              "mode": "normal"
+              "mode": "none"
             },
             "thresholdsStyle": {
               "mode": "off"
             }
           },
           "mappings": [],
+          "max": 1,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1218,70 +1231,9 @@
               }
             ]
           },
-          "unit": "bytes"
+          "unit": "percentunit"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Used"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#BF1B00",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Free"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#7EB26D",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Buffers"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#6ED0E0",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Cached"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "#EF843C",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 13,
@@ -1303,7 +1255,8 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "pluginVersion": "8.0.3",
@@ -1313,51 +1266,14 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
+          "editorMode": "code",
           "exemplar": true,
-          "expr": "node_memory_MemTotal_bytes{instance=~\"$instance\", job=\"$job\"} - (node_memory_MemFree_bytes{instance=~\"$instance\", job=\"$job\"} + node_memory_Buffers_bytes{instance=~\"$instance\", job=\"$job\"} + node_memory_Cached_bytes{instance=~\"$instance\", job=\"$job\"})",
+          "expr": "node_memory_Active_bytes{instance=~\"$instance\", job=\"$job\"} / node_memory_MemTotal_bytes{instance=~\"$instance\", job=\"$job\"}",
           "interval": "",
           "intervalFactor": 1,
-          "legendFormat": "{{ instance }} - Used",
+          "legendFormat": "{{ instance }}",
+          "range": true,
           "refId": "A",
-          "step": 1
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "exemplar": true,
-          "expr": "node_memory_MemFree_bytes{instance=~\"$instance\", job=\"$job\"}",
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "{{ instance }} - Free",
-          "refId": "B",
-          "step": 1
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "exemplar": true,
-          "expr": "node_memory_Buffers_bytes{instance=~\"$instance\", job=\"$job\"}",
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "{{ instance }} - Buffers",
-          "refId": "C",
-          "step": 1
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "exemplar": true,
-          "expr": "node_memory_Cached_bytes{instance=~\"$instance\", job=\"$job\"}",
-          "interval": "",
-          "intervalFactor": 1,
-          "legendFormat": "{{ instance }} - Cached",
-          "refId": "D",
           "step": 1
         }
       ],
@@ -1375,6 +1291,8 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -1408,7 +1326,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1440,7 +1359,8 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "pluginVersion": "8.0.3",
@@ -1488,6 +1408,8 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -1584,7 +1506,8 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "single"
+          "mode": "single",
+          "sort": "none"
         }
       },
       "pluginVersion": "8.0.3",
@@ -1630,6 +1553,8 @@
             "mode": "palette-classic"
           },
           "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
@@ -1695,7 +1620,8 @@
           "showLegend": true
         },
         "tooltip": {
-          "mode": "multi"
+          "mode": "multi",
+          "sort": "none"
         }
       },
       "pluginVersion": "8.0.3",
@@ -1853,6 +1779,6 @@
   "timezone": "browser",
   "title": "Node Multiple",
   "uid": "_j82lEc7k",
-  "version": 1,
+  "version": 4,
   "weekStart": ""
 }
