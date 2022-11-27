@@ -3,6 +3,7 @@
 ansible_host: "{{ vault_ansible_host }}"
 ansible_host6: "{{ vault_ansible_host6 }}"
 ansible_user: "{{ vault_ansible_user }}"
+ansible_become: true
 
 sys_timezone: "Etc/UTC"
 

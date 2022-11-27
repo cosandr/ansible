@@ -1,5 +1,7 @@
 ---
 
+sshd_permit_root: "prohibit-password"
+
 sshd_config:
   - regexp: "^#?StrictModes"
     line: "StrictModes yes"
@@ -8,7 +10,7 @@ sshd_config:
   - regexp: "^#?X11Forwarding"
     line: "X11Forwarding no"
   - regexp: "^#?PermitRootLogin"
-    line: "PermitRootLogin prohibit-password"
+    line: "PermitRootLogin {{ sshd_permit_root }}"
   - regexp: "^#?PasswordAuthentication"
     line: "PasswordAuthentication no"
   - regexp: "^#?PermitEmptyPasswords"

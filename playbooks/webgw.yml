@@ -25,6 +25,68 @@
         - __configured_ssh.state is undefined
       tags: ["sshd"]
 
+- name: Configure user
+  hosts: webgw
+  gather_facts: false
+  pre_tasks:
+    - name: Try to connect as configured user
+      delegate_to: localhost
+      ansible.builtin.command: >
+        ssh -q -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=1
+          -p {{ ansible_port | default(22) }} {{ ansible_user }}@{{ ansible_host }} /bin/true
+      check_mode: false
+      changed_when: false
+      failed_when: false
+      register: __user_connect
+      tags: ["user"]
+      when: ansible_user != 'root'
+
+  tasks:
+    - name: Configure user
+      tags: ["user"]
+      when:
+        - __user_connect is defined
+        - __user_connect.rc | default(0) != 0
+      block:
+        - name: Temporarily connect as root
+          ansible.builtin.set_fact:
+            ansible_conf_user: "{{ ansible_user }}"
+            ansible_user: "root"
+
+        - name: Ensure user exists
+          ansible.builtin.user:
+            name: "{{ ansible_conf_user }}"
+            create_home: true
+            groups:
+              - wheel
+
+        - name: Configure user SSH keys
+          ansible.posix.authorized_key:
+            user: "{{ ansible_conf_user }}"
+            key: "{{ ssh_authorized_keys | join('\n') }}"
+            state: present
+            exclusive: true
+          tags: ["ssh"]
+
+        - name: Configure sudo
+          ansible.builtin.include_role:
+            name: sudo
+          vars:
+            sudo_install: false
+            sudoers_files:
+              - dest: "10-{{ ansible_conf_user }}"
+                content: "{{ ansible_conf_user }} ALL=(ALL) NOPASSWD: ALL"
+
+        - name: Connect as configured user
+          ansible.builtin.set_fact:
+            ansible_user: "{{ ansible_conf_user }}"
+
+        - name: Ensure we can connect and become
+          become: true
+          check_mode: false
+          changed_when: false
+          ansible.builtin.shell: /usr/bin/test $EUID -eq 0
+
 - name: Configure gateways
   hosts: webgw
   gather_facts: true
