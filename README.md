@@ -38,6 +38,14 @@ ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -t stop,all_guest
 ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -l slb -t mount
 ```
 
+## kubespray
+
+Run Ansible from the kubespray submodule
+
+```sh
+ansible-playbook -i ../hosts --vault-password-file ../gopass-vault.sh cluster.yml
+```
+
 ## sshjail
 
 ```sh
