@@ -160,6 +160,20 @@ __common_prometheus_scrape_configs:
         regex: '([^:]+):\d+'
 
 __extra_prometheus_scrape_configs:
+  - job_name: "federate"
+    scrape_interval: 15s
+
+    honor_labels: true
+    metrics_path: '/federate'
+
+    params:
+      'match[]':
+        - '{job=~".+"}'
+
+    static_configs:
+      - targets:
+        - "{{ hostvars['dresrv'].ansible_host }}:9090"
+
   - job_name: "pushgateway"
     static_configs:
       - targets: ["localhost:{{ pushgateway_port }}"]
@@ -257,10 +271,6 @@ __extra_prometheus_scrape_configs:
 
   - job_name: "cadvisor"
     static_configs:
-      - targets: ["{{ __dresrv.ansible_host }}:{{ __dresrv.cadvisor_port }}"]
-        labels:
-          instance: "{{ server_label }}"
-
       - targets: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].cadvisor_port }}"]
         labels:
           instance: "{{ romsto_label }}"
