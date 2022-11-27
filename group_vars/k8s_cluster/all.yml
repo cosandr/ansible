@@ -1,0 +1,21 @@
+---
+## Directory where the binaries will be installed
+bin_dir: /usr/local/bin
+
+calico_iptables_backend: "NFT"
+
+## Local loadbalancer should use this port
+## And must be set port 6443
+loadbalancer_apiserver_port: 6443
+
+## If loadbalancer_apiserver_healthcheck_port variable defined, enables proxy liveness check for nginx.
+loadbalancer_apiserver_healthcheck_port: 8081
+
+## Since workers are included in the no_proxy variable by default, docker engine will be restarted on all nodes (all
+## pods will restart) when adding or removing workers.  To override this behaviour by only including master nodes in the
+## no_proxy variable, set below to true:
+no_proxy_exclude_workers: false
+
+## Variables for webhook token auth https://kubernetes.io/docs/reference/access-authn-authz/authentication/#webhook-token-authentication
+kube_webhook_token_auth: false
+kube_webhook_token_auth_url_skip_tls_verify: false

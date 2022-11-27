@@ -1,0 +1,6 @@
+---
+## Directory where etcd data stored
+etcd_data_dir: /var/lib/etcd
+
+## Settings for etcd deployment type
+etcd_deployment_type: host

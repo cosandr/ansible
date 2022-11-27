@@ -5,6 +5,7 @@ __pycache__
 .cache/
 .vscode/
 !.vscode/settings.json
+files/k8s/credentials/*
 roles/geerlingguy.*
 roles/cosandr.*
 roles/cloudalchemy.*

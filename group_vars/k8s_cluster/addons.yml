@@ -1,0 +1,46 @@
+---
+# Kubernetes dashboard
+# RBAC required. see docs/getting-started.md for access details.
+# dashboard_enabled: false
+
+# Helm deployment
+helm_enabled: false
+
+# Registry deployment
+registry_enabled: false
+
+# Metrics Server deployment
+metrics_server_enabled: false
+
+# Rancher Local Path Provisioner
+local_path_provisioner_enabled: false
+
+# Local volume provisioner deployment
+local_volume_provisioner_enabled: false
+
+# CephFS provisioner deployment
+cephfs_provisioner_enabled: false
+
+# RBD provisioner deployment
+rbd_provisioner_enabled: false
+
+# Nginx ingress controller deployment
+ingress_nginx_enabled: true
+# ingress_nginx_host_network: false
+ingress_publish_status_address: ""
+
+# ALB ingress controller deployment
+ingress_alb_enabled: false
+
+# Cert manager deployment
+cert_manager_enabled: false
+
+# MetalLB deployment
+metallb_enabled: false
+metallb_speaker_enabled: true
+
+argocd_enabled: false
+
+# The plugin manager for kubectl
+krew_enabled: false
+krew_root_dir: "/usr/local/krew"
