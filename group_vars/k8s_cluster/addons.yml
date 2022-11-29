@@ -36,8 +36,8 @@ ingress_alb_enabled: false
 cert_manager_enabled: false
 
 # MetalLB deployment
-metallb_enabled: false
-metallb_speaker_enabled: true
+metallb_enabled: true
+metallb_speaker_enabled: false
 
 argocd_enabled: false
 

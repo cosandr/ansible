@@ -3,6 +3,33 @@
 bin_dir: /usr/local/bin
 
 calico_iptables_backend: "NFT"
+calico_bgp_listen_port: 179
+calico_network_backend: "bird"
+global_as_num: "64512"
+calico_vxlan_mode: "Never"
+calico_advertise_cluster_ips: true
+calico_advertise_service_loadbalancer_ips: "{{ metallb_ip_range }}"
+
+peer_with_router: true
+nat_outgoing: false
+
+peers:
+  - name: rb5009
+    as: 5009
+    router_id: "10.0.10.1"
+
+metallb_protocol: bgp
+metallb_ip_range:
+  - 10.0.15.0/24
+
+# Advertised by calico
+metallb_peers: []
+metallb_avoid_buggy_ips: true
+
+# Need to deploy ingress-nginx-lb service in ingress-nginx namespace
+# See https://github.com/kubernetes/ingress-nginx/blob/b338cb391754125b7884196d7b8d4b55dbad14d8/docs/examples/static-ip/static-ip-svc.yaml
+ingress_nginx_extra_args:
+  - "--publish-service=$(POD_NAMESPACE)/ingress-nginx-lb"
 
 ## Local loadbalancer should use this port
 ## And must be set port 6443
