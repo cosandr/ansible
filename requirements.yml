@@ -6,6 +6,8 @@ collections:
   - name: community.docker
   - name: community.general
     version: '>=5.2'
+  - name: kubernetes.core
+    version: '>=2.3'
 
 roles:
   - name: geerlingguy.docker

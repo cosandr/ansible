@@ -3,6 +3,7 @@
 - name: Configure Kubernetes nodes
   gather_facts: true
   hosts: k8s_cluster
+  tags: ["system"]
   tasks:
     - name: Stop firewalld
       systemd:
@@ -36,3 +37,34 @@
         node_exporter_config_firewall: false
         node_exporter_web_listen_address: "{{ ansible_host }}:9100"
       tags: ["node_exporter"]
+
+- name: Deploy charts and manifests
+  hosts: k8s_cluster[0]
+  gather_facts: false
+  vars:
+    helm_repos:
+      - name: nfs-subdir-external-provisioner
+        repo_url: "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner"
+  tasks:
+    - name: Run on localhost
+      delegate_to: localhost
+      block:
+        - name: Add helm repos
+          kubernetes.core.helm_repository:
+            name: "{{ item.name }}"
+            repo_url: "{{ item.repo_url }}"
+          loop: "{{ helm_repos }}"
+          loop_control:
+            label: "{{ item.name }}"
+          tags: ["helm", "repos"]
+
+        - name: Deploy NFS provisioner
+          kubernetes.core.helm:
+            name: nfs-provisioner
+            chart_ref: nfs-subdir-external-provisioner/nfs-subdir-external-provisioner
+            release_namespace: kube-system
+            release_values:
+              storageClass.defaultClass: true
+              nfs.server: "{{ hostvars['theia'].local_ips.vm }}"
+              nfs.path: "/srv/kube"
+          tags: ["helm", "nfs"]
