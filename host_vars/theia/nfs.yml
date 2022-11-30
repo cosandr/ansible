@@ -1,23 +1,15 @@
 ---
 
-__esxi_hosts: "{{ groups['esxi_hosts'] | map('extract', hostvars, 'local_ips') | map(attribute='san') | list }}"
-
 __nfs_all_dataset_hosts:
   - "{{ groups['backup'] | map('extract', hostvars, 'ansible_host') | list }}"
   - "{{ groups['desktops'] | map('extract', hostvars, 'ansible_host') | list }}"
   - "{{ hostvars['dresrv'].ansible_host }}"
 
 nfs_shares:
-  # ESXi shares
-  - path: /mnt/tank/archive/disk-images
+  # Kube shares
+  - path: /srv/kube
     options: "rw,no_root_squash"
-    sources: "{{ __esxi_hosts }}"
-  - path: /mnt/ssd/vm
-    options: "rw,no_root_squash"
-    sources: "{{ __esxi_hosts }}"
-  - path: /mnt/tank/esxi
-    options: "rw,no_root_squash"
-    sources: "{{ __esxi_hosts }}"
+    sources: "{{ groups['k8s_cluster'] | map('extract', hostvars, 'ansible_host') | list }}"
   # Backup shares
   - path: /mnt/tank/backup/pgsql
     options: "rw,no_root_squash"
