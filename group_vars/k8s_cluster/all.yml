@@ -26,6 +26,7 @@ metallb_ip_range:
 metallb_peers: []
 metallb_avoid_buggy_ips: true
 
+ingress_nginx_lb_ip: "10.0.15.91"
 # Need to deploy ingress-nginx-lb service in ingress-nginx namespace
 # See https://github.com/kubernetes/ingress-nginx/blob/b338cb391754125b7884196d7b8d4b55dbad14d8/docs/examples/static-ip/static-ip-svc.yaml
 ingress_nginx_extra_args:

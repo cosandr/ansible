@@ -68,3 +68,8 @@
               nfs.server: "{{ hostvars['theia'].local_ips.vm }}"
               nfs.path: "/srv/kube"
           tags: ["helm", "nfs"]
+
+        - name: Configure nginx ingress LB
+          kubernetes.core.k8s:
+            resource_definition: "{{ lookup('template', inventory_dir + '/files/k8s/nginx-lb.yml.j2') | from_yaml }}"
+          tags: ["nginx"]
