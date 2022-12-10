@@ -32,12 +32,6 @@
         dnf_automatic_upgrade_type: "security"
       tags: ["dnf_automatic"]
 
-    - role: node_exporter
-      vars:
-        node_exporter_config_firewall: false
-        node_exporter_web_listen_address: "{{ ansible_host }}:9100"
-      tags: ["node_exporter"]
-
 - name: Deploy charts and manifests
   hosts: k8s_cluster[0]
   gather_facts: false
@@ -45,6 +39,8 @@
     helm_repos:
       - name: nfs-subdir-external-provisioner
         repo_url: "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner"
+      - name: prometheus-community
+        repo_url: "https://prometheus-community.github.io/helm-charts"
   tasks:
     - name: Run on localhost
       delegate_to: localhost
@@ -68,6 +64,41 @@
               nfs.server: "{{ hostvars['theia'].local_ips.vm }}"
               nfs.path: "/srv/kube"
           tags: ["helm", "nfs"]
+
+        - name: Deploy Prometheus chart
+          kubernetes.core.helm:
+            name: prometheus
+            chart_ref: prometheus-community/kube-prometheus-stack
+            release_namespace: prometheus
+            create_namespace: true
+            release_values:
+              alertmanager:
+                enabled: false
+              grafana:
+                enabled: false
+              prometheus:
+                service:
+                  type: LoadBalancer
+                  loadBalancerIP: "10.0.15.21"
+                prometheusSpec:
+                  externalLabels: {}
+                  externalUrl: "http://10.0.15.21:9090"
+                  retention: 1h
+                  storageSpec:
+                    emptyDir:
+                      sizeLimit: "512Mi"
+              prometheus-node-exporter:
+                extraArgs:
+                  - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+                  - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+                  - --collector.systemd
+                extraHostVolumeMounts:
+                  - name: systemd
+                    hostPath: /run/dbus/system_bus_socket
+                    mountPath: /var/run/dbus/system_bus_socket
+                    readOnly: true
+                    mountPropagation: None
+          tags: ["helm", "prometheus"]
 
         - name: Configure nginx ingress LB
           kubernetes.core.k8s:
