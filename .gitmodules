@@ -52,3 +52,6 @@
 [submodule "roles/epel"]
 	path = roles/epel
 	url = git@github.com:cosandr/ansible-role-epel.git
+[submodule "roles/firewall_config"]
+	path = roles/firewall_config
+	url = git@github.com:cosandr/ansible-role-firewall-config.git
