@@ -35,6 +35,13 @@
 - name: Deploy charts and manifests
   hosts: k8s_cluster[0]
   gather_facts: false
+  pre_tasks:
+    - name: Install Helm diff plugin
+      delegate_to: localhost
+      kubernetes.core.helm_plugin:
+        plugin_path: https://github.com/databus23/helm-diff
+        state: present
+      tags: ["helm", "plugins"]
   vars:
     helm_repos:
       - name: nfs-subdir-external-provisioner
