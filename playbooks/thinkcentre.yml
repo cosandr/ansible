@@ -1,0 +1,7 @@
+---
+
+- name: Configure ThinkCentre machines
+  hosts: thinkcentre
+  roles:
+    - role: systemd_networkd
+      tags: ["networkd"]

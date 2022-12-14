@@ -20,6 +20,7 @@ webgw
 localgw
 rpi
 libvirt
+thinkcentre
 
 [libvirt]
 dresrv
@@ -109,6 +110,11 @@ logkib01 ansible_host=10.0.10.30
 
 [minio]
 minio01 ansible_host=10.0.10.7
+
+[thinkcentre]
+aegir ansible_host=10.0.100.21
+gerd ansible_host=10.0.100.22
+ymir ansible_host=10.0.100.23
 
 # kubespray
 [k8s_cluster]
