@@ -14,7 +14,15 @@ home_net:
     cidr6: "fd00:100::0/64"
     vlan: 100
 
+internal_net:
+  san:
+    cidr: "10.0.2.0/24"
+    cidr6: "fd00:2::0/64"
+    vlan: 2
+
 wg_net:
   mt:
     cidr: "10.4.20.0/24"
     cidr6: "fd00:4:20::0/64"
+
+all_net: "{{ home_net | combine(internal_net) | combine(wg_net) }}"
