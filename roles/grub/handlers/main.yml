@@ -1,0 +1,5 @@
+---
+
+- name: Regenerate grub
+  ansible.builtin.command: "grub2-mkconfig -o {{ grub_cfg_path }}"
+  when: "grub_cfg_path is defined"

@@ -1,0 +1,34 @@
+---
+
+- name: Check for grub config
+  ansible.builtin.stat:
+    path: "/etc/default/grub"
+  register: __grub_conf
+  tags: ["grub"]
+
+- name: Look for grub.cfg
+  ansible.builtin.find:
+    paths: /boot/efi/EFI
+    patterns: 'grub.cfg'
+    recurse: true
+  register: __grub_search
+  tags: ["grub"]
+
+- name: Set grub.cfg path
+  ansible.builtin.set_fact:
+    grub_cfg_path: "{{ __grub_search.files[0].path }}"
+  when: __grub_search.matched > 0
+  tags: ["grub"]
+
+- name: Configure grub
+  ansible.builtin.lineinfile:
+    dest: "/etc/default/grub"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  when: __grub_conf.stat.exists
+  loop: "{{ grub_config }}"
+  loop_control:
+    label: "{{ item.line }}"
+  notify: Regenerate grub
+  tags: ["grub"]
