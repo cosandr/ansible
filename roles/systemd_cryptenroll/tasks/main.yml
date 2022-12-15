@@ -1,0 +1,51 @@
+---
+
+- name: Add tpm2 config to crypttab
+  ansible.builtin.lineinfile:
+    path: "/etc/crypttab"
+    backrefs: true
+    regexp: '^((?>\S+\s+){3}(?!.*tpm2-device=auto).*)$'
+    line: '\1,tpm2-device=auto'
+  when: cryptenroll_crypttab_config
+  notify: Regenerate initramfs
+
+- name: Setup /etc/crypttab.initramfs symlink
+  ansible.builtin.file:
+    src: /etc/crypttab
+    dest: /etc/crypttab.initramfs
+    state: link
+  when:
+    - cryptenroll_crypttab_config
+    - cryptenroll_crypttab_link
+  notify: Regenerate initramfs
+
+- name: Run LUKS tasks
+  when: luks_root_disk
+  tags: ["luks"]
+  block:
+    - name: Get LUKS2 metadata
+      ansible.builtin.command:
+        cmd: "cryptsetup luksDump {{ luks_root_disk }} --dump-json-metadata"
+      register: __luks_dump
+      check_mode: false
+      changed_when: false
+
+    - name: Set cryptenroll_enrolled fact
+      ansible.builtin.set_fact:
+        cryptenroll_enrolled: "{{ __luks_dump.stdout | from_json | community.general.json_query(__query) }}"
+      vars:
+        __query: "contains(tokens.*.type, 'systemd-tpm2')"
+
+    - name: Wipe TPM2 slot
+      ansible.builtin.command:
+        cmd: "systemd-cryptenroll {{ luks_root_disk }} --wipe-slot=tpm2"
+      when: cryptenroll_force | bool
+
+    - name: Enroll TPM2 slot
+      ansible.builtin.command:
+        cmd: "systemd-cryptenroll {{ luks_root_disk }} --tpm2-device={{ cryptenroll_tpm_device }} --tpm2-pcrs={{ cryptenroll_tpm_pcrs | join('+') }}"
+      environment:
+        PASSWORD: "{{ luks_root_disk_password }}"
+      when:
+        - luks_root_disk_password
+        - not cryptenroll_enrolled or cryptenroll_force | bool
