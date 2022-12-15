@@ -20,6 +20,15 @@
   when: ansible_distribution != "Archlinux"
   tags: ["install"]
 
+- name: Register previously copied configuration files
+  ansible.builtin.find:
+    paths: "/etc/systemd/network"
+    patterns:
+      - "*.network"
+      - "*.netdev"
+  register: __networkd_present
+  when: networkd_provisioning_synced
+
 - name: Copy networkd configs
   copy:
     dest: "/etc/systemd/network/{{ item.key }}.network"
@@ -32,6 +41,7 @@
   with_dict: "{{ networkd_config }}"
   loop_control:
     label: "{{ item.key }}"
+  register: __network_copied
   notify: Restart systemd-networkd
 
 - name: Copy networkd netdevs
@@ -46,7 +56,27 @@
   with_dict: "{{ networkd_netdevs }}"
   loop_control:
     label: "{{ item.key }}"
+  register: __netdev_copied
   notify: Restart systemd-networkd
+
+- name: Set list facts
+  ansible.builtin.set_fact:
+    __networkd_present_list: "{{ __networkd_present | json_query('files[*].path') | default([]) }}"
+    __networkd_copied_list: "{{ __network_copied_tmp + __network_copied_tmp_check + __netdev_copied_tmp + __netdev_copied_tmp_check }}"
+  vars:
+    __network_copied_tmp: "{{ __network_copied.results | json_query('[*].dest') | default([]) }}"
+    __network_copied_tmp_check: "{{ __network_copied.results | json_query('[*].invocation.dest') | default([]) }}"
+    __netdev_copied_tmp: "{{ __netdev_copied.results | json_query('[*].dest') | default([]) }}"
+    __netdev_copied_tmp_check: "{{ __netdev_copied.results | json_query('[*].invocation.dest') | default([]) }}"
+  when: networkd_provisioning_synced
+
+- name: Remove configs not present on deployer machine (synchronize)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ __networkd_present_list | difference(__networkd_copied_list) }}"
+  notify: Restart systemd-networkd
+  when: networkd_provisioning_synced
 
 - name: Check if NetworkManager is active  # noqa command-instead-of-module
   command: systemctl is-active -q NetworkManager.service

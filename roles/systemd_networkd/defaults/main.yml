@@ -1,5 +1,6 @@
 ---
 
+networkd_provisioning_synced: true
 networkd_netdevs: []
 networkd_config:
   - wired: |
