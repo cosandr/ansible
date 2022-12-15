@@ -1,0 +1,3 @@
+---
+
+ssh_dest_hosts: "{{ groups['thinkcentre'] }}"

@@ -207,6 +207,9 @@
     - role: node_exporter
       tags: ["node_exporter"]
 
+    - role: auto_ssh
+      tags: ["auto-ssh"]
+
   handlers:
     - name: Reload systemd-journal
       ansible.builtin.command: killall -USR1 systemd-journal
