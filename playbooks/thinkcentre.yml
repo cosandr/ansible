@@ -3,5 +3,11 @@
 - name: Configure ThinkCentre machines
   hosts: thinkcentre
   roles:
+    - role: grub
+      tags: ["grub"]
+
+    - role: systemd_cryptenroll
+      tags: ["cryptenroll"]
+
     - role: systemd_networkd
       tags: ["networkd"]

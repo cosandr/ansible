@@ -1,0 +1,3 @@
+---
+
+luks_root_disk: /dev/sda3
