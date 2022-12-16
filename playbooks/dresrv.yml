@@ -14,17 +14,6 @@
         name: common
       tags: ["always"]
 
-    - name: Merge ports
-      set_fact:
-        ports: "{{ ports | combine(_ports, recursive=true) }}"
-      tags: ["always"]
-
-    - name: Merge Docker ports
-      set_fact:
-        ports: "{{ ports | combine(ansible_local.docker.ports, recursive=true) }}"
-      when: ansible_local.docker is defined and ansible_local.docker.ports is defined
-      tags: ["always"]
-
     - name: Ensure site log dir exists
       file:
         path: "{{ nginx_sites_logs }}"

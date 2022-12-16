@@ -2,7 +2,6 @@
 
 domain: "{{ domains['hb'] }}"
 hostname_configure_etc_hosts: true
-_ports: {}
 
 dht_exporter_gpio_pin: "17"
 dht_exporter_port: "8001"

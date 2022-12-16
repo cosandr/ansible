@@ -1,9 +1,9 @@
 [bitwarden]
-enabled = true 
-port = 80,443,{{ ports.bitwarden }},{{ ports.bitwarden_notifications }}
+enabled = true
+port = {{ fail2ban_bitwarden_ports | join(',') }}
 filter = bitwarden
 action = iptables-allports[name=bitwarden]
 logpath = {{ container_data }}/bitwarden/bitwarden.log
 maxretry = 5
 bantime = 6h
-findtime = 1m 
+findtime = 1m

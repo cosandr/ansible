@@ -11,3 +11,5 @@ fail2ban_ignoreip:
 fail2ban_sshd_extra: {}
   # maxretry: 2
   # bantime: 8h
+fail2ban_bitwarden_install: false
+fail2ban_bitwarden_ports: [80, 443]

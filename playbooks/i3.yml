@@ -8,11 +8,6 @@
         name: common
       tags: ["always"]
 
-    - name: Merge ports
-      set_fact:
-        ports: "{{ ports | combine(_ports, recursive=true) }}"
-      tags: ["always"]
-
     - name: Gather facts
       setup:
       tags: ["always"]

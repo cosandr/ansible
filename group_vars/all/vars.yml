@@ -5,8 +5,6 @@ ansible_python_interpreter: /usr/bin/python3
 
 domains: "{{ vault_domains }}"
 
-ports: {}
-
 ansible_managed: "Ansible managed"
 my_user: andrei
 my_groups:

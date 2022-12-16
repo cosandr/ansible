@@ -80,28 +80,3 @@ ansible-playbook -i hosts_local server.yml --tags nginx
 # Run with sudo remote user
 ansible-playbook -i hosts -K -e 'ansible_user=andrei' playbooks/laptop.yml --diff --check --tags laptop
 ```
-
-## Hosts file example
-`/etc/ansible/hosts` on source machine (running playbook)
-```
-localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3
-
-desktop ansible_connection=local ansible_become=yes ansible_python_interpreter=/usr/bin/python3
-
-server ansible_host=10.1.0.2 ansible_user=root ansible_python_interpreter=/usr/bin/python3
-```
-
-## Docker ports example
-`/etc/ansible/facts.d/docker.fact` on remote (target) machine
-```
-[ports]
-bitwarden_notifications=3012
-bitwarden=8343
-nextcloud=25683
-portainer=9000
-radarr=7878
-sonarr=8989
-transmission=9091
-vouch=9090
-vscode=8443
-```
