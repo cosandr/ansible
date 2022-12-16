@@ -1,7 +1,7 @@
 ---
 
 provisioned_disks:
-  - dev: "/dev/sdb"
+  - dev: "/dev/disk/by-id/virtio-data01"
     vols:
       - name: pgsql
         path: "/var/lib/pgsql"

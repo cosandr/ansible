@@ -12,8 +12,8 @@ smtp_config: "{{ vault_smtp_config }}"
 #     port:
 #     user:
 
-node_exporter_config_firewall: true
-node_exporter_allow_ips: "{{ groups['prom'] | map('extract', hostvars, 'ansible_host') | list }}"
+node_exporter_config_firewall: "{{ firewall_enabled | default(true) }}"
+node_exporter_allow_ips: "{{ groups['prom'] | difference(groups['webgw']) | map('extract', hostvars, 'ansible_host') | list }}"
 
 # Fetch with timedatectl -p Timezone --value show
 sys_timezone: "Europe/Oslo"

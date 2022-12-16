@@ -8,6 +8,8 @@ __ssh_sources:
   - "10.1.0.0/24"
   - "192.168.100.5"
 
+ufw_trusted_sources: []
+
 firewall_rules:
   - port: 22
     sources: "{{ __ssh_sources | flatten }}"

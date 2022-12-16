@@ -2,8 +2,12 @@
 
 firewall_frontend: 'firewalld'
 # Allow SSH by default so I don't accidentally lock myself out
-firewall_rules:
+firewall_rules: "{{ __firewall_rules_ufw if firewall_frontend == 'ufw' else [] }}"
+__firewall_rules_ufw:
   - port: 22
+
+firewalld_services:
+  - name: ssh
 
 firewall_trusted_sources:
   - "{{ hostvars['desktop'].ansible_host }}"
@@ -13,3 +17,5 @@ firewall_trusted_sources:
   - "{{ hostvars['m1bp'].wireguard_ip }}"
 
 ufw_trusted_sources: "{{ firewall_trusted_sources }}"
+
+webgw_sources: "{{ groups['webgw'] | difference(['romgw01']) }}"

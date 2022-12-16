@@ -13,7 +13,7 @@
     source: "{{ hostvars[item].wireguard_ip | default(hostvars[item].ansible_host) }}"
     permanent: true
     state: enabled
-  loop: "{{ groups['webgw'] }}"
+  loop: "{{ webgw_sources }}"
   notify: reload firewalld
 
 - name: Allow ports to webgw zone

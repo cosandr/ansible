@@ -7,7 +7,7 @@ firewalld_zones:
     sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
 
   - name: internal
-    sources: "{{ wg_net.mt.cidr }}"
+    sources: ["{{ wg_net.mt.cidr }}"]
 
   - name: internal
     # Allow prometheus

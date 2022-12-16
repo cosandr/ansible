@@ -43,6 +43,6 @@ firewall_rules:
     zone: public
     sources: "{{ proxy_hosts }}"
 
-  - port: "{{ nginx_ports['main'] }}"
+  - port: "{{ nginx_ports['www'] }}"
     zone: public
     sources: "{{ proxy_hosts }}"
