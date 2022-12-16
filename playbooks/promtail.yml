@@ -1,3 +1,4 @@
+#!/usr/bin/env -S ansible-playbook
 ---
 
 - name: Prepare target hosts group

@@ -1,3 +1,4 @@
+#!/usr/bin/env -S ansible-playbook
 ---
 
 # TODO: Configure NFS share on Theia for /mnt/tank/backup/pgbackrest

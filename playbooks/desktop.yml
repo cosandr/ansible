@@ -1,5 +1,6 @@
 #!/usr/bin/env -S ansible-playbook
 ---
+
 - name: Desktop playbook
   gather_facts: true
   hosts: desktop

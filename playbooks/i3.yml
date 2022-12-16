@@ -1,5 +1,6 @@
 #!/usr/bin/env -S ansible-playbook
 ---
+
 - hosts: gui
   gather_facts: false
   pre_tasks:

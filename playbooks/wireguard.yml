@@ -1,3 +1,4 @@
+#!/usr/bin/env -S ansible-playbook
 ---
 
 - hosts: webgw, romsto, desktop, laptops

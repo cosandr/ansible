@@ -1,3 +1,4 @@
+#!/usr/bin/env -S ansible-playbook
 ---
 
 # https://milliams.com/posts/2020/ansible-certificate-authority/
