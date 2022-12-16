@@ -31,3 +31,24 @@
     enabled: true
     state: started
     daemon_reload: true
+
+- name: Include firewall role
+  include_role:
+    name: firewall_config
+    apply:
+      become: true
+      tags: ["firewall"]
+  vars:
+    firewalld_services: []
+    firewalld_zones:
+      - name: loki
+        sources: "{{ (groups.get('loki', []) | difference(inventory_hostname)) | map('extract', hostvars, 'ansible_host') | list }}"
+    firewall_rules:
+      - port: "{{ __loki_grpc_port }}"
+        zone: loki
+
+      - port: "{{ __loki_http_port }}"
+        zone: "{{ loki_allow_zone }}"
+        sources: "{{ loki_allow_ips }}"
+  when: loki_config_firewall | bool
+  tags: ["firewall"]

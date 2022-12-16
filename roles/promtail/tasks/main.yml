@@ -40,3 +40,22 @@
   register: __sysv_start
   changed_when: "'already running' not in __sysv_start.stdout"
   when: ansible_os_family == 'Slackware'
+
+- name: Include firewall role
+  include_role:
+    name: firewall_config
+    apply:
+      become: true
+      tags: ["firewall"]
+  vars:
+    firewalld_services: []
+    firewalld_zones: []
+    firewall_rules:
+      - port: "{{ __promtail_http_port }}"
+        zone: "{{ promtail_allow_zone }}"
+        sources: "{{ promtail_allow_ips }}"
+  when:
+    - promtail_config_firewall | bool
+    - promtail_server_enabled | bool
+    - __promtail_http_address != "127.0.0.1"
+  tags: ["firewall"]
