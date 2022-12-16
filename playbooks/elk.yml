@@ -1,24 +1,14 @@
 ---
 
-- hosts: elk
-  gather_facts: true
-  roles:
-    - role: cosandr.dnf_automatic
-      tags: ["dnf_automatic"]
-
-    - role: node_exporter
-      tags: ["node_exporter"]
-
-    - role: firewall_config
-      tags: ["firewall"]
-      when: firewall_rules is defined
-
 - hosts: elasticsearch
   gather_facts: true
-  roles:
-    - role: setup_disks
-      tags: ["disk"]
+  pre_tasks:
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      tags: ["always"]
 
+  roles:
     - role: elastic.elasticsearch
       vars:
         ansible_distribution: RedHat
@@ -38,7 +28,6 @@
   roles:
     - role: kibana
       tags: ["kibana"]
-
 
 - name: Prepare target hosts group
   hosts: all

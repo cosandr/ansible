@@ -1,0 +1,58 @@
+---
+
+- name: Setup disks
+  ansible.builtin.include_role:
+    name: setup_disks
+    apply:
+      tags: ["disk"]
+  tags: ["disk"]
+
+- name: Configure firewall
+  ansible.builtin.include_role:
+    name: firewall_config
+    apply:
+      tags: ["firewall", "firewalld", "ufw"]
+  when: firewall_enabled | default(true)
+  tags: ["firewall", "firewalld", "ufw"]
+
+- name: Configure sshd
+  ansible.builtin.include_role:
+    name: sshd
+    apply:
+      tags: ["sshd"]
+  tags: ["sshd"]
+
+- name: Configure auto upgrades (Debian)
+  ansible.builtin.include_role:
+    name: unattended-upgrades
+    apply:
+      tags: ["upgrades", "unattended-upgrades"]
+  when: ansible_os_family == 'Debian'
+  tags: ["upgrades", "unattended-upgrades"]
+
+- name: Configure auto upgrades (RedHat)
+  ansible.builtin.include_role:
+    name: cosandr.dnf_automatic
+    apply:
+      tags: ["upgrades", "dnf_automatic"]
+  when: ansible_os_family == 'RedHat'
+  tags: ["upgrades", "dnf_automatic"]
+
+- name: Setup node exporter
+  ansible.builtin.include_role:
+    name: node_exporter
+    apply:
+      tags: ["node_exporter"]
+  when:
+    - node_exporter_port is defined
+    - node_exporter_port
+    - node_exporter_installed | default(true)
+  tags: ["node_exporter"]
+
+- name: Setup promtail
+  ansible.builtin.include_role:
+    name: promtail
+    apply:
+      tags: ["promtail"]
+  when: promtail_scrape_configs | default([])
+  tags: ["promtail"]

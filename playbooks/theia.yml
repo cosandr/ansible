@@ -43,6 +43,11 @@
       tags: ["journald"]
 
   tasks:
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      tags: ["always"]
+
     - name: Install libvirt KVM
       ansible.builtin.dnf:
         name:
@@ -162,9 +167,6 @@
     - role: dracut-sshd
       tags: ["dracut-sshd"]
 
-    - role: firewall_config
-      tags: ["firewall"]
-
     - role: clevis
       tags: ["clevis"]
 
@@ -186,9 +188,6 @@
     - role: sanoid
       tags: ["sanoid"]
 
-    - role: cosandr.dnf_automatic
-      tags: ["dnf_automatic"]
-
     - role: serial_proxy
       tags: ["serial"]
 
@@ -203,9 +202,6 @@
 
     - role: nginx
       tags: ["nginx"]
-
-    - role: node_exporter
-      tags: ["node_exporter"]
 
     - role: auto_ssh
       tags: ["auto-ssh"]

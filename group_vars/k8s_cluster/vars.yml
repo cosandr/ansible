@@ -1,0 +1,5 @@
+---
+
+firewall_enabled: false
+# Monitoring running inside kubernetes
+node_exporter_installed: false

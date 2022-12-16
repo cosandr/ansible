@@ -4,6 +4,11 @@
   gather_facts: true
   hosts: dresrv
   pre_tasks:
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      tags: ["always"]
+
     - name: Run common role
       import_role:
         name: common
@@ -155,17 +160,11 @@
     - role: btrbk
       tags: ["btrbk"]
 
-    - role: sshd
-      tags: ["sshd"]
-
     - role: postfix
       tags: ["postfix"]
 
     - role: sudo
       tags: ["sudo"]
-
-    - role: firewall_config
-      tags: ["firewall"]
 
     - role: fail2ban
       tags: ["fail2ban"]
@@ -179,9 +178,6 @@
     - role: systemd
       tags: ["systemd"]
 
-    - role: cosandr.dnf_automatic
-      tags: ["dnf_automatic"]
-
     - role: dracut-sshd
       tags: ["dracut-sshd"]
 
@@ -193,9 +189,6 @@
 
     - role: nginx_exporter
       tags: ["prometheus-stack", "nginx_exporter"]
-
-    - role: node_exporter
-      tags: ["prometheus-stack", "node_exporter"]
 
   handlers:
     - name: Restart syncthing

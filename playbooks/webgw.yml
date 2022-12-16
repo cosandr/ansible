@@ -116,33 +116,18 @@
       set_fact:
         fail2ban_ignoreip: "{{ (__f2b_extra_ignore + hostvars['laptop'].wireguard_mt_allowed_ips) | flatten }}"
       tags: ["fail2ban"]
-  roles:
-    - role: sshd
-      tags: ["sshd"]
 
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      tags: ["always"]
+  roles:
     - role: fail2ban
       tags: ["fail2ban"]
-
-    - role: unattended-upgrades
-      when: ansible_os_family == 'Debian'
-      tags: ["unattended-upgrades"]
-
-    - role: cosandr.dnf_automatic
-      when: ansible_os_family == 'RedHat'
-      tags: ["dnf_automatic"]
 
     - role: auto_ssh
       when: ssh_dest_hosts | default([])
       tags: ["auto-ssh"]
-
-    - role: node_exporter
-      tags: ["node_exporter"]
-
-    - role: filebeat
-      when:
-        - filebeat_config is defined
-        - filebeat_config | length > 0
-      tags: ["filebeat"]
 
     - role: certbot
       vars:

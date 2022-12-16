@@ -98,26 +98,12 @@
       when: dhcpcd_config | default('')
 
   roles:
-    - role: sshd
-      vars:
-        _sshd_pkg: "openssh-server"
-      tags: ["sshd"]
-
     - role: hostname
       tags: ["hostname"]
-
-    - role: firewall_config
-      tags: ["ufw", "firewall"]
 
     - role: motion
       when: motion_is_rpi | default(false)
       tags: ["motion"]
-
-    - role: node_exporter
-      tags: ["node_exporter"]
-
-    - role: unattended-upgrades
-      tags: ["unattended-upgrades"]
 
     - role: certbot
       when:
@@ -154,3 +140,11 @@
       ansible.builtin.systemd:
         name: dhcpcd.service
         state: restarted
+
+  post_tasks:
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      vars:
+        _sshd_pkg: "openssh-server"
+      tags: ["always"]

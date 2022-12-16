@@ -12,7 +12,8 @@ provisioned_disks:
 
 node_exporter_web_listen_address: '0.0.0.0:9100'
 node_exporter_port: "{{ node_exporter_web_listen_address.split(':')[1] }}"
-
+# Using gitlab's embedded node exporter
+node_exporter_installed: false
 gitlab_config_template: "{{ inventory_dir }}/files/gitlab/gitlab.rb.j2"
 
 domain: "{{ domains['dv'] }}"

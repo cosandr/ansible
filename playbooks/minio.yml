@@ -2,19 +2,13 @@
 
 - name: Provision minio
   hosts: minio
+  pre_tasks:
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      tags: ["always"]
+
   roles:
-    - role: setup_disks
-      tags: ["disk"]
-
-    - role: firewall_config
-      tags: ["firewall"]
-
-    - role: sshd
-      tags: ["sshd"]
-
-    - role: cosandr.dnf_automatic
-      tags: ["dnf_automatic"]
-
     - role: minio
       tags: ["minio"]
 
@@ -23,9 +17,6 @@
 
     - role: nginx
       tags: ["nginx"]
-
-    - role: node_exporter
-      tags: ["node_exporter"]
 
   post_tasks:
     - name: Write client config
