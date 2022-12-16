@@ -7,5 +7,3 @@ domain: "{{ domains['hb'] }}"
 __f2b_extra_ignore:
   - "127.0.0.1/8"
   - "::1"
-
-filebeat_config: {}

@@ -1,6 +1,0 @@
----
-
-kibana_config_template: "{{ inventory_dir }}/files/kibana/kibana.yml.j2"
-kibana_server_port: 5601
-kibana_config:
-  server.publicBaseUrl: "http://{{ inventory_hostname }}.vm.hlab.no"

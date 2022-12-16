@@ -92,22 +92,6 @@ plex01 ansible_host=10.0.10.65
 [esxi_hosts]
 slb  ansible_host=10.0.100.21
 
-[elk:children]
-elasticsearch
-logstash
-kibana
-
-[elasticsearch]
-es01 ansible_host=10.0.10.31
-es02 ansible_host=10.0.10.32
-es03 ansible_host=10.0.10.33
-
-[logstash]
-logkib01 ansible_host=10.0.10.30
-
-[kibana]
-logkib01 ansible_host=10.0.10.30
-
 [minio]
 minio01 ansible_host=10.0.10.7
 

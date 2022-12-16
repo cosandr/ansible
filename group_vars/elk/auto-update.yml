@@ -1,5 +1,0 @@
----
-
-dnf_automatic_excludes:
-  - "kernel*"
-  - "systemd*"

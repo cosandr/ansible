@@ -1,9 +1,0 @@
----
-
-provisioned_disks:
-  - dev: "/dev/disk/by-id/virtio-data01"
-    vols:
-      - name: elasticsearch
-        path: "/var/lib/elasticsearch"
-        shrink: false
-        size: "100%FREE"

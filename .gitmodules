@@ -19,12 +19,6 @@
 [submodule "roles/aisbergg.snapper"]
 	path = roles/aisbergg.snapper
 	url = https://github.com/aisbergg/ansible-role-snapper.git
-[submodule "roles/logstash"]
-	path = roles/logstash
-	url = git@github.com:cosandr/ansible-role-logstash.git
-[submodule "roles/kibana"]
-	path = roles/kibana
-	url = git@github.com:cosandr/ansible-role-kibana.git
 [submodule "roles/postgresql"]
 	path = roles/postgresql
 	url = git@github.com:cosandr/ansible-role-postgresql.git

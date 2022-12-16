@@ -9,6 +9,5 @@ files/k8s/credentials/*
 roles/geerlingguy.*
 roles/cosandr.*
 roles/cloudalchemy.*
-roles/elastic.*
 
 playbooks/test.yml

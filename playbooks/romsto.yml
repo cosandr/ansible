@@ -26,7 +26,6 @@
     - name: Setup extra SSD
       blockinfile:
         path: /boot/config/go
-        insertbefore: '^# BEGIN filebeat$'
         marker: "# {mark} datassd"
         block: |
           # Enable swap partition
@@ -85,34 +84,7 @@
 
     - role: promtail
       tags: ["promtail"]
-
-    # - role: filebeat
-    #   tags: ["filebeat"]
   post_tasks:
-    # - name: Ensure filebeat is persistent
-    #   block:
-    #     - name: Compress filebeat
-    #       archive:
-    #         path:
-    #           - "{{ filebeat_config_path }}"
-    #           - "{{ filebeat_home_path }}"
-    #           - "{{ sysv_path }}/rc.filebeat"
-    #           - "{{ ca_path }}"
-    #         dest: /pstore/filebeat.tar.gz
-    #         owner: root
-    #         group: root
-    #         mode: 0644
-
-    #     - name: Setup filebeat on boot
-    #       blockinfile:
-    #         path: /boot/config/go
-    #         marker: "# {mark} filebeat"
-    #         block: |
-    #           tar zxf /pstore/filebeat.tar.gz -C /
-    #           install -o root -g root -dm755 {{ filebeat_log_path }}
-    #           {{ sysv_path }}/rc.filebeat start
-    #       tags: ["filebeat", "go"]
-
     - name: Ensure promtail is persistent
       block:
         - name: Copy promtail rc file

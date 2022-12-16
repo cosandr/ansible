@@ -22,6 +22,3 @@ roles:
     src: https://github.com/cosandr/ansible-role-nextcloud.git
     scm: git
     version: v1.2.0
-
-  - name: elastic.elasticsearch
-    version: v7.17.0
