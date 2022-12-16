@@ -12,13 +12,6 @@ syncoid_timers:
       - '--exclude=".*\\/var\\/lib\\/(containers|docker)"'
       - '--exclude="rpool\\/redhat\\/esxi"'
 
-  - name: vm
-    src: rpool/redhat/esxi
-    dest: tank/backup/truenas/ssd/vm
-    oncalendar: Weekly
-    options:
-      - "--no-sync-snap"
-
 sanoid_timer_minutes: 30
 
 sanoid_backup_modules:

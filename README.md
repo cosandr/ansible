@@ -4,39 +4,6 @@
 
 Generate keys on the command line with `wg genkey | tee /dev/stderr | wg pubkey`, private is the first string.
 
-## VMware
-
-[Ansible docs](https://docs.ansible.com/ansible/latest/collections/community/vmware/vmware_vm_inventory_inventory.html)
-
-```sh
-pip install -U --user pyvmomi git+https://github.com/vmware/vsphere-automation-sdk-python.git
-```
-
-Run with ansible with `-i vcenter.vmware.yml`, e.g:
-
-```sh
-ansible-playbook -i hosts -i vcenter.vmware.yml playbooks/pg.yml
-```
-
-Power on/off managed VMs
-
-```sh
-# Power on
-ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -t start
-# Power off
-ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -t stop
-# Target all VMs
-ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -t stop,all_guests
-# All except TrueNAS
-ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -t stop,all_guests -l '!TrueNAS'
-```
-
-(un)mount NFS
-
-```sh
-# targetting one host
-ansible-playbook -i hosts -i slb.vmware.yml playbooks/esxi.yml -l slb -t mount
-```
 
 ## kubespray
 
