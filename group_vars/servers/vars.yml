@@ -4,6 +4,8 @@ proxy_hosts:
   - "{{ hostvars['webgw01'].wireguard_ip }}"
   - "{{ hostvars['localgw01'].ansible_host }}"
 
+smartd_email: "{{ my_email }}"
+
 smtp_config: "{{ vault_smtp_config }}"
 # smtp_config:
 #   example.com:

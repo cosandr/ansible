@@ -27,3 +27,10 @@
     apply:
       tags: ["libvirt"]
   tags: ["libvirt"]
+
+- name: Install and configure smartd
+  ansible.builtin.include_role:
+    name: smartd
+    apply:
+      tags: ["smartd"]
+  tags: ["smartd"]

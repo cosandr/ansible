@@ -1,0 +1,21 @@
+---
+
+- name: Install smartmontools
+  ansible.builtin.package:
+    name: smartmontools
+    state: present
+  tags: ["install"]
+
+- name: Configure smartd email address
+  ansible.builtin.lineinfile:
+    path: /etc/smartmontools/smartd.conf
+    regexp: '^DEVICESCAN'
+    line: 'DEVICESCAN -H -m {{ smartd_email }} -M exec /usr/libexec/smartmontools/smartdnotify -n standby,10,q'
+  when: smartd_email
+  notify: Restart smartd
+
+- name: Enable and start smartd
+  ansible.builtin.systemd:
+    name: smartd.service
+    state: started
+    enabled: true

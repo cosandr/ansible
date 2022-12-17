@@ -82,14 +82,6 @@
       notify: Restore tank SELinux context
       tags: ["selinux"]
 
-    - name: Configure smartd email address
-      ansible.builtin.lineinfile:
-        path: /etc/smartmontools/smartd.conf
-        regexp: '^DEVICESCAN'
-        line: 'DEVICESCAN -H -m {{ my_email }} -M exec /usr/libexec/smartmontools/smartdnotify -n standby,10,q'
-      notify: Restart smartd
-      tags: ["smartd"]
-
     - name: Install tmuxinator
       community.general.gem:
         name: tmuxinator
@@ -177,11 +169,6 @@
   handlers:
     - name: Reload systemd-journal
       ansible.builtin.command: killall -USR1 systemd-journal
-
-    - name: Restart smartd
-      ansible.builtin.systemd:
-        name: smartd.service
-        state: restarted
 
     - name: Restore tank SELinux context
       ansible.builtin.command: restorecon -r /mnt/tank
