@@ -1,0 +1,5 @@
+---
+
+swapfile_path: "/swapfile"
+swapfile_size: "4G"
+swapfile_blocksize: "512B"

@@ -1,0 +1,4 @@
+---
+
+- name: Activate swapfile
+  ansible.builtin.command: "swapon {{ swapfile_path }}"

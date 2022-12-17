@@ -1,0 +1,25 @@
+---
+
+- name: Create swapfile
+  community.general.filesize:
+    path: "{{ swapfile_path }}"
+    size: "{{ swapfile_size }}"
+    blocksize: "{{ swapfile_blocksize }}"
+    owner: root
+    group: root
+    mode: 0600
+  notify: Activate swapfile
+
+- name: Create swap filesystem
+  community.general.filesystem:
+    fstype: swap
+    dev: "{{ swapfile_path }}"
+  notify: Activate swapfile
+
+- name: Add swap to fstab
+  ansible.posix.mount:
+    path: none
+    src: "{{ swapfile_path }}"
+    fstype: swap
+    opts: defaults
+    state: present
