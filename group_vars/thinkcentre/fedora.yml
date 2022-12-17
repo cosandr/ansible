@@ -1,0 +1,16 @@
+---
+
+dnf_packages:
+  - cockpit
+  - cockpit-machines
+  - htop
+  - iftop
+  - iotop
+  - lm_sensors
+  - lsof
+  - mlocate
+  - pciutils
+  - rpmconf
+  - rsync
+  - wget
+  - yum-utils

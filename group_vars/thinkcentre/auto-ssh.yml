@@ -1,0 +1,4 @@
+---
+
+ssh_dest_hosts: "{{ groups['thinkcentre'] | difference([inventory_hostname]) }}"
+ssh_conf_hosts: true
