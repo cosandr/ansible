@@ -1,0 +1,29 @@
+---
+
+- name: Check if RTC is using local time
+  ansible.builtin.command:
+    cmd: timedatectl show -p LocalRTC
+  check_mode: false
+  changed_when: false
+  register: __rtc_local
+  tags: ["rtc"]
+
+- name: Ensure system clock is using UTC
+  ansible.builtin.command:
+    cmd: timedatectl set-local-rtc 0
+  when: __rtc_local.stdout.strip() == 'LocalRTC=yes'
+  tags: ["rtc"]
+
+- name: Install and configure cpupower
+  ansible.builtin.include_role:
+    name: cpupower
+    apply:
+      tags: ["cpupower"]
+  tags: ["cpupower"]
+
+- name: Install libvirt
+  ansible.builtin.include_role:
+    name: libvirt
+    apply:
+      tags: ["libvirt"]
+  tags: ["libvirt"]

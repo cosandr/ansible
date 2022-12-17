@@ -1,0 +1,5 @@
+---
+
+# Defaults from package
+cpupower_start_governor: "performance"
+cpupower_stop_governor: "ondemand"

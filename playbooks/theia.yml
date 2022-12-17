@@ -12,27 +12,6 @@
         - ansible_distribution != 'Fedora'
       tags: ["install"]
 
-    - name: Configure cpupower
-      ansible.builtin.lineinfile:
-        path: /etc/sysconfig/cpupower
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
-      loop:
-        - regexp: '^CPUPOWER_START_OPTS='
-          line: 'CPUPOWER_START_OPTS="frequency-set -g {{ cpupower_start_governor }}"'
-        - regexp: '^CPUPOWER_STOP_OPTS='
-          line: 'CPUPOWER_STOP_OPTS="frequency-set -g {{ cpupower_stop_governor }}"'
-      loop_control:
-        label: "{{ item.regexp }}"
-      tags: ["cpupower"]
-
-    - name: Enable and start cpupower service
-      ansible.builtin.systemd:
-        name: cpupower.service
-        enabled: true
-        state: started
-      tags: ["cpupower"]
-
     - name: Ensure /var/log/journal exists
       ansible.builtin.file:
         path: /var/log/journal
@@ -49,24 +28,12 @@
         file: ../tasks/common_servers.yml
       tags: ["always"]
 
-    - name: Install libvirt KVM
-      ansible.builtin.dnf:
-        name:
-          - qemu-kvm
-          - libvirt
-          - virt-manager
-          - virt-install
-          - guestfs-tools
-          - python3-libvirt
-        state: present
-      tags: ["libvirt", "install"]
-
-    - name: Enable and start libvirtd
-      ansible.builtin.systemd:
-        name: libvirtd.service
-        state: started
-        enabled: true
-      tags: ["libvirt"]
+    - name: Include hypervisor tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/kvm_hypervisors.yml
+        apply:
+          tags: ["hypervisor"]
+      tags: ["always"]
 
     - name: Configure NFS shares
       ansible.builtin.blockinfile:

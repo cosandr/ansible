@@ -12,3 +12,10 @@
 
     - role: systemd_networkd
       tags: ["networkd"]
+  tasks:
+    - name: Include hypervisor tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/kvm_hypervisors.yml
+        apply:
+          tags: ["hypervisor"]
+      tags: ["always"]

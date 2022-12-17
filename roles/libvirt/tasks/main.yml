@@ -1,0 +1,20 @@
+---
+
+- name: Install libvirt KVM
+  ansible.builtin.dnf:
+    name:
+      - guestfs-tools
+      - libvirt
+      - python3-libvirt
+      - qemu-kvm
+      - virt-install
+      - virt-manager
+    state: present
+  when: ansible_os_family == 'RedHat'
+  tags: ["install"]
+
+- name: Enable and start libvirtd
+  ansible.builtin.systemd:
+    name: libvirtd.service
+    state: started
+    enabled: true

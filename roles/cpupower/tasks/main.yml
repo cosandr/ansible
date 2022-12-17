@@ -1,0 +1,28 @@
+---
+
+- name: Install kernel-tools
+  ansible.builtin.dnf:
+    name: kernel-tools
+    state: present
+  when: ansible_os_family == 'RedHat'
+  tags: ["install"]
+
+- name: Configure cpupower
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/cpupower
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  loop:
+    - regexp: '^CPUPOWER_START_OPTS='
+      line: 'CPUPOWER_START_OPTS="frequency-set -g {{ cpupower_start_governor }}"'
+    - regexp: '^CPUPOWER_STOP_OPTS='
+      line: 'CPUPOWER_STOP_OPTS="frequency-set -g {{ cpupower_stop_governor }}"'
+  loop_control:
+    label: "{{ item.regexp }}"
+  notify: Restart cpupower service
+
+- name: Enable and start cpupower service
+  ansible.builtin.systemd:
+    name: cpupower.service
+    enabled: true
+    state: started
