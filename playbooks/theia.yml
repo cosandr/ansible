@@ -133,9 +133,6 @@
     - role: samba
       tags: ["samba"]
 
-    - role: postfix
-      tags: ["postfix"]
-
     - role: fzf
       tags: ["fzf"]
 

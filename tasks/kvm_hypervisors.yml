@@ -28,6 +28,13 @@
       tags: ["libvirt"]
   tags: ["libvirt"]
 
+- name: Install postfix
+  ansible.builtin.include_role:
+    name: postfix
+    apply:
+      tags: ["postfix"]
+  tags: ["postfix"]
+
 - name: Install and configure smartd
   ansible.builtin.include_role:
     name: smartd
