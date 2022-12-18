@@ -1,5 +1,7 @@
 ---
 
+node_exporter_config_firewall: false
+
 firewalld_zones:
   - name: internal
     interfaces:
@@ -33,6 +35,10 @@ firewalld_services:
     sources: "{{ firewall_trusted_sources }}"
 
 firewall_rules:
+  - port: "{{ node_exporter_port }}"
+    zone: internal
+    sources: "{{ node_exporter_allow_ips }}"
+
   # https://wiki.libvirt.org/page/FAQ#What_are_the_different_migration_methods.3F
   - port: "49152-49215"
     protocol: tcp

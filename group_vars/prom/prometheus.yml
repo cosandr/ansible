@@ -8,12 +8,14 @@ romsto_label: "RomeoTV"
 __dresrv: "{{ hostvars['dresrv'] }}"
 __prom_node_group: "servers"
 
-__exclude_auto_node:
+__exclude_auto_node: "{{ __exclude_auto_node_tmp | flatten }}"
+__exclude_auto_node_tmp:
   - dresrv
   - drepi
   - romsto
   - theia
   - oldpi
+  - "{{ groups['k8s_cluster'] }}"
 
 __prom_node_ips: >-
   {%- set tmp = [] -%}
