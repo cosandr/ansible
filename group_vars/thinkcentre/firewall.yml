@@ -32,4 +32,9 @@ firewalld_services:
     zone: internal
     sources: "{{ firewall_trusted_sources }}"
 
-firewall_rules: []
+firewall_rules:
+  # https://wiki.libvirt.org/page/FAQ#What_are_the_different_migration_methods.3F
+  - port: "49152-49215"
+    protocol: tcp
+    zone: internal
+    sources: "{{ groups['thinkcentre'] | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='mgmt') | list }}"

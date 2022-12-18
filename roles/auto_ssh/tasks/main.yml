@@ -58,6 +58,16 @@
     - hostvars[item].domain is defined
     - hostvars[item].domain | length > 0
 
+- name: Add custom names if available
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  ansible.builtin.set_fact:
+    __target_host_names: "{{ hostvars[item].__target_host_names + hostvars[item].ssh_custom_host_names }}"
+  loop: "{{ ssh_dest_hosts }}"
+  when:
+    - hostvars[item].ssh_custom_host_names is defined
+    - hostvars[item].ssh_custom_host_names | length > 0
+
 - name: Scan target host keys
   ansible.builtin.command: "ssh-keyscan {{ hostvars[item].__target_host_names | join(',') }}"
   check_mode: false
@@ -82,7 +92,7 @@
     marker: "# {mark} auto-ssh {{ ssh_key_comment }}"
     block: |
       {% for h in ssh_dest_hosts %}
-      {{ hostvars[h].ansible_host }} {{ hostvars[h].__target_host_names | difference([hostvars[h].ansible_host]) | unique | join(' ') }}
+      {{ hostvars[h].ansible_host }} {{ hostvars[h].ssh_conf_hosts_names | default(hostvars[h].__target_host_names | difference([hostvars[h].ansible_host])) | unique | join(' ') }}
       {% endfor %}
   when: ssh_conf_hosts
   tags: ["hosts"]
