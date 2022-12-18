@@ -2,7 +2,7 @@
 
 __nginx_upstreams_host:
   - name: syncthing
-    servers: ["{{ hostvars['theia'].local_ips.vm }}:8384"]
+    servers: ["{{ hostvars['theia'].host_ips.vm }}:8384"]
 
   - name: motion
     servers: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].motion_port }}"]

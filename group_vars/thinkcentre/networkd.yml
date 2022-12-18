@@ -1,7 +1,5 @@
 ---
 
-__host_num: "{{ ansible_host.split('.')[-1] }}"
-
 networkd_netdevs:
   - bond0: |
       [NetDev]

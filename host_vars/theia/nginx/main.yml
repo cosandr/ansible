@@ -1,6 +1,6 @@
 ---
 
-nginx_listen_address: "{{ local_ips.vm }}"
+nginx_listen_address: "{{ host_ips.vm }}"
 nginx_ports:
   www: 8013
 

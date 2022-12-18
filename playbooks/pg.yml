@@ -34,7 +34,7 @@
   pre_tasks:
     - name: Mount NFS share
       mount:
-        src: "{{ hostvars['theia'].local_ips.vm }}:/mnt/tank/backup/pgbackrest"
+        src: "{{ hostvars['theia'].host_ips.vm }}:/mnt/tank/backup/pgbackrest"
         path: "/var/lib/pgbackrest"
         opts: "defaults,vers=4,rw,noatime,bg"
         state: mounted

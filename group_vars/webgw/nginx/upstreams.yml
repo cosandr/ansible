@@ -23,7 +23,7 @@ __nginx_upstreams_common:
     keepalive: 16
 
   - name: dv-main
-    servers: ["{{ hostvars['theia'].local_ips.vm }}:{{ hostvars['theia'].nginx_ports['www'] }}"]
+    servers: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].nginx_ports['www'] }}"]
 
   - name: mrbot_web
     servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].mrbot_web_port }}"]

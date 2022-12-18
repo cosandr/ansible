@@ -53,7 +53,7 @@ prometheus_node_static_config:
     labels:
       instance: "{{ drepi_label }}"
 
-  - targets: ["{{ hostvars['theia'].local_ips.vm }}:9100"]
+  - targets: ["{{ hostvars['theia'].host_ips.vm }}:9100"]
     labels:
       instance: "{{ hostvars['theia'].inventory_hostname }}"
 

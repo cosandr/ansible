@@ -1,5 +1,7 @@
 ---
 
+__host_num: "{{ ansible_host.rsplit('.', 1)[-1] }}"
+
 home_net:
   vm:
     cidr: "10.0.10.0/24"
@@ -26,3 +28,11 @@ wg_net:
     cidr6: "fd00:4:20::0/64"
 
 all_net: "{{ home_net | combine(internal_net) | combine(wg_net) }}"
+
+# These do not necessarily exist, but are useful for automation
+host_ips: >-
+  {%- set tmp = {} -%}
+  {%- for k, v in all_net.items() -%}
+  {{- tmp.update({k: v.cidr | ansible.utils.ipaddr(__host_num) | ansible.utils.ipaddr('address')}) -}}
+  {%- endfor -%}
+  {{ tmp }}

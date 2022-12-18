@@ -65,7 +65,7 @@
             release_namespace: kube-system
             release_values:
               storageClass.defaultClass: true
-              nfs.server: "{{ hostvars['theia'].local_ips.vm }}"
+              nfs.server: "{{ hostvars['theia'].host_ips.vm }}"
               nfs.path: "/srv/kube"
           tags: ["helm", "nfs"]
 
