@@ -8,6 +8,7 @@ dnf_packages:
   - lsof
   - mlocate
   - pciutils
+  - python3-lxml  # virt ansible modules
   - rpmconf
   - rsync
   - wget

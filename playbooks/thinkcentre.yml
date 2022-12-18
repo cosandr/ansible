@@ -123,6 +123,24 @@
           tags: ["swap"]
       tags: ["swap"]
 
+    - name: Create libvirt NFS dir
+      ansible.builtin.file:
+        path: /var/lib/libvirt/theia
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      tags: ["libvirt", "nfs"]
+
+    - name: Define libvirt NFS pool
+      community.libvirt.virt_pool:
+        name: theia
+        command: define
+        xml: "{{ lookup('template', inventory_dir + '/files/thinkcentre/libvirt/theia.xml.j2') }}"
+        state: "active"
+        autostart: true
+      tags: ["libvirt", "nfs"]
+
   handlers:
     - name: Restart systemd-resolved
       ansible.builtin.systemd:
