@@ -43,7 +43,7 @@
           line: "FallbackDNS=1.1.1.1,8.8.8.8"
       tags: ["resolved"]
 
-    - name: btrfs tasks
+    - name: Btrfs tasks
       tags: ["btrfs"]
       block:
         - name: Mount btrfs root

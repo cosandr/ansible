@@ -1,0 +1,6 @@
+---
+
+# https://cockpit-project.org/guide/latest/feature-machines
+cockpit_machines: {}
+cockpit_packages: ["cockpit"]
+cockpit_extra_packages: ["cockpit-machines"]

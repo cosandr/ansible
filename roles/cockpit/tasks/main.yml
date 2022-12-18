@@ -1,0 +1,22 @@
+---
+
+- name: Install cockpit
+  ansible.builtin.package:
+    name: "{{ cockpit_packages + cockpit_extra_packages }}"
+    state: present
+  tags: ["install"]
+
+- name: Configure cockpit machines
+  ansible.builtin.copy:
+    dest: /etc/cockpit/machines.d/10-ansible.json
+    content: "{{ cockpit_machines | to_nice_json(indent=2) }}"
+    owner: root
+    group: root
+    mode: 0644
+  when: cockpit_machines
+
+- name: Enable and start cockpit socket
+  ansible.builtin.systemd:
+    name: cockpit.socket
+    state: started
+    enabled: true

@@ -28,6 +28,13 @@
       tags: ["libvirt"]
   tags: ["libvirt"]
 
+- name: Install and configure cockpit
+  ansible.builtin.include_role:
+    name: cockpit
+    apply:
+      tags: ["cockpit"]
+  tags: ["cockpit"]
+
 - name: Install postfix
   ansible.builtin.include_role:
     name: postfix

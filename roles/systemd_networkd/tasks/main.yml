@@ -84,9 +84,12 @@
   changed_when: false
   failed_when: false
   register: __nm_active
-  tags: ["always"]
 
 - name: Disable NM
+  when:
+    - __nm_active is defined
+    - __nm_active.rc is defined
+    - __nm_active.rc == 0
   block:
     - name: Stop NetworkManager
       systemd:
@@ -97,7 +100,6 @@
       systemd:
         name: NetworkManager
         enabled: false
-  when: __nm_active.rc == 0
 
 - name: Enable and start systemd-networkd/resolved
   systemd:

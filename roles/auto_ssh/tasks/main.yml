@@ -67,7 +67,7 @@
 
 - name: Ensure host keys are in known_hosts
   ansible.builtin.blockinfile:
-    path: "{{ ssh_src_dir }}/known_hosts"
+    path: "{{ ssh_known_hosts_file }}"
     marker: "# {mark} auto-ssh {{ ssh_key_comment }}"
     create: true
     mode: 0644

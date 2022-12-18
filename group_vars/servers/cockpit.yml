@@ -1,0 +1,9 @@
+---
+
+cockpit_machines_list: []
+cockpit_machines: >-
+  {%- set tmp = {} -%}
+  {%- for h in cockpit_machines_list -%}
+  {{- tmp.update({hostvars[h].ansible_host: {"user": "root", "address": hostvars[h].ansible_host, "visible": true}}) -}}
+  {%- endfor -%}
+  {{ tmp }}

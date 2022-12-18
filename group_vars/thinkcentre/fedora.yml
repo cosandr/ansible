@@ -1,8 +1,6 @@
 ---
 
 dnf_packages:
-  - cockpit
-  - cockpit-machines
   - htop
   - iftop
   - iotop

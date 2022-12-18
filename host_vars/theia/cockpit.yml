@@ -1,0 +1,3 @@
+---
+
+cockpit_machines_list: "{{ groups['thinkcentre'] }}"
