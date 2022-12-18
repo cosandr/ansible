@@ -24,6 +24,7 @@
           device: "disk"
           capacity: "{{ item }}"
           serial: "{{ disk_name }}"
+          pool: "{{ vm_disk_pool }}"
       tags: ["always"]
 
   roles:

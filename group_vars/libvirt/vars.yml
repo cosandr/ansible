@@ -7,6 +7,7 @@ vm_cpus: 4
 vm_mem: 4096
 vm_template: "rocky9_packer.qcow2"
 vm_os_id: "http://rockylinux.org/rocky/9"
+vm_disk_pool: "default"
 vm_extra_disks: []
 
 vm_data_disks: []
@@ -19,6 +20,7 @@ vm_root_disk:
   capacity: "{{ vm_root_size }}"
   clone_image: "{{ vm_template }}"
   serial: "root01"
+  pool: "{{ vm_disk_pool }}"
 
 vm_default_nic:
   type: bridge
