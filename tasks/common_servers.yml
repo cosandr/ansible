@@ -56,3 +56,11 @@
       tags: ["promtail"]
   when: promtail_scrape_configs | default([])
   tags: ["promtail"]
+
+- name: Setup SSL cert sync
+  ansible.builtin.include_role:
+    name: pg_cert_store
+    apply:
+      tags: ["pg_cert", "ssl"]
+  when: pg_cert_installed | default(false)
+  tags: ["pg_cert", "ssl"]

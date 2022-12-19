@@ -1,0 +1,8 @@
+---
+
+pg_cert_installed: "{{ pg_cert_pull | default([]) | length > 0 }}"
+pg_cert_pg_host: "{{ hostvars['pg01'].ansible_host }}"
+pg_cert_pg_db: "certs"
+pg_cert_pg_user: "certs_reader"
+pg_cert_pg_password: "{{ hostvars['pg01'].vault_postgresql_passwords.certs_reader }}"
+pg_cert_pg_schema: "public"

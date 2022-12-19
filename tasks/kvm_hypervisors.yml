@@ -35,6 +35,15 @@
       tags: ["cockpit"]
   tags: ["cockpit"]
 
+- name: Symlink cockpit certs
+  ansible.builtin.file:
+    src: "/etc/pki/tls/{{ 'certs' if item == 'crt' else 'private' }}/{{ domain }}.{{ item }}"
+    dest: "/etc/cockpit/ws-certs.d/99-live.{{ item }}"
+    follow: false
+    state: link
+  loop: ["crt", "key"]
+  tags: ["cockpit"]
+
 - name: Install postfix
   ansible.builtin.include_role:
     name: postfix

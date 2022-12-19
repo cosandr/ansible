@@ -24,3 +24,9 @@ postgresql_users:
 
   - name: terraform
     password: "{{ vault_postgresql_passwords.terraform }}"
+
+  - name: certs_pusher
+    password: "{{ vault_postgresql_passwords.certs_pusher }}"
+
+  - name: certs_reader
+    password: "{{ vault_postgresql_passwords.certs_reader }}"

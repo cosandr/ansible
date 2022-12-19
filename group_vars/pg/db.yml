@@ -24,3 +24,6 @@ postgresql_databases:
 
   - name: terraform
     owner: terraform
+
+  - name: certs
+    owner: certs_pusher

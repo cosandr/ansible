@@ -49,3 +49,6 @@
 [submodule "roles/firewall_config"]
 	path = roles/firewall_config
 	url = git@github.com:cosandr/ansible-role-firewall-config.git
+[submodule "roles/pg_cert_store"]
+	path = roles/pg_cert_store
+	url = git@github.com:cosandr/ansible-role-pg-cert-store.git

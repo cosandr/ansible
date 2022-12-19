@@ -1,0 +1,13 @@
+---
+
+pg_cert_pull:
+  - name: "{{ domain }}"
+    cert_path: "{{ nginx_certs_dir }}/{{ domain }}.pem"
+    key_path: "{{ nginx_certs_dir }}/{{ domain }}.key"
+
+pg_cert_pull_hooks:
+  - name: restart-nginx
+    content: |
+      #!/bin/sh
+
+      systemctl restart nginx

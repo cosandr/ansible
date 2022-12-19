@@ -15,6 +15,9 @@ firewalld_services:
   - name: postgresql
     zone: internal
 
+  - name: postgresql
+    zone: public
+
   - name: cockpit
     zone: public
     state: absent
