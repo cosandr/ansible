@@ -1,3 +1,7 @@
 ---
 
 ansible_become_pass: "{{ vault_ansible_become_pass }}"
+# Installed from syno community
+node_exporter_installed: false
+# TODO
+promtail_scrape_configs: []

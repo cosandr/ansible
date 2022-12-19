@@ -113,10 +113,6 @@
     webdav_selinux_rw:
       - "/var/www/main/discord"
       - "/var/www/dav-temp"
-    cadvisor_version: "0.40.0"
-    grafana_version: "latest"
-    nginx_exporter_version: "latest"
-    node_exporter_version: "latest"
   tasks:
     - name: Setup syncthing
       tags: ["syncthing"]

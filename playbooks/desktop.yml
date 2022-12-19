@@ -2,6 +2,7 @@
 ---
 
 - name: Desktop playbook
+  become: true
   gather_facts: true
   hosts: desktop
   pre_tasks:

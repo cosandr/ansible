@@ -6,3 +6,5 @@ ssh_port: "{{ vault_ssh_port }}"
 syncthing_port: "{{ vault_syncthing_port }}"
 cadvisor_port: "9101"
 nextcloud_port: "25683"
+# Running in Docker
+node_exporter_installed: false

@@ -21,11 +21,14 @@
       become: true
       tags: ["firewall"]
   vars:
+    ufw_configure_defaults: false
     ufw_before_rules: ""
+    ufw_allow_dhcpv6: false
     ufw_trusted_sources: []
     firewalld_services: []
     firewalld_zones: []
     firewall_rules:
       - port: "{{ node_exporter_web_listen_address.split(':')[1] }}"
+        zone: "{{ node_exporter_firewalld_zone }}"
         sources: "{{ node_exporter_allow_ips }}"
   when: node_exporter_config_firewall
