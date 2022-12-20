@@ -1,5 +1,6 @@
 ---
 
+zfs_arc_max_gb: 8
 zfs_zed_options:
   - regexp: '^#?ZED_SLACK_WEBHOOK_URL'
     line: 'ZED_SLACK_WEBHOOK_URL="{{ vault_zfs_zed_slack_webhook }}"'

@@ -74,6 +74,14 @@
       loop: "{{ zfs_scrub_timers | default([]) }}"
       tags: ["zfs", "scrub"]
 
+    - name: Configure max ZFS ARC size
+      ansible.builtin.lineinfile:
+        path: /etc/modprobe.d/zfs.conf
+        regexp: '^options zfs.*'
+        line: 'options zfs zfs_arc_max={{ zfs_arc_max_gb * 2**30 }}'
+      notify: Dracut regenerate
+      tags: ["zfs", "arc"]
+
     - name: Set tank SELinux context
       community.general.sefcontext:
         target: "/mnt/tank(/.*)?"
@@ -172,3 +180,6 @@
 
     - name: Reload NFS shares
       ansible.builtin.command: exportfs -ar
+
+    - name: Dracut regenerate
+      command: dracut -f --regenerate-all
