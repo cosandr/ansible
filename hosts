@@ -97,6 +97,9 @@ aegir ansible_host=10.0.100.21
 gerd ansible_host=10.0.100.22
 ymir ansible_host=10.0.100.23
 
+[ceph:children]
+thinkcentre
+
 # kubespray
 [k8s_cluster]
 k8s01 ansible_host=10.0.10.51

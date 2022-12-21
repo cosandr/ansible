@@ -120,25 +120,59 @@ groups:
     labels:
       severity: critical
 
-  - alert: NodeNetworkReceiveErrs
+  # Adapted from "nodes" group in ceph's default alerts
+  - alert: "NodeNetworkPacketDrops"
     annotations:
-      description: '{{ $labels.instance }} interface {{ $labels.device }} has encountered
-        {{ printf "%.0f" $value }} receive errors in the last two minutes.'
-      summary: Network interface is reporting many receive errors.
-    expr: 'increase(node_network_receive_errs_total[2m]) > 10'
-    for: 1h
+      description: "Node {{ $labels.instance }} experiences packet drop > 0.5% or > 10 packets/s on interface {{ $labels.device }}."
+      summary: "One or more NICs reports packet drops"
+    expr: |
+      (
+        rate(node_network_receive_drop_total{device!="lo"}[1m]) +
+        rate(node_network_transmit_drop_total{device!="lo"}[1m])
+      ) / (
+        rate(node_network_receive_packets_total{device!="lo"}[1m]) +
+        rate(node_network_transmit_packets_total{device!="lo"}[1m])
+      ) >= 0.0050000000000000001 and (
+        rate(node_network_receive_drop_total{device!="lo"}[1m]) +
+        rate(node_network_transmit_drop_total{device!="lo"}[1m])
+      ) >= 10
     labels:
-      severity: warning
+      severity: "warning"
 
-  - alert: NodeNetworkTransmitErrs
+  - alert: "NodeNetworkPacketErrors"
     annotations:
-      description: '{{ $labels.instance }} interface {{ $labels.device }} has encountered
-        {{ printf "%.0f" $value }} transmit errors in the last two minutes.'
-      summary: Network interface is reporting many transmit errors.
-    expr: 'increase(node_network_transmit_errs_total[2m]) > 10'
-    for: 1h
+      description: "Node {{ $labels.instance }} experiences packet errors > 0.01% or > 10 packets/s on interface {{ $labels.device }}."
+      summary: "One or more NICs reports packet errors"
+    expr: |
+      (
+        rate(node_network_receive_errs_total{device!="lo"}[1m]) +
+        rate(node_network_transmit_errs_total{device!="lo"}[1m])
+      ) / (
+        rate(node_network_receive_packets_total{device!="lo"}[1m]) +
+        rate(node_network_transmit_packets_total{device!="lo"}[1m])
+      ) >= 0.0001 or (
+        rate(node_network_receive_errs_total{device!="lo"}[1m]) +
+        rate(node_network_transmit_errs_total{device!="lo"}[1m])
+      ) >= 10
     labels:
-      severity: warning
+      severity: "warning"
+
+  - alert: "NodeNetworkBondDegraded"
+    annotations:
+      summary: "Degraded Bond on Node {{ $labels.instance }}"
+      description: "Bond {{ $labels.master }} is degraded on Node {{ $labels.instance }}."
+    expr: |
+      node_bonding_slaves - node_bonding_active != 0
+    labels:
+      severity: "warning"
+
+  - alert: "NodeInconsistentMTU"
+    annotations:
+      description: "Node {{ $labels.instance }} has a different MTU size ({{ $value }}) than the median of devices named {{ $labels.device }}."
+      summary: "MTU settings across hosts is inconsistent"
+    expr: "node_network_mtu_bytes * (node_network_up{device!=\"lo\"} > 0) ==  scalar(    max by (device) (node_network_mtu_bytes * (node_network_up{device!=\"lo\"} > 0)) !=      quantile by (device) (.5, node_network_mtu_bytes * (node_network_up{device!=\"lo\"} > 0))  )or node_network_mtu_bytes * (node_network_up{device!=\"lo\"} > 0) ==  scalar(    min by (device) (node_network_mtu_bytes * (node_network_up{device!=\"lo\"} > 0)) !=      quantile by (device) (.5, node_network_mtu_bytes * (node_network_up{device!=\"lo\"} > 0))  )"
+    labels:
+      severity: "warning"
 
   - alert: NodeHighNumberConntrackEntriesUsed
     annotations:

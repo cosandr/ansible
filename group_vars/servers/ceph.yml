@@ -1,0 +1,4 @@
+---
+
+ceph_dashboard_port: 8443
+ceph_exporter_port: 9283

@@ -38,3 +38,4 @@ grafana_dashboards: []
 
 grafana_plugins:
   - grafana-piechart-panel
+  - vonage-status-panel
