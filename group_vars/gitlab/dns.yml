@@ -1,0 +1,5 @@
+---
+
+mt_dns_entries:
+  - name: "{{ inventory_hostname }}.vm.{{ domains['hb'] }}"
+    address: "{{ ansible_host }}"

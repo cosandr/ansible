@@ -1,0 +1,18 @@
+---
+
+mt_dns_managed_comment: "ansible managed"
+mt_dns_entries: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_dns_entries | default([])) -%}
+  {%- for item in hostvars[h].mt_dns_entries -%}
+  {{- tmp.append(
+      {
+      "name": item.name,
+      "address": item.address,
+      "comment": item.comment | default(mt_dns_managed_comment),
+      "ttl": item.ttl | default('1h')
+    }
+  ) -}}
+  {%- endfor -%}
+  {%- endfor -%}
+  {{ tmp }}

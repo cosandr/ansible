@@ -1,5 +1,5 @@
 ---
-
+domain: "{{ domains['hb'] }}"
 provisioned_disks:
   - dev: "/dev/disk/by-id/virtio-data01"
     vols:

@@ -1,0 +1,7 @@
+---
+
+mt_dns_entries:
+  - name: "{{ inventory_hostname }}.{{ domain }}"
+    address: "{{ ansible_host }}"
+  - name: "{{ inventory_hostname }}.san.{{ domain }}"
+    address: "{{ host_ips.san }}"

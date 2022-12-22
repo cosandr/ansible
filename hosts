@@ -22,6 +22,9 @@ rpi
 libvirt
 thinkcentre
 
+[servers:vars]
+ansible_group_priority=1
+
 [libvirt]
 dresrv
 localgw01
@@ -37,6 +40,9 @@ minio
 nextcloud
 plex
 k8s_cluster
+
+[libvirt:vars]
+ansible_group_priority=2
 
 [rpi]
 drepi   ansible_host=10.0.50.21    ansible_user=andrei
@@ -66,6 +72,9 @@ gitrun02 ansible_host=10.0.10.42
 [prom]
 prom01 ansible_host=10.0.10.21
 webgw01
+
+[prom:vars]
+ansible_group_priority=10
 
 [loki]
 loki01 ansible_host=10.0.10.25
@@ -99,6 +108,14 @@ ymir ansible_host=10.0.100.23
 
 [ceph:children]
 thinkcentre
+
+[rom]
+romgw01
+rompi
+romsto
+
+[rom:vars]
+ansible_group_priority=10
 
 # kubespray
 [k8s_cluster]

@@ -1,0 +1,85 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: MikroTik playbook
+  hosts: mikrotik
+  gather_facts: false
+  module_defaults:
+    group/community.routeros.api:
+      hostname: "{{ ansible_host }}"
+      username: "{{ api_username }}"
+      password: "{{ api_password }}"
+      tls: true
+      validate_certs: true
+      ca_path: "{{ inventory_dir }}/files/{{ inventory_hostname }}/ca.crt"
+
+  tasks:
+    - name: Get all DNS entries
+      delegate_to: localhost
+      community.routeros.api_info:
+        path: ip dns static
+        handle_disabled: null-value
+      register: __mt_dns
+
+    - name: Set fact for managed entries
+      ansible.builtin.set_fact:
+        mt_dns_present: "{{ __mt_dns.result | selectattr('comment', 'eq', mt_dns_managed_comment) | list }}"
+
+    - name: Set helper facts
+      ansible.builtin.set_fact:
+        __configured_hosts: "{{ mt_dns_entries | map(attribute='name') | list }}"
+        __present_hosts: "{{ mt_dns_present | map(attribute='name') | list }}"
+
+    - name: Remove old entries
+      delegate_to: localhost
+      vars:
+        __delete_entries: >-
+          {%- set tmp = [] -%}
+          {%- for item in mt_dns_present -%}
+          {%- if item.name not in __configured_hosts -%}
+          {{- tmp.append(item) -}}
+          {%- endif -%}
+          {%- endfor -%}
+          {{ tmp }}
+      community.routeros.api:
+        path: ip dns static
+        remove: "{{ item['.id'] }}"
+      loop: "{{ __delete_entries }}"
+      loop_control:
+        label: "{{ item.name }} [{{ item.address }}]"
+
+    - name: Add missing entries
+      delegate_to: localhost
+      vars:
+        __missing_entries: >-
+          {%- set tmp = [] -%}
+          {%- for item in mt_dns_entries -%}
+          {%- if item.name not in __present_hosts -%}
+          {{- tmp.append(item) -}}
+          {%- endif -%}
+          {%- endfor -%}
+          {{ tmp }}
+      community.routeros.api_modify:
+        path: ip dns static
+        data: "{{ __missing_entries }}"
+
+    - name: Update entries
+      delegate_to: localhost
+      vars:
+        __same_entries: >-
+          {%- set tmp = [] -%}
+          {%- for item in mt_dns_entries -%}
+          {%- if item.name in __present_hosts -%}
+          {{- tmp.append(item) -}}
+          {%- endif -%}
+          {%- endfor -%}
+          {{ tmp }}
+      community.routeros.api_find_and_modify:
+        path: ip dns static
+        find:
+          name: "{{ item.name }}"
+          comment: "{{ item.comment | default(mt_dns_managed_comment) }}"
+        values: "{{ item }}"
+      loop: "{{ __same_entries }}"
+      loop_control:
+        label: "{{ item.name }} [{{ item.address }}]"

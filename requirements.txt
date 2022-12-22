@@ -2,3 +2,4 @@ docker
 netaddr
 jmespath
 kubernetes
+librouteros

@@ -8,6 +8,8 @@ collections:
     version: '>=5.2'
   - name: kubernetes.core
     version: '>=2.3'
+  - name: community.routeros
+    version: '>2.1'
 
 roles:
   - name: geerlingguy.docker

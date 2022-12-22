@@ -1,6 +1,7 @@
 ---
 
 ansible_become: true
+domain: "{{ domains['hb'] }}"
 
 system_timezone: "Europe/Oslo"
 system_locale: "en_US.UTF-8"
