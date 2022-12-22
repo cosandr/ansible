@@ -1,0 +1,20 @@
+---
+
+__cert_names:
+  - "IP:{{ ansible_host }}"
+
+repo_base_dir: "{{ ansible_config_file | dirname }}"
+vault_password_file: "{{ repo_base_dir }}/gopass-vault.sh"
+key_passphrase: "{{ lookup('community.general.passwordstore', 'ansible/mt_key_pass') }}"
+ca_passphrase: "{{ lookup('community.general.passwordstore', 'ansible/mt_ca_pass') }}"
+ca_publickey_path: "{{ repo_base_dir }}/files/mikrotik/ca.crt"
+ca_privatekey_path: "{{ repo_base_dir }}/files/mikrotik/ca.key"
+
+self_signed_certs:
+  - privatekey_path: "{{ repo_base_dir }}/files/mikrotik/{{ inventory_hostname }}.key"
+    publickey_path: "{{ repo_base_dir }}/files/mikrotik/{{ inventory_hostname }}.crt"
+    passphrase: "{{ key_passphrase }}"
+    subject_alt_name: "{{ __cert_names }}"
+    ca_passphrase: "{{ ca_passphrase }}"
+    ca_publickey_path: "{{ ca_publickey_path }}"
+    ca_privatekey_path: "{{ ca_privatekey_path }}"

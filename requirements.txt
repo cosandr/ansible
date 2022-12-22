@@ -1,5 +1,7 @@
+ansible-pylibssh
+cryptography
 docker
-netaddr
 jmespath
 kubernetes
 librouteros
+netaddr

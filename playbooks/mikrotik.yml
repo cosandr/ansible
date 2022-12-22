@@ -1,9 +1,69 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
+- name: MikroTik certificate setup
+  hosts: mikrotik
+  gather_facts: false
+  tags: ["tls-setup"]
+  vars:
+    p12_path: "/tmp/{{ inventory_hostname }}.p12"
+  roles:
+    - role: self_signed_cert
+      when: "'tls-setup' in ansible_run_tags"
+      tags: ["generate"]
+
+  post_tasks:
+    - name: Generate and copy bundle
+      when: "'tls-setup' in ansible_run_tags"
+      block:
+        - name: Generate random password
+          ansible.builtin.set_fact:
+            random_password: "{{ lookup('community.general.random_string', length=32, override_all='0123456789abcdefghijklmnopqrstuvwxyz') }}"
+
+        - name: Create PKCS#12 bundle
+          delegate_to: localhost
+          community.crypto.openssl_pkcs12:
+            path: "{{ p12_path }}"
+            certificate_path: "{{ self_signed_certs[0].publickey_path }}"
+            privatekey_passphrase: "{{ key_passphrase }}"
+            privatekey_content: "{{ lookup('file', self_signed_certs[0].privatekey_path) }}"
+            friendly_name: '{{ inventory_hostname }}'
+            passphrase: "{{ random_password }}"
+            mode: "0600"
+
+        - name: Copy router certificate onto router
+          ansible.netcommon.net_put:
+            src: "{{ p12_path }}"
+            dest: "{{ inventory_hostname }}.p12"
+
+        - name: Install router certificate and clean up
+          community.routeros.command:
+            commands:
+              # Import certificate:
+              - /certificate import name={{ inventory_hostname }} file-name={{ inventory_hostname }}.p12 passphrase="{{ random_password }}"
+              # Remove PKCS12 bundle:
+              - /file remove {{ inventory_hostname }}.p12
+              # Show certificates
+              - /certificate print
+          register: output
+
+      always:
+        - name: Delete PKCS12 bundle
+          delegate_to: localhost
+          ansible.builtin.file:
+            path: "{{ p12_path }}"
+            state: absent
+
+    - name: Use certificate
+      community.routeros.command:
+        commands:
+          - /ip service set www-ssl certificate={{ inventory_hostname }} tls-version=only-1.2
+          - /ip service set api-ssl certificate={{ inventory_hostname }} tls-version=only-1.2
+
 - name: MikroTik playbook
   hosts: mikrotik
   gather_facts: false
+  tags: ["dns"]
   module_defaults:
     group/community.routeros.api:
       hostname: "{{ ansible_host }}"
@@ -11,7 +71,8 @@
       password: "{{ api_password }}"
       tls: true
       validate_certs: true
-      ca_path: "{{ inventory_dir }}/files/{{ inventory_hostname }}/ca.crt"
+      validate_cert_hostname: true
+      ca_path: "{{ ca_publickey_path }}"
 
   tasks:
     - name: Get all DNS entries

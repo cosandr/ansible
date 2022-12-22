@@ -1,0 +1,14 @@
+---
+
+__cert_names: >-
+  {%- set tmp = [] -%}
+  {%- for v in host_ips.values() | sort -%}
+  {{- tmp.append('IP:' + v) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+self_signed_cas:
+  - cn: "MikroTik CA"
+    passphrase: "{{ ca_passphrase }}"
+    publickey_path: "{{ ca_publickey_path }}"
+    privatekey_path: "{{ ca_privatekey_path }}"
