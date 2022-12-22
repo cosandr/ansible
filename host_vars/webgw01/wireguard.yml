@@ -17,6 +17,7 @@ wireguard_mt_allowed_ips:
   - "{{ hostvars['dresrv'].ansible_host }}/32"
   - "{{ hostvars['mt-router'].wireguard_ipv6 }}/128"
   - "{{ home_net.vm.cidr6 }}"
+  - "{{ hostvars['theia'].ansible_host }}/32"
 
 wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_ip: "{{ wireguard_addresses[0] | ansible.utils.ipaddr('address') }}"
