@@ -1,0 +1,20 @@
+---
+
+mt_groups:
+  - name: "{{ api_username }}"
+    args:
+      - "policy=api,read,write"
+  - name: "prometheus"
+    args:
+      - "policy=api,read,winbox"
+
+mt_users:
+  - name: "{{ api_username }}"
+    args:
+      - "password={{ api_password }}"
+      - "group={{ api_username }}"
+  - name: "prometheus"
+    args:
+      - "password={{ lookup('community.general.passwordstore', 'network/mt_prom_pass') }}"
+      - "group=prometheus"
+      - "address={{ hostvars['prom01'].ansible_host }}/32"

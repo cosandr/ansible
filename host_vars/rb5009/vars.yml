@@ -1,4 +1,0 @@
----
-
-api_username: ansible
-api_password: "{{ lookup('community.general.passwordstore', 'network/mt_ansible_pass') }}"

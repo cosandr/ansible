@@ -1,19 +1,52 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- name: MikroTik certificate setup
+- name: Configure using SSH
   hosts: mikrotik
   gather_facts: false
-  tags: ["tls-setup"]
   vars:
     p12_path: "/tmp/{{ inventory_hostname }}.p12"
   roles:
     - role: self_signed_cert
-      when: "'tls-setup' in ansible_run_tags"
+      when: "'generate' in ansible_run_tags"
       tags: ["generate"]
+
+  tasks:
+    - name: Configure groups
+      community.routeros.command:
+        commands:
+          - >
+            :if ([/user group find name={{ item.name }}]) do={
+              /user group set [find name={{ item.name }}] {{ item.args | community.routeros.join }}
+            } else={
+              /user group add name={{ item.name }} {{ item.args | community.routeros.join }}
+            }
+          - /user group print
+        wait_for: result[1] contains {{ item.name }}
+      loop: "{{ mt_groups | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      tags: ["groups"]
+
+    - name: Configure users
+      community.routeros.command:
+        commands:
+          - >
+            :if ([/user find name={{ item.name }}]) do={
+              /user set [find name={{ item.name }}] {{ item.args | community.routeros.join }}
+            } else={
+              /user add name={{ item.name }} {{ item.args | community.routeros.join }}
+            }
+          - /user print
+        wait_for: result[1] contains {{ item.name }}
+      loop: "{{ mt_users | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      tags: ["users"]
 
   post_tasks:
     - name: Generate and copy bundle
+      tags: ["tls-setup"]
       when: "'tls-setup' in ansible_run_tags"
       block:
         - name: Generate random password
@@ -58,12 +91,13 @@
       community.routeros.command:
         commands:
           - /ip service set www-ssl certificate={{ inventory_hostname }} tls-version=only-1.2
-          - /ip service set api-ssl certificate={{ inventory_hostname }} tls-version=only-1.2
+          - /ip service set api-ssl certificate={{ inventory_hostname }} disabled=no tls-version=only-1.2
+      tags: ["tls-setup"]
+      when: "'tls-setup' in ansible_run_tags"
 
-- name: MikroTik playbook
+- name: Configure using API
   hosts: mikrotik
   gather_facts: false
-  tags: ["dns"]
   module_defaults:
     group/community.routeros.api:
       hostname: "{{ ansible_host }}"
@@ -75,72 +109,75 @@
       ca_path: "{{ ca_publickey_path }}"
 
   tasks:
-    - name: Get all DNS entries
-      delegate_to: localhost
-      community.routeros.api_info:
-        path: ip dns static
-        handle_disabled: null-value
-      register: __mt_dns
+    - name: Configure DNS
+      tags: ["dns"]
+      block:
+        - name: Get all DNS entries
+          delegate_to: localhost
+          community.routeros.api_info:
+            path: ip dns static
+            handle_disabled: null-value
+          register: __mt_dns
 
-    - name: Set fact for managed entries
-      ansible.builtin.set_fact:
-        mt_dns_present: "{{ __mt_dns.result | selectattr('comment', 'eq', mt_dns_managed_comment) | list }}"
+        - name: Set fact for managed entries
+          ansible.builtin.set_fact:
+            mt_dns_present: "{{ __mt_dns.result | selectattr('comment', 'eq', mt_dns_managed_comment) | list }}"
 
-    - name: Set helper facts
-      ansible.builtin.set_fact:
-        __configured_hosts: "{{ mt_dns_entries | map(attribute='name') | list }}"
-        __present_hosts: "{{ mt_dns_present | map(attribute='name') | list }}"
+        - name: Set helper facts
+          ansible.builtin.set_fact:
+            __configured_hosts: "{{ mt_dns_entries | map(attribute='name') | list }}"
+            __present_hosts: "{{ mt_dns_present | map(attribute='name') | list }}"
 
-    - name: Remove old entries
-      delegate_to: localhost
-      vars:
-        __delete_entries: >-
-          {%- set tmp = [] -%}
-          {%- for item in mt_dns_present -%}
-          {%- if item.name not in __configured_hosts -%}
-          {{- tmp.append(item) -}}
-          {%- endif -%}
-          {%- endfor -%}
-          {{ tmp }}
-      community.routeros.api:
-        path: ip dns static
-        remove: "{{ item['.id'] }}"
-      loop: "{{ __delete_entries }}"
-      loop_control:
-        label: "{{ item.name }} [{{ item.address }}]"
+        - name: Remove old entries
+          delegate_to: localhost
+          vars:
+            __delete_entries: >-
+              {%- set tmp = [] -%}
+              {%- for item in mt_dns_present -%}
+              {%- if item.name not in __configured_hosts -%}
+              {{- tmp.append(item) -}}
+              {%- endif -%}
+              {%- endfor -%}
+              {{ tmp }}
+          community.routeros.api:
+            path: ip dns static
+            remove: "{{ item['.id'] }}"
+          loop: "{{ __delete_entries }}"
+          loop_control:
+            label: "{{ item.name }} [{{ item.address }}]"
 
-    - name: Add missing entries
-      delegate_to: localhost
-      vars:
-        __missing_entries: >-
-          {%- set tmp = [] -%}
-          {%- for item in mt_dns_entries -%}
-          {%- if item.name not in __present_hosts -%}
-          {{- tmp.append(item) -}}
-          {%- endif -%}
-          {%- endfor -%}
-          {{ tmp }}
-      community.routeros.api_modify:
-        path: ip dns static
-        data: "{{ __missing_entries }}"
+        - name: Add missing entries
+          delegate_to: localhost
+          vars:
+            __missing_entries: >-
+              {%- set tmp = [] -%}
+              {%- for item in mt_dns_entries -%}
+              {%- if item.name not in __present_hosts -%}
+              {{- tmp.append(item) -}}
+              {%- endif -%}
+              {%- endfor -%}
+              {{ tmp }}
+          community.routeros.api_modify:
+            path: ip dns static
+            data: "{{ __missing_entries }}"
 
-    - name: Update entries
-      delegate_to: localhost
-      vars:
-        __same_entries: >-
-          {%- set tmp = [] -%}
-          {%- for item in mt_dns_entries -%}
-          {%- if item.name in __present_hosts -%}
-          {{- tmp.append(item) -}}
-          {%- endif -%}
-          {%- endfor -%}
-          {{ tmp }}
-      community.routeros.api_find_and_modify:
-        path: ip dns static
-        find:
-          name: "{{ item.name }}"
-          comment: "{{ item.comment | default(mt_dns_managed_comment) }}"
-        values: "{{ item }}"
-      loop: "{{ __same_entries }}"
-      loop_control:
-        label: "{{ item.name }} [{{ item.address }}]"
+        - name: Update entries
+          delegate_to: localhost
+          vars:
+            __same_entries: >-
+              {%- set tmp = [] -%}
+              {%- for item in mt_dns_entries -%}
+              {%- if item.name in __present_hosts -%}
+              {{- tmp.append(item) -}}
+              {%- endif -%}
+              {%- endfor -%}
+              {{ tmp }}
+          community.routeros.api_find_and_modify:
+            path: ip dns static
+            find:
+              name: "{{ item.name }}"
+              comment: "{{ item.comment | default(mt_dns_managed_comment) }}"
+            values: "{{ item }}"
+          loop: "{{ __same_entries }}"
+          loop_control:
+            label: "{{ item.name }} [{{ item.address }}]"
