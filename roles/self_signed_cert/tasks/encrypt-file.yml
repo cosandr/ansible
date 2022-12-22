@@ -1,0 +1,18 @@
+---
+
+- name: Check if file exists
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "{{ file_path }}"
+  register: __fstat
+
+- name: Encrypt file
+  delegate_to: localhost
+  ansible.builtin.command:
+    cmd: "ansible-vault encrypt --vault-password-file {{ vault_password_file }} {{ file_path }}"
+  register: __encrypt
+  changed_when: __encrypt.rc == 0
+  failed_when:
+    - __encrypt.rc != 0
+    - "'already encrypted' not in __encrypt.stderr"
+  when: __fstat.stat.exists

@@ -1,0 +1,68 @@
+---
+
+- name: Check if certificate private key exists
+  delegate_to: localhost
+  ansible.builtin.stat:
+    path: "{{ cert.privatekey_path }}"
+  register: __cert_private_check
+
+# https://docs.ansible.com/ansible/latest/collections/community/crypto/docsite/guide_ownca.html#use-the-ca-to-sign-a-certificate
+
+- name: Certificate tasks
+  delegate_to: localhost
+  block:
+    - name: Create private key
+      community.crypto.openssl_privatekey_pipe:
+        content: "{{ lookup('file', cert.privatekey_path) if __cert_private_check.stat.exists else omit }}"
+        cipher: "{{ 'auto' if cert.passphrase | default(None) else omit }}"
+        passphrase: "{{ cert.passphrase | default(omit) }}"
+        return_current_key: true
+      no_log: true
+      register: __cert_private
+
+    - name: Write private key to file  # noqa risky-file-permissions
+      ansible.builtin.copy:
+        content: "{{ __cert_private.privatekey }}"
+        dest: "{{ cert.privatekey_path }}"
+      when: __cert_private is changed
+
+    - name: Create CSR for certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_content: "{{ __cert_private.privatekey }}"
+        privatekey_passphrase: "{{ cert.passphrase | default(omit) }}"
+        common_name: "{{ cert.cn | default(omit) }}"
+        subject_alt_name: "{{ cert.subject_alt_name }}"
+      register: cert_csr
+      # It will always change, since it's stored in memory
+      changed_when: false
+
+    - name: Check if certificate public key exists
+      ansible.builtin.stat:
+        path: "{{ cert.publickey_path }}"
+      register: __cert_public
+
+    - name: Sign CSR with CA
+      community.crypto.x509_certificate_pipe:
+        content: "{{ lookup('file', cert.publickey_path) if __cert_public.stat.exists else omit }}"
+        csr_content: "{{ cert_csr.csr }}"
+        provider: ownca
+        ownca_path: "{{ cert.ca_publickey_path }}"
+        ownca_privatekey_content: "{{ lookup('file', cert.ca_privatekey_path) }}"
+        ownca_privatekey_passphrase: "{{ cert.ca_passphrase }}"
+        ownca_not_after: "{{ cert.not_after | default(omit) }}"
+        ownca_not_before: "{{ cert.not_before | default(omit) }}"
+      register: __cert
+
+    - name: Write public key to file  # noqa risky-file-permissions
+      ansible.builtin.copy:
+        content: "{{ __cert.certificate }}"
+        dest: "{{ cert.publickey_path }}"
+      when: __cert is changed
+  always:
+    # Run here instead of handler to ensure private key is never left decrypted
+    - name: Encrypt certificate private key
+      ansible.builtin.include_tasks:
+        file: encrypt-file.yml
+      vars:
+        file_path: "{{ cert.privatekey_path }}"
+      when: vault_password_file
