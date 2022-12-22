@@ -109,6 +109,13 @@
       ca_path: "{{ ca_publickey_path }}"
 
   tasks:
+    - name: Configure services
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip service
+        data: "{{ mt_services }}"
+      tags: ["services"]
+
     - name: Configure DNS
       tags: ["dns"]
       block:
