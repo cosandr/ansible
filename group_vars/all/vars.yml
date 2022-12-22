@@ -26,3 +26,6 @@ locale_conf:
 systemd_script_install_path: "/usr/local/bin/systemd"
 
 s3_url: "https://s3.{{ domains['hb'] }}"
+
+node_exporter_config_firewall: "{{ firewall_enabled | default(true) }}"
+node_exporter_allow_ips: "{{ groups['prom'] | difference(groups['webgw']) | map('extract', hostvars, 'ansible_host') | list }}"

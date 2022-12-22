@@ -9,13 +9,6 @@ __firewall_rules_ufw:
 firewalld_services:
   - name: ssh
 
-firewall_trusted_sources:
-  - "{{ hostvars['desktop'].ansible_host }}"
-  - "{{ hostvars['laptop'].ansible_host }}"
-  - "{{ hostvars['laptop'].wireguard_ip }}"
-  - "{{ hostvars['m1bp'].ansible_host }}"
-  - "{{ hostvars['m1bp'].wireguard_ip }}"
-
 ufw_trusted_sources: "{{ firewall_trusted_sources }}"
 
 webgw_sources: "{{ groups['webgw'] | difference(['romgw01']) }}"
