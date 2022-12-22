@@ -6,16 +6,16 @@ wireguard_addresses:
   - "{{ wg_net.mt.cidr6 | ansible.utils.ipaddr('0x91' | int(base=16)) }}"
 
 wireguard_dns_list:
-  - "{{ hostvars['mt-router'].wireguard_ip }}"
-  - "{{ hostvars['mt-router'].wireguard_ipv6 }}"
+  - "{{ hostvars['rb5009'].wireguard_ip }}"
+  - "{{ hostvars['rb5009'].wireguard_ipv6 }}"
   - "1.1.1.1"
   - "8.8.8.8"
 
 wireguard_mt_allowed_ips:
-  - "{{ hostvars['mt-router'].wireguard_ip }}/32"
+  - "{{ hostvars['rb5009'].wireguard_ip }}/32"
   - "{{ home_net.vm.cidr }}"
   - "{{ hostvars['dresrv'].ansible_host }}/32"
-  - "{{ hostvars['mt-router'].wireguard_ipv6 }}/128"
+  - "{{ hostvars['rb5009'].wireguard_ipv6 }}/128"
   - "{{ home_net.vm.cidr6 }}"
   - "{{ hostvars['theia'].ansible_host }}/32"
 
@@ -29,9 +29,9 @@ wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
 
 wireguard_unmanaged_peers:
   mt:
-    endpoint: "{{ hostvars['mt-router'].wireguard_endpoint }}"
+    endpoint: "{{ hostvars['rb5009'].wireguard_endpoint }}"
     allowed_ips: "{{ wireguard_mt_allowed_ips | join(', ') }}"
-    public_key: "{{ hostvars['mt-router'].wireguard_public_key }}"
+    public_key: "{{ hostvars['rb5009'].wireguard_public_key }}"
   romgw:
     endpoint: "{{ hostvars['romsto'].ddns_domain }}:{{ hostvars['romgw01'].wireguard_port }}"
     allowed_ips: "{{ hostvars['romgw01'].wireguard_ip }}/32"

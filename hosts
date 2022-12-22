@@ -60,7 +60,7 @@ pg01 ansible_host=10.0.10.11
 pgbak01 ansible_host=10.0.10.9
 
 [mikrotik]
-mt-router ansible_host=10.0.50.1
+rb5009 ansible_host=10.0.50.1
 
 [gitlab]
 gitlab01 ansible_host=10.0.10.40
