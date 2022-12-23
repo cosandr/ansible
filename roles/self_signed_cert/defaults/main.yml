@@ -1,5 +1,0 @@
----
-
-vault_password_file: ""
-self_signed_cas: []
-self_signed_certs: []

@@ -7,7 +7,7 @@
   vars:
     p12_path: "/tmp/{{ inventory_hostname }}.p12"
   roles:
-    - role: self_signed_cert
+    - role: ownca
       when: "'generate' in ansible_run_tags"
       tags: ["generate"]
 
@@ -57,9 +57,9 @@
           delegate_to: localhost
           community.crypto.openssl_pkcs12:
             path: "{{ p12_path }}"
-            certificate_path: "{{ self_signed_certs[0].publickey_path }}"
+            certificate_path: "{{ ownca_cert_list[0].publickey_path }}"
             privatekey_passphrase: "{{ key_passphrase }}"
-            privatekey_content: "{{ lookup('file', self_signed_certs[0].privatekey_path) }}"
+            privatekey_content: "{{ lookup('file', ownca_cert_list[0].privatekey_path) }}"
             friendly_name: '{{ inventory_hostname }}'
             passphrase: "{{ random_password }}"
             mode: "0600"

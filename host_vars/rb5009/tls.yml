@@ -7,7 +7,7 @@ __cert_names: >-
   {%- endfor -%}
   {{ tmp }}
 
-self_signed_cas:
+ownca_ca_list:
   - cn: "MikroTik CA"
     passphrase: "{{ ca_passphrase }}"
     publickey_path: "{{ ca_publickey_path }}"

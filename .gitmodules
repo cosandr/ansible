@@ -52,3 +52,6 @@
 [submodule "roles/pg_cert_store"]
 	path = roles/pg_cert_store
 	url = git@github.com:cosandr/ansible-role-pg-cert-store.git
+[submodule "roles/ownca"]
+	path = roles/ownca
+	url = git@github.com:cosandr/ansible-role-ownca.git
