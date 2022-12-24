@@ -41,6 +41,10 @@ firewalld_services:
     zone: public
     state: absent
 
+  - name: ssh
+    zone: public
+    state: absent
+
   - name: nfs3
     zone: internal
 

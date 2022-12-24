@@ -1,5 +1,8 @@
 ---
 
+# Used for GENERAL and VM where 21, 22 and 23 are taken
+__ip_offset: 50
+
 networkd_netdevs:
   - bond0: |
       [NetDev]
@@ -168,13 +171,31 @@ networkd_config:
       [Match]
       Name=VM
 
+      [Network]
+      Address={{ all_net.vm.cidr | ansible.utils.ipaddr(__host_num | int + __ip_offset) }}
+
+      [Route]
+      Scope=link
+
   - NOINET: |
       [Match]
       Name=NOINET
 
+      [Network]
+      Address={{ all_net.noinet.cidr | ansible.utils.ipaddr(__host_num) }}
+
+      [Route]
+      Scope=link
+
   - GENERAL: |
       [Match]
       Name=GENERAL
+
+      [Network]
+      Address={{ all_net.general.cidr | ansible.utils.ipaddr(__host_num | int + __ip_offset) }}
+
+      [Route]
+      Scope=link
 
   - MGMT: |
       [Match]

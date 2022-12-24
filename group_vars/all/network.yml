@@ -21,6 +21,10 @@ internal_net:
     cidr: "10.0.2.0/24"
     cidr6: "fd00:2::0/64"
     vlan: 2
+  noinet:
+    cidr: "10.0.20.0/24"
+    cidr6: "fd00:20::0/64"
+    vlan: 20
 
 wg_net:
   mt:

@@ -2,21 +2,11 @@
 end_of_line = lf
 insert_final_newline = true
 indent_style = space
-indent_size = 4
+indent_size = 2
 trim_trailing_whitespace = true
 
-[*.{py,sh,py.j2, sh.j2}]
-indent_style = space
+[*.{py,sh}{,.j2}]
 indent_size = 4
 
-[*.{yml,yaml}]
-indent_style = space
-indent_size = 2
-
-[*.json]
-indent_style = space
-indent_size = 2
-
-[*.{conf,conf.j2}]
-indent_style = space
+[*.conf{,.j2}]
 indent_size = 4
