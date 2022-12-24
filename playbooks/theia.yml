@@ -35,24 +35,6 @@
           tags: ["hypervisor"]
       tags: ["always"]
 
-    - name: Configure NFS shares
-      ansible.builtin.blockinfile:
-        path: /etc/exports
-        content: |
-          {% for s in nfs_shares %}
-          {{ s.path }}{% for h in s.sources %} {{ h }}({{ s.options }}){% endfor %}
-
-          {% endfor %}
-      notify: Reload NFS shares
-      tags: ["nfs"]
-
-    - name: Enable and start NFS server
-      ansible.builtin.systemd:
-        name: nfs-server.service
-        state: started
-        enabled: true
-      tags: ["nfs"]
-
     - name: Install systemd-timesyncd
       ansible.builtin.dnf:
         name: systemd-timesyncd
@@ -177,9 +159,6 @@
 
     - name: Restore tank SELinux context
       ansible.builtin.command: restorecon -r /mnt/tank
-
-    - name: Reload NFS shares
-      ansible.builtin.command: exportfs -ar
 
     - name: Dracut regenerate
       command: dracut -f --regenerate-all

@@ -64,3 +64,10 @@
       tags: ["pg_cert", "ssl"]
   when: pg_cert_installed | default(false)
   tags: ["pg_cert", "ssl"]
+
+- name: Configure NFS
+  ansible.builtin.include_role:
+    name: nfs
+    apply:
+      tags: ["nfs"]
+  tags: ["nfs"]

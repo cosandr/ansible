@@ -55,3 +55,6 @@
 [submodule "roles/ownca"]
 	path = roles/ownca
 	url = git@github.com:cosandr/ansible-role-ownca.git
+[submodule "roles/nfs"]
+	path = roles/nfs
+	url = git@github.com:cosandr/ansible-role-nfs.git
