@@ -11,3 +11,5 @@ roles/cosandr.*
 roles/cloudalchemy.*
 
 playbooks/test.yml
+library/ceph*
+module_utils/ceph*
