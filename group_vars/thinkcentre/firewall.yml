@@ -53,6 +53,9 @@ firewalld_services:
     sources: "{{ firewall_trusted_sources }}"
 
 firewall_rules:
+  - port: "{{ rgw_ingress_port }}"
+    zone: public
+
   - port: "{{ node_exporter_port }}"
     zone: internal
     sources: "{{ node_exporter_allow_ips }}"

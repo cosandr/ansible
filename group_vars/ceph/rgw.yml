@@ -1,0 +1,11 @@
+---
+
+
+rgw_frontend_port: 8080
+rgw_networks:
+  - "{{ all_net.mgmt.cidr }}"
+
+rgw_ingress_port: 443
+rgw_ingress_vip: "{{ all_net.vm.cidr | ansible.utils.ipaddr('20') }}"
+rgw_ingress_networks:
+  - "{{ all_net.vm.cidr }}"

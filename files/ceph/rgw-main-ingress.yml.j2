@@ -1,0 +1,12 @@
+service_type: ingress
+service_id: rgw.main
+placement:
+  count: {{ groups['ceph'] | length }}
+spec:
+  backend_service: rgw.main
+  virtual_ip: {{ rgw_ingress_vip }}
+  frontend_port: {{ rgw_ingress_port | default(443) }}
+  monitor_port: {{ rgw_ingress_monitor_port | default(1967) }}
+  virtual_interface_networks: {{ rgw_ingress_networks | to_json }}
+  ssl_cert: |
+    {{ rgw_ingress_ssl_cert | indent(4) }}

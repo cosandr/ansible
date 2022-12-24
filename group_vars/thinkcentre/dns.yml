@@ -1,7 +1,13 @@
 ---
 
-mt_dns_entries:
+# Only add VIP once
+mt_dns_entries: "{{ __mt_dns_entries_common + __mt_dns_entries_vip if inventory_hostname == groups['thinkcentre'][0] else __mt_dns_entries_common }}"
+__mt_dns_entries_common:
   - name: "{{ inventory_hostname }}.{{ domain }}"
     address: "{{ ansible_host }}"
   - name: "{{ inventory_hostname }}.san.{{ domain }}"
     address: "{{ host_ips.san }}"
+
+__mt_dns_entries_vip:
+  - name: "rgw.{{ domain }}"
+    address: "{{ rgw_ingress_vip | ansible.utils.ipaddr('address') }}"
