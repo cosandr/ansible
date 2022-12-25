@@ -3,6 +3,20 @@
 # Used for GENERAL and VM where 21, 22 and 23 are taken
 __ip_offset: 50
 
+__host_ips:
+  general: "{{ all_net.general.cidr | ansible.utils.ipaddr(__host_num | int + __ip_offset) }}"
+  mgmt: "{{ all_net.mgmt.cidr | ansible.utils.ipaddr(__host_num) }}"
+  noinet: "{{ all_net.noinet.cidr | ansible.utils.ipaddr(__host_num) }}"
+  san: "{{ all_net.san.cidr | ansible.utils.ipaddr(__host_num) }}"
+  vm: "{{ all_net.vm.cidr | ansible.utils.ipaddr(__host_num | int + __ip_offset) }}"
+
+host_ips: >-
+  {%- set tmp = {} -%}
+  {%- for k, v in __host_ips.items() -%}
+  {{- tmp.update({k: v | ansible.utils.ipaddr('address')}) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
 networkd_netdevs:
   - bond0: |
       [NetDev]
@@ -162,7 +176,7 @@ networkd_config:
       Name=SAN
 
       [Network]
-      Address={{ all_net.san.cidr | ansible.utils.ipaddr(__host_num) }}
+      Address={{ __host_ips.san }}
 
       [Route]
       Scope=link
@@ -172,7 +186,7 @@ networkd_config:
       Name=VM
 
       [Network]
-      Address={{ all_net.vm.cidr | ansible.utils.ipaddr(__host_num | int + __ip_offset) }}
+      Address={{ __host_ips.vm }}
 
       [Route]
       Scope=link
@@ -182,7 +196,7 @@ networkd_config:
       Name=NOINET
 
       [Network]
-      Address={{ all_net.noinet.cidr | ansible.utils.ipaddr(__host_num) }}
+      Address={{ __host_ips.noinet }}
 
       [Route]
       Scope=link
@@ -192,7 +206,7 @@ networkd_config:
       Name=GENERAL
 
       [Network]
-      Address={{ all_net.general.cidr | ansible.utils.ipaddr(__host_num | int + __ip_offset) }}
+      Address={{ __host_ips.general }}
 
       [Route]
       Scope=link
@@ -202,7 +216,7 @@ networkd_config:
       Name=MGMT
 
       [Network]
-      Address={{ all_net.mgmt.cidr | ansible.utils.ipaddr(__host_num) }}
+      Address={{ __host_ips.mgmt }}
       DNS={{ all_net.mgmt.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
       DNS=1.1.1.1
       DNS=8.8.8.8
