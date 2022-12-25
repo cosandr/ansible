@@ -1,0 +1,3 @@
+#!/bin/sh
+
+echo "$SMARTD_MESSAGE" | mail -r {{ smartd_from_address }} -s "$SMARTD_FAILTYPE" "$SMARTD_ADDRESS"

@@ -6,11 +6,25 @@
     state: present
   tags: ["install"]
 
+- name: Copy custom smartdnotify
+  ansible.builtin.template:
+    src: smartdnotify.sh.j2
+    dest: /usr/local/bin/smartdnotify
+    owner: root
+    group: root
+    mode: 0755
+  when:
+    - smartd_email
+    - smartd_from_address
+
 - name: Configure smartd email address
   ansible.builtin.lineinfile:
     path: /etc/smartmontools/smartd.conf
     regexp: '^DEVICESCAN'
-    line: 'DEVICESCAN -H -m {{ smartd_email }} -M exec /usr/libexec/smartmontools/smartdnotify -n standby,10,q'
+    line: 'DEVICESCAN -H -m {{ smartd_email }} -M exec {{ __exec_custom if smartd_from_address else __exec_stock }} -n standby,10,q'
+  vars:
+    __exec_stock: "/usr/libexec/smartmontools/smartdnotify"
+    __exec_custom: "/usr/local/bin/smartdnotify"
   when: smartd_email
   notify: Restart smartd
 

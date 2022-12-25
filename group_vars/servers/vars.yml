@@ -5,6 +5,8 @@ proxy_hosts:
   - "{{ hostvars['localgw01'].ansible_host }}"
 
 smartd_email: "{{ my_email }}"
+# Send from root domain
+smartd_from_address: "{{ inventory_hostname }}@{{ domain | regex_search('(\\w+\\.\\w+)$', '\\1') | first }}"
 
 smtp_config: "{{ vault_smtp_config }}"
 # smtp_config:
