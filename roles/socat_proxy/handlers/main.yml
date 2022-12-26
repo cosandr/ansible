@@ -14,7 +14,17 @@
     name: "serial-proxy-{{ item.item.name }}.service"
     state: started
     enabled: true
-  loop: "{{ __installed_svc.results }}"
+  loop: "{{ __installed_serial_svc.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.changed
+
+- name: Restart socat proxy
+  ansible.builtin.systemd:
+    name: "socat-proxy-{{ item.item.name }}.service"
+    state: started
+    enabled: true
+  loop: "{{ __installed_socat_svc.results }}"
   loop_control:
     label: "{{ item.item.name }}"
   when: item.changed

@@ -1,7 +1,11 @@
 ---
 
-serial_proxies:
-  - name: default
-    src: "/dev/ttyUSB0"
-    port: 8888
-    baud: 2400
+serial_proxies: []
+  # - name: default
+  #   src: "/dev/ttyUSB0"
+  #   port: 8888
+  #   baud: 2400
+socat_proxies: []
+  # - name: rgw
+  #   src: "TCP4-LISTEN:8080,reuseaddr,fork,bind=10.0.100.21"
+  #   dest: "TCP:10.0.10.71:8080"

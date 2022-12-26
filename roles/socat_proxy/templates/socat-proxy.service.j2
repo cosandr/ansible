@@ -1,0 +1,10 @@
+[Unit]
+Description={{ item.name | title }} proxy using socat
+After=network-online.target
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/socat {% if item.args | default('') %}{{ item.args }} {% endif %}{{ item.src }} {{ item.dest }}
+
+[Install]
+WantedBy=default.target
