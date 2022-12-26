@@ -7,10 +7,12 @@
   tasks:
     - name: Run on only one host
       run_once: true
+      tags: ["orch"]
       block:
         - name: Deploy RGW service
           ceph_orch_apply:
             spec: "{{ lookup('template', inventory_dir + '/files/ceph/rgw-main.yml.j2') }}"
+          tags: ["rgw"]
 
         - name: Read SSL cert from localgw
           delegate_to: localgw01
@@ -20,6 +22,7 @@
             - "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
             - "/etc/letsencrypt/live/{{ domain }}/privkey.pem"
           register: __certs
+          tags: ["rgw-ingress"]
 
         - name: Deploy RGW ingress service
           ceph_orch_apply:
@@ -28,3 +31,11 @@
             rgw_ingress_ssl_cert: |
               {{ (__certs.results[0].content | b64decode).strip() }}
               {{ (__certs.results[1].content | b64decode).strip() }}
+          tags: ["rgw-ingress"]
+
+    - name: Proxy RGW to MGMT
+      ansible.builtin.include_role:
+        name: socat_proxy
+        apply:
+          tags: ["rgw-ingress"]
+      tags: ["rgw-ingress"]
