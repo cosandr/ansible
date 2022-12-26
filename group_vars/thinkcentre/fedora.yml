@@ -5,6 +5,7 @@ dnf_packages:
   - iftop
   - iotop
   - lm_sensors
+  - logrotate
   - lsof
   - mlocate
   - pciutils
