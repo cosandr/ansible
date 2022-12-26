@@ -4,6 +4,19 @@
 
 Generate keys on the command line with `wg genkey | tee /dev/stderr | wg pubkey`, private is the first string.
 
+Store the private key with gopass, i.e.
+
+```sh
+gopass edit -c network/<inventory_hostname>_wg_pk
+```
+
+If using preshared keys, generate it with
+
+```sh
+wg genpsk
+gopass edit -c network/<inventory_hostname>_wg_psk
+```
+
 ## kubespray
 
 Run Ansible from the kubespray submodule

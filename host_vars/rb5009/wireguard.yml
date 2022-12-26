@@ -8,3 +8,43 @@ wireguard_ip: "{{ wireguard_addresses[0] | ansible.utils.ipaddr('address') }}"
 wireguard_ipv6: "{{ wireguard_addresses[1] | ansible.utils.ipaddr('address') }}"
 wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
+
+mt_wg_interfaces:
+  - name: WG1
+    listen-port: "{{ wireguard_endpoint.rsplit(':', 1)[1] | int }}"
+    private-key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
+
+mt_wg_peers: "{{ __mt_wg_peers_manual + __mt_wg_peers_auto }}"
+
+__mt_wg_peers_manual: "{{ vault_mt_wg_peers_manual }}"
+
+__mt_wg_allowed_addresses_default: "{{ wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') }}"
+
+__mt_wg_peers_auto: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].wireguard_public_key | default('')) -%}
+  {%- set tmp_dict = {
+      "comment": h,
+      "public-key": hostvars[h].wireguard_public_key,
+      "interface": mt_wg_interfaces[0].name
+    }
+  -%}
+  {%- if hostvars[h].wireguard_preshared_key | default('') -%}
+  {{- tmp_dict.update({
+    "preshared-key": hostvars[h].wireguard_preshared_key
+  }) -}}
+  {%- endif -%}
+  {%- if hostvars[h].wireguard_endpoint | default('') -%}
+  {{- tmp_dict.update({
+    "endpoint-address": hostvars[h].wireguard_endpoint.rsplit(':', 1)[0],
+    "endpoint-port": hostvars[h].wireguard_endpoint.rsplit(':', 1)[1] | int,
+  }) -}}
+  {%- endif -%}
+  {{- tmp_dict.update({
+    "allowed-address": hostvars[h].mt_wg_allowed_addresses | default(
+      hostvars[h].wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') | join(',')
+    )
+  }) -}}
+  {{- tmp.append(tmp_dict) -}}
+  {%- endfor -%}
+  {{ tmp }}

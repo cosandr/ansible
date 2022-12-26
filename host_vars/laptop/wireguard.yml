@@ -21,7 +21,8 @@ wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_ip: "{{ wireguard_addresses[0] | ansible.utils.ipaddr('address') }}"
 wireguard_ipv6: "{{ wireguard_addresses[1] | ansible.utils.ipaddr('address') }}"
 wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"
-wireguard_private_key: "{{ vault_wireguard_private_key }}"
+wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
+wireguard_public_key: "{{ vault_wireguard_public_key }}"
 
 wireguard_unmanaged_peers:
   mt:

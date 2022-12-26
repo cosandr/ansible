@@ -116,6 +116,26 @@
         data: "{{ mt_services }}"
       tags: ["services"]
 
+    - name: Configure wireguard interfaces
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: interface wireguard
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+        data: "{{ mt_wg_interfaces }}"
+      when: mt_wg_interfaces | default([])
+      tags: ["wg", "interfaces"]
+
+    - name: Configure wireguard peers
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: interface wireguard peers
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+        data: "{{ mt_wg_peers }}"
+      when: mt_wg_peers | default([])
+      tags: ["wg", "peers"]
+
     - name: Configure DNS
       tags: ["dns"]
       block:

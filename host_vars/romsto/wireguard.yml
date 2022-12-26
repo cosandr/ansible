@@ -17,8 +17,9 @@ wireguard_mt_allowed_ips:
 
 wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_ip: "{{ wireguard_addresses[0] | ansible.utils.ipaddr('address') }}"
-wireguard_private_key: "{{ vault_wireguard_private_key }}"
+wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
+wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
 
 wireguard_unmanaged_peers:
   mt:
@@ -32,7 +33,6 @@ wireguard_unmanaged_peers:
     public_key: "{{ hostvars['webgw01'].wireguard_public_key }}"
     persistent_keepalive: "{{ wireguard_persistent_keepalive }}"
 
-wireguard_endpoint: ""
 wireguard_persistent_keepalive: 300
 wireguard_postup:
   - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} started'

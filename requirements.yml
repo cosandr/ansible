@@ -8,8 +8,9 @@ collections:
     version: '>=5.2'
   - name: kubernetes.core
     version: '>=2.3'
-  - name: community.routeros
-    version: '>2.1'
+  - name: git@github.com:cosandr/community.routeros.git
+    type: git
+    version: "merge"
 
 roles:
   - name: geerlingguy.docker
