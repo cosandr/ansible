@@ -1,17 +1,17 @@
 {{ ansible_managed | comment }}
 
-timestamp_format      {{ timestamp_format }}
+timestamp_format      {{ btrbk_timestamp_format }}
 
-snapshot_preserve_min {{ snapshot_preserve_min }}
-snapshot_preserve     {{ snapshot_preserve }}
+snapshot_preserve_min {{ btrbk_snapshot_preserve_min }}
+snapshot_preserve     {{ btrbk_snapshot_preserve }}
 
-target_preserve_min   {{ target_preserve_min }}
-target_preserve       {{ target_preserve }}
+target_preserve_min   {{ btrbk_target_preserve_min }}
+target_preserve       {{ btrbk_target_preserve }}
 
 {% for k, v in btrbk_global_options.items() %}
 {{ k }} {{ v }}
 {% endfor %}
-{% for vol in volumes %}
+{% for vol in btrbk_volumes %}
 
 volume {{ vol.path }}
 {% if vol.options is defined %}

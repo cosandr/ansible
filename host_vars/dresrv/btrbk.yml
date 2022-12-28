@@ -1,12 +1,12 @@
 ---
 
-timestamp_format: "long"
-snapshot_preserve_min: "latest"
-snapshot_preserve: "2h 7d"
+btrbk_timestamp_format: "long"
+btrbk_snapshot_preserve_min: "latest"
+btrbk_snapshot_preserve: "2h 7d"
 btrbk_global_options:
   snapshot_dir: "snapshots"
 
-volumes:
+btrbk_volumes:
   - path: "/mnt/btrfs_root"
     options:
       snapshot_preserve: "3h 3d 1m"

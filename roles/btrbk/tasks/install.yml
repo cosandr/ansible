@@ -1,11 +1,13 @@
 ---
 
 - name: Install btrbk using package manager
-  package:
+  ansible.builtin.package:
     name: btrbk
     state: present
   register: __btrbk_install
   ignore_errors: true
 
-- include_tasks: install_from_source.yml
+- name: Include installation from source tasks
+  ansible.builtin.include_tasks:
+    file: install_from_source.yml
   when: __btrbk_install.failed

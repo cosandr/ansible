@@ -1,6 +1,7 @@
 ---
+
 - name: Configure btrbk
-  template:
+  ansible.builtin.template:
     src: "btrbk.conf.j2"
     dest: "{{ btrbk_config_file }}"
     owner: "root"
@@ -8,27 +9,40 @@
     mode: 0644
 
 - name: Configure sudo
-  become: true
-  import_role:
+  ansible.builtin.include_role:
     name: sudo
+    apply:
+      become: true
   vars:
     sudoers_files:
       - dest: "btrbk"
-        content: "btrbk ALL= NOPASSWD: /sbin/btrfs, /usr/bin/readlink, /usr/bin/test"
+        content: "btrbk ALL= NOPASSWD: /usr/sbin/btrfs, /usr/bin/readlink, /usr/bin/test"
+
+- name: Ensure timer override dir exists
+  become: true
+  ansible.builtin.file:
+    path: "/etc/systemd/system/btrbk.timer.d"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: 0755
+  when: btrbk_timer_oncalendar
 
 - name: Configure btrbk timer override
-  template:
+  become: true
+  ansible.builtin.template:
     src: "timer_override.conf.j2"
-    dest: "{{ btrbk_timer_override }}"
+    dest: "/etc/systemd/system/btrbk.timer.d/override.conf"
     owner: "root"
     group: "root"
     mode: 0644
-  when: timer_oncalendar is defined
-  notify: reload systemd
+  when: btrbk_timer_oncalendar
+  notify: Reload systemd
 
 - name: Enable btrbk timer
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: btrbk.timer
     state: started
     enabled: true
+    daemon_reload: true

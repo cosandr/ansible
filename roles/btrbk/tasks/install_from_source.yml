@@ -1,4 +1,6 @@
-- block:
+- name: Set btrfs version
+  when: btrbk_version == "latest"
+  block:
   - name: Get latest release
     uri:
       url: "https://api.github.com/repos/digint/btrbk/tags?page=1&per_page=1"
@@ -12,14 +14,12 @@
     retries: 5
     check_mode: false
 
-  - name: "Set node-exporter version to {{ _latest_release.json[0].name }}"
-    set_fact:
+  - name: "Set btrbk version to {{ _latest_release.json[0].name }}"
+    ansible.builtin.set_fact:
       btrbk_version: "{{ _latest_release.json[0].name }}"
-  when:
-    - btrbk_version == "latest"
 
 - name: Download btrbk binary to local folder
-  get_url:
+  ansible.builtin.get_url:
     url: "https://api.github.com/repos/digint/btrbk/tarball/refs/tags/{{ btrbk_version }}"
     dest: "/tmp/btrbk-{{ btrbk_version }}.tar.gz"
   register: _download_archive
@@ -30,14 +30,14 @@
   check_mode: false
 
 - name: Create btrbk temp directory
-  file:
+  ansible.builtin.file:
     path: "/tmp/btrbk-{{ btrbk_version }}"
     mode: 0755
     state: directory
   check_mode: false
 
 - name: Unpack btrbk binaries
-  unarchive:
+  ansible.builtin.unarchive:
     src: "/tmp/btrbk-{{ btrbk_version }}.tar.gz"
     dest: "/tmp/btrbk-{{ btrbk_version }}"
     extra_opts:

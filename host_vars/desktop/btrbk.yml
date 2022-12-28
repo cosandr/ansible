@@ -1,13 +1,13 @@
 ---
 
-timestamp_format: "long"
-snapshot_preserve_min: "latest"
-snapshot_preserve: "1h 2d 1w"
+btrbk_timestamp_format: "long"
+btrbk_snapshot_preserve_min: "latest"
+btrbk_snapshot_preserve: "1h 2d 1w"
 btrbk_global_options:
   backend_remote: "btrfs-progs-sudo"
   snapshot_dir: "@snapshots"
 
-volumes:
+btrbk_volumes:
   - path: "/mnt/btrfs_root"
     subvolumes:
       - path: "@"
