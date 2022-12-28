@@ -14,6 +14,87 @@
   when: __rtc_local.stdout.strip() == 'LocalRTC=yes'
   tags: ["rtc"]
 
+- name: Btrfs tasks
+  tags: ["btrfs"]
+  when:
+    - btrfs_src | default('')
+    - btrfs_root | default('')
+  block:
+    - name: Mount btrfs root
+      ansible.posix.mount:
+        src: "{{ btrfs_src }}"
+        path: "{{ btrfs_root }}"
+        fstype: btrfs
+        opts: "subvolid=5,{{ btrfs_opts }}"
+        state: mounted
+      tags: ["subvols"]
+
+    - name: Get existing subvolumes
+      ansible.builtin.shell: "set -o pipefail; btrfs sub list -t {{ btrfs_root }} | tail -n+3 | awk '{ print $4 }'"
+      check_mode: false
+      changed_when: false
+      register: __subvols
+      tags: ["subvols"]
+
+    - name: Create missing subvolumes
+      ansible.builtin.command: "btrfs sub create {{ btrfs_root }}/{{ item }}"
+      loop: "{{ btrfs_subvols | default([]) }}"
+      when: item not in __subvols.stdout_lines
+      tags: ["subvols"]
+
+    - name: Create root snapshots dir
+      ansible.builtin.file:
+        path: "/.snapshots"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      tags: ["snapshots"]
+
+    - name: Mount snapshots subvolume
+      ansible.posix.mount:
+        src: "{{ btrfs_src }}"
+        path: /.snapshots
+        fstype: btrfs
+        opts: "subvol=@snapshots,{{ btrfs_opts }}"
+        state: mounted
+      tags: ["snapshots"]
+
+    - name: Create swap dir
+      ansible.builtin.file:
+        path: "{{ swapfile_path | dirname }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0700
+      when: swapfile_path | default('')
+      tags: ["swap"]
+
+    - name: Mount swap subvolume
+      ansible.posix.mount:
+        src: "{{ btrfs_src }}"
+        path: "{{ swapfile_path | dirname }}"
+        fstype: btrfs
+        opts: "subvol=@swap,{{ btrfs_opts }}"
+        state: mounted
+      when: swapfile_path | default('')
+      tags: ["swap"]
+
+    - name: Set no COW attribute
+      ansible.builtin.file:
+        path: "{{ item }}"
+        attributes: +C
+      loop: "{{ btrfs_nocow_paths | default([]) }}"
+      tags: ["swap"]
+
+- name: Setup swap file
+  ansible.builtin.include_role:
+    name: swapfile
+    apply:
+      tags: ["swap"]
+  when: swapfile_path | default('')
+  tags: ["swap"]
+
 - name: Install and configure cpupower
   ansible.builtin.include_role:
     name: cpupower

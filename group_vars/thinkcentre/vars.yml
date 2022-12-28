@@ -2,11 +2,13 @@
 
 domain: "{{ domains['hb'] }}"
 
-btrfs_src: "/dev/mapper/root"
+btrfs_src: "LABEL=FEDORA-BTRFS"
 btrfs_root: "/mnt/btrfs_root"
 btrfs_opts: "compress=zstd:3,space_cache=v2"
 swapfile_path: "/.swap/swapfile"
 swapfile_size: "16GB"
+btrfs_nocow_paths:
+  - "{{ swapfile_path | dirname }}"
 btrfs_subvols:
   - "@snapshots"
   - "@swap"
