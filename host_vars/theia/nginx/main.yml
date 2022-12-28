@@ -1,12 +1,11 @@
 ---
 
+nginx_nis_enabled: true
 nginx_listen_address: "{{ host_ips.vm }}"
 nginx_ports:
   www: 8013
 
 nginx_modules_path: "/usr/lib64/nginx/modules"
-nginx_modules_conf_path: "/usr/share/nginx/modules"
-nginx_rtmp_port: 1935
 
 nginx_access_log_options: "main buffer=16k flush=2m"
 nginx_access_log: "/var/log/nginx/access.log {{ nginx_access_log_options }}"
@@ -14,10 +13,7 @@ nginx_error_log_options: "warn"
 nginx_error_log: "/var/log/nginx/error.log {{ nginx_error_log_options }}"
 nginx_sites_logs: "/var/log/nginx/sites"
 
-nginx_extra_conf_options: |
-  include {{ nginx_modules_conf_path }}/mod-http-dav-ext-module.conf;
-  include {{ nginx_modules_conf_path }}/mod-rtmp-module.conf;
-  include /etc/nginx/rtmp.conf;
+nginx_extra_conf_options: ""
 
 nginx_extra_http_options: |
   autoindex off;

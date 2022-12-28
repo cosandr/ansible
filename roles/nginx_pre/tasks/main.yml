@@ -53,6 +53,17 @@
     - ansible_selinux.status == "enabled"
   tags: ["nginx"]
 
+- name: Allow nginx proxy
+  ansible.posix.seboolean:
+    name: nis_enabled
+    state: true
+    persistent: true
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_selinux.status == "enabled"
+    - nginx_nis_enabled
+  tags: ["nginx"]
+
 - name: Add logrotate config for sites
   ansible.builtin.template:
     src: logrotate.conf.j2

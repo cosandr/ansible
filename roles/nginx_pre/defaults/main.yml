@@ -3,3 +3,4 @@
 nginx_dhparam: "/etc/nginx/dhparam.pem"
 nginx_sites_logs: "/var/log/nginx/sites"
 nginx_certs_dir: ""
+nginx_nis_enabled: false
