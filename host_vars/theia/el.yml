@@ -1,6 +1,6 @@
 ---
 
-dnf_rhel_packages:
+dnf_packages:
   - ansible
   - ansible-lint
   - autoconf

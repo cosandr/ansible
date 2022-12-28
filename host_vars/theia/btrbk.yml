@@ -1,0 +1,56 @@
+---
+
+btrbk_timestamp_format: "long"
+btrbk_snapshot_preserve_min: "latest"
+btrbk_snapshot_preserve: "2h 7d"
+
+btrbk_volumes:
+  - path: "/mnt/btrfs_root"
+    options:
+      snapshot_dir: "@snapshots"
+      snapshot_preserve: "3h 3d 3w 1m"
+      target: "/mnt/tank/backup/btrbk/{{ inventory_hostname }}"
+    subvolumes:
+      - path: "@"
+        options:
+          snapshot_name: "root"
+      - path: "@home"
+        options:
+          snapshot_name: "home"
+      - path: "@home/andrei"
+        options:
+          snapshot_name: "andrei"
+          snapshot_preserve: "8h 5d 2m"
+
+  - path: /mnt/libvirt-tmp
+    options:
+      snapshot_dir: ".snapshots"
+      target: "/mnt/tank/backup/btrbk/{{ inventory_hostname }}"
+    subvolumes:
+      - path: "images"
+        options:
+          snapshot_name: "images"
+          snapshot_preserve: "3h 7d 2w"
+
+  - path: "/mnt/tank"
+    options:
+      snapshot_dir: ".snapshots"
+      snapshot_preserve: "3h 5d 1m"
+    subvolumes:
+      - path: "archive"
+      - path: "backup"
+      - path: "borg"
+        options:
+          snapshot_preserve: "2d 1w"
+      - path: "media"
+        options:
+          snapshot_preserve: "1h 7d 1m"
+      - path: "media/photo"
+        options:
+          snapshot_preserve: "1h 7d 1m"
+      - path: "media/motion"
+        options:
+          snapshot_preserve: "2d 1w"
+      - path: "yes"
+        options:
+          snapshot_preserve: "2d 2w"

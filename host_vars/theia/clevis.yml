@@ -1,4 +1,0 @@
----
-
-clevis_zfs: true
-clevis_keyfile_content: "{{ vault_clevis_keyfile_content }}"

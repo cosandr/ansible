@@ -1,15 +1,15 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- hosts: theia
+- name: Provision Theia
+  hosts: theia
   pre_tasks:
-    - name: Install packages [RHEL]
+    - name: Install packages [EL]
       ansible.builtin.dnf:
-        name: "{{ dnf_rhel_packages }}"
+        name: "{{ dnf_packages }}"
         state: present
       when:
         - ansible_os_family == 'RedHat'
-        - ansible_distribution != 'Fedora'
       tags: ["install"]
 
     - name: Ensure /var/log/journal exists
@@ -34,35 +34,6 @@
         apply:
           tags: ["hypervisor"]
       tags: ["always"]
-
-    - name: Install systemd-timesyncd
-      ansible.builtin.dnf:
-        name: systemd-timesyncd
-        state: present
-      tags: ["timesyncd"]
-
-    - name: Enable and start systemd-timesyncd
-      ansible.builtin.systemd:
-        name: systemd-timesyncd.service
-        state: started
-        enabled: true
-      tags: ["timesyncd"]
-
-    - name: Enable zpool scrub timers
-      ansible.builtin.systemd:
-        name: "zfs-scrub-{{ item.schedule }}@{{ item.pool }}.timer"
-        state: started
-        enabled: true
-      loop: "{{ zfs_scrub_timers | default([]) }}"
-      tags: ["zfs", "scrub"]
-
-    - name: Configure max ZFS ARC size
-      ansible.builtin.lineinfile:
-        path: /etc/modprobe.d/zfs.conf
-        regexp: '^options zfs.*'
-        line: 'options zfs zfs_arc_max={{ zfs_arc_max_gb * 2**30 }}'
-      notify: Dracut regenerate
-      tags: ["zfs", "arc"]
 
     - name: Set tank SELinux context
       community.general.sefcontext:
@@ -114,29 +85,17 @@
     - role: systemd_networkd
       tags: ["networkd"]
 
-    - role: dracut-sshd
-      tags: ["dracut-sshd"]
-
-    - role: clevis
-      tags: ["clevis"]
-
     - role: samba
       tags: ["samba"]
 
     - role: fzf
       tags: ["fzf"]
 
-    - role: zfs_zed
-      tags: ["zfs", "zed"]
+    - role: btrbk
+      tags: ["btrbk"]
 
     - role: chezmoi
       tags: ["chezmoi"]
-
-    - role: sanoid
-      tags: ["sanoid"]
-
-    - role: libvirt_vm
-      tags: ["vms"]
 
     - role: systemd
       tags: ["systemd", "rclone"]

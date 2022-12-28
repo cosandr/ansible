@@ -1,6 +1,0 @@
----
-
-dracut_ssh_networkd: true
-dracut_ssh_authorized_keys:
-  - "{{ hostvars.desktop.ssh_keys.andrei }}"
-  - "{{ hostvars.laptop.ssh_keys.andrei }}"
