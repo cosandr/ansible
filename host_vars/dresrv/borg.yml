@@ -89,7 +89,7 @@ borg_backups:
       - "--exclude '**/.snapshots'"
       - "--exclude 'home/*/.cache'"
       - "--exclude 'home/*/.ccache'"
-      - "--remote-ratelimit 20000"
+      - "--upload-ratelimit 20000"
     prune_args:
       - "--list"
       - "--show-rc"

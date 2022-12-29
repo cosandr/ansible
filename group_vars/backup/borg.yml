@@ -47,7 +47,7 @@ borg_backups:
       - "--compression auto,zstd"
       - "--exclude-caches"
       - "--exclude '**/.snapshots'"
-      - "--remote-ratelimit 20000"
+      - "--upload-ratelimit 20000"
     prune_args:
       - "--list"
       - "--show-rc"
