@@ -12,16 +12,6 @@
         - ansible_os_family == 'RedHat'
       tags: ["install"]
 
-    - name: Ensure /var/log/journal exists
-      ansible.builtin.file:
-        path: /var/log/journal
-        state: directory
-        owner: root
-        group: root
-        mode: 0755
-      notify: Reload systemd-journal
-      tags: ["journald"]
-
   tasks:
     - name: Include common tasks
       ansible.builtin.include_tasks:
@@ -110,9 +100,6 @@
       tags: ["auto-ssh"]
 
   handlers:
-    - name: Reload systemd-journal
-      ansible.builtin.command: killall -USR1 systemd-journal
-
     - name: Restore tank SELinux context
       ansible.builtin.command: restorecon -r /mnt/tank
 
