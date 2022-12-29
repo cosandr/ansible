@@ -4,7 +4,7 @@
     authorized_key:
       user: "{{ borg_user }}"
       key: "{{ item.key }}"
-      key_options: 'command="cd {{ borg_pool }}/{{ item.host }};borg serve --restrict-to-path {{ borg_pool }}/{{ item.host }}",restrict'
+      key_options: 'command="cd {{ borg_pool }}/{{ item.host }};{{ borg_serve_bin }} serve --restrict-to-path {{ borg_pool }}/{{ item.host }}",restrict'
     with_items: "{{ borg_auth_users }}"
 
   - name: Write authorized_keys
@@ -14,6 +14,7 @@
       group: "{{ borg_group }}"
       mode: 0600
       state: file
+    when: borg_auth_users
 
   - name: Create remote client repo directories
     file:

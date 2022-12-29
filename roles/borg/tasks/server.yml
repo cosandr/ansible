@@ -5,6 +5,7 @@
     name: "{{ borg_group }}"
     gid: "{{ borg_gid | default(omit) }}"
     state: present
+  when: borg_create_user
 
 - name: Create "{{ borg_user }}" user
   user:
@@ -15,6 +16,7 @@
     group: "{{ borg_group }}"
     uid: "{{ borg_uid | default(omit) }}"
     state: present
+  when: borg_create_user
 
 - name: Set "{{ borg_home }}" permissions
   file:

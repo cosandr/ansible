@@ -1,16 +1,19 @@
 ---
 
 borg_package_name: borg
+borg_install: true
+borg_create_user: true
 borg_user: backup
 # borg_uid: 1002
 borg_group: backup
 # borg_gid: 1002
-borg_create_home: yes
-borg_local_repo: no
-borg_server: no
+borg_create_home: true
+borg_local_repo: false
+borg_server: false
 borg_home: /home/backup
 borg_pool: "{{ home }}/repos"
 borg_backup_script_path: "/usr/local/bin/borg"
+borg_serve_bin: "borg"
 borg_auth_users: []
 #   - host: example
 #     key: "ssh-rsa <key> example@host"

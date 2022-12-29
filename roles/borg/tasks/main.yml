@@ -1,11 +1,24 @@
 ---
 
-- include_tasks: install.yml
+- name: Include installation tasks
+  ansible.builtin.include_tasks:
+    file: install.yml
+    apply:
+      tags: ["install"]
+  when: borg_install | bool
   tags: ["install"]
 
-- include_tasks: server.yml
+- name: Include borg server taskss
+  ansible.builtin.include_tasks:
+    file: server.yml
+    apply:
+      tags: ["install", "server"]
   when: borg_server | bool
   tags: ["install", "server"]
 
-- include_tasks: configure.yml
+- name: Include borg configuration tasks
+  ansible.builtin.include_tasks:
+    file: configure.yml
+    apply:
+      tags: ["configure"]
   tags: ["configure"]
