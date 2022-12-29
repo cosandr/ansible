@@ -37,6 +37,7 @@ dnf_packages:
   - policycoreutils-python-utils
   - powertop
   - python3-aiohttp
+  - python3-dnf-plugin-versionlock
   - python3-llfuse  # borg mount
   - python3-netaddr
   - python3-websockets

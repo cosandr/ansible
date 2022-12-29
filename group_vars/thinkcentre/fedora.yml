@@ -9,6 +9,7 @@ dnf_packages:
   - lsof
   - mlocate
   - pciutils
+  - python3-dnf-plugin-versionlock
   - python3-lxml  # virt ansible modules
   - rpmconf
   - rsync
