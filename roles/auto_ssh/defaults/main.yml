@@ -7,9 +7,11 @@ ssh_key_options: ""
 
 ssh_src_dir: "/root/.ssh"
 ssh_src_user: "root"
+ssh_src_group: "{{ ssh_src_user }}"
 
 ssh_dest_dir: "/root/.ssh"
 ssh_dest_user: "root"
+ssh_dest_group: "{{ ssh_dest_user }}"
 ssh_dest_hosts: []
 
 ssh_conf_hosts: false

@@ -5,7 +5,7 @@
     path: "{{ ssh_src_dir }}"
     state: directory
     owner: "{{ ssh_src_user }}"
-    group: "{{ ssh_src_user }}"
+    group: "{{ ssh_src_group }}"
     mode: 0700
 
 - name: Ensure SSH dir exists on targets
@@ -14,7 +14,7 @@
     path: "{{ ssh_dest_dir }}"
     state: directory
     owner: "{{ ssh_dest_user }}"
-    group: "{{ ssh_dest_user }}"
+    group: "{{ ssh_dest_group }}"
     mode: 0700
   loop: "{{ ssh_dest_hosts }}"
 
@@ -24,7 +24,7 @@
     comment: "{{ ssh_key_comment }}"
     type: "{{ ssh_key_type }}"
     owner: "{{ ssh_src_user }}"
-    group: "{{ ssh_src_user }}"
+    group: "{{ ssh_src_group }}"
   register: __ssh_key
 
 - name: Copy SSH keys
