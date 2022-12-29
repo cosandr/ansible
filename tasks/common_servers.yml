@@ -7,6 +7,14 @@
       tags: ["disk"]
   tags: ["disk"]
 
+- name: Setup btrfs
+  ansible.builtin.include_role:
+    name: btrfs
+    apply:
+      tags: ["btrfs"]
+  when: btrfs_scrub_targets | default([])
+  tags: ["btrfs"]
+
 - name: Configure firewall
   ansible.builtin.include_role:
     name: firewall_config

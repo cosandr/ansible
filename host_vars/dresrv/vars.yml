@@ -20,3 +20,5 @@ smtp_user: "{{ smtp_config[domain].user }}"
 nginx_htpasswd: "{{ vault_nginx_htpasswd }}"
 
 postfix_hostname: "{{ domain }}"
+btrfs_scrub_targets:
+  - /

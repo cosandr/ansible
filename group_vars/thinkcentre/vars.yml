@@ -12,3 +12,6 @@ btrfs_nocow_paths:
 btrfs_subvols:
   - "@snapshots"
   - "@swap"
+
+btrfs_scrub_targets:
+  - /

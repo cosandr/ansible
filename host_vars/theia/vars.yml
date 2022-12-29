@@ -15,3 +15,8 @@ dnf_automatic_excludes:
   - "zfs*"
   - "libvirt*"
   - "qemu*"
+
+btrfs_scrub_targets:
+  - /
+  - /mnt/tank
+  - /mnt/libvirt-tmp

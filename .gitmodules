@@ -58,3 +58,6 @@
 [submodule "roles/nfs"]
 	path = roles/nfs
 	url = git@github.com:cosandr/ansible-role-nfs.git
+[submodule "roles/btrfs"]
+	path = roles/btrfs
+	url = git@github.com:cosandr/ansible-role-btrfs.git

@@ -24,3 +24,6 @@ ssh_authorized_keys:
   - "{{ hostvars['laptop'].ssh_keys.andrei }}"
 
 domain: "vm.{{ domains['hb'] }}"
+
+btrfs_scrub_email: "{{ smartd_email }}"
+btrfs_scrub_from_email: "{{ smartd_from_address }}"

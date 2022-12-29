@@ -2,8 +2,6 @@
 
 systemd_units:
   - "{{ __sd_backup_gdrive }}"
-  - "{{ __sd_btrfs_mail_scrub }}"
-  - "{{ __sd_btrfs_scrub }}"
   - "{{ __sd_concat_motion }}"
   - "{{ __sd_docker_auto_update }}"
   - "{{ __sd_nextcloud_mount }}"
