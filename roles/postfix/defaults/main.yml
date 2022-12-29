@@ -16,3 +16,4 @@ __postfix_networks:
   - "{{ postfix_networks }}"
 
 postfix_relay_domains: []
+postfix_mail_rc_config: ""

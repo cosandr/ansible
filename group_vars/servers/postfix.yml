@@ -15,3 +15,7 @@ postfix_main_config:
     line: "smtp_use_tls = yes"
   - regexp: "^#?smtp_tls_security_level"
     line: "smtp_tls_security_level = may"
+
+postfix_mail_rc_config: |
+  set sendcharsets=utf-8,iso-8859-1
+  set from="{{ inventory_hostname | title }} <{{ smartd_from_address }}>"

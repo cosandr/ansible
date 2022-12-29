@@ -26,6 +26,15 @@
     label: "{{ item.line }}"
   notify: Restart postfix
 
+- name: Configure /etc/mail.rc
+  ansible.builtin.template:
+    src: "mail.rc.j2"
+    dest: "/etc/mail.rc"
+    owner: root
+    group: root
+    mode: 0644
+  when: postfix_mail_rc_config
+
 - name: Configure relayhosts
   ansible.builtin.lineinfile:
     dest: "/etc/postfix/main.cf"
