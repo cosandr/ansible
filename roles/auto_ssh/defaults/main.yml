@@ -2,6 +2,7 @@
 
 ssh_key_type: ed25519
 ssh_key_comment: "{{ ssh_src_user }}@{{ inventory_hostname }}"
+ssh_hosts_comment: "auto-ssh {{ ssh_key_comment }}"
 ssh_key_options: ""
 
 
