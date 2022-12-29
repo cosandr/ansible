@@ -1,0 +1,55 @@
+---
+
+borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
+
+borg_backups:
+  - name: "syno-tank"
+    timer_description: "Backup tank to Synology every 14 days"
+    oncalendar: "*-*-01/14 02:15:00"
+    passphrase: "{{ borg_syno_tank_passphrase }}"
+    repo: "{{ hostvars['syno'].borg_remote_repo }}/{{ inventory_hostname }}/tank"
+    backup_name: "tank"
+    pre_run: |
+      if ! ssh -q -o "BatchMode=yes" {{ hostvars['syno'].borg_ssh_check }} exit &>/dev/null
+      then
+          echo "Cannot SSH into remote server"
+          exit 1
+      fi
+      # Take snapshots
+      snap_paths=(
+        "/mnt/tank/archive"
+        "/mnt/tank/backup"
+        "/mnt/tank/borg"
+        "/mnt/tank/games"
+        "/mnt/tank/media"
+        "/mnt/tank/media/motion"
+        "/mnt/tank/media/photo"
+        "/mnt/tank/yes"
+      )
+      snap_dir="/mnt/tank/.snapshots"
+      mkdir -p "$snap_dir"/borg_tmp
+      cd "$snap_dir"/borg_tmp
+      for p in "${snap_paths[@]}"; do
+          btrfs subvolume snapshot -r "$p" "$(basename "$p")"
+      done
+    post_run: |
+      cd /
+      for p in "$snap_dir"/borg_tmp/*; do
+          btrfs subvolume delete "$p"
+      done
+      rmdir "$snap_dir"/borg_tmp
+    paths:
+      - "."
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--exclude-caches"
+      - "--exclude '**/.snapshots'"
+      - "--upload-ratelimit 80000"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-weekly 2"
+      - "--keep-monthly 3"
+      - "--keep-yearly 1"

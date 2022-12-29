@@ -1,0 +1,16 @@
+---
+
+# Install from synocommunity
+borg_install: false
+# Setup user in UI
+borg_create_user: false
+# Ensure user shell is sh
+borg_user: borg
+borg_group: users
+borg_server: true
+borg_home: /var/services/homes/borg
+borg_pool: /volume1/backup/borg
+borg_serve_bin: "/usr/local/bin/borg"
+
+borg_ssh_check: "{{ borg_user }}@{{ inventory_hostname }}.{{ domain }}"
+borg_remote_repo: "ssh://{{ borg_ssh_check }}{{ borg_pool }}"

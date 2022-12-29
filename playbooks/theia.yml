@@ -12,6 +12,34 @@
         - ansible_os_family == 'RedHat'
       tags: ["install"]
 
+    - name: Prepare Synology borg SSH
+      ansible.builtin.include_role:
+        name: auto_ssh
+        apply:
+          become: true
+          tags: ["auto-ssh", "borg"]
+      vars:
+        ssh_hosts_comment: "auto-ssh {{ inventory_hostname }}-syno"
+        ssh_dest_hosts: ["syno"]
+        ssh_dest_dir: "{{ hostvars['syno'].borg_home }}/.ssh"
+        ssh_dest_user: "{{ hostvars['syno'].borg_user }}"
+        ssh_dest_group: "{{ hostvars['syno'].borg_group }}"
+        ssh_key_options: >-
+          command="cd {{ hostvars['syno'].borg_pool }}/{{ inventory_hostname }};
+          {{ hostvars['syno'].borg_serve_bin }} serve --restrict-to-path {{ hostvars['syno'].borg_pool }}/{{ inventory_hostname }}",restrict
+      tags: ["auto-ssh", "borg"]
+
+    - name: Ensure Borg directory exists
+      delegate_to: syno
+      become: true
+      ansible.builtin.file:
+        path: "{{ hostvars['syno'].borg_pool }}/{{ inventory_hostname }}"
+        state: directory
+        owner: "{{ hostvars['syno'].borg_user }}"
+        group: "{{ hostvars['syno'].borg_group }}"
+        mode: 0750
+      tags: ["borg"]
+
   tasks:
     - name: Include common tasks
       ansible.builtin.include_tasks:
@@ -74,6 +102,9 @@
   roles:
     - role: systemd_networkd
       tags: ["networkd"]
+
+    - role: borg
+      tags: ["borg"]
 
     - role: samba
       tags: ["samba"]
