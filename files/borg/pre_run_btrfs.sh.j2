@@ -1,0 +1,15 @@
+# Take snapshots
+snap_src="{{ snap_src }}"
+snap_dir="$snap_src/{{ snap_dir }}"
+snap_subvols=(
+{% for s in snap_subvols %}
+    "{{ s }}"
+{% endfor %}
+)
+{% raw %}
+mkdir -p "$snap_dir"
+for p in "${snap_subvols[@]}"; do
+    btrfs subvolume snapshot -r "$snap_src/$p" "$snap_dir/$p"
+done
+cd "$snap_dir"
+{% endraw %}

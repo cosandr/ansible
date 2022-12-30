@@ -2,6 +2,20 @@
 
 borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
 
+__borg_btrfs_snaps:
+  tank:
+    snap_src: "/mnt/tank"
+    snap_dir: ".snapshots/borg_tmp"
+    snap_subvols:
+      - "archive"
+      - "backup"
+      - "borg"
+      - "games"
+      - "media"
+      - "media/motion"
+      - "media/photo"
+      - "yes"
+
 borg_backups:
   - name: "syno-tank"
     timer_description: "Backup tank to Synology every 14 days"
@@ -15,29 +29,8 @@ borg_backups:
           echo "Cannot SSH into remote server"
           exit 1
       fi
-      # Take snapshots
-      snap_paths=(
-        "/mnt/tank/archive"
-        "/mnt/tank/backup"
-        "/mnt/tank/borg"
-        "/mnt/tank/games"
-        "/mnt/tank/media"
-        "/mnt/tank/media/motion"
-        "/mnt/tank/media/photo"
-        "/mnt/tank/yes"
-      )
-      snap_dir="/mnt/tank/.snapshots"
-      mkdir -p "$snap_dir"/borg_tmp
-      cd "$snap_dir"/borg_tmp
-      for p in "${snap_paths[@]}"; do
-          btrfs subvolume snapshot -r "$p" "$(basename "$p")"
-      done
-    post_run: |
-      cd /
-      for p in "$snap_dir"/borg_tmp/*; do
-          btrfs subvolume delete "$p"
-      done
-      rmdir "$snap_dir"/borg_tmp
+      {{ lookup('template', inventory_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
+    post_run: "{{ lookup('file', inventory_dir + '/files/borg/post_run_btrfs.sh') }}"
     paths:
       - "."
     create_args:
