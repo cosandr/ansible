@@ -34,6 +34,11 @@ __postfix_networks:
 
 postfix_networks: "{{ __postfix_networks | flatten }}"
 
+postfix_custom_maps:
+  - name: sender_canonical_maps
+    content: |
+      /^(.*)@(.+)\.(.+\..+)$/ ${1}-${2}@${3}
+
 postfix_main_config:
   - regexp: "^#?smtp_use_tls"
     line: "smtp_use_tls = yes"
@@ -71,3 +76,7 @@ postfix_main_config:
     line: "smtpd_tls_key_file = /etc/letsencrypt/live/{{ postfix_hostname }}/privkey.pem"
   - regexp: "^#?smtpd_tls_security_level"
     line: "smtpd_tls_security_level = may"
+  - regexp: "^#?sender_canonical_classes"
+    line: "sender_canonical_classes = envelope_sender, header_sender"
+  - regexp: "^#?sender_canonical_maps"
+    line: "sender_canonical_maps = regexp:/etc/postfix/sender_canonical_maps"
