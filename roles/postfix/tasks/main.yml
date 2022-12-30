@@ -121,6 +121,21 @@
     - Regenerate sasl_passwd.db
     - Restart postfix
 
+- name: Configure custom postfix maps
+  ansible.builtin.copy:
+    dest: "/etc/postfix/{{ item.name }}"
+    owner: root
+    group: root
+    mode: 0600
+    content: "{{ item.content }}"
+  loop: "{{ postfix_custom_maps }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: __postfix_custom_maps_copy
+  notify:
+    - Regenerate custom maps
+    - Restart postfix
+
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
 

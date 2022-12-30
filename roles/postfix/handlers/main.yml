@@ -12,6 +12,13 @@
 - name: Regenerate sasl_passwd.db
   ansible.builtin.command: "/usr/sbin/postmap /etc/postfix/sasl_passwd"
 
+- name: Regenerate custom maps
+  ansible.builtin.command: "/usr/sbin/postmap /etc/postfix/{{ item.item.name }}"
+  loop: "{{ __postfix_custom_maps_copy.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  when: item.changed
+
 - name: Restart postfix
   ansible.builtin.systemd:
     name: postfix
