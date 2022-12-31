@@ -1,5 +1,8 @@
 ---
 
+postfix_exporter_port: 9154
+postfix_exporter_listen_address: "0.0.0.0:{{ postfix_exporter_port }}"
+
 smtp_credentials: "{{ vault_smtp_credentials }}"
 
 postfix_interfaces:

@@ -317,6 +317,11 @@ __extra_prometheus_scrape_configs:
     static_configs:
       - targets: ["localhost:{{ mikrotik_exporter_port }}"]
 
+  - job_name: "postfix"
+    scrape_interval: 1m
+    static_configs:
+      - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].postfix_exporter_port }}"]
+
   - job_name: "cadvisor"
     static_configs:
       - targets: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].cadvisor_port }}"]

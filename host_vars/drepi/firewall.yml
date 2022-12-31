@@ -30,11 +30,10 @@ firewall_rules:
     source: "{{ hostvars['theia'].host_ips.general }}"
 
   - port: "{{ node_exporter_port }}"
-    source: "{{ hostvars['prom01'].ansible_host }}"
+    sources: "{{ node_exporter_allow_ips }}"
 
-  - port: "{{ (serial_proxies | selectattr('name', 'eq', 'zigbee') | first).port }}"
-    zone: public
-    source: "10.0.50.48"
+  - port: "{{ postfix_exporter_port }}"
+    sources: "{{ node_exporter_allow_ips }}"
 
   # RouterOS neighbour discovery
   - port: 5678

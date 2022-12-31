@@ -61,3 +61,6 @@
 [submodule "roles/btrfs"]
 	path = roles/btrfs
 	url = git@github.com:cosandr/ansible-role-btrfs.git
+[submodule "roles/postfix_exporter"]
+	path = roles/postfix_exporter
+	url = git@github.com:cosandr/ansible-role-postfix_exporter.git
