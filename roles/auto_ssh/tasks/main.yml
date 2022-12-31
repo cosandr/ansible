@@ -1,99 +1,11 @@
 ---
 
-- name: Ensure SSH dir exists on source
-  ansible.builtin.file:
-    path: "{{ ssh_src_dir }}"
-    state: directory
-    owner: "{{ ssh_src_user }}"
-    group: "{{ ssh_src_group }}"
-    mode: 0700
+- name: Include SSH key config
+  ansible.builtin.include_tasks:
+    file: keys.yml
+  when: ssh_key_config
 
-- name: Ensure SSH dir exists on targets
-  delegate_to: "{{ item }}"
-  ansible.builtin.file:
-    path: "{{ ssh_dest_dir }}"
-    state: directory
-    owner: "{{ ssh_dest_user }}"
-    group: "{{ ssh_dest_group }}"
-    mode: 0700
-  loop: "{{ ssh_dest_hosts }}"
-  when: ssh_dest_create_dir
-
-- name: Generate SSH keys
-  community.crypto.openssh_keypair:
-    path: "{{ ssh_src_dir }}/id_{{ ssh_key_type }}"
-    comment: "{{ ssh_key_comment }}"
-    type: "{{ ssh_key_type }}"
-    owner: "{{ ssh_src_user }}"
-    group: "{{ ssh_src_group }}"
-  register: __ssh_key
-
-- name: Copy SSH keys
-  delegate_to: "{{ item }}"
-  ansible.posix.authorized_key:
-    user: "{{ ssh_dest_user }}"
-    comment: "{{ __ssh_key.comment }}"
-    key: "{{ __ssh_key.public_key }}"
-    key_options: "{{ ssh_key_options | default(omit) }}"
-    path: "{{ ssh_dest_dir }}/{{ ssh_dest_authorized_keys_name }}"
-  loop: "{{ ssh_dest_hosts }}"
-
-- name: Initialize target names list
-  delegate_to: "{{ item }}"
-  delegate_facts: true
-  ansible.builtin.set_fact:
-    __target_host_names:
-      - "{{ hostvars[item].ansible_host }}"
-      - "{{ hostvars[item].inventory_hostname }}"
-  loop: "{{ ssh_dest_hosts }}"
-
-- name: Add domain if available
-  delegate_to: "{{ item }}"
-  delegate_facts: true
-  ansible.builtin.set_fact:
-    __target_host_names: "{{ hostvars[item].__target_host_names + [tmp] }}"
-  vars:
-    tmp: "{{ hostvars[item].inventory_hostname }}.{{ hostvars[item].domain }}"
-  loop: "{{ ssh_dest_hosts }}"
-  when:
-    - hostvars[item].domain is defined
-    - hostvars[item].domain | length > 0
-
-- name: Add custom names if available
-  delegate_to: "{{ item }}"
-  delegate_facts: true
-  ansible.builtin.set_fact:
-    __target_host_names: "{{ hostvars[item].__target_host_names + hostvars[item].ssh_custom_host_names }}"
-  loop: "{{ ssh_dest_hosts }}"
-  when:
-    - hostvars[item].ssh_custom_host_names is defined
-    - hostvars[item].ssh_custom_host_names | length > 0
-
-- name: Scan target host keys
-  ansible.builtin.command: "ssh-keyscan {{ hostvars[item].__target_host_names | join(',') }}"
-  check_mode: false
-  changed_when: false
-  loop: "{{ ssh_dest_hosts }}"
-  register: __host_keys
-
-- name: Ensure host keys are in known_hosts
-  ansible.builtin.blockinfile:
-    path: "{{ ssh_known_hosts_file }}"
-    marker: "# {mark} {{ ssh_hosts_comment }}"
-    create: true
-    mode: 0644
-    block: |
-      {% for k in __host_keys.results | map(attribute='stdout') | sort %}
-      {{ k }}
-      {% endfor %}
-
-- name: Add target host names to /etc/hosts
-  ansible.builtin.blockinfile:
-    path: /etc/hosts
-    marker: "# {mark} {{ ssh_hosts_comment }}"
-    block: |
-      {% for h in ssh_dest_hosts %}
-      {{ hostvars[h].ansible_host }} {{ hostvars[h].ssh_conf_hosts_names | default(hostvars[h].__target_host_names | difference([hostvars[h].ansible_host])) | unique | join(' ') }}
-      {% endfor %}
-  when: ssh_conf_hosts
-  tags: ["hosts"]
+- name: Include known_hosts config
+  ansible.builtin.include_tasks:
+    file: known_hosts.yml
+  when: ssh_known_hosts_config

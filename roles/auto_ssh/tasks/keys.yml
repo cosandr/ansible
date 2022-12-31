@@ -1,0 +1,39 @@
+---
+
+- name: Ensure SSH dir exists on source
+  ansible.builtin.file:
+    path: "{{ ssh_src_dir }}"
+    state: directory
+    owner: "{{ ssh_src_user }}"
+    group: "{{ ssh_src_group }}"
+    mode: 0700
+
+- name: Ensure SSH dir exists on targets
+  delegate_to: "{{ item }}"
+  ansible.builtin.file:
+    path: "{{ ssh_dest_dir }}"
+    state: directory
+    owner: "{{ ssh_dest_user }}"
+    group: "{{ ssh_dest_group }}"
+    mode: 0700
+  loop: "{{ ssh_dest_hosts }}"
+  when: ssh_dest_create_dir
+
+- name: Generate SSH keys
+  community.crypto.openssh_keypair:
+    path: "{{ ssh_src_dir }}/id_{{ ssh_key_type }}"
+    comment: "{{ ssh_key_comment }}"
+    type: "{{ ssh_key_type }}"
+    owner: "{{ ssh_src_user }}"
+    group: "{{ ssh_src_group }}"
+  register: __ssh_key
+
+- name: Copy SSH keys
+  delegate_to: "{{ item }}"
+  ansible.posix.authorized_key:
+    user: "{{ ssh_dest_user }}"
+    comment: "{{ __ssh_key.comment }}"
+    key: "{{ __ssh_key.public_key }}"
+    key_options: "{{ ssh_key_options | default(omit) }}"
+    path: "{{ ssh_dest_dir }}/{{ ssh_dest_authorized_keys_name }}"
+  loop: "{{ ssh_dest_hosts }}"
