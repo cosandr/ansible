@@ -35,3 +35,25 @@ blackbox_exporter_configuration_modules:
     icmp:
       preferred_ip_protocol: ip6
       ip_protocol_fallback: false  # no fallback to "ip4"
+  tls_connect_ipv4:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      preferred_ip_protocol: ip4
+      ip_protocol_fallback: false  # no fallback to "ip6"
+  smtp_starttls_ipv4:
+    prober: tcp
+    timeout: 5s
+    tcp:
+      preferred_ip_protocol: ip4
+      ip_protocol_fallback: false  # no fallback to "ip6"
+      query_response:
+        - expect: "^220 ([^ ]+) ESMTP (.+)$"
+        - send: "EHLO prober\r"
+        - expect: "^250-STARTTLS"
+        - send: "STARTTLS\r"
+        - expect: "^220"
+        - starttls: true
+        - send: "EHLO prober\r"
+        - expect: "^250 CHUNKING"
+        - send: "QUIT\r"

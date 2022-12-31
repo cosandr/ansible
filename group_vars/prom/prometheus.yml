@@ -79,6 +79,12 @@ blackbox_exporter_targets_http_ipv4:
   - "https://ha.hlab.no"
   - "https://gitlab.{{ hostvars['gitlab01'].domain }}"
 
+blackbox_exporter_targets_tls_ipv4:
+  - "{{ hostvars['drepi'].postfix_hostname }}:465"
+
+blackbox_exporter_targets_starttls_ipv4:
+  - "{{ hostvars['drepi'].postfix_hostname }}:587"
+
 __prom_am_configs: >-
   {%- set tmp = [] -%}
   {%- for h in groups['prom'] -%}
@@ -144,6 +150,40 @@ __common_prometheus_scrape_configs:
       module: [icmp_ipv4]
     static_configs:
       - targets: "{{ blackbox_exporter_targets_icmp_ipv4 + __prom_blackbox_icmp_targets }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "localhost:{{ blackbox_exporter_port }}"
+      - source_labels: [instance]
+        target_label: __host_ip
+
+  - job_name: 'blackbox_tls_connect4'
+    scrape_interval: 30m
+    metrics_path: '/probe'
+    params:
+      module: [tls_connect_ipv4]
+    static_configs:
+      - targets: "{{ blackbox_exporter_targets_tls_ipv4 }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "localhost:{{ blackbox_exporter_port }}"
+      - source_labels: [instance]
+        target_label: __host_ip
+
+  - job_name: 'blackbox_starttls4'
+    scrape_interval: 30m
+    metrics_path: '/probe'
+    params:
+      module: [smtp_starttls_ipv4]
+    static_configs:
+      - targets: "{{ blackbox_exporter_targets_starttls_ipv4 }}"
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
