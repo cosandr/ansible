@@ -9,7 +9,14 @@ snap_subvols=(
 {% raw %}
 mkdir -p "$snap_dir"
 for p in "${snap_subvols[@]}"; do
-    btrfs subvolume snapshot -r "$snap_src/$p" "$snap_dir/$p"
+    # Target should not exist already
+    rmdir "$snap_dir/$p" &>/dev/null || true
+    # Cannot take read-only snapshots with nested structures
+    btrfs subvolume snapshot "$snap_src/$p" "$snap_dir/$p"
+done
+# Set snapshots read-only
+for p in "${snap_subvols[@]}"; do
+    btrfs property set -ts "$snap_dir/$p" ro true
 done
 cd "$snap_dir"
 {% endraw %}
