@@ -17,6 +17,7 @@
     group: "{{ ssh_dest_group }}"
     mode: 0700
   loop: "{{ ssh_dest_hosts }}"
+  when: ssh_dest_create_dir
 
 - name: Generate SSH keys
   community.crypto.openssh_keypair:
@@ -34,7 +35,7 @@
     comment: "{{ __ssh_key.comment }}"
     key: "{{ __ssh_key.public_key }}"
     key_options: "{{ ssh_key_options | default(omit) }}"
-    path: "{{ ssh_dest_dir }}/authorized_keys"
+    path: "{{ ssh_dest_dir }}/{{ ssh_dest_authorized_keys_name }}"
   loop: "{{ ssh_dest_hosts }}"
 
 - name: Initialize target names list
