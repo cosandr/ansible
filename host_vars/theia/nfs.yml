@@ -17,9 +17,6 @@ nfs_shares:
   - path: /mnt/tank/backup/pgsql
     options: "rw,no_root_squash"
     sources: "{{ groups['pg'] | map('extract', hostvars, 'ansible_host') | list }}"
-  - path: /mnt/tank/backup/vcenter
-    options: "rw,no_root_squash"
-    sources: ["10.0.100.10"]
   - path: /mnt/tank/backup/gitlab
     options: "rw,no_root_squash"
     sources: "{{ groups['gitlab'] | map('extract', hostvars, 'ansible_host') | list }}"
@@ -32,14 +29,8 @@ nfs_shares:
     sources: "{{ __nfs_all_dataset_hosts | flatten }}"
   - path: /mnt/tank/media/motion
     options: "rw,no_root_squash"
-    sources: "{{ (__nfs_all_dataset_hosts | flatten) + [hostvars['drepi'].ansible_host] }}"
+    sources: "{{ [hostvars['drepi'].ansible_host] }}"
   # Plex shares
   - path: /mnt/tank/media
-    options: "ro,no_root_squash"
-    sources: "{{ groups['plex'] | map('extract', hostvars, 'ansible_host') | list }}"
-  - path: /mnt/tank/media/photo
-    options: "ro,no_root_squash"
-    sources: "{{ groups['plex'] | map('extract', hostvars, 'ansible_host') | list }}"
-  - path: /mnt/tank/media/motion
     options: "ro,no_root_squash"
     sources: "{{ groups['plex'] | map('extract', hostvars, 'ansible_host') | list }}"
