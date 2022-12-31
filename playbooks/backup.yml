@@ -91,15 +91,6 @@
         state: directory
       tags: ["nfs", "borg"]
 
-    - name: Mount tank NFS share
-      mount:
-        src: "{{ hostvars['theia'].host_ips.vm }}:/mnt/tank"
-        path: "/mnt/tank"
-        opts: "defaults,vers=4,ro,noatime,bg"
-        state: mounted
-        fstype: nfs
-      tags: ["nfs"]
-
     - name: Mount Borg NFS share
       mount:
         src: "{{ hostvars['theia'].host_ips.vm }}:/mnt/tank/borg/repos"

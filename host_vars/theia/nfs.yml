@@ -1,7 +1,6 @@
 ---
 
 __nfs_all_dataset_hosts:
-  - "{{ groups['backup'] | map('extract', hostvars, 'ansible_host') | list }}"
   - "{{ groups['desktops'] | map('extract', hostvars, 'ansible_host') | list }}"
   - "{{ hostvars['dresrv'].ansible_host }}"
 

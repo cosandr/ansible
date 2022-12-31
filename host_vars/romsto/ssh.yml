@@ -1,4 +1,6 @@
 ---
 
+ssh_custom_host_names:
+  - "{{ wireguard_ip }}"
 ssh_keys:
   root: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOcilf7C2/8vH1LnCjHT3LJyN+c+Ig511llnzA4VNh+T root@rtv"

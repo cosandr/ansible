@@ -1,6 +1,7 @@
 ---
 
 borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
+borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
 
 __borg_btrfs_snaps:
   tank:
@@ -46,3 +47,32 @@ borg_backups:
       - "--keep-weekly 2"
       - "--keep-monthly 3"
       - "--keep-yearly 1"
+
+  - name: "remote-tank"
+    timer_description: "Backup tank to remote location every 30 days"
+    oncalendar: "*-*-01/30 00:12:00"
+    passphrase: "{{ borg_remote_tank_passphrase }}"
+    repo: "{{ hostvars['romsto'].borg_remote_repo }}/{{ inventory_hostname }}/tank"
+    backup_name: "tank"
+    pre_run: |
+      if ! ssh -q -o "BatchMode=yes" {{ hostvars['romsto'].borg_ssh_check }} exit &>/dev/null
+      then
+          echo "Cannot SSH into remote server"
+          exit 1
+      fi
+      {{ lookup('template', inventory_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
+    post_run: "{{ lookup('file', inventory_dir + '/files/borg/post_run_btrfs.sh') }}"
+    paths:
+      - "."
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--exclude-caches"
+      - "--exclude '**/.snapshots'"
+      - "--upload-ratelimit 20000"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-monthly 3"
+      - "--keep-yearly 2"

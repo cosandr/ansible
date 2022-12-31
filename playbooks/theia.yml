@@ -29,6 +29,21 @@
           {{ hostvars['syno'].borg_serve_bin }} serve --restrict-to-path {{ hostvars['syno'].borg_pool }}/{{ inventory_hostname }}",restrict
       tags: ["auto-ssh", "borg"]
 
+    - name: Prepare romsto borg SSH
+      ansible.builtin.include_role:
+        name: auto_ssh
+        apply:
+          become: true
+          tags: ["auto-ssh", "borg"]
+      vars:
+        # Manaully add root's key to
+        # /boot/config/ssh/andrei.pubkeys (permanent)
+        # ~andrei/.ssh/authorized_keys (runtime)
+        ssh_key_config: false
+        ssh_hosts_comment: "auto-ssh {{ inventory_hostname }}-romsto"
+        ssh_dest_hosts: ["romsto"]
+      tags: ["auto-ssh", "borg"]
+
     - name: Ensure Borg directory exists
       delegate_to: syno
       become: true
