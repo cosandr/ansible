@@ -10,9 +10,9 @@ cat <<EOT > "$hook_path"
 
 # Do we have GNU find?
 if find --version &>/dev/null; then
-    cmd="find files host_vars group_vars -type f -regextype egrep -regex '.*(\.csr|\.key|vault\.yml)$' -print0"
+    cmd="find files inventory -type f -regextype egrep -regex '.*(\.csr|\.key|vault\.yml)$' -print0"
 else
-    cmd="find -E files host_vars group_vars -type f -regex '.*(\.csr|\.key|vault\.yml)$' -print0"
+    cmd="find -E files inventory -type f -regex '.*(\.csr|\.key|vault\.yml)$' -print0"
 fi
 
 eval \$cmd | while read -d $'\0' f
