@@ -7,13 +7,13 @@
   # Only gather facts for relevant hosts
   gather_facts: false
   vars:
-    host_cert_path: "{{ inventory_dir }}/files/{{ inventory_hostname }}/elk_ssl"
+    host_cert_path: "{{ repo_base_dir }}/files/{{ inventory_hostname }}/elk_ssl"
   pre_tasks:
     - block:
         - name: Search for encrypted private keys
           delegate_to: localhost
           find:
-            paths: "{{ inventory_dir }}/files"
+            paths: "{{ repo_base_dir }}/files"
             recurse: true
             patterns: '*.key,*.csr'
             contains: '^\$ANSIBLE_VAULT'
@@ -25,7 +25,7 @@
           delegate_to: localhost
           command: ansible-vault decrypt {{ item.path }}
           args:
-            chdir: "{{ inventory_dir }}"
+            chdir: "{{ repo_base_dir }}"
           register: __decrypt
           changed_when: __decrypt.rc == 0
           loop: "{{ __dec_files.files }}"
@@ -97,7 +97,7 @@
     - name: Search for unencrypted private keys
       delegate_to: localhost
       find:
-        paths: "{{ inventory_dir }}/files"
+        paths: "{{ repo_base_dir }}/files"
         recurse: true
         patterns: '*.key,*.csr'
         contains: '^-----BEGIN.*-----$'
@@ -109,7 +109,7 @@
       delegate_to: localhost
       command: ansible-vault encrypt {{ item.path }}
       args:
-        chdir: "{{ inventory_dir }}"
+        chdir: "{{ repo_base_dir }}"
       register: __encrypt
       changed_when: __encrypt.rc == 0
       loop: "{{ __enc_files.files }}"

@@ -11,4 +11,4 @@ __nginx_vhosts_host:
   - filename: syncthing.conf
     server_name: syncthing
     upstream_name: syncthing
-    template: "{{ inventory_dir }}/files/webgw/nginx/syncthing.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/syncthing.conf.j2"

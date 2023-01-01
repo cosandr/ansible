@@ -71,7 +71,7 @@
       community.libvirt.virt_pool:
         name: theia
         command: define
-        xml: "{{ lookup('template', inventory_dir + '/files/thinkcentre/libvirt/theia.xml.j2') }}"
+        xml: "{{ lookup('template', repo_base_dir + '/files/thinkcentre/libvirt/theia.xml.j2') }}"
         state: "active"
         autostart: true
       tags: ["libvirt", "nfs"]

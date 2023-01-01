@@ -30,8 +30,8 @@ borg_backups:
           echo "Cannot SSH into remote server"
           exit 1
       fi
-      {{ lookup('template', inventory_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
-    post_run: "{{ lookup('file', inventory_dir + '/files/borg/post_run_btrfs.sh') }}"
+      {{ lookup('template', repo_base_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
+    post_run: "{{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}"
     paths:
       - "."
     create_args:
@@ -59,8 +59,8 @@ borg_backups:
           echo "Cannot SSH into remote server"
           exit 1
       fi
-      {{ lookup('template', inventory_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
-    post_run: "{{ lookup('file', inventory_dir + '/files/borg/post_run_btrfs.sh') }}"
+      {{ lookup('template', repo_base_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
+    post_run: "{{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}"
     paths:
       - "."
     create_args:

@@ -16,22 +16,22 @@ nginx_upstreams:
 nginx_vhosts:
   - filename: default_reject.conf
     server_name: default_reject
-    template: "{{ inventory_dir }}/files/webgw/nginx/default_reject.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/default_reject.conf.j2"
 
   - filename: ha.conf
     server_name: ha
     upstream_name: ha_ta
     domain: "{{ domains['ti'] }}"
-    template: "{{ inventory_dir }}/files/webgw/nginx/ha.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/ha.conf.j2"
 
   - filename: nextcloud.conf
     server_name: nextcloud
     upstream_name: nextcloud_ta
     domain: "{{ domains['ti'] }}"
-    template: "{{ inventory_dir }}/files/webgw/nginx/nextcloud.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/nextcloud.conf.j2"
 
   - filename: photoprism.conf
     server_name: photoprism
     upstream_name: photoprism_ta
     domain: "{{ domains['ti'] }}"
-    template: "{{ inventory_dir }}/files/webgw/nginx/photoprism.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/photoprism.conf.j2"

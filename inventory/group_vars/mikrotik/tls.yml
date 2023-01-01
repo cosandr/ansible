@@ -3,7 +3,6 @@
 __cert_names:
   - "IP:{{ ansible_host }}"
 
-repo_base_dir: "{{ ansible_config_file | dirname }}"
 ownca_vault_password_file: "{{ repo_base_dir }}/gopass-vault.sh"
 key_passphrase: "{{ lookup('community.general.passwordstore', 'ansible/mt_key_pass') }}"
 ca_passphrase: "{{ lookup('community.general.passwordstore', 'ansible/mt_ca_pass') }}"

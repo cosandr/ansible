@@ -13,12 +13,12 @@ nginx_upstreams:
 nginx_vhosts:
   - filename: default_reject.conf
     server_name: default_reject
-    template: "{{ inventory_dir }}/files/webgw/nginx/default_reject.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/default_reject.conf.j2"
 
   - filename: console.conf
     server_name: console
-    template: "{{ inventory_dir }}/files/minio/console.conf.j2"
+    template: "{{ repo_base_dir }}/files/minio/console.conf.j2"
 
   - filename: server.conf
     server_name: server
-    template: "{{ inventory_dir }}/files/minio/server.conf.j2"
+    template: "{{ repo_base_dir }}/files/minio/server.conf.j2"

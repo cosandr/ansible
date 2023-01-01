@@ -3,45 +3,45 @@
 __nginx_vhosts_common:
   - filename: default_reject.conf
     server_name: default_reject
-    template: "{{ inventory_dir }}/files/webgw/nginx/default_reject.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/default_reject.conf.j2"
 
   - filename: gitlab.conf
     server_name: gitlab
-    template: "{{ inventory_dir }}/files/webgw/nginx/gitlab.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/gitlab.conf.j2"
 
   - filename: registry.conf
     server_name: registry
-    template: "{{ inventory_dir }}/files/webgw/nginx/registry.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/registry.conf.j2"
 
   - filename: grafana.conf
     server_name: grafana
-    template: "{{ inventory_dir }}/files/webgw/nginx/grafana.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/grafana.conf.j2"
 
   - filename: admin.conf
     server_name: admin
-    template: "{{ inventory_dir }}/files/webgw/nginx/admin.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/admin.conf.j2"
 
   - filename: jellyfin.conf
     server_name: jellyfin
-    template: "{{ inventory_dir }}/files/webgw/nginx/jellyfin.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/jellyfin.conf.j2"
 
   - filename: dv-main.conf
     server_name: www
-    template: "{{ inventory_dir }}/files/webgw/nginx/dv-main.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/dv-main.conf.j2"
 
   - filename: nextcloud.conf
     server_name: nextcloud
-    template: "{{ inventory_dir }}/files/webgw/nginx/nextcloud.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/nextcloud.conf.j2"
 
   - filename: plex.conf
     server_name: plex
-    template: "{{ inventory_dir }}/files/webgw/nginx/plex.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/plex.conf.j2"
 
 __nginx_vhosts_host:
   - filename: nextcloud_ta.conf
     server_name: nextcloud_ta
     upstream_name: nextcloud_ta
     domain: "{{ domains['ti'] }}"
-    template: "{{ inventory_dir }}/files/webgw/nginx/nextcloud.conf.j2"
+    template: "{{ repo_base_dir }}/files/webgw/nginx/nextcloud.conf.j2"
 
 nginx_vhosts: "{{ (__nginx_vhosts_common | default([])) + (__nginx_vhosts_host | default([])) }}"

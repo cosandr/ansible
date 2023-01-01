@@ -331,6 +331,6 @@ __extra_prometheus_scrape_configs:
     static_configs: "{{ __prom_nginx_configs }}"
 
 prometheus_alert_rules_files:
-  - "{{ inventory_dir }}/files/prometheus/alerts/*.rules"
+  - "{{ repo_base_dir }}/files/prometheus/alerts/*.rules"
 
 prometheus_alert_rules: []

@@ -33,7 +33,7 @@ kube_cert_group: kube-cert
 kube_log_level: 2
 
 # Directory where credentials will be stored
-credentials_dir: "{{ inventory_dir }}/files/k8s/credentials"
+credentials_dir: "{{ repo_base_dir }}/files/k8s/credentials"
 
 # Choose network plugin (cilium, calico, weave or flannel. Use cni for generic cni plugin)
 # Can also be set to 'cloud', which lets the cloud provider setup appropriate routing

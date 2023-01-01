@@ -106,5 +106,5 @@
 
         - name: Configure nginx ingress LB
           kubernetes.core.k8s:
-            resource_definition: "{{ lookup('template', inventory_dir + '/files/k8s/nginx-lb.yml.j2') | from_yaml }}"
+            resource_definition: "{{ lookup('template', repo_base_dir + '/files/k8s/nginx-lb.yml.j2') | from_yaml }}"
           tags: ["nginx"]

@@ -11,7 +11,7 @@
       block:
         - name: Deploy RGW service
           ceph_orch_apply:
-            spec: "{{ lookup('template', inventory_dir + '/files/ceph/rgw-main.yml.j2') }}"
+            spec: "{{ lookup('template', repo_base_dir + '/files/ceph/rgw-main.yml.j2') }}"
           tags: ["rgw"]
 
         - name: Read SSL cert from localgw
@@ -26,7 +26,7 @@
 
         - name: Deploy RGW ingress service
           ceph_orch_apply:
-            spec: "{{ lookup('template', inventory_dir + '/files/ceph/rgw-main-ingress.yml.j2') }}"
+            spec: "{{ lookup('template', repo_base_dir + '/files/ceph/rgw-main-ingress.yml.j2') }}"
           vars:
             rgw_ingress_ssl_cert: |
               {{ (__certs.results[0].content | b64decode).strip() }}

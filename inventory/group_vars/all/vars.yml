@@ -3,6 +3,8 @@
 ansible_user: root
 ansible_python_interpreter: /usr/bin/python3
 
+repo_base_dir: "{{ ansible_config_file | dirname }}"
+
 domains: "{{ vault_domains }}"
 
 ansible_managed: "Ansible managed"

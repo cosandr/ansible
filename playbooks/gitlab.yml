@@ -51,7 +51,7 @@
 
     - name: Add garbage collection job
       template:
-        src: "{{ inventory_dir }}/files/gitlab/registry-garbage-collect.timer.j2"
+        src: "{{ repo_base_dir }}/files/gitlab/registry-garbage-collect.timer.j2"
         dest: "/etc/systemd/system/registry-garbage-collect.timer"
         owner: root
         group: root
@@ -63,7 +63,7 @@
 
     - name: Copy garbage collection service
       copy:
-        src: "{{ inventory_dir }}/files/gitlab/registry-garbage-collect.service"
+        src: "{{ repo_base_dir }}/files/gitlab/registry-garbage-collect.service"
         dest: "/etc/systemd/system/registry-garbage-collect.service"
         owner: root
         group: root
