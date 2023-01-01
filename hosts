@@ -13,7 +13,7 @@ m1bp    ansible_host=10.0.50.34
 dresrv  ansible_host=10.0.50.22
 romsto  ansible_host=10.1.0.6
 theia   ansible_host=10.0.50.2
-syno    ansible_host=10.0.50.8 ansible_user=andrei
+syno    ansible_host=10.0.100.8 ansible_user=andrei
 
 [servers:children]
 webgw
