@@ -65,7 +65,7 @@ backup_exit=$?
 echo "Pruning repository"
 
 borg prune \
-    --prefix '{{ name }}-' \
+    --glob-archives '{{ name }}-*' \
 {% for a in item.prune_args %}
     {{ a }} \
 {% endfor %}
