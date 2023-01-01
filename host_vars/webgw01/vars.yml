@@ -15,3 +15,7 @@ promtail_syslog_port: ""
 pushgateway_port: ""
 webgw_ports: []
 provisioned_disks: []
+
+prometheus_blackbox_icmp_targets:
+  - "{{ ansible_host }}"
+  - "{{ wireguard_ip }}"

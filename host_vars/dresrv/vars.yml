@@ -22,3 +22,5 @@ nginx_htpasswd: "{{ vault_nginx_htpasswd }}"
 postfix_hostname: "{{ domain }}"
 btrfs_scrub_targets:
   - /
+
+prometheus_nginx_targets: ["{{ ansible_host + ':' + nginx_exporter_port | string }}"]

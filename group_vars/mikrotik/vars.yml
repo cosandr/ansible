@@ -7,3 +7,6 @@ ansible_network_cli_ssh_type: libssh
 
 api_username: ansible
 api_password: "{{ lookup('community.general.passwordstore', 'network/mt_ansible_pass') }}"
+
+prometheus_blackbox_icmp_targets: []
+prometheus_node_targets: []

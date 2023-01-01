@@ -3,3 +3,6 @@
 firewall_enabled: false
 # Monitoring running inside kubernetes
 node_exporter_installed: false
+# Skip for now
+prometheus_blackbox_icmp_targets: []
+prometheus_node_targets: []

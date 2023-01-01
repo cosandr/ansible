@@ -9,6 +9,13 @@ dht_exporter_room: "Hallway"
 
 firewalld_trusted_sources: "{{ vault_firewalld_trusted_sources }}"
 firewall_frontend: "ufw"
+
+prometheus_blackbox_tls_targets:
+  - "{{ postfix_hostname }}:465"
+
+prometheus_blackbox_starttls_targets:
+  - "{{ postfix_hostname }}:587"
+
 motion_port: 8081
 
 motion_is_rpi: true

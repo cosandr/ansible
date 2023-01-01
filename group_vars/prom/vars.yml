@@ -21,3 +21,17 @@ webgw_ports:
   - "{{ grafana_port }}"
 
 node_exporter_config_firewall: false
+prometheus_alertmanager_targets: ["{{ wireguard_ip | default(ansible_host) + ':' + alertmanager_port | string }}"]
+prometheus_prometheus_targets: ["{{ wireguard_ip | default(ansible_host) + ':' + prometheus_port | string }}"]
+
+prometheus_blackbox_icmp_targets:
+  - "{{ wireguard_ip | default(ansible_host) }}"
+  - "google.com"
+  - "1.1.1.1"
+  # Home assistant
+  - "10.0.50.48"
+
+prometheus_blackbox_http_targets:
+  - "https://google.com"
+  - "https://{{ grafana_domain }}"
+  - "https://ha.hlab.no"

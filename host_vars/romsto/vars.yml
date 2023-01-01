@@ -9,3 +9,11 @@ nextcloud_port: "25683"
 # Running in Docker
 node_exporter_installed: false
 nfs_idmapping_configure: false
+
+prometheus_blackbox_icmp_targets:
+  - "{{ ansible_host }}"
+  - "{{ wireguard_ip }}"
+  - "{{ ddns_domain }}"
+prometheus_node_targets: ["{{ ansible_host + ':' + node_exporter_port | string }}"]
+prometheus_node_labels:
+  instance: "RomeoTV"

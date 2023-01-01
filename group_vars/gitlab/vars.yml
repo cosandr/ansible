@@ -61,3 +61,6 @@ gitlab_letsencrypt_enable: "false"
 gitlab_ldap_enabled: "false"
 
 gitlab_gc_oncalendar: "Tue,Fri 02:00:00"
+
+prometheus_blackbox_http_targets:
+  - "{{ gitlab_external_url }}"

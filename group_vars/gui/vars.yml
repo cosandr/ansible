@@ -11,3 +11,5 @@ ddcutil_udev_rule: |
 
 udev_rules:
   99-platformio: "{{ lookup('url', 'https://raw.githubusercontent.com/platformio/platformio-core/master/scripts/99-platformio-udev.rules', split_lines=False) }}"
+
+prometheus_blackbox_icmp_targets: []

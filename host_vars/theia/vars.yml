@@ -20,3 +20,5 @@ btrfs_scrub_targets:
   - /
   - /mnt/tank
   - /mnt/libvirt-tmp
+
+prometheus_node_targets: ["{{ host_ips.vm + ':' + node_exporter_port | string }}"]

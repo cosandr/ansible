@@ -1,22 +1,5 @@
 ---
 
-desktop_label: "{{ hostvars.desktop.inventory_hostname }}"
-laptop_label: "{{ hostvars.laptop.inventory_hostname }}"
-drepi_label: "{{ hostvars.drepi.inventory_hostname }}"
-server_label: "{{ hostvars.dresrv.inventory_hostname }}"
-romsto_label: "RomeoTV"
-__dresrv: "{{ hostvars['dresrv'] }}"
-__prom_node_group: "servers"
-
-__exclude_auto_node: "{{ __exclude_auto_node_tmp | flatten }}"
-__exclude_auto_node_tmp:
-  - dresrv
-  - drepi
-  - romsto
-  - theia
-  - oldpi
-  - "{{ groups['k8s_cluster'] }}"
-
 __prom_node_ips: >-
   {%- set tmp = [] -%}
   {%- for h in groups['prom'] -%}
@@ -42,58 +25,13 @@ prometheus_alertmanager_config:
   - static_configs:
       - targets: "{{ __prom_node_ips | map('regex_replace', '$', ':' + (alertmanager_port | string)) | list }}"
 
-prometheus_node_static_config:
-  - targets: ["{{ __dresrv.ansible_host }}:{{ __dresrv.node_exporter_port }}"]
-    labels:
-      instance: "{{ server_label }}"
-
-  - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].node_exporter_port }}"]
-    labels:
-      instance: "{{ desktop_label }}"
-
-  - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].node_exporter_port }}"]
-    labels:
-      instance: "{{ drepi_label }}"
-
-  - targets: ["{{ hostvars['theia'].host_ips.vm }}:9100"]
-    labels:
-      instance: "{{ hostvars['theia'].inventory_hostname }}"
-
-  - targets: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].node_exporter_port }}"]
-    labels:
-      instance: "{{ romsto_label }}"
-
-# Appended at runtime
-blackbox_exporter_targets_icmp_ipv4:
-  - "google.com"
-  - "1.1.1.1"
-  - "{{ hostvars['romsto'].ddns_domain }}"
-  - "{{ hostvars['romsto'].wireguard_ip }}"
-  - "{{ hostvars['webgw01'].ansible_host }}"
-  # Home assistant
-  - "10.0.50.48"
-
-blackbox_exporter_targets_http_ipv4:
-  - "https://google.com"
-  - "https://{{ grafana_domain }}"
-  - "https://ha.hlab.no"
-  - "https://gitlab.{{ hostvars['gitlab01'].domain }}"
-
-blackbox_exporter_targets_tls_ipv4:
-  - "{{ hostvars['drepi'].postfix_hostname }}:465"
-
-blackbox_exporter_targets_starttls_ipv4:
-  - "{{ hostvars['drepi'].postfix_hostname }}:587"
-
 __prom_am_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['prom'] -%}
+  {%- for h in groups['prom'] | sort if hostvars[h].prometheus_alertmanager_targets | default([]) -%}
   {{- tmp.append(
     {
-      "targets": [hostvars[h].wireguard_ip | default(hostvars[h].ansible_host) + ":" + hostvars[h].alertmanager_port | string],
-      "labels": {
-        "instance": hostvars[h].inventory_hostname
-      }
+      "targets": hostvars[h].prometheus_alertmanager_targets,
+      "labels": hostvars[h].prometheus_node_labels,
     }
   ) -}}
   {%- endfor -%}
@@ -101,13 +39,11 @@ __prom_am_configs: >-
 
 __prom_prom_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['prom'] -%}
+  {%- for h in groups['prom'] | sort if hostvars[h].prometheus_prometheus_targets | default([]) -%}
   {{- tmp.append(
     {
-      "targets": [hostvars[h].wireguard_ip | default(hostvars[h].ansible_host) + ":" + hostvars[h].prometheus_port | string],
-      "labels": {
-        "instance": hostvars[h].inventory_hostname
-      }
+      "targets": hostvars[h].prometheus_prometheus_targets,
+      "labels": hostvars[h].prometheus_node_labels,
     }
   ) -}}
   {%- endfor -%}
@@ -115,13 +51,23 @@ __prom_prom_configs: >-
 
 __prom_node_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_node_group] | difference(__exclude_auto_node) | sort -%}
+  {%- for h in groups['all'] | sort if hostvars[h].prometheus_node_targets | default([]) -%}
   {{- tmp.append(
     {
-      "targets": [hostvars[h].wireguard_ip | default(hostvars[h].ansible_host) + ":" + hostvars[h].node_exporter_port | string],
-      "labels": {
-        "instance": hostvars[h].inventory_hostname
-      }
+      "targets": hostvars[h].prometheus_node_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_nginx_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['all'] | sort if hostvars[h].prometheus_nginx_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_nginx_targets,
+      "labels": hostvars[h].prometheus_node_labels,
     }
   ) -}}
   {%- endfor -%}
@@ -129,10 +75,31 @@ __prom_node_configs: >-
 
 __prom_blackbox_icmp_targets: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_node_group] | difference(__exclude_auto_node) | sort -%}
-  {{- tmp.append(hostvars[h].wireguard_ip | default(hostvars[h].ansible_host)) -}}
+  {%- for h in groups['all'] if hostvars[h].prometheus_blackbox_icmp_targets | default([]) -%}
+  {{- tmp.append(hostvars[h].prometheus_blackbox_icmp_targets) -}}
   {%- endfor -%}
-  {{ tmp }}
+  {{ tmp | flatten | unique | sort }}
+
+__prom_blackbox_http_targets: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['all'] if hostvars[h].prometheus_blackbox_http_targets | default([]) -%}
+  {{- tmp.append(hostvars[h].prometheus_blackbox_http_targets) -}}
+  {%- endfor -%}
+  {{ tmp | flatten | unique | sort }}
+
+__prom_blackbox_tls_targets: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['all'] if hostvars[h].prometheus_blackbox_tls_targets | default([]) -%}
+  {{- tmp.append(hostvars[h].prometheus_blackbox_tls_targets) -}}
+  {%- endfor -%}
+  {{ tmp | flatten | unique | sort }}
+
+__prom_blackbox_starttls_targets: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['all'] if hostvars[h].prometheus_blackbox_starttls_targets | default([]) -%}
+  {{- tmp.append(hostvars[h].prometheus_blackbox_starttls_targets) -}}
+  {%- endfor -%}
+  {{ tmp | flatten | unique | sort }}
 
 prometheus_scrape_configs: "{{ (__common_prometheus_scrape_configs | default([])) + (__extra_prometheus_scrape_configs | default([])) }}"
 
@@ -149,7 +116,7 @@ __common_prometheus_scrape_configs:
     params:
       module: [icmp_ipv4]
     static_configs:
-      - targets: "{{ blackbox_exporter_targets_icmp_ipv4 + __prom_blackbox_icmp_targets }}"
+      - targets: "{{ __prom_blackbox_icmp_targets }}"
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -166,7 +133,7 @@ __common_prometheus_scrape_configs:
     params:
       module: [tls_connect_ipv4]
     static_configs:
-      - targets: "{{ blackbox_exporter_targets_tls_ipv4 }}"
+      - targets: "{{ __prom_blackbox_tls_targets }}"
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -183,7 +150,7 @@ __common_prometheus_scrape_configs:
     params:
       module: [smtp_starttls_ipv4]
     static_configs:
-      - targets: "{{ blackbox_exporter_targets_starttls_ipv4 }}"
+      - targets: "{{ __prom_blackbox_starttls_targets }}"
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -195,7 +162,7 @@ __common_prometheus_scrape_configs:
         target_label: __host_ip
 
   - job_name: "node"
-    static_configs: "{{ prometheus_node_static_config + __prom_node_configs }}"
+    static_configs: "{{ __prom_node_configs }}"
     relabel_configs:
       - source_labels: [__address__]
         target_label: __host_ip
@@ -204,17 +171,14 @@ __common_prometheus_scrape_configs:
 __extra_prometheus_scrape_configs:
   - job_name: "federate"
     scrape_interval: 15s
-
     honor_labels: true
     metrics_path: '/federate'
-
     params:
       'match[]':
         - '{job=~".+"}'
-
     static_configs:
       - targets:
-        - "{{ hostvars['dresrv'].ansible_host }}:9090"
+          - "{{ hostvars['dresrv'].ansible_host }}:9090"
 
   - job_name: "ceph"
     scrape_interval: 15s
@@ -225,16 +189,13 @@ __extra_prometheus_scrape_configs:
   - job_name: "pushgateway"
     static_configs:
       - targets: ["localhost:{{ pushgateway_port }}"]
-        labels:
-          instance: "{{ inventory_hostname }}"
+        labels: "{{ prometheus_node_labels }}"
 
   - job_name: "hass"
     scrape_interval: 30s
     metrics_path: /api/prometheus
-
     authorization:
       credentials: "{{ vault_ha_token }}"
-
     scheme: https
     static_configs:
       - targets: ["ha.{{ domains['hb'] }}:443"]
@@ -244,10 +205,8 @@ __extra_prometheus_scrape_configs:
   - job_name: "hass_ti"
     scrape_interval: 30s
     metrics_path: /api/prometheus
-
     authorization:
       credentials: "{{ vault_ha_ta_token }}"
-
     scheme: https
     static_configs:
       - targets: ["ha.{{ domains['ti'] }}:443"]
@@ -293,7 +252,7 @@ __extra_prometheus_scrape_configs:
     params:
       module: [http_2xx_ipv4]
     static_configs:
-      - targets: "{{ blackbox_exporter_targets_http_ipv4 }}"
+      - targets: "{{ __prom_blackbox_http_targets }}"
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -321,77 +280,55 @@ __extra_prometheus_scrape_configs:
     scrape_interval: 1m
     static_configs:
       - targets: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].postfix_exporter_port }}"]
+        labels: "{{ hostvars['drepi'].prometheus_node_labels }}"
 
   - job_name: "cadvisor"
     static_configs:
       - targets: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].cadvisor_port }}"]
-        labels:
-          instance: "{{ romsto_label }}"
+        labels: "{{ hostvars['romsto'].prometheus_node_labels }}"
 
   - job_name: "aquaero"
     scrape_interval: 30s
     static_configs:
       - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].aquaero_exporter_port }}"]
-        labels:
-          instance: "{{ desktop_label }}"
+        labels: "{{ hostvars['desktop'].prometheus_node_labels }}"
 
   - job_name: "nvidia"
     scrape_interval: 30s
     static_configs:
       - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].nvidia_exporter_port }}"]
-        labels:
-          instance: "{{ desktop_label }}"
+        labels: "{{ hostvars['desktop'].prometheus_node_labels }}"
 
   - job_name: "fah"
     scrape_interval: 60s
     static_configs:
       - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].fah_exporter_port }}"]
-        labels:
-          instance: "{{ desktop_label }}"
+        labels: "{{ hostvars['desktop'].prometheus_node_labels }}"
 
   - job_name: "wmi"
     static_configs:
       - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].wmi_exporter_port }}"]
-        labels:
-          instance: "{{ desktop_label }}"
+        labels: "{{ hostvars['desktop'].prometheus_node_labels }}"
 
   - job_name: "hwinfo"
     static_configs:
       - targets: ["{{ hostvars['desktop'].ansible_host }}:{{ hostvars['desktop'].hwinfo_exporter_port }}"]
-        labels:
-          instance: "{{ desktop_label }}"
+        labels: "{{ hostvars['desktop'].prometheus_node_labels }}"
 
   - job_name: 'postgres'
     scrape_interval: 60s
     static_configs:
       - targets: ["{{ hostvars['pg01'].ansible_host }}:{{ hostvars['pg01'].postgres_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['pg01'].inventory_hostname }}"
+        labels: "{{ hostvars['pg01'].prometheus_node_labels }}"
 
   - job_name: 'loki'
     static_configs:
       - targets: ["{{ hostvars['loki01'].ansible_host }}:3100"]
-        labels:
-          instance: "{{ hostvars['loki01'].inventory_hostname }}"
+        labels: "{{ hostvars['loki01'].prometheus_node_labels }}"
 
   - job_name: 'nginx'
     scrape_interval: 60s
-    static_configs:
-      - targets: ['{{ __dresrv.ansible_host }}:{{ __dresrv.nginx_exporter_port }}']
-        labels:
-          instance: "{{ server_label }}"
-
-      - targets: ["{{ hostvars['webgw01'].wireguard_ip }}:{{ hostvars['webgw01'].nginx_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['webgw01'].inventory_hostname }}"
-
-      - targets: ["{{ hostvars['localgw01'].ansible_host }}:{{ hostvars['localgw01'].nginx_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['localgw01'].inventory_hostname }}"
-
-      - targets: ["{{ hostvars['romgw01'].wireguard_ip }}:{{ hostvars['romgw01'].nginx_exporter_port }}"]
-        labels:
-          instance: "{{ hostvars['romgw01'].inventory_hostname }}"
+    static_configs: "{{ __prom_nginx_configs }}"
 
 prometheus_alert_rules_files:
   - "{{ inventory_dir }}/files/prometheus/alerts/*.rules"
