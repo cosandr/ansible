@@ -22,7 +22,7 @@ gopass edit -c network/<inventory_hostname>_wg_psk
 Run Ansible from the kubespray submodule
 
 ```sh
-ansible-playbook -i ../hosts --vault-password-file ../gopass-vault.sh cluster.yml
+ansible-playbook -i ../inventory --vault-password-file ../gopass-vault.sh cluster.yml
 ```
 
 ## sshjail
