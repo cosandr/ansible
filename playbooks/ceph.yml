@@ -48,3 +48,40 @@
         opts: "noatime,mon_addr={{ groups['ceph'] | map('extract', hostvars, 'ansible_host') | join('/') }}"
         state: mounted
       tags: ["cephfs"]
+
+    - name: Set CephFS SELinux context
+      community.general.sefcontext:
+        target: "/mnt/ceph(/.*)?"
+        seuser: system_u
+        setype: var_t
+        state: present
+      notify: Restore ceph SELinux context
+      tags: ["cephfs", "selinux"]
+
+    - name: Create libvirt dir on CephFS
+      run_once: true
+      ansible.builtin.file:
+        path: /mnt/ceph/libvirt
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+      tags: ["cephfs", "libvirt"]
+
+    - name: Set libvirt CephFS SELinux context
+      community.general.sefcontext:
+        target: "/mnt/ceph/libvirt(/.*)?"
+        seuser: system_u
+        setype: virt_image_t
+        state: present
+      notify: Restore libvirt SELinux context
+      tags: ["cephfs", "selinux"]
+
+  handlers:
+    - name: Restore ceph SELinux context
+      run_once: true
+      ansible.builtin.command: restorecon -r /mnt/ceph
+
+    - name: Restore libvirt SELinux context
+      run_once: true
+      ansible.builtin.command: restorecon -r /mnt/ceph/libvirt
