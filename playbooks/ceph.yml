@@ -39,3 +39,12 @@
         apply:
           tags: ["rgw-ingress"]
       tags: ["rgw-ingress"]
+
+    - name: Mount CephFS
+      ansible.posix.mount:
+        src: admin@.cephfs=/
+        path: /mnt/ceph
+        fstype: ceph
+        opts: "noatime,mon_addr={{ groups['ceph'] | map('extract', hostvars, 'ansible_host') | join('/') }}"
+        state: mounted
+      tags: ["cephfs"]
