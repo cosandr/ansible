@@ -1,0 +1,9 @@
+---
+
+firewalld_zones:
+  - name: cluster
+    sources: "{{ groups['swarm'] | difference([inventory_hostname]) | map('extract', hostvars, 'ansible_host') | list }}"
+
+firewall_rules:
+  - port: 2377
+    zone: cluster

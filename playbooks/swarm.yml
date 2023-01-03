@@ -3,6 +3,11 @@
 
 - name: Setup Docker Swarm nodes
   hosts: swarm
+  pre_tasks:
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      tags: ["always"]
   roles:
     - role: ceph_client
       tags: ["ceph"]
