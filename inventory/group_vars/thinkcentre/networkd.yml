@@ -1,5 +1,8 @@
 ---
 
+__bond0_primary_iface: "enp1s0"
+__bond0_backup_iface: "eno1"
+
 # Used for GENERAL and VM where 21, 22 and 23 are taken
 __ip_offset: 50
 
@@ -154,18 +157,18 @@ networkd_config:
       [Network]
       Bridge=MGMT
 
-  - enp1s0f0: |
+  - bond0_primary: |
       [Match]
-      Name=enp1s0f0
+      Name={{ __bond0_primary_iface }}
 
       [Network]
       Description=Trunk bond interface primary
       Bond=bond0
       PrimarySlave=true
 
-  - eno1: |
+  - bond0_backup: |
       [Match]
-      Name=eno1
+      Name={{ __bond0_backup_iface }}
 
       [Network]
       Description=Trunk bond interface secondary
