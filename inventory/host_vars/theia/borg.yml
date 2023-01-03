@@ -22,7 +22,7 @@ borg_backups:
     timer_description: "Backup tank to Synology every 14 days"
     oncalendar: "*-*-01/14 02:15:00"
     passphrase: "{{ borg_syno_tank_passphrase }}"
-    repo: "{{ hostvars['syno'].borg_remote_repo }}/{{ inventory_hostname }}/tank"
+    repo: "{{ hostvars['syno'].borg_remote_repo }}/tank"
     backup_name: "tank"
     pre_run: |
       if ! ssh -q -o "BatchMode=yes" {{ hostvars['syno'].borg_ssh_check }} exit &>/dev/null
@@ -51,7 +51,7 @@ borg_backups:
     timer_description: "Backup tank to remote location every 30 days"
     oncalendar: "*-*-01/30 00:12:00"
     passphrase: "{{ borg_remote_tank_passphrase }}"
-    repo: "{{ hostvars['romsto'].borg_remote_repo }}/{{ inventory_hostname }}/tank"
+    repo: "{{ hostvars['romsto'].borg_remote_repo }}/tank"
     backup_name: "tank"
     pre_run: |
       if ! ssh -q -o "BatchMode=yes" {{ hostvars['romsto'].borg_ssh_check }} exit &>/dev/null

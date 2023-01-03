@@ -13,4 +13,4 @@ borg_pool: /volume1/backup/borg
 borg_serve_bin: "/usr/local/bin/borg"
 
 borg_ssh_check: "{{ borg_user }}@{{ inventory_hostname }}.{{ domain }}"
-borg_remote_repo: "ssh://{{ borg_ssh_check }}{{ borg_pool }}"
+borg_remote_repo: "ssh://{{ borg_ssh_check }}/."
