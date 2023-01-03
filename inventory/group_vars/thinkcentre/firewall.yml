@@ -52,6 +52,14 @@ firewalld_services:
     zone: internal
     sources: "{{ firewall_trusted_sources }}"
 
+  - name: ceph
+    zone: internal
+    sources: ["{{ home_net.vm.cidr }}"]
+
+  - name: ceph-mon
+    zone: internal
+    sources: ["{{ home_net.vm.cidr }}"]
+
 firewall_rules:
   - port: "{{ rgw_ingress_port }}"
     zone: public
