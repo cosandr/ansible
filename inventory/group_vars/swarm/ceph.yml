@@ -1,0 +1,3 @@
+---
+
+ceph_user_keys: "{{ vault_ceph_user_keys }}"

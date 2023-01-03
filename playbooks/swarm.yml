@@ -1,0 +1,21 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Setup Docker Swarm nodes
+  hosts: swarm
+  roles:
+    - role: ceph_client
+      tags: ["ceph"]
+
+    - role: geerlingguy.docker
+      tags: ["docker"]
+
+  post_tasks:
+    - name: Mount CephFS
+      ansible.posix.mount:
+        src: swarm@.cephfs=/swarm
+        path: /mnt/ceph
+        fstype: ceph
+        opts: "noatime"
+        state: mounted
+      tags: ["ceph"]

@@ -2,3 +2,4 @@
 
 ceph_dashboard_port: 8443
 ceph_exporter_port: 9283
+ceph_config_fetch_host: "{{ groups['ceph'][0] }}"
