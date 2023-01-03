@@ -1,0 +1,8 @@
+---
+
+ceph_release: quincy
+ceph_repo_distro: "el{{ ansible_distribution_major_version }}"
+ceph_repo_mirror: "https://eu.ceph.com"
+ceph_user_keys: {}
+ceph_config_content: ""
+ceph_config_fetch_host: ""

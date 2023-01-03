@@ -1,0 +1,62 @@
+---
+
+- name: Install ceph RPM repo
+  ansible.builtin.template:
+    src: ceph.repo.j2
+    dest: /etc/yum.repos.d/ceph.repo
+    owner: root
+    group: root
+    mode: 0644
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution != 'Fedora'
+
+- name: Install ceph-common
+  ansible.builtin.package:
+    name: ceph-common
+    state: present
+
+- name: Ensure /etc/ceph exists
+  ansible.builtin.file:
+    path: /etc/ceph
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Fetch config
+  when:
+    - ceph_config_fetch_host
+    - not ceph_config_content
+  block:
+    - name: Get ceph minimal config from cluster
+      run_once: true
+      delegate_to: "{{ ceph_config_fetch_host }}"
+      ansible.builtin.command:
+        cmd: ceph config generate-minimal-conf
+      check_mode: false
+      changed_when: false
+      register: __ceph_conf
+
+    - name: Set ceph config fact
+      ansible.builtin.set_fact:
+        ceph_config_content: "{{ __ceph_conf.stdout }}\n"
+
+- name: Write ceph.conf
+  ansible.builtin.copy:
+    content: "{{ ceph_config_content }}"
+    dest: "/etc/ceph/ceph.conf"
+    owner: root
+    group: root
+    mode: 0644
+  when: ceph_config_content
+
+- name: Write client keyrings
+  ansible.builtin.template:
+    src: client.keyring.j2
+    dest: "/etc/ceph/ceph.client.{{ item.key }}.keyring"
+    owner: root
+    group: root
+    mode: 0600
+  loop: "{{ ceph_user_keys | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
