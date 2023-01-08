@@ -4,8 +4,6 @@
   command: "/usr/bin/efibootmgr --verbose"
   check_mode: false
   changed_when: false
-  args:
-    warn: false
   register: __efi_entries
 
 - name: Add entry if it doesn't exist already

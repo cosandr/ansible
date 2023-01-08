@@ -18,3 +18,5 @@ __pacman_packages:
 
 ignored_packages:
   - chromium
+
+sddm_dpi: 144

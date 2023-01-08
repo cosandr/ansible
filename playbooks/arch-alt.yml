@@ -154,6 +154,7 @@
         env_name: "{{ env_name }}"
         esp_mount: "{{ esp_mount }}"
         src_host: "{{ src_host }}"
+        desktop_environment: "{{ desktop_environment }}"
 
 - name: Run in chroot
   hosts: chroots
@@ -205,7 +206,6 @@
         sbctl_enroll: false
         sbctl_ucode: "{{ hostvars[src_host].sbctl_ucode | default('intel-ucode.img') }}"
         boot_mount: /boot
-        esp_mount: "{{ esp_mount }}"
         sbctl_bundles:
           - kernel: linux
             label: "Arch Linux {{ desktop_environment | upper }}"

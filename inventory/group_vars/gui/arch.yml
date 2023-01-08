@@ -103,7 +103,7 @@ base_pacman_packages:
   - tmux
   - ttf-fira-code
   - ttf-font-awesome
-  - ttf-nerd-fonts-symbols
+  - ttf-nerd-fonts-symbols-2048-em
   - usbutils
   - vim
   - vlc

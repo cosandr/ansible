@@ -1,7 +1,8 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- hosts: laptop
+- name: Configure KDE
+  hosts: gui
   gather_facts: false
   vars:
     desktop_environment: "kde"
@@ -37,7 +38,7 @@
       copy:
         content: |
           [X11]
-          ServerArguments=-nolisten tcp -dpi 192
+          ServerArguments=-nolisten tcp -dpi {{ sddm_dpi | default(192) }}
         dest: "/etc/sddm.conf.d/dpi.conf"
         owner: root
         group: root
@@ -63,7 +64,7 @@
         owner: "{{ my_user }}"
         group: "{{ my_user }}"
         mode: 0755
-      loop: "{{ plasma_startup_scripts }}"
+      loop: "{{ plasma_startup_scripts | default([]) }}"
       tags: ["scripts"]
 
     # Doing it seperately because I'm not sure if the key is the same across installations
@@ -81,7 +82,7 @@
         backrefs: true
         regexp: '^({{ item.key | regex_escape() }})=([^,]+)(.*)$'
         line: '\1={{ item.value }}\3'
-      with_dict: "{{ kde_global_shortcuts }}"
+      with_dict: "{{ kde_global_shortcuts | default([]) }}"
       tags: ["shortcuts"]
 
     - name: Write KDE configs
@@ -89,5 +90,5 @@
       become_user: "{{ my_user }}"
       changed_when: false
       command: "kwriteconfig5 {{ item }}"
-      loop: "{{ kde_configs }}"
+      loop: "{{ kde_configs | default([]) }}"
       tags: ["kconfig"]
