@@ -13,6 +13,15 @@
   when: ansible_os_family == 'RedHat'
   tags: ["install"]
 
+# https://libvirt.org/drvqemu.html#selinux-svirt-confinement
+- name: Disable sVirt confinement
+  ansible.builtin.lineinfile:
+    path: /etc/libvirt/qemu.conf
+    regexp: '^#?security_driver'
+    line: 'security_driver = "none"'
+  notify: Restart libvirtd
+  when: libvirt_disable_svirt
+
 - name: Enable and start libvirtd
   ansible.builtin.systemd:
     name: libvirtd.service
