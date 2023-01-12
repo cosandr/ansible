@@ -4,3 +4,5 @@
 __vm_host_list: "{{ groups['thinkcentre'] | sort }}"
 vm_host: "{{ __vm_host_list[groups['swarm'] | ansible.utils.index_of('eq', inventory_hostname) % (__vm_host_list | length)] }}"
 vm_disk_pool: "cephfs"
+# qcow2 doesn't perform well on CephFS
+vm_disk_format: "raw"

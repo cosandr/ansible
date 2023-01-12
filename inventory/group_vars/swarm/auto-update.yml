@@ -1,0 +1,7 @@
+---
+
+dnf_automatic_excludes:
+  - "kernel*"
+  - "docker*"
+  - "container*"
+  - "systemd*"
