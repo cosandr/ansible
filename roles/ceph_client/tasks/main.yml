@@ -11,6 +11,13 @@
     - ansible_os_family == 'RedHat'
     - ansible_distribution != 'Fedora'
 
+- name: Install epel
+  ansible.builtin.include_role:
+    name: epel
+  when:
+    - ansible_os_family == 'RedHat'
+    - ansible_distribution != 'Fedora'
+
 - name: Install ceph-common
   ansible.builtin.package:
     name: ceph-common
