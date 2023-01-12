@@ -20,7 +20,8 @@
       vars:
         disk_name: "data{{ '%02d' % (index + 1) }}"
         tmp_dict:
-          name: "{{ inventory_hostname }}-{{ disk_name }}.qcow2"
+          name: "{{ inventory_hostname }}-{{ disk_name }}.{{ vm_disk_format }}"
+          format: "{{ vm_disk_format }}"
           device: "disk"
           capacity: "{{ item }}"
           serial: "{{ disk_name }}"

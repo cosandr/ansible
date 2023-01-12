@@ -2,10 +2,11 @@
 
 libvirt_vm_engine: "kvm"
 
+vm_disk_format: "qcow2"
 vm_host: "theia"
 vm_cpus: 4
 vm_mem: 4096
-vm_template: "rocky9_packer.qcow2"
+vm_template: "rocky9_packer.{{ vm_disk_format }}"
 vm_os_id: "http://rockylinux.org/rocky/9"
 vm_disk_pool: "default"
 vm_extra_disks: []
@@ -15,7 +16,8 @@ vm_data_disks: []
 
 vm_root_size: "20G"
 vm_root_disk:
-  name: '{{ inventory_hostname }}-root01.qcow2'
+  name: '{{ inventory_hostname }}-root01.{{ vm_disk_format }}'
+  format: "{{ vm_disk_format }}"
   device: 'disk'
   capacity: "{{ vm_root_size }}"
   clone_image: "{{ vm_template }}"
