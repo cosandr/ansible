@@ -64,3 +64,6 @@
 [submodule "roles/postfix_exporter"]
 	path = roles/postfix_exporter
 	url = git@github.com:cosandr/ansible-role-postfix_exporter.git
+[submodule "roles/keepalived"]
+	path = roles/keepalived
+	url = git@github.com:cosandr/ansible-keepalived.git

@@ -15,7 +15,20 @@
     - role: geerlingguy.docker
       tags: ["docker"]
 
+    - role: keepalived
+      tags: ["keepalived"]
+
   post_tasks:
+    - name: Enable daemon cluster mode SELinux boolean
+      ansible.posix.seboolean:
+        name: daemons_enable_cluster_mode
+        state: true
+        persistent: true
+      when:
+        - ansible_os_family == 'RedHat'
+        - ansible_selinux.status == "enabled"
+      tags: ["keepalived"]
+
     - name: Mount CephFS
       ansible.posix.mount:
         src: swarm@.cephfs=/swarm
