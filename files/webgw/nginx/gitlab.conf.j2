@@ -1,6 +1,6 @@
 {{ ansible_managed | comment }}
 {% if nginx_upstreams | selectattr('name', 'search', 'gitlab') %}
-{% set domain = domains['dv'] %}
+{% set domain = hostvars['gitlab01'].domain %}
 server {
     listen 80;
     listen [::]:80;

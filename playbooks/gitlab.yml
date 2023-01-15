@@ -88,8 +88,6 @@
 - hosts: gitrun
   pre_tasks:
     - name: Set Gitlab URL fact
-      set_fact:
-        gitlab_external_url: "https://gitlab.{{ hostvars['gitlab01'].domain }}"
       tags: ["runner"]
 
   roles:

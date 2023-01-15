@@ -9,6 +9,4 @@ provisioned_disks:
         size: "100%FREE"
 
 docker_compose_install: false
-# Too many nested variables
-# gitlab_external_url: "{{ hostvars[groups['gitlab'][0]].gitlab_external_url }}"
 gitlab_runner_token: "{{ vault_gitlab_runner_token }}"
