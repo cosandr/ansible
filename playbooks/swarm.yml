@@ -38,6 +38,15 @@
         state: mounted
       tags: ["ceph"]
 
+    - name: Mount media share
+      ansible.posix.mount:
+        src: "{{ hostvars['theia'].host_ips.vm }}:/mnt/tank/media"
+        path: "/mnt/media"
+        opts: "defaults,noatime"
+        state: mounted
+        fstype: nfs
+      tags: ["nfs"]
+
     - name: Setup swarm
       tags: ["swarm"]
       block:
