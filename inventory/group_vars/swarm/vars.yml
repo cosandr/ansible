@@ -1,0 +1,6 @@
+---
+
+docker_registries:
+  - url: "{{ gitlab_registry_external_url | regex_replace('^https?://', '') }}"
+    username: "{{ vault_gitlab_token_name }}"
+    password: "{{ vault_gitlab_token_value }}"
