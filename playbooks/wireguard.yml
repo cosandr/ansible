@@ -1,17 +1,54 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- hosts: webgw, romsto, desktop, laptops
+- name: Prepare target hosts group
+  hosts: all
+  become: false
   gather_facts: false
-  pre_tasks:
-    - name: Run common role
-      import_role:
-        name: common
+  tasks:
+    - name: Add hosts with wireguard configs
+      run_once: true
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        group: wireguard_hosts
+      loop: "{{ groups['all'] }}"
+      when:
+        - hostvars[item].wireguard_unmanaged_peers is defined
+        - hostvars[item].wireguard_unmanaged_peers | length > 0
       tags: ["always"]
 
-    - name: Gather facts
-      setup:
-      tags: ["always"]
+- name: Configure WireGuard hosts
+  hosts: wireguard_hosts
+  become: true
   roles:
     - role: wireguard
-      become: true
+      tags: ["wireguard"]
+
+  post_tasks:
+    - name: Install reresolve-dns service and timer
+      ansible.builtin.template:
+        src: "{{ repo_base_dir }}/files/wireguard/wireguard_reresolve-dns.{{ item }}.j2"
+        dest: "/etc/systemd/system/wireguard_reresolve-dns.{{ item }}"
+        owner: root
+        group: root
+        mode: 0644
+      loop:
+        - service
+        - timer
+      notify: Reload systemd
+      tags: ["dns"]
+      when: wireguard_reresolve_dns | default(false)
+
+    - name: Enable and start reresolve-dns timer
+      ansible.builtin.systemd:
+        name: wireguard_reresolve-dns.timer
+        enabled: true
+        state: started
+        daemon_reload: true
+      tags: ["dns"]
+      when: wireguard_reresolve_dns | default(false)
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true

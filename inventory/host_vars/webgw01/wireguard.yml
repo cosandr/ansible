@@ -26,6 +26,7 @@ wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
 wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
+wireguard_reresolve_dns: true
 
 wireguard_unmanaged_peers:
   mt:
