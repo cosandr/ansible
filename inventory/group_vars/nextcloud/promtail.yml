@@ -1,0 +1,18 @@
+---
+
+__promtail_host_configs:
+  - job_name: nextcloud
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nextcloud
+          __path__: /var/www/html/nextcloud/data/{nextcloud,audit}.log
+
+    pipeline_stages:
+      - json:
+          expressions:
+            time: "time"
+      - timestamp:
+          source: time
+          format: RFC3339
