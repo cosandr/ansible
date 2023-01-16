@@ -8,6 +8,12 @@
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
       tags: ["always"]
+
+    - name: Install python3-docker
+      ansible.builtin.dnf:
+        name: python3-docker
+        state: present
+      tags: ["docker", "swarm"]
   roles:
     - role: ceph_client
       tags: ["ceph"]
@@ -50,63 +56,26 @@
     - name: Setup swarm
       tags: ["swarm"]
       block:
-        - name: Check if swarm is active
-          run_once: true
-          ansible.builtin.command:
-            cmd: "{% raw %}docker node ls --format '{{ .Hostname }}'{% endraw %}"
-          check_mode: false
-          changed_when: false
-          failed_when: false
-          register: __swarm_nodes
-
         - name: Initialize swarm
           run_once: true
-          ansible.builtin.command:
-            cmd: docker swarm init
-          when:
-            - '"This node is not a swarm manager" in __swarm_nodes.stderr'
+          community.docker.docker_swarm:
+            state: present
           register: __swarm_init
 
-        - name: Get join token
-          run_once: true
-          ansible.builtin.command:
-            cmd: docker swarm join-token manager -q
-          changed_when: false
-          register: __swarm_token
-          when:
-            - "inventory_hostname not in __swarm_nodes.stdout"
-
         - name: Join nodes
-          ansible.builtin.command:
-            cmd: "docker swarm join --token {{ __swarm_token.stdout }} {{ hostvars[groups['swarm'][0]].ansible_host }}:2377"
-          when:
-            - inventory_hostname != groups['swarm'][0]
-            - "inventory_hostname not in __swarm_nodes.stdout"
+          community.docker.docker_swarm:
+            state: join
+            remote_addrs:
+              - "{{ hostvars[groups['swarm'][0]].ansible_host }}:2377"
+            join_token: "{{ __swarm_init.swarm_facts.JoinTokens.Manager }}"
+          when: __swarm_init.get('swarm_facts', {}).get('JoinTokens', {}).get('Manager', '')
 
-    - name: Configure registries
+    - name: Login to registries
+      community.docker.docker_login:
+        registry_url: "{{ item.url }}"
+        username: "{{ item.username }}"
+        password: "{{ item.password }}"
+      loop: "{{ docker_registries }}"
+      loop_control:
+        label: "{{ item.url }} [{{ item.username }}]"
       tags: ["registry"]
-      block:
-        - name: Check if config file exists
-          ansible.builtin.stat:
-            path: "/root/.docker/config.json"
-          register: __docker_config
-
-        - name: Read docker config
-          ansible.builtin.slurp:
-            path: "/root/.docker/config.json"
-          register: __docker_config_content
-          when: __docker_config.stat.exists
-
-        - name: Set docker config fact
-          ansible.builtin.set_fact:
-            __docker_config_json: "{{ __docker_config_content.content | b64decode | from_json }}"
-          when: __docker_config_content.content | default('')
-
-        - name: Login to registries
-          ansible.builtin.command:
-            cmd: "docker login --username {{ item.username }} --password-stdin {{ item.url }}"
-            stdin: "{{ item.password }}"
-          loop: "{{ docker_registries }}"
-          loop_control:
-            label: "{{ item.url }} [{{ item.username }}]"
-          when: not __docker_config.stat.exists or item.url not in __docker_config_json.auths
