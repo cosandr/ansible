@@ -29,9 +29,9 @@ __mt_wg_peers_auto: >-
       "interface": mt_wg_interfaces[0].name
     }
   -%}
-  {%- if hostvars[h].wireguard_preshared_key | default('') -%}
+  {%- if hostvars[h].get('wireguard_unmanaged_peers', {}).get('mt', {}).get('preshared_key', '') -%}
   {{- tmp_dict.update({
-    "preshared-key": hostvars[h].wireguard_preshared_key
+    "preshared-key": hostvars[h].wireguard_unmanaged_peers.mt.preshared_key
   }) -}}
   {%- endif -%}
   {%- if hostvars[h].wireguard_endpoint | default('') -%}

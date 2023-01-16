@@ -28,9 +28,11 @@ wireguard_unmanaged_peers:
     endpoint: "{{ hostvars['rb5009'].wireguard_endpoint }}"
     allowed_ips: "{{ wireguard_mt_allowed_ips | join(', ') }}"
     public_key: "{{ hostvars['rb5009'].wireguard_public_key }}"
+    preshared_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_psk_mt') }}"
     persistent_keepalive: "{{ wireguard_persistent_keepalive }}"
   webgw:
     endpoint: "{{ hostvars['webgw01'].wireguard_endpoint }}"
     allowed_ips: "{{ wireguard_webgw_allowed_ips | join(', ') }}"
     public_key: "{{ hostvars['webgw01'].wireguard_public_key }}"
+    preshared_key: "{{ lookup('community.general.passwordstore', 'network/webgw01_wg_psk_romgw01') }}"
     persistent_keepalive: "{{ wireguard_persistent_keepalive }}"

@@ -32,11 +32,14 @@ wireguard_unmanaged_peers:
     endpoint: "{{ hostvars['rb5009'].wireguard_endpoint }}"
     allowed_ips: "{{ wireguard_mt_allowed_ips | join(', ') }}"
     public_key: "{{ hostvars['rb5009'].wireguard_public_key }}"
+    preshared_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_psk_mt') }}"
   romgw:
     endpoint: "{{ hostvars['romsto'].ddns_domain }}:{{ hostvars['romgw01'].wireguard_port }}"
     allowed_ips: "{{ hostvars['romgw01'].wireguard_ip }}/32"
     public_key: "{{ hostvars['romgw01'].wireguard_public_key }}"
+    preshared_key: "{{ lookup('community.general.passwordstore', 'network/webgw01_wg_psk_romgw01') }}"
   romsto:
     endpoint: "{{ hostvars['romsto'].ddns_domain }}:{{ hostvars['romsto'].wireguard_port }}"
     allowed_ips: "{{ hostvars['romsto'].wireguard_ip }}/32"
     public_key: "{{ hostvars['romsto'].wireguard_public_key }}"
+    preshared_key: "{{ lookup('community.general.passwordstore', 'network/webgw01_wg_psk_romsto') }}"
