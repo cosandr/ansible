@@ -17,3 +17,5 @@ loki_config_firewall: true
 
 loki_workdir: "/var/lib/loki"
 loki_alertmanager_url: "{{ alertmanager_web_external_url | default('http://localhost:9093') }}"
+
+loki_extra_config: {}

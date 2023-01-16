@@ -32,6 +32,8 @@ schema_config:
 ruler:
   alertmanager_url: {{ loki_alertmanager_url }}
 
+{{ loki_extra_config | to_nice_yaml(indent=2) }}
+
 # By default, Loki will send anonymous, but uniquely-identifiable usage and configuration
 # analytics to Grafana Labs. These statistics are sent to https://stats.grafana.org/
 #

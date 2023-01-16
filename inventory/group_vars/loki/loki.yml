@@ -1,3 +1,11 @@
 ---
 
 loki_allow_zone: "internal"
+
+loki_extra_config:
+  compactor:
+    retention_enabled: true
+    deletion_mode: filter-and-delete
+    delete_request_cancel_period: 15m
+  limits_config:
+    retention_period: 365d
