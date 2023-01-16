@@ -9,3 +9,6 @@ loki_extra_config:
     delete_request_cancel_period: 15m
   limits_config:
     retention_period: 365d
+  query_range:
+    # https://github.com/grafana/loki/issues/4613#issuecomment-1021421653
+    parallelise_shardable_queries: false
