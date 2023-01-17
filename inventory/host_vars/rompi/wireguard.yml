@@ -15,6 +15,7 @@ wireguard_dns_list:
 wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
   - "{{ hostvars['rb5009'].wireguard_ipv6 }}/128"
+  - "{{ hostvars['loki01'].ansible_host }}/32"
 
 wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_ip: "{{ wireguard_addresses[0] | ansible.utils.ipaddr('address') }}"
