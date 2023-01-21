@@ -13,5 +13,7 @@ dnf_packages:
   - python3-lxml  # virt ansible modules
   - rpmconf
   - rsync
+  - tmux
+  - util-linux-user  # chsh
   - wget
   - yum-utils
