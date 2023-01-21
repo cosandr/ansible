@@ -14,6 +14,9 @@ nfs_shares:
     options: "rw,no_root_squash"
     sources: "{{ groups['thinkcentre'] | map('extract', hostvars, 'host_ips') | map(attribute='san') | list }}"
   # Backup shares
+  - path: /mnt/tank/borg/repos
+    options: "rw,no_root_squash"
+    sources: "{{ groups['backup'] | map('extract', hostvars, 'ansible_host') | list }}"
   - path: /mnt/tank/backup/pgsql
     options: "rw,no_root_squash"
     sources: "{{ groups['pg'] | map('extract', hostvars, 'ansible_host') | list }}"
