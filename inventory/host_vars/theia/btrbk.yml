@@ -22,16 +22,6 @@ btrbk_volumes:
           snapshot_name: "andrei"
           snapshot_preserve: "8h 5d 2m"
 
-  - path: /mnt/libvirt-tmp
-    options:
-      snapshot_dir: ".snapshots"
-      target: "/mnt/tank/backup/btrbk/{{ inventory_hostname }}"
-    subvolumes:
-      - path: "images"
-        options:
-          snapshot_name: "images"
-          snapshot_preserve: "3h 7d 2w"
-
   - path: "/mnt/tank"
     options:
       snapshot_dir: ".snapshots"

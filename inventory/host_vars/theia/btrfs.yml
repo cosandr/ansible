@@ -5,7 +5,7 @@ btrfs_root: "/mnt/btrfs_root"
 btrfs_opts: "compress=zstd:3,space_cache=v2"
 
 btrfs_subvols:
-  # - "@/var/lib/libvirt/images"
+  - "@/var/lib/libvirt/images"
   - "@/srv/libvirt"
   - "@/srv/kube"
 
