@@ -117,6 +117,9 @@ ymir ansible_host=10.0.100.23
 [ceph:children]
 thinkcentre
 
+[ceph]
+theia
+
 [rom]
 romgw01
 rompi

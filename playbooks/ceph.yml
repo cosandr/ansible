@@ -45,7 +45,7 @@
         src: admin@.cephfs=/
         path: /mnt/ceph
         fstype: ceph
-        opts: "noatime,mon_addr={{ groups['ceph'] | map('extract', hostvars, 'ansible_host') | join('/') }}"
+        opts: "noatime"
         state: mounted
       tags: ["cephfs"]
 
@@ -76,6 +76,27 @@
         state: present
       notify: Restore libvirt SELinux context
       tags: ["cephfs", "selinux"]
+
+    - name: Define libvirt CephFS pool
+      community.libvirt.virt_pool:
+        name: cephfs
+        command: define
+        xml: "{{ lookup('file', repo_base_dir + '/files/ceph/libvirt-cephfs.xml') }}"
+        state: "present"
+      tags: ["libvirt", "cephfs"]
+
+    - name: Start libvirt CephFS pool
+      community.libvirt.virt_pool:
+        name: cephfs
+        state: active
+        autostart: true
+      tags: ["libvirt", "cephfs"]
+
+    - name: Ensure libvirt CephFS pool is autostarted
+      community.libvirt.virt_pool:
+        name: cephfs
+        autostart: true
+      tags: ["libvirt", "cephfs"]
 
   handlers:
     - name: Restore ceph SELinux context

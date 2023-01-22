@@ -1,16 +1,12 @@
 ---
 
-firewalld_default_zone: cluster
-__cluster_sources:
-  - "{{ groups['ceph'] | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='san') | list }}"
-  - "{{ groups['ceph'] | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='mgmt') | list }}"
-
 node_exporter_config_firewall: false
 
-firewalld_zones:
-  - name: cluster
-    sources: "{{ __cluster_sources | flatten }}"
+firewalld_zones: "{{ __cluster_firewalld_zones + __host_firewalld_zones }}"
+firewalld_services: "{{ __cluster_firewalld_services + __host_firewalld_services }}"
+firewall_rules: "{{ __cluster_firewall_rules + __host_firewall_rules }}"
 
+__host_firewalld_zones:
   - name: internal
     interfaces:
       - MGMT
@@ -22,13 +18,7 @@ firewalld_zones:
       - VM
       - NOINET
 
-firewalld_services:
-  - name: ssh
-    zone: cluster
-
-  - name: nfs3
-    zone: cluster
-
+__host_firewalld_services:
   - name: cockpit
     zone: public
     state: absent
@@ -52,31 +42,7 @@ firewalld_services:
     zone: internal
     sources: "{{ firewall_trusted_sources }}"
 
-  - name: ceph
-    zone: internal
-    sources: ["{{ home_net.vm.cidr }}"]
-
-  - name: ceph-mon
-    zone: internal
-    sources: ["{{ home_net.vm.cidr }}"]
-
-firewall_rules:
-  - port: "{{ rgw_ingress_port }}"
-    zone: public
-
+__host_firewall_rules:
   - port: "{{ node_exporter_port }}"
     zone: internal
     sources: "{{ node_exporter_allow_ips }}"
-
-  - port: "{{ ceph_exporter_port }}"
-    zone: internal
-    sources: "{{ node_exporter_allow_ips }}"
-
-  - port: "{{ ceph_dashboard_port }}"
-    zone: internal
-    sources: "{{ firewall_trusted_sources }}"
-
-  # https://wiki.libvirt.org/page/FAQ#What_are_the_different_migration_methods.3F
-  - port: "49152-49215"
-    protocol: tcp
-    zone: cluster

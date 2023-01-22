@@ -41,6 +41,7 @@ dnf_packages:
   - python3-aiohttp
   - python3-dnf-plugin-versionlock
   - python3-llfuse  # borg mount
+  - python3-lxml  # virt ansible modules
   - python3-netaddr
   - python3-websockets
   - rsync

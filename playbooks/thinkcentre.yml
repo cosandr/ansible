@@ -76,27 +76,6 @@
         autostart: true
       tags: ["libvirt", "nfs"]
 
-    - name: Define libvirt CephFS pool
-      community.libvirt.virt_pool:
-        name: cephfs
-        command: define
-        xml: "{{ lookup('file', repo_base_dir + '/files/thinkcentre/libvirt/cephfs.xml') }}"
-        state: "present"
-      tags: ["libvirt", "cephfs"]
-
-    - name: Start libvirt CephFS pool
-      community.libvirt.virt_pool:
-        name: cephfs
-        state: active
-        autostart: true
-      tags: ["libvirt", "cephfs"]
-
-    - name: Ensure libvirt CephFS pool is autostarted
-      community.libvirt.virt_pool:
-        name: cephfs
-        autostart: true
-      tags: ["libvirt", "cephfs"]
-
   handlers:
     - name: Restart systemd-resolved
       ansible.builtin.systemd:
