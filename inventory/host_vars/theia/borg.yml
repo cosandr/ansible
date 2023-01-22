@@ -2,6 +2,7 @@
 
 borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
 borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
+borg_cephfs_tank_passphrase: "{{ vault_borg_cephfs_tank_passphrase }}"
 
 __borg_btrfs_snaps:
   tank:
@@ -75,3 +76,30 @@ borg_backups:
       - "--show-rc"
       - "--keep-monthly 3"
       - "--keep-yearly 2"
+
+  - name: "cephfs"
+    timer_description: "Backup CephFS to tank every 7 days"
+    oncalendar: "*-*-01/7 01:21:00"
+    passphrase: "{{ borg_cephfs_tank_passphrase }}"
+    repo: "/mnt/tank/borg/repos/cephfs"
+    backup_name: "cephfs"
+    pre_run: |
+      snap_dir="/mnt/ceph/.snap/borg_tmp.$(date +%Y%m%dT%H%M)"
+      mkdir -p "$snap_dir"
+      cd "$snap_dir" || exit 1
+    post_run: |
+      cd /
+      rmdir "$snap_dir"
+    paths:
+      - "."
+    create_args:
+      - "--stats"
+      - "--show-rc"
+      - "--compression auto,zstd"
+      - "--exclude-caches"
+    prune_args:
+      - "--list"
+      - "--show-rc"
+      - "--keep-weekly 2"
+      - "--keep-monthly 3"
+      - "--keep-yearly 1"
