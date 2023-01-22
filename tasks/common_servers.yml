@@ -79,3 +79,11 @@
     apply:
       tags: ["nfs"]
   tags: ["nfs"]
+
+- name: Ensure fstrim timer is enabled
+  ansible.builtin.systemd:
+    name: fstrim.timer
+    state: started
+    enabled: true
+  when: fstrim_timer_enabled | default(false)
+  tags: ["fstrim"]

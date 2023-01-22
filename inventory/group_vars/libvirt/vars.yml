@@ -1,5 +1,6 @@
 ---
 
+fstrim_timer_enabled: true
 libvirt_vm_engine: "kvm"
 
 vm_disk_format: "qcow2"
