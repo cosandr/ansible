@@ -8,12 +8,6 @@
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
       tags: ["always"]
-
-    - name: Install python3-docker
-      ansible.builtin.dnf:
-        name: python3-docker
-        state: present
-      tags: ["docker", "swarm"]
   roles:
     - role: ceph_client
       tags: ["ceph"]
@@ -52,6 +46,12 @@
         state: mounted
         fstype: nfs
       tags: ["nfs"]
+
+    - name: Install python3-docker
+      ansible.builtin.dnf:
+        name: python3-docker
+        state: present
+      tags: ["swarm", "registry"]
 
     - name: Setup swarm
       tags: ["swarm"]
