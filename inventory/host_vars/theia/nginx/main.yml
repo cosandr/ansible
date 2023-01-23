@@ -1,5 +1,7 @@
 ---
 
+# Conflicts with Ceph RGW ingress
+nginx_default_reject_ssl: false
 nginx_nis_enabled: true
 nginx_listen_address: "{{ host_ips.vm }}"
 nginx_ports:
