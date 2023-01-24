@@ -16,7 +16,7 @@ __sd_docker_auto_update:
       Environment=BUILD=1
       Environment=PULL=1
       Environment=HOSTNAME={{ ansible_hostname | default(inventory_hostname) }}
-      ExecStart=/usr/bin/bash run-all.sh
+      ExecStart=/usr/bin/bash run.sh up
 
   # Every day at 05:00
   timer:
