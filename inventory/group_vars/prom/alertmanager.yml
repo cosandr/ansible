@@ -5,7 +5,6 @@ alertmanager_port: 9093
 alertmanager_peer_port: 9094
 alertmanager_web_listen_address: "0.0.0.0:{{ alertmanager_port }}"
 alertmanager_web_external_url: "http://{{ wireguard_ip | default(ansible_host) }}:{{ alertmanager_port }}/"
-alertmanager_slack_api_url: "{{ vault_alertmanager_slack_api_url }}"
 
 alertmanager_cluster:
   listen-address: "{{ wireguard_ip | default(ansible_host) }}:{{ alertmanager_peer_port }}"
@@ -16,16 +15,9 @@ alertmanager_cluster:
 # https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl
 alertmanager_receivers:
   - name: discord
-    slack_configs:
+    discord_configs:
       - send_resolved: true
-        title: '{% raw %}[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .GroupLabels.SortedPairs.Values | join " " }} {{ if gt (len .CommonLabels) (len .GroupLabels) }}{{ end }}{% endraw %}'
-        fields:
-          - title: 'Summary'
-            value: '{% raw %}{{ if .Alerts }}{{ range .Alerts }}{{ .Annotations.summary }}{{ printf "\n" }}{{ end }}{{ else }}{{ .CommonAnnotations.summary }}{{ end }}{% endraw %}'
-            short: false
-          - title: 'Description'
-            value: '{% raw %}{{ if .Alerts }}{{ range .Alerts }}{{ .Annotations.description }}{{ printf "\n" }}{{ end }}{{ else }}{{ .CommonAnnotations.description }}{{ end }}{% endraw %}'
-            short: false
+        webhook_url: "{{ vault_alertmanager_discord_webhook_url }}"
 
 alertmanager_route:
   group_by: ['instance', 'job']
