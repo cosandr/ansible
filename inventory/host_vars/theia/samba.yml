@@ -35,6 +35,18 @@ samba_shares:
     "follow symlinks": true
     "wide links": true
 
+  ceph:
+    comment: "CephFS"
+    path: "/mnt/ceph"
+    writable: true
+    ## VFS doesn't work
+    ## fsp_get_io_fd: fsp [.] is a path referencing fsp
+    # path: "/"
+    # "ceph: user_id": "samba"
+    # "oplocks": "no"
+    # "vfs objects": "ceph"
+    # "kernel share modes": "no"
+
   tank:
     comment: "Rust Storage"
     path: "/mnt/tank"
