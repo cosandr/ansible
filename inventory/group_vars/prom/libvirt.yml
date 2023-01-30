@@ -8,5 +8,5 @@ vm_os_id: "http://rockylinux.org/rocky/8"
 
 vm_root_size: "10G"
 vm_data_disks:
-  - "100G"
+  - "200G"
   - "100G"
