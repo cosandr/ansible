@@ -31,7 +31,7 @@ __cluster_firewall_rules:
   # NFS general export
   - port: "2050"
     zone: public
-    sources: ["{{ hostvars['desktop'].ansible_host }}"]
+    sources: ["{{ hostvars['desktop'].ansible_host }}", "{{ hostvars['dresrv'].ansible_host }}"]
 
   - port: "{{ ceph_exporter_port }}"
     zone: internal
