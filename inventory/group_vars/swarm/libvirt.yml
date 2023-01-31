@@ -1,5 +1,6 @@
 ---
 
+vm_root_size: "50G"
 # Sort to ensure it's consistent between runs
 __vm_host_list: "{{ ['theia'] + (groups['thinkcentre'] | sort) }}"
 vm_host: "{{ __vm_host_list[groups['swarm'] | ansible.utils.index_of('eq', inventory_hostname) % (__vm_host_list | length)] }}"
