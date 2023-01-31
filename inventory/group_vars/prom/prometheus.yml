@@ -21,6 +21,7 @@ prometheus_global:
   scrape_timeout: 10s
   evaluation_interval: 15s
 
+__prom_auto_target_group: "all"
 prometheus_alertmanager_config:
   - static_configs:
       - targets: "{{ __prom_node_ips | map('regex_replace', '$', ':' + (alertmanager_port | string)) | list }}"
@@ -51,7 +52,7 @@ __prom_prom_configs: >-
 
 __prom_node_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['all'] | sort if hostvars[h].prometheus_node_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_node_targets | default([]) -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_node_targets,
@@ -63,7 +64,7 @@ __prom_node_configs: >-
 
 __prom_nginx_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['all'] | sort if hostvars[h].prometheus_nginx_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nginx_targets | default([]) -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_nginx_targets,
@@ -75,28 +76,28 @@ __prom_nginx_configs: >-
 
 __prom_blackbox_icmp_targets: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['all'] if hostvars[h].prometheus_blackbox_icmp_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_icmp_targets | default([]) -%}
   {{- tmp.append(hostvars[h].prometheus_blackbox_icmp_targets) -}}
   {%- endfor -%}
   {{ tmp | flatten | unique | sort }}
 
 __prom_blackbox_http_targets: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['all'] if hostvars[h].prometheus_blackbox_http_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_http_targets | default([]) -%}
   {{- tmp.append(hostvars[h].prometheus_blackbox_http_targets) -}}
   {%- endfor -%}
   {{ tmp | flatten | unique | sort }}
 
 __prom_blackbox_tls_targets: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['all'] if hostvars[h].prometheus_blackbox_tls_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_tls_targets | default([]) -%}
   {{- tmp.append(hostvars[h].prometheus_blackbox_tls_targets) -}}
   {%- endfor -%}
   {{ tmp | flatten | unique | sort }}
 
 __prom_blackbox_starttls_targets: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['all'] if hostvars[h].prometheus_blackbox_starttls_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_starttls_targets | default([]) -%}
   {{- tmp.append(hostvars[h].prometheus_blackbox_starttls_targets) -}}
   {%- endfor -%}
   {{ tmp | flatten | unique | sort }}
@@ -127,6 +128,14 @@ __common_prometheus_scrape_configs:
       - source_labels: [instance]
         target_label: __host_ip
 
+  - job_name: "node"
+    static_configs: "{{ __prom_node_configs }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __host_ip
+        regex: '([^:]+):\d+'
+
+__extra_prometheus_scrape_configs:
   - job_name: 'blackbox_tls_connect4'
     scrape_interval: 30m
     metrics_path: '/probe'
@@ -161,14 +170,6 @@ __common_prometheus_scrape_configs:
       - source_labels: [instance]
         target_label: __host_ip
 
-  - job_name: "node"
-    static_configs: "{{ __prom_node_configs }}"
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __host_ip
-        regex: '([^:]+):\d+'
-
-__extra_prometheus_scrape_configs:
   - job_name: "federate"
     scrape_interval: 15s
     honor_labels: true
@@ -184,7 +185,7 @@ __extra_prometheus_scrape_configs:
     scrape_interval: 15s
     honor_labels: true
     static_configs:
-      - targets: "{{ groups['ceph'] | map('extract', hostvars, 'ansible_host') | map('regex_replace', '$', ':' + (ceph_exporter_port | string)) | list }}"
+      - targets: "{{ groups['ceph'] | map('extract', hostvars, 'host_ips') | map(attribute='mgmt') | map('regex_replace', '$', ':' + (ceph_exporter_port | string)) | list }}"
 
   - job_name: "pushgateway"
     static_configs:

@@ -4,8 +4,8 @@ prometheus_storage_retention: "7d"
 prometheus_config_flags_extra: {}
 prometheus_web_listen_address: "{{ wireguard_ip }}:{{ prometheus_port }}"
 
-blackbox_exporter_targets_icmp_ipv4: []
-__prom_node_group: "prom"
+__prom_blackbox_icmp_targets: "{{ __prom_node_ips }}"
+__prom_auto_target_group: "prom"
 __extra_prometheus_scrape_configs: []
 
 prometheus_node_static_config: []

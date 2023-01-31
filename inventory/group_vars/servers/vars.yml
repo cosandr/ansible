@@ -28,5 +28,5 @@ domain: "vm.{{ domains['hb'] }}"
 btrfs_scrub_email: "{{ smartd_email }}"
 btrfs_scrub_from_email: "{{ smartd_from_address }}"
 
-gitlab_external_url: "https://gitlab.{{ hostvars['gitlab01'].domain }}"
-gitlab_registry_external_url: "https://registry.{{ hostvars['gitlab01'].domain }}"
+gitlab_external_url: "https://gitlab.{{ domains['dv'] }}"
+gitlab_registry_external_url: "https://registry.{{ domains['dv'] }}"
