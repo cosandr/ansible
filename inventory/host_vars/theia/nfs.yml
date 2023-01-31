@@ -41,3 +41,6 @@ nfs_shares:
   - path: /mnt/tank/media
     options: "rw,no_root_squash"
     sources: "{{ groups['swarm'] | map('extract', hostvars, 'ansible_host') | list }}"
+  - path: /mnt/tank/yes
+    options: "ro,no_root_squash"
+    sources: "{{ groups['swarm'] | map('extract', hostvars, 'ansible_host') | list }}"

@@ -6,13 +6,14 @@ __sd_backup_gdrive:
     content: |
       [Unit]
       Description=Backup important files to Google Drive
-      After=network-online.target mnt-tank.mount
-      Requires=network-online.target mnt-tank.mount
+      After=network-online.target mnt-tank.mount mnt-ceph.mount
+      Requires=network-online.target mnt-tank.mount mnt-ceph.mount
       ConditionPathExists=/mnt/tank/backup
+      ConditionPathExists=/mnt/ceph/swarm/syncthing/data
 
       [Service]
       Type=simple
-      ExecStart=rclone sync -v --exclude-if-present .rclone_ignore /mnt/tank/backup gsecret:tank-backup
+      ExecStart={{ systemd_script_install_path }}/backup-gitea
 
       [Install]
       WantedBy=multi-user.target
@@ -31,3 +32,11 @@ __sd_backup_gdrive:
 
       [Install]
       WantedBy=timers.target
+
+  scripts:
+    - dest: "{{ systemd_script_install_path }}/backup-gdrive"
+      content: |
+        #!/bin/sh
+
+        rclone sync -v --exclude-if-present .rclone_ignore /mnt/tank/backup gsecret:tank-backup
+        rclone sync -v /mnt/ceph/swarm/syncthing/data gsecret:syncthing

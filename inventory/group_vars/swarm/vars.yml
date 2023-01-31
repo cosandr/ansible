@@ -1,5 +1,8 @@
 ---
 
+jellyfin_port: 8096
+mrbot_web_port: 8001
+
 docker_registries:
   - url: "{{ gitlab_registry_external_url | regex_replace('^https?://', '') }}"
     username: "{{ vault_gitlab_token_name }}"

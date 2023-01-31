@@ -38,13 +38,18 @@
         state: mounted
       tags: ["ceph"]
 
-    - name: Mount media share
+    - name: Mount media shares
       ansible.posix.mount:
-        src: "{{ hostvars['theia'].host_ips.vm }}:/mnt/tank/media"
-        path: "/mnt/media"
+        src: "{{ hostvars['theia'].host_ips.vm }}:{{ item.src }}"
+        path: "{{ item.dest }}"
         opts: "defaults,noatime"
         state: mounted
         fstype: nfs
+      loop:
+        - src: "/mnt/tank/media"
+          dest: "/mnt/media"
+        - src: "/mnt/tank/yes"
+          dest: "/mnt/yes"
       tags: ["nfs"]
 
     - name: Install python3-docker

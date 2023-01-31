@@ -33,3 +33,4 @@ prometheus_node_labels:
   instance: "{{ inventory_hostname }}"
 
 swarm_vip: "{{ all_net.vm.cidr | ansible.utils.ipaddr('200') }}"
+swarm_vip_address: "{{ swarm_vip | ansible.utils.ipaddr('address') }}"

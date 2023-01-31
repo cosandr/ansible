@@ -26,10 +26,10 @@ __nginx_upstreams_common:
     servers: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].nginx_ports['www'] }}"]
 
   - name: mrbot_web
-    servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].mrbot_web_port }}"]
+    servers: ["{{ swarm_vip_address }}:{{ hostvars['swarm01'].mrbot_web_port }}"]
 
   - name: jellyfin
-    servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].jellyfin_port }}"]
+    servers: ["{{ swarm_vip_address }}:{{ hostvars['swarm01'].jellyfin_port }}"]
 
   - name: vouch
     servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].vouch_listen_port }}"]

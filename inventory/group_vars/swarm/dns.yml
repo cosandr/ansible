@@ -8,4 +8,4 @@ __mt_dns_entries_common:
 
 __mt_dns_entries_vip:
   - name: "swarm.{{ domains['hb'] }}"
-    address: "{{ swarm_vip | ansible.utils.ipaddr('address') }}"
+    address: "{{ swarm_vip_address }}"
