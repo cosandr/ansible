@@ -13,7 +13,7 @@ __sd_backup_gdrive:
 
       [Service]
       Type=simple
-      ExecStart={{ systemd_script_install_path }}/backup-gitea
+      ExecStart={{ systemd_script_install_path }}/backup-gdrive
 
       [Install]
       WantedBy=multi-user.target
