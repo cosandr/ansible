@@ -45,6 +45,7 @@ base_pacman_packages:
   - git
   - gnu-netcat
   - go
+  - gopass
   - grep
   - groff
   - gzip
@@ -156,7 +157,7 @@ pacman_i3_packages:
   - xorg-xset
 
 aur_i3_packages:
-  - adwaita-qt
+  - adwaita-qt5-git
   - i3lock-color
   - i3lock-fancy-rapid-git
 

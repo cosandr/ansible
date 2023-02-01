@@ -33,12 +33,12 @@ modprobe_config:
 # systemd-cryptenroll /dev/nvme0n1p2 --wipe-slot=tpm2
 # systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+1+7 /dev/nvme0n1p2
 
-esp_src: "UUID=A14E-3411"
+esp_src: "UUID=66FD-2807"
 esp_mount: "{{ '/boot' if desktop_environment in ['i3', 'sway'] else '/boot/efi' }}"
 mkinitcpio_uefi_prefix: "arch_{{ desktop_environment }}"
 
-extra_kernel_params: "intel_iommu=on nmi_watchdog=0 console=tty7 systemd.unified_cgroup_hierarchy=0"
-kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ resume=/dev/mapper/root resume_offset=941473 {{ extra_kernel_params }}"
+extra_kernel_params: "intel_iommu=on nmi_watchdog=0 console=tty7"
+kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ resume=/dev/mapper/root resume_offset=2893056 {{ extra_kernel_params }}"
 
 systemd_boot_entries:
   "arch-zen": |
@@ -51,7 +51,7 @@ systemd_boot_entries:
 crypttab: ""
 
 crypttab_initramfs: |
-  root    UUID=7dc15fde-8ccd-4752-a24b-194b53b37f28   -   luks,discard,tpm2-device=auto
+  root    UUID=6b84ad63-29cc-414d-ae2d-c1f1b3897c21   -   luks,discard,tpm2-device=auto
 
 
 fstab: |

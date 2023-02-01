@@ -10,13 +10,13 @@ PRESETS=({{ item.presets | default(mkinitcpio_kernel_presets) | map("regex_repla
 
 default_image="/boot/initramfs-{{ item.name }}.img"
 {% if mkinitcpio_uefi_bundle | bool %}
-default_efi_image="{{ mkinitcpio_uefi_path }}/{{ mkinitcpio_uefi_prefix }}-{{ item.name }}.efi"
+default_uki="{{ mkinitcpio_uefi_path }}/{{ mkinitcpio_uefi_prefix }}-{{ item.name }}.efi"
 {% endif %}
 default_options="--splash {{ mkinitcpio_uefi_splash }}"
 
 #fallback_config="/etc/mkinitcpio.conf"
 fallback_image="/boot/initramfs-{{ item.name }}-fallback.img"
 {% if mkinitcpio_uefi_bundle | bool %}
-fallback_efi_image="{{ mkinitcpio_uefi_path }}/{{ mkinitcpio_uefi_prefix }}-{{ item.name }}-fallback.efi"
+fallback_uki="{{ mkinitcpio_uefi_path }}/{{ mkinitcpio_uefi_prefix }}-{{ item.name }}-fallback.efi"
 {% endif %}
 fallback_options="-S autodetect --splash {{ mkinitcpio_uefi_splash }}"
