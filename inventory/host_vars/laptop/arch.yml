@@ -8,7 +8,9 @@ host_pacman_packages:
   - intel-media-driver
   - intel-ucode
   - libva-intel-driver
+  - libvirt
   - powertop
+  - qemu-full
   - sof-firmware
   - system-config-printer
   - upower
@@ -38,7 +40,7 @@ esp_mount: "{{ '/boot' if desktop_environment in ['i3', 'sway'] else '/boot/efi'
 mkinitcpio_uefi_prefix: "arch_{{ desktop_environment }}"
 
 extra_kernel_params: "intel_iommu=on nmi_watchdog=0 console=tty7"
-kernel_params: "root=/dev/mapper/root rw rootflags=subvol=@ resume=/dev/mapper/root resume_offset=2893056 {{ extra_kernel_params }}"
+kernel_params: "root=/dev/mapper/root rw rootflags=subvol=arch_{{ desktop_environment }}/@ resume=/dev/mapper/root resume_offset=2893056 {{ extra_kernel_params }}"
 
 systemd_boot_entries:
   "arch-zen": |
@@ -65,5 +67,4 @@ fstab: |
 # sudo systemctl enable --now go-check-updates.socket
 
 sbctl_sign_files:
-  - "{{ esp_mount }}/EFI/BOOT/BOOTX64.EFI"
-  - "{{ esp_mount }}/EFI/arch/fwupdx64.efi"
+  - "{{ esp_mount }}/EFI/Linux/fwupdx64.efi"

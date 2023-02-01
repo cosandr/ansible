@@ -2,6 +2,7 @@
 ---
 
 - name: Laptop playbook
+  become: true
   gather_facts: true
   hosts: laptop
   pre_tasks:
@@ -24,7 +25,6 @@
     - name: Set desktop_environment to GNOME
       set_fact:
         desktop_environment: "gnome"
-        kernel_params: "root=/dev/mapper/root rw rootflags=subvol=arch_gnome/@ resume=/dev/mapper/root resume_offset=37889341 {{ extra_kernel_params }}"
         mkinitcpio_kernels:
           - name: linux
             label: "Arch GNOME"
@@ -36,7 +36,6 @@
     - name: Set desktop_environment to KDE
       set_fact:
         desktop_environment: "kde"
-        kernel_params: "root=/dev/mapper/root rw rootflags=subvol=arch_kde/@ {{ extra_kernel_params }}"
         mkinitcpio_kernels:
           - name: linux
             label: "Arch KDE"
