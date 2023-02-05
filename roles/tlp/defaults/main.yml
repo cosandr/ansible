@@ -7,6 +7,7 @@ network_manager: "systemd-networkd"
 touchpad_natural_scroll: true
 touchpad_tap_to_click: true
 
+tlp_configure_platform: false
 tlp_start_charge: 0
 tlp_stop_charge: 80
 tlp_pcie_ac: "default"
@@ -18,3 +19,6 @@ tlp_tlp_devices_lan_dc: "{{ tlp_devices_lan_con }}"
 
 tlp_cpu_governor_ac: "performance"
 tlp_cpu_governor_bat: "powersave"
+
+tlp_platform_profile_ac: "performance"
+tlp_platform_profile_bat: "low-power"

@@ -12,3 +12,7 @@ DEVICES_TO_ENABLE_ON_LAN_DISCONNECT="{{ tlp_tlp_devices_lan_dc | join(' ') }}"
 {% endif %}
 CPU_SCALING_GOVERNOR_ON_AC={{ tlp_cpu_governor_ac }}
 CPU_SCALING_GOVERNOR_ON_BAT={{ tlp_cpu_governor_bat }}
+{% if tlp_configure_platform %}
+PLATFORM_PROFILE_ON_AC={{ tlp_platform_profile_ac }}
+PLATFORM_PROFILE_ON_BAT={{ tlp_platform_profile_bat }}
+{% endif %}

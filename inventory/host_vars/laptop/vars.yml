@@ -12,3 +12,5 @@ my_groups:
   - libvirt
   - video
   - wheel
+
+tlp_configure_platform: true
