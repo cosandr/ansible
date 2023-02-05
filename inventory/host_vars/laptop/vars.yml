@@ -9,6 +9,7 @@ autorandr_install_lid_listener: true
 my_groups:
   - docker
   - i2c
+  - input
   - libvirt
   - video
   - wheel

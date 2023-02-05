@@ -2,6 +2,7 @@
 
 host_pacman_packages:
   - acpi_call-dkms
+  - blueman
   - fprintd
   - fwupd
   - intel-gpu-tools
@@ -9,11 +10,13 @@ host_pacman_packages:
   - intel-ucode
   - libva-intel-driver
   - libvirt
+  - polkit-gnome
   - powertop
   - qemu-full
   - sof-firmware
   - system-config-printer
   - upower
+  - virt-manager
   - wireless-regdb
 
 pacman_packages: "{{ base_pacman_packages + host_pacman_packages }}"
@@ -67,4 +70,4 @@ fstab: |
 # sudo systemctl enable --now go-check-updates.socket
 
 sbctl_sign_files:
-  - "{{ esp_mount }}/EFI/Linux/fwupdx64.efi"
+  - "/usr/lib/fwupd/efi/fwupdx64.efi.signed"

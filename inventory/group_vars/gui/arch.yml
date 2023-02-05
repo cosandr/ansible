@@ -57,6 +57,7 @@ base_pacman_packages:
   - jq
   - kernel-modules-hook
   - kitty
+  - kubectl
   - libpulse
   - libtool
   - libva-utils
@@ -82,6 +83,8 @@ base_pacman_packages:
   - pacutils
   - patch
   - pkgconf
+  - podman
+  - podman-compose
   - pyenv
   - python-aiohttp
   - python-jmespath  # ansible json filter
@@ -151,6 +154,7 @@ pacman_i3_packages:
   - thunar
   - thunar-archive-plugin
   - xclip
+  - xorg-server
   - xorg-xev
   - xorg-xinit
   - xorg-xinput
@@ -178,5 +182,5 @@ pacman_sway_packages:
   - xorg-xwayland
 
 aur_sway_packages:
-  - swaylock-effects-git
+  - swaylock
   - wdisplays

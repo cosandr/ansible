@@ -2,12 +2,11 @@
 ---
 
 - name: Laptop playbook
-  become: true
   gather_facts: true
   hosts: laptop
   pre_tasks:
     - name: Check if GDM is active  # noqa command-instead-of-module
-      command: systemctl is-active -q gdm.service
+      ansible.builtin.command: systemctl is-active -q gdm.service
       check_mode: false
       changed_when: false
       failed_when: false
@@ -15,7 +14,7 @@
       tags: ["always"]
 
     - name: Check if SDDM is active  # noqa command-instead-of-module
-      command: systemctl is-active -q sddm.service
+      ansible.builtin.command: systemctl is-active -q sddm.service
       check_mode: false
       changed_when: false
       failed_when: false
@@ -23,7 +22,7 @@
       tags: ["always"]
 
     - name: Set desktop_environment to GNOME
-      set_fact:
+      ansible.builtin.set_fact:
         desktop_environment: "gnome"
         mkinitcpio_kernels:
           - name: linux
@@ -34,7 +33,7 @@
       tags: ["always"]
 
     - name: Set desktop_environment to KDE
-      set_fact:
+      ansible.builtin.set_fact:
         desktop_environment: "kde"
         mkinitcpio_kernels:
           - name: linux
@@ -45,7 +44,8 @@
       tags: ["always"]
 
     - name: Install packages (pacman)
-      pacman:
+      become: true
+      community.general.pacman:
         name: "{{ pacman_packages }}"
         state: present
       when: ansible_distribution == 'Archlinux'
@@ -53,7 +53,7 @@
   tasks:
     - name: Enable resume dracut module
       become: true
-      copy:
+      ansible.builtin.copy:
         dest: /etc/dracut.conf.d/resume.conf
         owner: root
         group: root
@@ -65,7 +65,8 @@
       tags: ["hibernate"]
 
     - name: Install i3 packages (pacman)
-      pacman:
+      become: true
+      community.general.pacman:
         name: "{{ pacman_i3_packages }}"
         state: present
       when:
@@ -74,7 +75,8 @@
       tags: ["i3"]
 
     - name: Install sway packages (pacman)
-      pacman:
+      become: true
+      community.general.pacman:
         name: "{{ pacman_sway_packages }}"
         state: present
       when:
@@ -82,25 +84,73 @@
         - desktop_environment == "sway"
       tags: ["sway"]
 
-    - block:
+    - name: Configure bluetooth
+      tags: ["bluetooth"]
+      block:
         - name: Ensure bluetooth is enabled
-          systemd:
+          become: true
+          ansible.builtin.systemd:
             name: bluetooth.service
             state: started
             enabled: true
 
         - name: Enable bluetooth auto power on
-          lineinfile:
+          become: true
+          ansible.builtin.lineinfile:
             path: '/etc/bluetooth/main.conf'
             regexp: '^#?AutoEnable'
             line: 'AutoEnable=true'
 
-      tags: ["bluetooth"]
+
+    # https://wiki.archlinux.org/title/Fwupd#Setup_for_UEFI_upgrade
+    - name: Configure fwupd
+      become: true
+      tags: ["fwupd"]
+      block:
+        - name: Ensure fwupd packages are installed
+          ansible.builtin.package:
+            name:
+              - fwupd
+              - udisks2
+            state: present
+
+        - name: Disable shim
+          ansible.builtin.lineinfile:
+            path: /etc/fwupd/uefi_capsule.conf
+            regexp: '^#?DisableShimForSecureBoot'
+            line: DisableShimForSecureBoot=true
+          notify: Restart fwupd
+
+        - name: Ensure fwupd service is running
+          ansible.builtin.systemd:
+            name: fwupd.service
+            state: started
+            enabled: true
+
+        # Ensure this file is enrolled in sbctl
+        # manually: sbctl sign -s /usr/lib/fwupd/efi/fwupdx64.efi.signed
+        # ansible: add to sbctl_sign_files
+        - name: Ensure signed file exists
+          ansible.builtin.copy:
+            src: /usr/lib/fwupd/efi/fwupdx64.efi
+            dest: /usr/lib/fwupd/efi/fwupdx64.efi.signed
+            owner: root
+            group: root
+            mode: 0644
+            remote_src: true
+            force: false
 
   handlers:
     - name: dracut regenerate
       become: true
-      command: dracut -f --regenerate-all
+      ansible.builtin.command: dracut -f --regenerate-all
+
+    - name: Restart fwupd
+      become: true
+      ansible.builtin.systemd:
+        name: fwupd.service
+        state: restarted
+
   roles:
     - role: laptop
       tags: ["laptop"]
@@ -239,14 +289,17 @@
       tags: ["sway"]
 
     - role: aisbergg.snapper
+      become: true
       tags: ["snapper"]
 
     - role: node_exporter
+      become: true
       tags: ["prometheus-stack", "node_exporter"]
 
   post_tasks:
     - name: Configure user groups
-      user:
+      become: true
+      ansible.builtin.user:
         name: "{{ my_user }}"
         groups: "{{ my_groups }}"
         append: true

@@ -37,7 +37,7 @@ chezmoi_overrides:
     MONITOR_MAP["eDP-1"]="laptop"
     MONITOR_MAP["HDMI-1"]="laptop-ext"
     MONITOR_MAP["DP-3-2"]="laptop-ext-secondary"
-    DPI_MAP["eDP-1"]="192"
+    DPI_MAP["eDP-1"]="120"
   sway: |
     export MOZ_ENABLE_WAYLAND=1
     export MOZ_USE_XINPUT2=1
@@ -48,18 +48,20 @@ chezmoi_overrides:
     QT_QPA_PLATFORMTHEME="qt5ct"
   xinitrc: |
     MOZ_X11_EGL="1"
-    xinput set-prop 'SynPS/2 Synaptics TouchPad' 'libinput Accel Speed' 0.4
+    xinput set-prop 'ELAN067C:00 04F3:31F9 Touchpad' 'libinput Natural Scrolling Enabled' 1
+    xinput set-prop 'ELAN067C:00 04F3:31F9 Touchpad' 'libinput Tapping Enabled' 1
+    xinput set-prop 'ELAN067C:00 04F3:31F9 Touchpad' 'libinput Accel Speed' 0.4
     xinput set-prop 'TPPS/2 Elan TrackPoint' 'libinput Accel Speed' -0.5
   lock: |
     idle_hook="xidlehook_lock_screen_on"
     LOCKER="i3lock"
     OPTS="-i $HOME/.wallpaper -t --clock"
   xorg: |
-    DPI=192
+    DPI=120
   xorg_2: |
-    DPI=144
+    DPI=120
   xorg_3: |
-    DPI=144
+    DPI=120
     mon=$(xrandr --query | grep -oP '\S+\s+connected' | cut -d' ' -f1)
     if [[ $mon =~ DP-3$ && $mon =~ HDMI-1 ]]; then
       MONITOR_MAP["DP-3"]="--primary --mode 3840x2160 --rate 120"
