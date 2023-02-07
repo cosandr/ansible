@@ -144,6 +144,7 @@ pacman_i3_packages:
   - numlockx
   - pamixer
   - pavucontrol
+  - perl-anyevent-i3  # i3-save-tree
   - picom
   - playerctl
   - polybar
@@ -153,6 +154,7 @@ pacman_i3_packages:
   - scrot
   - thunar
   - thunar-archive-plugin
+  - tumbler  # Thumbnailer for Thunar
   - xclip
   - xorg-server
   - xorg-xev
