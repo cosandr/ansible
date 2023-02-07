@@ -11,7 +11,7 @@
   tags: ["install"]
 
 - name: Install networkd and resolved
-  package:
+  ansible.builtin.package:
     name:
       - systemd-networkd
       - systemd-resolved
@@ -30,7 +30,7 @@
   when: networkd_provisioning_synced
 
 - name: Copy networkd configs
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/systemd/network/{{ item.key }}.network"
     owner: root
     group: root
@@ -45,7 +45,7 @@
   notify: Restart systemd-networkd
 
 - name: Copy networkd netdevs
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/systemd/network/{{ item.key }}.netdev"
     owner: root
     group: root
@@ -79,7 +79,7 @@
   when: networkd_provisioning_synced
 
 - name: Check if NetworkManager is active  # noqa command-instead-of-module
-  command: systemctl is-active -q NetworkManager.service
+  ansible.builtin.command: systemctl is-active -q NetworkManager.service
   check_mode: false
   changed_when: false
   failed_when: false
@@ -92,17 +92,25 @@
     - __nm_active.rc == 0
   block:
     - name: Stop NetworkManager
-      systemd:
+      ansible.builtin.systemd:
         name: NetworkManager
         state: stopped
 
     - name: Disable NetworkManager
-      systemd:
+      ansible.builtin.systemd:
         name: NetworkManager
         enabled: false
 
+- name: Link resolved stub file to /etc/resolv.conf
+  ansible.builtin.file:
+    src: /run/systemd/resolve/stub-resolv.conf
+    dest: /etc/resolv.conf
+    state: link
+    force: true
+  when: resolved_link_stub
+
 - name: Enable and start systemd-networkd/resolved
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     enabled: true
     state: started
