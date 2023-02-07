@@ -12,9 +12,9 @@ wireguard_dns_list:
   - "8.8.8.8"
 
 wireguard_mt_allowed_ips:
-  - "{{ hostvars['rb5009'].wireguard_ip }}/32"
+  - "{{ wg_net.mt.cidr }}"
   - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
-  - "{{ hostvars['rb5009'].wireguard_ipv6 }}/128"
+  - "{{ wg_net.mt.cidr6 }}"
   - "{{ home_net | dict2items | json_query('[].value.cidr6') }}"
 
 wireguard_address: "{{ wireguard_addresses | join(', ') }}"
