@@ -1,15 +1,20 @@
 ---
 
-- name: Create user
+- name: Create AUR build user
   become: true
-  user:
+  ansible.builtin.user:
     name: "{{ aur_build_user }}"
+    comment: "AUR build user"
+    system: true
+    shell: /usr/bin/nologin
+    create_home: true
+    home: /var/lib/aur_builder
 
 - name: Allow AUR user passwordless pacman
-  include_role:
+  ansible.builtin.include_role:
     name: sudo
   vars:
     sudo_install: false
     sudoers_files:
       - dest: "20-{{ aur_build_user }}"
-        content: "{{ aur_build_user }} ALL=(ALL) NOPASSWD:/sbin/pacman"
+        content: "{{ aur_build_user }} ALL=(ALL) NOPASSWD:/usr/bin/pacman"
