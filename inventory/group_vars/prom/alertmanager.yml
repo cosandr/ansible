@@ -12,12 +12,17 @@ alertmanager_cluster:
     map('regex_replace', '$', ':' + (alertmanager_peer_port | string)) | list }}"
   peer-timeout: 45s
 
+alertmanager_template_files:
+  - "{{ repo_base_dir }}/files/alertmanager/*.tmpl"
+
 # https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl
 alertmanager_receivers:
   - name: discord
     discord_configs:
       - send_resolved: true
         webhook_url: "{{ vault_alertmanager_discord_webhook_url }}"
+        title: '{% raw %}{{ template "discord.andrei.title" . }}{% endraw %}'
+        message: '{% raw %}{{ template "discord.andrei.message" . }}{% endraw %}'
 
 alertmanager_route:
   group_by: ['instance', 'job']

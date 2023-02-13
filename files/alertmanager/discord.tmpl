@@ -1,0 +1,15 @@
+{{ define "discord.andrei.title" }}[{{ .Status | toUpper }}:{{ if eq .Status "firing" }}{{ .Alerts.Firing | len }}{{ else }}{{ .Alerts.Resolved | len }}{{ end }}] {{ .GroupLabels.SortedPairs.Values | join " " }}{{ end }}
+{{ define "discord.andrei.message" }}
+{{ range .Alerts -}}
+**{{ .Annotations.summary }}{{ if index .Annotations "VALUE" }} ({{ .Annotations.VALUE }}){{ end }}**
+
+{{ .Annotations.description }}
+
+{{ else }}
+**{{ .CommonAnnotations.summary }}{{ if index .Annotations "VALUE" }} ({{ .Annotations.VALUE }}){{ end }}**
+
+{{ .CommonAnnotations.description }}
+
+{{ if index .CommonAnnotations "VALUE" }}Value = {{ .Annotations.VALUE }}{{ end }}
+{{ end }}
+{{ end }}
