@@ -2,6 +2,7 @@
 
 host_pacman_packages:
   - acpi_call-dkms
+  - aws-cli-v2
   - blueman
   - fprintd
   - fwupd

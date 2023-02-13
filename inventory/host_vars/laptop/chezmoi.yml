@@ -3,7 +3,7 @@
 chezmoi_overrides:
   i3: |
     # Restore based on connected displays
-    _hour=$(date +%H)
+    _hour=$(date +%-H)
     if [[ $_hour -ge 8 && $_hour -lt 17 ]]; then
       workhours=1
     else

@@ -30,6 +30,7 @@ base_pacman_packages:
   - docker-compose
   - efibootmgr
   - ethtool
+  - expect
   - fakeroot
   - file
   - findutils
@@ -49,12 +50,14 @@ base_pacman_packages:
   - grep
   - groff
   - gzip
+  - helm
   - htop
   - inetutils
   - iotop
   - ipython
   - iwd
   - jq
+  - k9s
   - kernel-modules-hook
   - kitty
   - kubectl
@@ -87,9 +90,10 @@ base_pacman_packages:
   - podman-compose
   - pyenv
   - python-aiohttp
-  - python-jmespath  # ansible json filter
-  - python-llfuse    # borg mount
-  - python-netaddr   # ansible ip filter
+  - python-jmespath    # ansible json filter
+  - python-kubernetes  # ansible kubernetes modules
+  - python-llfuse      # borg mount
+  - python-netaddr     # ansible ip filter
   - python-pip
   - python-virtualenv
   - python-websockets
