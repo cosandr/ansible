@@ -1,7 +1,7 @@
 ---
 
-vm_cpus: 8
-vm_mem: 8192
+vm_cpus: 4
+vm_mem: 4096
 
 vm_template: "rocky8_packer.raw"
 vm_os_id: "http://fedoraproject.org/fedora/35"
