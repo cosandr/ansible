@@ -2,7 +2,7 @@
 
 - name: Install sudo
   become: true
-  package:
+  ansible.builtin.package:
     name: sudo
     state: present
   when: sudo_install | bool
@@ -10,7 +10,7 @@
 
 - name: Write sudoers files
   become: true
-  copy:
+  ansible.builtin.copy:
     content: |
       {{ ansible_managed | comment }}
       {{ item.content }}
@@ -20,3 +20,15 @@
     group: root
     validate: 'visudo -cf %s'
   loop: "{{ sudoers_files }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  when: item.state | default('present') == 'present'
+
+- name: Remove sudoers files
+  ansible.builtin.file:
+    path: "/etc/sudoers.d/{{ item.dest }}"
+    state: absent
+  loop: "{{ sudoers_files }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  when: item.state | default('present') == 'absent'
