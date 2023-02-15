@@ -38,6 +38,7 @@ chezmoi_overrides:
     MONITOR_MAP["HDMI-1"]="laptop-ext"
     MONITOR_MAP["DP-3-2"]="laptop-ext-secondary"
     DPI_MAP["eDP-1"]="120"
+    export DDCUTIL_SLEEP_MULTIPLIER=3
   sway: |
     export MOZ_ENABLE_WAYLAND=1
     export MOZ_USE_XINPUT2=1
@@ -72,3 +73,7 @@ chezmoi_overrides:
       MONITOR_MAP["DP-3-2"]="--left-of HDMI-1 --mode 3840x2160"
       MONITOR_MAP["eDP-1"]="--right-of HDMI-1 --mode 3840x2160"
     fi
+  waybar: |
+    MONITOR_MAP["Lenovo Group Limited L32p-30 U511L1X2"]=laptop_ext
+    MONITOR_MAP["Samsung Electric Company LS27A800U HNMTA00225"]=laptop_ext_secondary
+    export DDCUTIL_SLEEP_MULTIPLIER=3
