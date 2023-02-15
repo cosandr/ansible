@@ -61,7 +61,7 @@
         content: |
           add_dracutmodules+=" resume "
       when: ansible_os_family == 'RedHat'
-      notify: dracut regenerate
+      notify: Dracut regenerate
       tags: ["hibernate"]
 
     - name: Install i3 packages (pacman)
@@ -84,6 +84,17 @@
         - desktop_environment == "sway"
       tags: ["sway"]
 
+    - name: Install i3 packages (pip)
+      become: true
+      become_user: "{{ my_user }}"
+      ansible.builtin.pip:
+        name: "{{ pip_i3_packages }}"
+        state: present
+        extra_args: "--user"
+      when:
+        - desktop_environment in ["i3", "sway"]
+      tags: ["i3", "pip"]
+
     - name: Configure bluetooth
       tags: ["bluetooth"]
       block:
@@ -100,7 +111,6 @@
             path: '/etc/bluetooth/main.conf'
             regexp: '^#?AutoEnable'
             line: 'AutoEnable=true'
-
 
     # https://wiki.archlinux.org/title/Fwupd#Setup_for_UEFI_upgrade
     - name: Configure fwupd
@@ -141,7 +151,7 @@
             force: false
 
   handlers:
-    - name: dracut regenerate
+    - name: Dracut regenerate
       become: true
       ansible.builtin.command: dracut -f --regenerate-all
 

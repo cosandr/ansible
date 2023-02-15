@@ -10,3 +10,6 @@ ddcutil_udev_rule: |
   KERNEL=="i2c-[0-9]*", GROUP="wheel", MODE="0660"
 
 prometheus_blackbox_icmp_targets: []
+
+pip_i3_packages:
+  - dbus_next  # Used by various bar modules
