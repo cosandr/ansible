@@ -6,7 +6,6 @@ __ssh_sources:
   - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
   - "{{ home_net | dict2items | json_query('[].value.cidr6') }}"
   - "10.1.0.0/24"
-  - "192.168.100.5"
 
 ufw_trusted_sources: []
 

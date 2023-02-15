@@ -14,6 +14,10 @@ wireguard_mt_allowed_ips:
   - "{{ hostvars['backup01'].ansible_host }}/32"
   - "{{ hostvars['loki01'].ansible_host }}/32"
 
+mt_wg_allowed_addresses:
+  - "{{ wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') }}"
+  - "10.1.0.0/24"
+
 wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_ip: "{{ wireguard_addresses[0] | ansible.utils.ipaddr('address') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"

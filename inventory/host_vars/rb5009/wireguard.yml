@@ -18,8 +18,6 @@ mt_wg_peers: "{{ __mt_wg_peers_manual + __mt_wg_peers_auto }}"
 
 __mt_wg_peers_manual: "{{ vault_mt_wg_peers_manual }}"
 
-__mt_wg_allowed_addresses_default: "{{ wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') }}"
-
 __mt_wg_peers_auto: >-
   {%- set tmp = [] -%}
   {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].wireguard_public_key | default('')) -%}
@@ -41,9 +39,9 @@ __mt_wg_peers_auto: >-
   }) -}}
   {%- endif -%}
   {{- tmp_dict.update({
-    "allowed-address": hostvars[h].mt_wg_allowed_addresses | default(
-      hostvars[h].wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') | join(',')
-    )
+    "allowed-address": hostvars[h].mt_wg_allowed_addresses
+      | default(hostvars[h].wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host'))
+      | flatten | join(',')
   }) -}}
   {{- tmp.append(tmp_dict) -}}
   {%- endfor -%}
