@@ -109,6 +109,7 @@ base_pacman_packages:
   - sudo
   - systemd-resolvconf  # Required by Wireguard
   - texinfo
+  - tk  # Required by pyenv to compile Python
   - tmux
   - ttf-fira-code
   - ttf-font-awesome
@@ -152,6 +153,7 @@ pacman_i3_packages:
   - picom
   - playerctl
   - polybar
+  - python-i3ipc
   - qt5ct
   - redshift
   - rofi
