@@ -1,45 +1,62 @@
 ---
 
 - name: Install sbctl
-  pacman:
+  community.general.pacman:
     name: sbctl
     state: present
+  when: not chroot_path
   tags: ["install"]
 
 - name: Create keys
-  command: "sbctl create-keys"
+  ansible.builtin.command: >-
+    {% if chroot_path %}
+    arch-chroot {{ chroot_path }}
+    {% endif %}
+    sbctl create-keys
   args:
-    creates: /usr/share/secureboot/GUID
+    creates: "{{ chroot_path }}/usr/share/secureboot/GUID"
 
-- name: Write kernel parameters to {{ sbctl_cmdline }}
-  copy:
+- name: Fail if bundling is enabled but kernel params are missing
+  ansible.builtin.fail:
+    msg: "kernel_params is empty"
+  when:
+    - sbctl_bundles | length > 0
+    - not kernel_params
+
+- name: Write kernel parameters to file
+  ansible.builtin.copy:
     dest: "{{ sbctl_cmdline }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     content: "{{ kernel_params }}"
   when: sbctl_bundles | length > 0
 
 - name: Enroll keys
-  command: "sbctl enroll-keys {% if sbctl_enroll_microsoft %}--microsoft{% endif %}"
+  ansible.builtin.command: >-
+    {% if chroot_path %}
+    arch-chroot {{ chroot_path }}
+    {% endif %}
+    sbctl enroll-keys {% if sbctl_enroll_microsoft %}--microsoft{% endif %}
   args:
     # https://github.com/Foxboron/sbctl/blob/32ac2678342aab8233ee887ea73cc781e907f86a/util.go#L73
+    # Don't need chroot here
     creates: "/sys/firmware/efi/efivars/db-d719b2cb-3d3a-4596-a3bc-dad00e67656f"
   notify: reboot
   when: sbctl_enroll | bool
   tags: ["enroll"]
 
-- name: Ensure {{ esp_mount }}/EFI/Linux exists
-  file:
-    path: "{{ esp_mount }}/EFI/Linux"
+- name: Ensure <ESP>/EFI/Linux exists
+  ansible.builtin.file:
+    path: "{{ chroot_path }}{{ esp_mount }}/EFI/Linux"
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   when: sbctl_bundles | length > 0
 
 - name: Prepare required facts
-  set_fact:
+  ansible.builtin.set_fact:
     __bundles: "{{ __bundles | default([]) + [tmp_dict] }}"
     __sbctl_efibootmgr: "{{ __sbctl_efibootmgr | default([]) + [tmp_dict_efi] }}"
   vars:
@@ -58,7 +75,10 @@
     label: "{{ item.kernel }}"
 
 - name: Bundle kernels
-  command: >
+  ansible.builtin.command: >-
+    {% if chroot_path %}
+    arch-chroot {{ chroot_path }}
+    {% endif %}
     sbctl bundle -s
     -i {{ boot_mount }}/{{ sbctl_ucode }}
     -c {{ sbctl_cmdline }}
@@ -67,23 +87,33 @@
     -f {{ boot_mount }}/{{ item.initrd }}
     {{ esp_mount }}/EFI/Linux/{{ item.bundle }}
   args:
-    creates: "{{ esp_mount }}/EFI/Linux/{{ item.bundle }}"
+    creates: "{{ chroot_path }}{{ esp_mount }}/EFI/Linux/{{ item.bundle }}"
   loop: "{{ __bundles }}"
   when: __bundles is defined
 
 - name: Sign files
-  command: "sbctl sign -s {{ item }}"
+  ansible.builtin.command: >-
+    {% if chroot_path %}
+    arch-chroot {{ chroot_path }}
+    {% endif %}
+    sbctl sign -s {{ item }}
   register: __sbctl_sign
   changed_when: "'already been signed' not in __sbctl_sign.stdout"
   loop: "{{ sbctl_sign_files }}"
 
 - name: Sign all
-  command: "sbctl sign-all -g"
+  ansible.builtin.command: >-
+    {% if chroot_path %}
+    arch-chroot {{ chroot_path }}
+    {% endif %}
+    sbctl sign-all -g
   changed_when: false
 
 - name: Add entries in EFI
-  include_role:
+  ansible.builtin.include_role:
     name: "efibootmgr"
   vars:
     efibootmgr_entries: "{{ __sbctl_efibootmgr }}"
-  when: __sbctl_efibootmgr is defined
+  when:
+    - sbctl_uefi_add
+    - __sbctl_efibootmgr is defined

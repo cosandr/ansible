@@ -1,11 +1,19 @@
 ---
 
-- name: rebuild all mkinitcpio presets
-  command: /usr/bin/mkinitcpio -P
+- name: Rebuild all mkinitcpio presets
+  ansible.builtin.command: >-
+    {% if chroot_path %}
+    arch-chroot {{ chroot_path }}
+    {% endif %}
+    /usr/bin/mkinitcpio -P
 
-- name: sign all files
-  listen: rebuild all mkinitcpio presets
-  command: "/usr/bin/sbctl sign -s {{ item }}"
+- name: Sign all files
+  listen: Rebuild all mkinitcpio presets
+  ansible.builtin.command: >-
+    {% if chroot_path %}
+    arch-chroot {{ chroot_path }}
+    {% endif %}
+    /usr/bin/sbctl sign -s {{ item }}
   register: __sbctl_sign
   changed_when: "'already been signed' not in __sbctl_sign.stdout"
   loop: "{{ __mkinitcpio_sign_files }}"

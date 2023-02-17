@@ -1,3 +1,9 @@
-- name: generate locales
+---
+
+- name: Generate locales
   become: true
-  command: "locale-gen"
+  ansible.builtin.command: >-
+    {% if chroot_path %}
+    chroot {{ chroot_path }}
+    {% endif %}
+    locale-gen

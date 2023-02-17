@@ -1,5 +1,7 @@
 ---
 
+chroot_path: ""
+
 esp_mount: "/boot"
 esp_disk: "/dev/nvme0n1"
 esp_part: "1"

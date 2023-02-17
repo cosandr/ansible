@@ -1,47 +1,50 @@
 ---
 
 - name: Include OS-specific variables.
-  include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Install OpenSSH server
   become: true
-  package:
+  ansible.builtin.package:
     name: "{{ _sshd_pkg }}"
     state: present
+  when: not chroot_path
   tags: ["install"]
 
 - name: Check if sshd_config.d exists
   become: true
-  stat:
-    path: "/etc/ssh/sshd_config.d"
+  ansible.builtin.stat:
+    path: "{{ chroot_path }}/etc/ssh/sshd_config.d"
   register: __ssh_conf_d
 
 - name: Configure using sshd_config.d
   become: true
-  copy:
+  ansible.builtin.copy:
     content: "{{ sshd_config | map(attribute='line') | join('\n') }}\n"
-    dest: /etc/ssh/sshd_config.d/00-ansible.conf
+    dest: "{{ chroot_path }}/etc/ssh/sshd_config.d/00-ansible.conf"
     owner: root
     group: root
-    mode: 0600
-  notify: reload sshd
+    mode: "0600"
+  notify: Reload sshd
   when: __ssh_conf_d.stat.exists
 
 - name: Set up sshd_config
   become: true
-  lineinfile:
-    dest: "/etc/ssh/sshd_config"
+  ansible.builtin.lineinfile:
+    dest: "{{ chroot_path }}/etc/ssh/sshd_config"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
     state: present
-  with_items: "{{ sshd_config }} "
+  loop: "{{ sshd_config }}"
+  loop_control:
+    label: "{{ item.line }}"
   when: not __ssh_conf_d.stat.exists
-  notify: reload sshd
+  notify: Reload sshd
 
 - name: Set up extra sshd config
   become: true
-  blockinfile:
-    path: "/etc/ssh/sshd_config"
+  ansible.builtin.blockinfile:
+    path: "{{ chroot_path }}/etc/ssh/sshd_config"
     block: "{{ sshd_extra_config }}"
   when: sshd_extra_config | length > 0
-  notify: reload sshd
+  notify: Reload sshd

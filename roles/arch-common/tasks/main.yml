@@ -2,9 +2,10 @@
 
 - name: "Set timezone"
   become: true
-  file:
+  ansible.builtin.file:
+    # src should remain relative to chroot_path, it does not need the prefix.
     src: "/usr/share/zoneinfo/{{ sys_timezone }}"
-    dest: "/etc/localtime"
+    dest: "{{ chroot_path }}/etc/localtime"
     owner: root
     group: root
     state: link
@@ -12,33 +13,38 @@
 
 - name: "Sync hwclock"
   become: true
-  command: "hwclock --systohc"
+  ansible.builtin.command: "hwclock --systohc"
   args:
-    creates: "/etc/adjtime"
+    creates: "{{ chroot_path }}/etc/adjtime"
   when: hwclock_sync | bool
   tags: ["time"]
 
 - name: Configure pacman
   become: true
-  lineinfile:
-    path: "/etc/pacman.conf"
+  ansible.builtin.lineinfile:
+    path: "{{ chroot_path }}/etc/pacman.conf"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
-  with_items: "{{ pacman_config }}"
+  loop: "{{ pacman_config }}"
+  loop_control:
+    label: "{{ item.line }}"
   tags: ["pacman"]
 
 - name: Configure makepkg
   become: true
-  replace:
-    path: "/etc/makepkg.conf"
+  ansible.builtin.replace:
+    path: "{{ chroot_path }}/etc/makepkg.conf"
     regexp: "{{ item.regexp }}"
     replace: "{{ item.replace }}"
-  with_items: "{{ makepkg_config }}"
+  loop: "{{ makepkg_config }}"
+  loop_control:
+    label: "{{ item.replace }}"
   tags: ["makepkg"]
 
 - name: Enable and start systemd-timesyncd
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-timesyncd.service
     state: started
     enabled: true
+  when: not chroot_path
   tags: ["timesyncd"]

@@ -1,17 +1,9 @@
 ---
 
-
-sudoers_files:
-  - dest: "10-wheel"
-    content: "%wheel ALL=(ALL) ALL"
+chroot_path: ""
 
 sys_timezone: "Europe/Oslo"
 hwclock_sync: true
-
-network_manager: "systemd-networkd"
-boot_loader: "systemd-boot"
-
-mkinitcpio_no_fallback: []
 
 makepkg_jobs: "{{ ansible_processor_vcpus | default('4') }}"
 makepkg_march: "native"

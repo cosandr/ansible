@@ -1,6 +1,7 @@
 ---
 
-- name: reload sshd
-  systemd:
+- name: Reload sshd
+  ansible.builtin.systemd:
     name: sshd
     state: reloaded
+  when: not chroot_path

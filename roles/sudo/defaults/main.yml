@@ -1,4 +1,8 @@
 ---
+
 ansible_managed: "Ansible managed"
-sudo_install: true
+
+chroot_path: ""
+
+sudo_install: "{{ not chroot_path }}"
 sudoers_files: []

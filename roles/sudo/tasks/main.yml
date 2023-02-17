@@ -14,8 +14,8 @@
     content: |
       {{ ansible_managed | comment }}
       {{ item.content }}
-    dest: "/etc/sudoers.d/{{ item.dest }}"
-    mode: 0440
+    dest: "{{ chroot_path }}/etc/sudoers.d/{{ item.dest }}"
+    mode: "0440"
     owner: root
     group: root
     validate: 'visudo -cf %s'
@@ -25,8 +25,9 @@
   when: item.state | default('present') == 'present'
 
 - name: Remove sudoers files
+  become: true
   ansible.builtin.file:
-    path: "/etc/sudoers.d/{{ item.dest }}"
+    path: "{{ chroot_path }}/etc/sudoers.d/{{ item.dest }}"
     state: absent
   loop: "{{ sudoers_files }}"
   loop_control:
