@@ -6,6 +6,7 @@
     apply:
       tags: ["install"]
   when:
+    - not chroot_path
     - ansible_distribution != 'Fedora'
     - ansible_os_family == 'RedHat'
   tags: ["install"]
@@ -16,13 +17,15 @@
       - systemd-networkd
       - systemd-resolved
     state: present
-  # They are part of the systemd package on Arch
-  when: ansible_distribution != "Archlinux"
+  when:
+    - not chroot_path
+    # They are part of the systemd package on Arch
+    - ansible_distribution != "Archlinux"
   tags: ["install"]
 
 - name: Register previously copied configuration files
   ansible.builtin.find:
-    paths: "/etc/systemd/network"
+    paths: "{{ chroot_path }}/etc/systemd/network"
     patterns:
       - "*.network"
       - "*.netdev"
@@ -31,10 +34,10 @@
 
 - name: Copy networkd configs
   ansible.builtin.copy:
-    dest: "/etc/systemd/network/{{ item.key }}.network"
+    dest: "{{ chroot_path }}/etc/systemd/network/{{ item.key }}.network"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     content: |
       {{ ansible_managed | comment }}
       {{ item.value }}
@@ -46,10 +49,10 @@
 
 - name: Copy networkd netdevs
   ansible.builtin.copy:
-    dest: "/etc/systemd/network/{{ item.key }}.netdev"
+    dest: "{{ chroot_path }}/etc/systemd/network/{{ item.key }}.netdev"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     content: |
       {{ ansible_managed | comment }}
       {{ item.value }}
@@ -83,6 +86,7 @@
   check_mode: false
   changed_when: false
   failed_when: false
+  when: not chroot_path
   register: __nm_active
 
 - name: Disable NM
@@ -104,16 +108,21 @@
 - name: Link resolved stub file to /etc/resolv.conf
   ansible.builtin.file:
     src: /run/systemd/resolve/stub-resolv.conf
-    dest: /etc/resolv.conf
+    dest: "{{ chroot_path }}/etc/resolv.conf"
     state: link
     force: true
   when: resolved_link_stub
 
-- name: Enable and start systemd-networkd/resolved
+- name: Enable and start systemd-networkd services
   ansible.builtin.systemd:
     name: "{{ item }}"
     enabled: true
     state: started
-  loop:
-    - "systemd-networkd.service"
-    - "systemd-resolved.service"
+  loop: "{{ networkd_services }}"
+  when: not chroot_path
+
+- name: Enable and start systemd-networkd services (chroot)
+  ansible.builtin.command: >-
+    arch-chroot {{ chroot_path }} systemctl enable {{ item }}
+  loop: "{{ networkd_services }}"
+  when: chroot_path

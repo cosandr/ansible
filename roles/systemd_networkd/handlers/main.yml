@@ -1,5 +1,7 @@
 ---
+
 - name: Restart systemd-networkd
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-networkd.service
     state: restarted
+  when: not chroot_path

@@ -1,5 +1,7 @@
 ---
 
+chroot_path: ""
+
 resolved_link_stub: true
 networkd_provisioning_synced: true
 networkd_netdevs: []
@@ -16,3 +18,7 @@ networkd_config:
 
       [Network]
       DHCP=yes
+
+networkd_services:
+  - "systemd-networkd.service"
+  - "systemd-resolved.service"

@@ -1,4 +1,5 @@
 ---
 
+chroot_path: ""
 hostname: "{{ inventory_hostname }}"
 hostname_configure_etc_hosts: false
