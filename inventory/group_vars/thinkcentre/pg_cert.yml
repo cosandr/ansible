@@ -1,4 +1,0 @@
----
-
-pg_cert_pull:
-  - name: "{{ domain }}"
