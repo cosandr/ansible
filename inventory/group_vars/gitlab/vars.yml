@@ -46,13 +46,12 @@ gitlab_email_display_name: "Gitlab"
 gitlab_email_reply_to: "no-reply@{{ domain }}"
 
 gitlab_smtp_enable: "true"
-gitlab_smtp_address: "{{ smtp_config[domain].host }}"
-gitlab_smtp_port: "{{ smtp_config[domain].port }}"
-gitlab_smtp_user_name: "{{ smtp_config[domain].user }}"
-gitlab_smtp_password: "{{ smtp_config[domain].pass }}"
+gitlab_smtp_address: "{{ hostvars['drepi'].postfix_hostname }}"
+gitlab_smtp_port: "587"
 gitlab_smtp_domain: "{{ domain }}"
-gitlab_smtp_authentication: "login"
-gitlab_smtp_tls: "true"
+gitlab_smtp_authentication: ''
+gitlab_smtp_enable_starttls_auto: "true"
+gitlab_smtp_openssl_verify_mode: "peer"
 
 gitlab_letsencrypt_enable: "false"
 gitlab_ldap_enabled: "false"

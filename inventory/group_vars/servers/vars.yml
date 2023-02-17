@@ -8,14 +8,6 @@ smartd_email: "{{ my_email }}"
 # Send from root domain
 smartd_from_address: "{{ inventory_hostname }}@{{ domain | regex_search('(\\w+\\.\\w+)$', '\\1') | first }}"
 
-smtp_config: "{{ vault_smtp_config }}"
-# smtp_config:
-#   example.com:
-#     host:
-#     pass:
-#     port:
-#     user:
-
 # Fetch with timedatectl -p Timezone --value show
 sys_timezone: "Europe/Oslo"
 
