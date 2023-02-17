@@ -1,0 +1,17 @@
+---
+
+gitlab_runners:
+  - name: "Docker Runner"
+    executor: docker
+    tags: ["docker"]
+    args: '--run-untagged --locked=false --docker-image "alpine:latest"'
+
+  - name: "Docker Runner DIND"
+    executor: docker
+    tags: ["docker-dind"]
+    args: '--docker-privileged --locked=false --docker-image "docker:latest" --docker-volumes /certs/client --env DOCKER_DRIVER=overlay2'
+
+  - name: "Docker Runner Socket"
+    executor: docker
+    tags: ["docker-socket"]
+    args: '--docker-image "docker:latest" --docker-volumes /run/docker.sock:/var/run/docker.sock'

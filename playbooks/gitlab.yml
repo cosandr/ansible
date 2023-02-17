@@ -1,7 +1,8 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- hosts: gitlab
+- name: Setup Gitlab
+  hosts: gitlab
   gather_facts: true
   pre_tasks:
     - name: Include common tasks
@@ -23,7 +24,7 @@
         state: present
 
     - name: Mount backup NFS share
-      mount:
+      ansible.posix.mount:
         src: "{{ hostvars['theia'].host_ips.vm }}:/mnt/tank/backup/gitlab"
         path: "{{ gitlab_backup_upload_connection.local_root }}"
         opts: "defaults,vers=4,rw,noatime,bg"
@@ -32,7 +33,7 @@
       tags: ["gitlab", "nfs"]
 
     - name: Ensure git owns backup mount
-      file:
+      ansible.builtin.file:
         path: "{{ gitlab_backup_upload_connection.local_root }}"
         owner: git
         group: git
@@ -41,55 +42,57 @@
       tags: ["gitlab", "nfs"]
 
     - name: Ensure correct SELinux context for git .ssh
-      sefcontext:
+      community.general.sefcontext:
         target: "/var/opt/gitlab/.ssh(/.*)?"
         setype: ssh_home_t
         state: present
-      notify: restore git contexts
+      notify: Restore git contexts
       when: ansible_selinux.status == "enabled"
       tags: ["gitlab", "selinux"]
 
     - name: Add garbage collection job
-      template:
+      ansible.builtin.template:
         src: "{{ repo_base_dir }}/files/gitlab/registry-garbage-collect.timer.j2"
         dest: "/etc/systemd/system/registry-garbage-collect.timer"
         owner: root
         group: root
         mode: 0644
       notify:
-        - reload systemd
-        - enable and start garbage collection
+        - Reload systemd
+        - Enable and start garbage collection
       tags: ["gitlab", "gc"]
 
     - name: Copy garbage collection service
-      copy:
+      ansible.builtin.copy:
         src: "{{ repo_base_dir }}/files/gitlab/registry-garbage-collect.service"
         dest: "/etc/systemd/system/registry-garbage-collect.service"
         owner: root
         group: root
         mode: 0644
-      notify: reload systemd
+      notify: Reload systemd
       tags: ["gitlab", "gc"]
 
   handlers:
-    - name: restore git contexts
-      command: restorecon -r /var/opt/gitlab/.ssh
+    - name: Restore git contexts
+      ansible.builtin.command: restorecon -r /var/opt/gitlab/.ssh
 
-    - name: reload systemd
-      systemd:
+    - name: Reload systemd
+      ansible.builtin.systemd:
         daemon_reload: true
 
-    - name: enable and start garbage collection
-      systemd:
+    - name: Enable and start garbage collection
+      ansible.builtin.systemd:
         name: registry-garbage-collect.timer
         state: started
         enabled: true
 
-- hosts: gitrun
+- name: Setup Gitlab runners
+  hosts: gitrun
   pre_tasks:
-    - name: Set Gitlab URL fact
-      tags: ["runner"]
-
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      tags: ["always"]
   roles:
     - role: gitlab_runner
       tags: ["runner"]
