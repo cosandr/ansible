@@ -6,6 +6,7 @@ host_pacman_packages:
   - blueman
   - fprintd
   - fwupd
+  - intel-compute-runtime
   - intel-gpu-tools
   - intel-media-driver
   - intel-ucode
@@ -18,15 +19,14 @@ host_pacman_packages:
   - system-config-printer
   - upower
   - virt-manager
+  - vulkan-intel
   - wireless-regdb
 
 pacman_packages: "{{ base_pacman_packages + host_pacman_packages }}"
 aur_packages: "{{ base_aur_packages + host_aur_packages }}"
 host_aur_packages:
   - slack-desktop
-  - teams
-  - webex-bin
-  - zoom
+  - upd72020x-fw
 
 masked_services:
   - systemd-rfkill.service

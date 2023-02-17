@@ -197,6 +197,13 @@
     - role: sshd
       tags: ["sshd"]
 
+    - role: hostname
+      tags: ["hostname"]
+
+    - role: systemd_networkd
+      when: network_manager == "systemd-networkd"
+      tags: ["systemd-networkd"]
+
     - role: sbctl
       vars:
         sbctl_enroll: false
@@ -247,7 +254,7 @@
         cmd: >-
           arch-chroot {{ chroot_path }}
             systemctl enable
-              sshd firewalld {{ network_manager | default('systemd-networkd') }}
+              sshd firewalld {{ network_manager }}
               {% if desktop_environment == 'kde' %}
               sddm
               {% elif desktop_environment == 'gnome' %}

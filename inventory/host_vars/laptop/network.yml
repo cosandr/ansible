@@ -1,6 +1,5 @@
 ---
 
-network_manager: "{{ 'systemd-networkd' if desktop_environment in ['i3', 'sway'] else 'NetworkManager' }}"
 networkd_config:
   - wired: |
       [Match]

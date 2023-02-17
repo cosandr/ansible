@@ -117,6 +117,7 @@ base_pacman_packages:
   - usbutils
   - vim
   - vlc
+  - vulkan-icd-loader
   - wget
   - which
   - yamllint
