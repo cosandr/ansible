@@ -41,6 +41,53 @@
     label: "{{ item.replace }}"
   tags: ["makepkg"]
 
+- name: Write crypttab
+  ansible.builtin.copy:
+    dest: "{{ chroot_path }}/etc/crypttab"
+    owner: root
+    group: root
+    mode: "0600"
+    content: "{{ crypttab }}\n"
+  when: crypttab | default('')
+  tags: ["crypttab"]
+
+- name: Write crypttab.initramfs
+  ansible.builtin.copy:
+    dest: "{{ chroot_path }}/etc/crypttab.initramfs"
+    owner: root
+    group: root
+    mode: "0600"
+    content: "{{ crypttab_initramfs }}\n"
+  when: crypttab_initramfs | default('')
+  tags: ["crypttab"]
+
+- name: Write modprobe configs
+  ansible.builtin.copy:
+    content: "{{ item.value }}\n"
+    dest: "{{ chroot_path }}/etc/modprobe.d/{{ item.key }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop: "{{ modprobe_config | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  tags: ["modprobe"]
+
+- name: Mask services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    masked: true
+  loop: "{{ masked_services }}"
+  when: not chroot_path
+  tags: ["mask"]
+
+- name: Mask services (chroot)
+  ansible.builtin.command: >-
+    arch-chroot {{ chroot_path }} systemctl mask {{ item }}
+  loop: "{{ masked_services }}"
+  when: chroot_path
+  tags: ["mask"]
+
 - name: Enable and start systemd-timesyncd
   ansible.builtin.systemd:
     name: systemd-timesyncd.service

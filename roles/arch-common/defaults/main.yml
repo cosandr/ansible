@@ -26,3 +26,6 @@ pacman_config:
     line: "VerbosePkgLists"
   - regexp: "^#?ParallelDownloads"
     line: "ParallelDownloads = {{ pacman_parallel }}"
+
+masked_services: []
+modprobe_config: {}

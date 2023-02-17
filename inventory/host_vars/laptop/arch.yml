@@ -39,30 +39,18 @@ modprobe_config:
 # systemd-cryptenroll /dev/nvme0n1p2 --wipe-slot=tpm2
 # systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+1+7 /dev/nvme0n1p2
 
-esp_src: "UUID=66FD-2807"
+btrfs_src: "LABEL=BTRFSROOT"
+btrfs_opts: "rw,relatime,compress=zstd:3,ssd,space_cache=v2"
+
+esp_src: "LABEL=ESP"
 esp_mount: "{{ '/boot' if desktop_environment in ['i3', 'sway'] else '/boot/efi' }}"
 mkinitcpio_uefi_prefix: "arch_{{ desktop_environment }}"
 
 extra_kernel_params: "intel_iommu=on nmi_watchdog=0 console=tty7"
 kernel_params: "root=/dev/mapper/root rw rootflags=subvol=arch_{{ desktop_environment }}/@ resume=/dev/mapper/root resume_offset=2893056 {{ extra_kernel_params }}"
 
-systemd_boot_entries:
-  "arch-zen": |
-    title Arch Linux (Zen)
-    linux /vmlinuz-linux-zen
-    initrd /intel-ucode.img
-    initrd /initramfs-linux-zen.img
-    options {{ kernel_params }}
-
-crypttab: ""
-
 crypttab_initramfs: |
   root    UUID=6b84ad63-29cc-414d-ae2d-c1f1b3897c21   -   luks,discard,tpm2-device=auto
-
-
-fstab: |
-  /dev/mapper/root    	/.swap    	btrfs     	rw,relatime,compress-force=zstd:3,ssd,space_cache=v2,subvol=/@swap 0 0
-  /.swap/swapfile		    none		    swap		    defaults	0 0
 
 # go-check-updates
 # git clone https://github.com/cosandr/go-check-updates
