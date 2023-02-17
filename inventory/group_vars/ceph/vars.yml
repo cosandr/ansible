@@ -5,3 +5,12 @@ prometheus_node_labels:
   instance: "{{ inventory_hostname }}"
 
 fstrim_timer_enabled: true
+
+dnf_automatic_excludes:
+  - "kernel*"
+  - "kmod*"
+  - "systemd*"
+  - "libvirt*"
+  - "qemu*"
+  - "podman*"
+  - "container*"

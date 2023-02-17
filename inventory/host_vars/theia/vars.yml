@@ -8,14 +8,6 @@ cpupower_stop_governor: ondemand
 web_root: "/var/www"
 pip_wheel_dir: "{{ web_root }}/pip"
 
-dnf_automatic_excludes:
-  - "kernel*"
-  - "kmod*"
-  - "systemd*"
-  - "zfs*"
-  - "libvirt*"
-  - "qemu*"
-
 btrfs_scrub_targets:
   - /
   - /mnt/tank

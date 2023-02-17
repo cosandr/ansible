@@ -121,6 +121,9 @@ thinkcentre
 [ceph]
 theia
 
+[ceph:vars]
+ansible_group_priority=2
+
 [rom]
 romgw01
 rompi
