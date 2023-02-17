@@ -7,9 +7,9 @@ mkinitcpio_uefi_bundle: true
 mkinitcpio_kernel_presets: ["default"]
 mkinitcpio_kernels:
   - name: linux
-    label: "Arch Linux"
+    label: "Arch {{ desktop_environment | title }}"
   - name: linux-lts
-    label: "Arch Linux LTS"
+    label: "Arch {{ desktop_environment | title }} LTS"
 
 base_pacman_packages:
   - alacritty

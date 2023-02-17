@@ -1,31 +1,15 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- name: Pre-chroot tasks
-  hosts: localhost
+- name: Arch Install
+  hosts: gui
   gather_facts: false
   become: true
   vars:
     ansible_os_family: Archlinux
     ansible_distribution: Archlinux
-    desktop_environment: kde
-    base_packages:
-      - base
-      - base-devel
-      - linux
-      - linux-lts
-      - linux-firmware
-      - networkmanager
-      - python-pip
-      - sof-firmware
-      - vim
-    btrfs_src: "/dev/mapper/root"
-    btrfs_opts: "rw,relatime,compress-force=zstd:3,ssd,space_cache=v2"
-    esp_mount: "/boot/efi"
-    env_name: "arch_{{ desktop_environment }}"
+    env_name: "{{ mkinitcpio_uefi_prefix }}"
     src_host: "{{ lookup('pipe', 'hostname') | lower }}"
-    btrfs_root: "{{ hostvars[src_host].btrfs_root }}"
-    esp_src: "{{ hostvars[src_host].esp_src }}"
     chroot_path: "/mnt/{{ env_name }}"
     mounts:
       - path: /
@@ -38,19 +22,30 @@
         subvol: "{{ env_name }}/@snapshots"
       - path: /.swap
         subvol: "{{ env_name }}/@swap"
-  tasks:
+    my_user_pass: !vault |
+      $ANSIBLE_VAULT;1.1;AES256
+      62353464383663383335353432663531373334356565316561316266393134353539643836316438
+      6233383661393830383936353434643163646266616464390a646130623539363266376635376137
+      38396138303830333566363733356638396331346437323161353462643762353836386232333061
+      6331363865653638640a383636323831653432653830396231363562656230336530636335336639
+      39363364313766363564613364326330643239366135343139626239613063616439643038383664
+      65353865383931666333643238653365353938356531313730393033663431363938306439613266
+      61356437623130393538616636316662356333653866386234653830626565616365313664633338
+      63626333366335643634373634386632653532633462383136343231333739383036333734313264
+      38356561393566396665353761616536643866313165353033656238623030633938
+  pre_tasks:
     - name: Get existing subvolumes
-      shell: "set -o pipefail; btrfs sub list -t {{ btrfs_root }} | tail -n+3 | awk '{ print $4 }'"
+      ansible.builtin.shell: "set -o pipefail; btrfs sub list -t {{ btrfs_root }} | tail -n+3 | awk '{ print $4 }'"
       changed_when: false
       register: __subvols
 
     - name: Create missing subvolumes
-      command: "btrfs sub create {{ btrfs_root }}/{{ item }}"
+      ansible.builtin.command: "btrfs sub create {{ btrfs_root }}/{{ item }}"
       loop: "{{ [env_name] + (mounts | map(attribute='subvol') | list) }}"
       when: item not in __subvols.stdout_lines
 
     - name: Prepare chroot mounts
-      mount:
+      ansible.posix.mount:
         src: "{{ btrfs_src }}"
         path: "{{ chroot_path }}{{ item.path }}"
         opts: "{{ btrfs_opts }},subvol={{ item.subvol }}"
@@ -61,12 +56,12 @@
       tags: ["mount"]
 
     - name: Ensure install scripts are present
-      pacman:
+      community.general.pacman:
         name: arch-install-scripts
         state: present
 
     - name: Copy pacman.conf
-      copy:
+      ansible.builtin.copy:
         src: /etc/pacman.conf
         dest: /tmp/pacstrap.conf
         remote_src: true
@@ -76,18 +71,31 @@
         mode: 0644
 
     - name: Ensure no packages are ignored
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /tmp/pacstrap.conf
         regexp: '^IgnorePkg'
         state: absent
 
     - name: Install base packages
-      command: "pacstrap -C /tmp/pacstrap.conf {{ chroot_path }} {{ base_packages | join(' ') }}"
+      ansible.builtin.command: "pacstrap -C /tmp/pacstrap.conf {{ chroot_path }}
+        {{ pacman_packages | join(' ') }}"
       args:
         creates: "{{ chroot_path }}/etc/fstab"
 
+    - name: Ensure fwupd signed file exists
+      ansible.builtin.copy:
+        src: "{{ chroot_path }}/usr/lib/fwupd/efi/fwupdx64.efi"
+        dest: "{{ chroot_path }}/usr/lib/fwupd/efi/fwupdx64.efi.signed"
+        owner: root
+        group: root
+        mode: "0644"
+        remote_src: true
+        force: false
+      when: "'fwupd' in pacman_packages"
+      tags: ["sbctl"]
+
     - name: Create some required directories
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         owner: root
         group: root
@@ -99,18 +107,18 @@
         - "{{ chroot_path }}/usr/share/secureboot"
       tags: ["mount"]
 
-    - name: Bind mount ESP
-      mount:
-        src: "/boot"
+    - name: Mount ESP
+      ansible.posix.mount:
+        src: "{{ esp_src }}"
         path: "{{ chroot_path }}/{{ esp_mount }}"
         state: mounted
-        opts: bind
-        fstype: none
+        opts: 'defaults,noatime'
+        fstype: vfat
         fstab: "/tmp/{{ env_name }}.fstab"
       tags: ["mount"]
 
     - name: Configure fstab # noqa no-tabs
-      copy:
+      ansible.builtin.copy:
         dest: "{{ chroot_path }}/etc/fstab"
         owner: root
         group: root
@@ -120,135 +128,130 @@
           # See fstab(5) for details.
 
           # <file system> <dir> <type> <options> <dump> <pass>
-          {{ esp_src }} 	 {{ esp_mount }} 	 vfat 	 rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 	 0  2
+          {{ esp_src }} 	 {{ esp_mount }} 	 vfat 	 rw,noatime,fmask=0022,dmask=0022,codepage=437,iocharset=ascii,shortname=mixed,utf8,errors=remount-ro 	 0  2
           {{ btrfs_src }} 	 {{ btrfs_root }} 	 btrfs 	 {{ btrfs_opts }} 	0  0
           {% for m in mounts %}
           {{ btrfs_src }} 	 {{ m.path }} 	 btrfs 	 {{ btrfs_opts }},subvol={{ m.subvol }} 	0  0
           {% endfor %}
 
+    - name: Check if sbctl is initialized on host
+      ansible.builtin.stat:
+        path: /usr/share/secureboot/GUID
+      register: __sbctl_init
+      tags: ["sbctl"]
+
     - name: Copy sbctl files
-      copy:
+      ansible.builtin.copy:
         src: "/usr/share/secureboot/{{ item }}"
         dest: "{{ chroot_path }}/usr/share/secureboot/"
         mode: preserve
       loop:
         - GUID
         - keys
+      when: __sbctl_init.stat.exists
       tags: ["sbctl"]
 
-    - name: Copy initrd config
-      copy:
-        src: "/etc/{{ item }}"
-        dest: "{{ chroot_path }}/etc/"
-        mode: preserve
-      loop:
-        - mkinitcpio.conf
-        - crypttab.initramfs
-        - vconsole.conf
-      tags: ["mkinitcpio"]
+    - name: Write vconsole.conf
+      ansible.builtin.copy:
+        dest: "{{ chroot_path }}/etc/vconsole.conf"
+        owner: root
+        group: root
+        mode: "0644"
+        content: "{{ vconsole_conf | default('') }}\n"
+      tags: ["vconsole"]
 
-    - name: Add chroot to inventory
-      add_host:
-        name: "{{ chroot_path }}"
-        groups: chroots
-        env_name: "{{ env_name }}"
-        esp_mount: "{{ esp_mount }}"
-        src_host: "{{ src_host }}"
-        desktop_environment: "{{ desktop_environment }}"
+    - name: Install pipewire
+      ansible.builtin.command:
+        cmd: >-
+          pacstrap -C /tmp/pacstrap.conf {{ chroot_path }}
+            pipewire pipewire-alsa pipewire-pulse wireplumber
+        creates: "{{ chroot_path }}/usr/bin/pipewire"
+      tags: ["pipewire"]
 
-- name: Run in chroot
-  hosts: chroots
-  gather_facts: false
-  connection: chroot
-  vars:
-    ansible_os_family: Archlinux
-    ansible_distribution: Archlinux
-  pre_tasks:
-    - name: Create my user
-      user:
-        name: andrei
-        password: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          62353464383663383335353432663531373334356565316561316266393134353539643836316438
-          6233383661393830383936353434643163646266616464390a646130623539363266376635376137
-          38396138303830333566363733356638396331346437323161353462643762353836386232333061
-          6331363865653638640a383636323831653432653830396231363562656230336530636335336639
-          39363364313766363564613364326330643239366135343139626239613063616439643038383664
-          65353865383931666333643238653365353938356531313730393033663431363938306439613266
-          61356437623130393538616636316662356333653866386234653830626565616365313664633338
-          63626333366335643634373634386632653532633462383136343231333739383036333734313264
-          38356561393566396665353761616536643866313165353033656238623030633938
-        groups: ["wheel"]
-        append: true
+    - name: Read passwd
+      ansible.builtin.slurp:
+        path: "{{ chroot_path }}/etc/passwd"
+      register: __passwd
+      tags: ["user"]
 
-    - name: Install common packages
-      pacman:
-        name: "{{ hostvars[src_host].pacman_packages }}"
-        state: present
+    - name: Create my user if it's missing
+      ansible.builtin.command:
+        cmd: >-
+          arch-chroot {{ chroot_path }}
+            useradd --create-home --btrfs-subvolume-home --groups wheel --shell /usr/bin/zsh --password {{ my_user_pass }} {{ my_user }}
+      when: my_user not in __passwd.content | b64decode
+      tags: ["user"]
+
   roles:
     - role: arch-common
       vars:
-        mkinitcpio_no_fallback: "{{ hostvars[src_host].mkinitcpio_no_fallback }}"
         hwclock_sync: false
+      tags: ["arch-common"]
+
     - role: locale_conf
-      vars:
-        locale_gen: "{{ hostvars[src_host].locale_gen }}"
-        locale_conf: "{{ hostvars[src_host].locale_conf }}"
+      tags: ["locale"]
+
     - role: sudo
-      vars:
-        sudoers_files: "{{ hostvars[src_host].sudoers_files }}"
-    - role: pipewire
+      tags: ["sudo"]
+
     - role: sshd
+      tags: ["sshd"]
 
     - role: sbctl
       vars:
-        kernel_params: "root=/dev/mapper/root rw rootflags=subvol={{ env_name }}/@ {{ hostvars[src_host].extra_kernel_params | default('') }}"
         sbctl_enroll: false
-        sbctl_ucode: "{{ hostvars[src_host].sbctl_ucode | default('intel-ucode.img') }}"
-        boot_mount: /boot
-        sbctl_bundles:
-          - kernel: linux
-            label: "Arch Linux {{ desktop_environment | upper }}"
-            bundle: "{{ env_name }}-linux.efi"
       tags: ["sbctl"]
+
+    - role: mkinitcpio
+      tags: ["mkinitcpio"]
 
   post_tasks:
     - name: Install KDE
-      pacman:
-        name:
-          - plasma
-          - plasma-wayland-session
-          - kde-applications
-          - sddm
-          - xdg-desktop-portal-kde
-        state: present
+      ansible.builtin.command:
+        cmd: >-
+          pacstrap -C /tmp/pacstrap.conf {{ chroot_path }}
+            plasma plasma-wayland-session kde-applications sddm xdg-desktop-portal-kde
+        creates: "{{ chroot_path }}/usr/bin/sddm"
       when: desktop_environment == 'kde'
+      tags: ["de"]
 
     - name: Install GNOME
-      pacman:
-        name:
-          - gnome
-          - xdg-desktop-portal-gnome
-        state: present
+      ansible.builtin.command:
+        cmd: >-
+          pacstrap -C /tmp/pacstrap.conf {{ chroot_path }}
+            gnome xdg-desktop-portal-gnome
+        creates: "{{ chroot_path }}/usr/bin/gdm"
       when: desktop_environment == 'gnome'
+      tags: ["de"]
 
-    - name: Enable common services
-      systemd:
-        name: "{{ item }}"
-        enabled: true
-      loop:
-        - sshd
-        - firewalld
-        - NetworkManager
+    - name: Install i3 packages
+      ansible.builtin.command:
+        cmd: >-
+          pacstrap -C /tmp/pacstrap.conf {{ chroot_path }}
+            {{ pacman_i3_packages | join(' ') }}
+        creates: "{{ chroot_path }}/usr/bin/i3"
+      when: desktop_environment in ["i3", "sway"]
+      tags: ["de"]
 
-    - name: Enable SDDM service
-      systemd:
-        name: sddm
-        enabled: true
-      when: desktop_environment == 'kde'
+    - name: Install Sway packages
+      ansible.builtin.command:
+        cmd: >-
+          pacstrap -C /tmp/pacstrap.conf {{ chroot_path }}
+            {{ pacman_sway_packages | join(' ') }}
+        creates: "{{ chroot_path }}/usr/bin/sway"
+      when: desktop_environment == "sway"
+      tags: ["de"]
 
-    - name: Enable GDM service
-      systemd:
-        name: gdm
-        enabled: true
-      when: desktop_environment == 'gnome'
+    - name: Enable services
+      ansible.builtin.command:
+        cmd: >-
+          arch-chroot {{ chroot_path }}
+            systemctl enable
+              sshd firewalld {{ network_manager | default('systemd-networkd') }}
+              {% if desktop_environment == 'kde' %}
+              sddm
+              {% elif desktop_environment == 'gnome' %}
+              gdm
+              {% endif %}
+        creates: "{{ chroot_path }}/etc/systemd/system/multi-user.target.wants/sshd.service"
+      tags: ["services"]
