@@ -21,6 +21,9 @@
 
     - role: auto_ssh
       tags: ["auto-ssh"]
+
+    - role: btrbk
+      tags: ["btrbk"]
   tasks:
     - name: Include common tasks
       ansible.builtin.include_tasks:

@@ -1,0 +1,14 @@
+---
+
+btrbk_timestamp_format: "long"
+btrbk_snapshot_preserve_min: "latest"
+
+btrbk_volumes:
+  - path: "/mnt/btrfs_root"
+    options:
+      snapshot_dir: "@snapshots"
+      snapshot_preserve: "1h 2d 1w"
+    subvolumes:
+      - path: "@"
+        options:
+          snapshot_name: "root"
