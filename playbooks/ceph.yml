@@ -5,7 +5,7 @@
   hosts: ceph
   gather_facts: false
   tasks:
-    - name: Run on only one host
+    - name: Run on only one host  # noqa: run-once[task]
       run_once: true
       tags: ["orch"]
       block:
@@ -58,14 +58,14 @@
       notify: Restore ceph SELinux context
       tags: ["cephfs", "selinux"]
 
-    - name: Create libvirt dir on CephFS
+    - name: Create libvirt dir on CephFS  # noqa: run-once[task]
       run_once: true
       ansible.builtin.file:
         path: /mnt/ceph/libvirt
         state: directory
         owner: root
         group: root
-        mode: 0755
+        mode: "0755"
       tags: ["cephfs", "libvirt"]
 
     - name: Set libvirt CephFS SELinux context
@@ -98,11 +98,56 @@
         autostart: true
       tags: ["libvirt", "cephfs"]
 
+    - name: Create my user
+      ansible.builtin.user:
+        name: "{{ my_user }}"
+        password: "{{ my_user_pass }}"
+        shell: "/usr/bin/zsh"
+        home: "/mnt/ceph/{{ my_user }}"
+        create_home: true
+        groups: wheel
+        append: true
+        uid: 1000
+      tags: ["user"]
+
+    # Based on defaults from 'semanage fcontext -l | grep user_home'
+    - name: Set user dir CephFS SELinux context
+      community.general.sefcontext:
+        target: "/mnt/ceph/{{ my_user }}"
+        ftype: d
+        seuser: unconfined_u
+        setype: user_home_dir_t
+        state: present
+      notify: Restore user SELinux context
+      tags: ["user", "selinux"]
+
+    - name: Set user files CephFS SELinux context
+      community.general.sefcontext:
+        target: "/mnt/ceph/{{ my_user }}/.+"
+        seuser: unconfined_u
+        setype: user_home_t
+        state: present
+      notify: Restore user SELinux context
+      tags: ["user", "selinux"]
+
+    - name: Configure user SSH keys  # noqa: run-once[task]
+      run_once: true
+      ansible.posix.authorized_key:
+        user: "{{ my_user }}"
+        key: "{{ ssh_authorized_keys | join('\n') }}"
+        state: present
+        exclusive: true
+      tags: ["user", "ssh"]
+
   handlers:
-    - name: Restore ceph SELinux context
+    - name: Restore ceph SELinux context  # noqa: run-once[task]
       run_once: true
       ansible.builtin.command: restorecon -r /mnt/ceph
 
-    - name: Restore libvirt SELinux context
+    - name: Restore libvirt SELinux context  # noqa: run-once[task]
       run_once: true
       ansible.builtin.command: restorecon -r /mnt/ceph/libvirt
+
+    - name: Restore user SELinux context  # noqa: run-once[task]
+      run_once: true
+      ansible.builtin.command: "restorecon -r /mnt/ceph/{{ my_user }}"

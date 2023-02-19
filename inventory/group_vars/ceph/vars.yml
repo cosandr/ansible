@@ -14,3 +14,5 @@ dnf_automatic_excludes:
   - "qemu*"
   - "podman*"
   - "container*"
+
+my_user_pass: "{{ vault_my_user_pass }}"

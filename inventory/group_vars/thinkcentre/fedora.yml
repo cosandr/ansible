@@ -1,6 +1,7 @@
 ---
 
 dnf_packages:
+  - fzf
   - htop
   - iftop
   - iotop
