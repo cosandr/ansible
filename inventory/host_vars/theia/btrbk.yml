@@ -17,10 +17,6 @@ btrbk_volumes:
       - path: "@home"
         options:
           snapshot_name: "home"
-      - path: "@home/andrei"
-        options:
-          snapshot_name: "andrei"
-          snapshot_preserve: "8h 5d 2m"
 
   - path: "/mnt/tank"
     options:
