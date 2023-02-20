@@ -1,5 +1,0 @@
----
-
-fail2ban_sshd_extra:
-  maxretry: 2
-  bantime: 8h

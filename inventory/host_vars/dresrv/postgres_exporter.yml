@@ -1,2 +1,0 @@
----
-postgres_exporter_web_listen_address: "127.0.0.1:{{ postgres_exporter_port }}"

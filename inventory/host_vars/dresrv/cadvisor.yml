@@ -1,4 +1,0 @@
----
-
-cadvisor_docker_only: true
-cadvisor_listen_ip: "0.0.0.0"

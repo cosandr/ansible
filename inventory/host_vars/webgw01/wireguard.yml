@@ -14,7 +14,6 @@ wireguard_dns_list:
 wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
   - "{{ home_net.vm.cidr }}"
-  - "{{ hostvars['dresrv'].ansible_host }}/32"
   - "{{ hostvars['rb5009'].wireguard_ipv6 }}/128"
   - "{{ home_net.vm.cidr6 }}"
   - "{{ hostvars['theia'].ansible_host }}/32"

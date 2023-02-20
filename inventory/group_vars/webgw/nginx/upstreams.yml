@@ -31,25 +31,6 @@ __nginx_upstreams_common:
   - name: jellyfin
     servers: ["{{ swarm_vip_address }}:{{ hostvars['swarm01'].jellyfin_port }}"]
 
-  - name: vouch
-    servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].vouch_listen_port }}"]
-
-  # - name: transmission
-  #   servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].transmission_port }}"]
-  #   keepalive: 16
-
-  # - name: sonarr
-  #   servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].sonarr_port }}"]
-  #   keepalive: 16
-
-  # - name: firefox
-  #   servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].firefox_port }}"]
-  #   keepalive: 16
-
-  # - name: vscode
-  #   servers: ["{{ hostvars['dresrv'].ansible_host }}:{{ hostvars['dresrv'].vscode_port }}"]
-  #   keepalive: 16
-
 __nginx_upstreams_host:
   - name: nextcloud_ta
     servers: ["{{ hostvars['romsto'].wireguard_ip }}:{{ hostvars['romsto'].nextcloud_port }}"]

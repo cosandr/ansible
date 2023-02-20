@@ -10,7 +10,6 @@ laptop  ansible_host=10.0.50.5
 m1bp    ansible_host=10.0.50.34
 
 [servers]
-dresrv  ansible_host=10.0.50.22
 romsto  ansible_host=10.1.0.6
 theia   ansible_host=10.0.50.2
 syno    ansible_host=10.0.100.8 ansible_user=andrei
@@ -26,7 +25,6 @@ thinkcentre
 ansible_group_priority=1
 
 [libvirt]
-dresrv
 localgw01
 prom01
 

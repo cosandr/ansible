@@ -17,10 +17,6 @@ __nginx_vhosts_common:
     server_name: grafana
     template: "{{ repo_base_dir }}/files/webgw/nginx/grafana.conf.j2"
 
-  - filename: admin.conf
-    server_name: admin
-    template: "{{ repo_base_dir }}/files/webgw/nginx/admin.conf.j2"
-
   - filename: jellyfin.conf
     server_name: jellyfin
     template: "{{ repo_base_dir }}/files/webgw/nginx/jellyfin.conf.j2"

@@ -5,17 +5,10 @@ user_suspend: |
   Environment=DISPLAY=:0
   Environment=SYSTEMD_SUSPEND=1
   ExecStart=-/usr/bin/playerctl pause
-  ExecStart=-/bin/sh -c 'export XDG_RUNTIME_DIR=/run/user/$$(id -u); systemctl --user stop ws-wait-online.service'
-  ExecStart=-/bin/sh -c 'export XDG_RUNTIME_DIR=/run/user/$$(id -u); systemctl --user stop dresrv-wait-online.service'
   {% if desktop_environment in ['i3', 'sway'] %}
   # Only lock if not locked already
   ExecStart=/bin/sh -c 'pgrep -u andrei -x my-screenlock || /home/andrei/.local/bin/my-screenlock'
   {% endif %}
-
-user_resume: |
-  Type=oneshot
-  ExecStart=-/bin/sh -c 'export XDG_RUNTIME_DIR=/run/user/$$(id -u); systemctl --user start ws-wait-online.service'
-  ExecStart=-/bin/sh -c 'export XDG_RUNTIME_DIR=/run/user/$$(id -u); systemctl --user start dresrv-wait-online.service'
 
 logind_config: |
   HandlePowerKey=ignore

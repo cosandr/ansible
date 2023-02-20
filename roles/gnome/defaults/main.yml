@@ -53,19 +53,3 @@ gnome_custom_keybindings:
   - binding: '<Alt><Super>f'
     command: 'nautilus --new-window'
     name: 'Nautilus'
-
-  - binding: '<Primary><Alt>1'
-    command: 'kitty ssh andrei@DreSRV-A'
-    name: 'Kitty DreSRV'
-
-  - binding: '<Primary><Alt>2'
-    command: 'kitty ssh root@DreSRV'
-    name: 'Kitty DreSRV root'
-
-  - binding: '<Primary><Alt>3'
-    command: 'kitty ssh andrei@dresrv.com-A'
-    name: 'Kitty dresrv.com'
-
-  - binding: '<Primary><Alt>4'
-    command: 'kitty ssh ws'
-    name: 'Kitty ws'
