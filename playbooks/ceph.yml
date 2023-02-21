@@ -5,7 +5,7 @@
   hosts: ceph
   gather_facts: false
   tasks:
-    - name: Run on only one host  # noqa: run-once[task]
+    - name: Run on only one host
       run_once: true
       tags: ["orch"]
       block:
@@ -58,7 +58,7 @@
       notify: Restore ceph SELinux context
       tags: ["cephfs", "selinux"]
 
-    - name: Create libvirt dir on CephFS  # noqa: run-once[task]
+    - name: Create libvirt dir on CephFS
       run_once: true
       ansible.builtin.file:
         path: /mnt/ceph/libvirt
@@ -130,7 +130,7 @@
       notify: Restore user SELinux context
       tags: ["user", "selinux"]
 
-    - name: Configure user SSH keys  # noqa: run-once[task]
+    - name: Configure user SSH keys
       run_once: true
       ansible.posix.authorized_key:
         user: "{{ my_user }}"
@@ -140,14 +140,14 @@
       tags: ["user", "ssh"]
 
   handlers:
-    - name: Restore ceph SELinux context  # noqa: run-once[task]
+    - name: Restore ceph SELinux context
       run_once: true
       ansible.builtin.command: restorecon -r /mnt/ceph
 
-    - name: Restore libvirt SELinux context  # noqa: run-once[task]
+    - name: Restore libvirt SELinux context
       run_once: true
       ansible.builtin.command: restorecon -r /mnt/ceph/libvirt
 
-    - name: Restore user SELinux context  # noqa: run-once[task]
+    - name: Restore user SELinux context
       run_once: true
       ansible.builtin.command: "restorecon -r /mnt/ceph/{{ my_user }}"
