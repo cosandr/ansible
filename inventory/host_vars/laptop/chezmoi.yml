@@ -75,5 +75,7 @@ chezmoi_overrides:
     fi
   waybar: |
     MONITOR_MAP["Lenovo Group Limited L32p-30 U511L1X2"]=laptop_ext
+    MONITOR_MAP["GIGA-BYTE TECHNOLOGY CO., LTD. Gigabyte M32U 21311B001327"]=laptop_ext
     MONITOR_MAP["Samsung Electric Company LS27A800U HNMTA00225"]=laptop_ext_secondary
+    MONITOR_MAP["Samsung Electric Company U24E850 HTHH300363"]=laptop_ext_secondary
     export DDCUTIL_SLEEP_MULTIPLIER=3
