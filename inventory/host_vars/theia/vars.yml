@@ -2,8 +2,8 @@
 
 domain: "{{ domains['hb'] }}"
 
-cpupower_start_governor: powersave
-cpupower_stop_governor: ondemand
+cpupower_start_governor: schedutil
+cpupower_stop_governor: conservative
 
 web_root: "/var/www"
 pip_wheel_dir: "{{ web_root }}/pip"
