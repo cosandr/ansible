@@ -11,6 +11,9 @@ vm_template: "rocky9_packer.{{ vm_disk_format }}"
 vm_os_id: "http://rockylinux.org/rocky/9"
 vm_disk_pool: "cephfs"
 vm_extra_disks: []
+vm_started: true
+vm_cpu_mode: "{{ 'custom' if vm_cpu_model_name else 'host-passthrough' }}"
+vm_cpu_model_name: ""
 
 vm_data_disks: []
 # vm_data_disks: ["200G", "150G"]
@@ -42,7 +45,8 @@ vm_nics: ["{{ vm_default_nic }}"]
 vm_default_definition:
   state: present
   machine: q35
-  start: true
+  start: "{{ vm_started }}"
+  autostart: "{{ vm_started }}"
   customize: true
   enable_console: true
   enable_vnc: false
@@ -54,5 +58,7 @@ vm_default_definition:
   os_id: "{{ vm_os_id }}"
   volumes: "{{ [vm_root_disk] + vm_extra_disks }}"
   interfaces: "{{ vm_nics }}"
+  cpu_mode: "{{ vm_cpu_mode }}"
+  cpu_model_name: "{{ vm_cpu_model_name }}"
 
 libvirt_vms: ["{{ vm_default_definition }}"]
