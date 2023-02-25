@@ -62,19 +62,23 @@
       tags: ["swarm"]
       block:
         - name: Initialize swarm
+          delegate_to: "{{ docker_swarm_managers[0] }}"
           run_once: true
           community.docker.docker_swarm:
             state: present
+            advertise_addr: "{{ ansible_host }}"
+            default_addr_pool:
+              - "10.233.0.0/16"
             task_history_retention_limit: 2
           register: __swarm_init
 
         - name: Join nodes
           community.docker.docker_swarm:
             state: join
-            remote_addrs:
-              - "{{ hostvars[groups['swarm'][0]].ansible_host }}:2377"
-            join_token: "{{ __swarm_init.swarm_facts.JoinTokens.Manager }}"
-          when: __swarm_init.get('swarm_facts', {}).get('JoinTokens', {}).get('Manager', '')
+            advertise_addr: "{{ ansible_host }}"
+            remote_addrs: "{{ docker_swarm_managers | map('extract', hostvars, 'ansible_host') | map('regex_replace', '$', ':2377') }}"
+            join_token: "{{ __swarm_init.swarm_facts.JoinTokens[docker_swarm_role] }}"
+          when: __swarm_init.get('swarm_facts', {}).get('JoinTokens', {}).get(docker_swarm_role, '')
 
     - name: Login to registries
       community.docker.docker_login:
