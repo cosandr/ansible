@@ -73,6 +73,8 @@ base_pacman_packages:
   - make
   - man-db
   - mesa-demos
+  - molecule-docker
+  - molecule-podman
   - ncdu
   - net-tools
   - nextcloud-client
@@ -82,6 +84,7 @@ base_pacman_packages:
   - openssh
   - otf-cascadia-code
   - p7zip
+  - packer
   - pacman-contrib
   - pacutils
   - patch
@@ -174,6 +177,7 @@ aur_i3_packages:
   - adwaita-qt5-git
   - i3lock-color
   - i3lock-fancy-rapid-git
+  - xvkbd
 
 pacman_sway_packages:
   - gammastep
@@ -187,6 +191,7 @@ pacman_sway_packages:
   - waybar
   - wl-clipboard
   - wofi
+  - wtype
   - xdg-desktop-portal-wlr
   - xorg-xwayland
 
