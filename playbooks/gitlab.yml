@@ -93,9 +93,84 @@
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
       tags: ["always"]
+
+    - name: Setup podman runner
+      tags: ["podman"]
+      block:
+        # Package sets it up, but it won't be installed when running from scratch
+        - name: Ensure runner user exists
+          ansible.builtin.user:
+            name: gitlab-runner
+            system: true
+            state: present
+          register: __runner_user
+          tags: ["runner"]
+
+        - name: Configure runner authorized_keys
+          ansible.posix.authorized_key:
+            user: "gitlab-runner"
+            key: "{{ ssh_authorized_keys | join('\n') }}"
+            state: present
+            exclusive: true
+
+        - name: Setup rootless podman
+          ansible.builtin.copy:
+            content: |
+              gitlab-runner:100000:65536
+            dest: "{{ item }}"
+            owner: root
+            group: root
+            mode: "0644"
+          loop:
+            - "/etc/subuid"
+            - "/etc/subgid"
+
+        - name: Install packages
+          ansible.builtin.dnf:
+            name:
+              - fuse-overlayfs
+              - podman
+              - python3-podman
+              - podman-plugins
+            state: present
+
+        - name: Get user status
+          ansible.builtin.command:
+            cmd: loginctl show-user gitlab-runner
+          changed_when: false
+          check_mode: false
+          failed_when: false
+          register: __user_status
+
+        - name: Enable linger
+          ansible.builtin.command:
+            cmd: loginctl enable-linger gitlab-runner
+          when: "'Linger=yes' not in __user_status.stdout or 'not logged in or lingering' in __user_status.stderr"
+          notify: Reboot
+
+        - name: Enable and start user socket
+          become: false
+          vars:
+            # become + become_user doesn't start a systemd session
+            ansible_ssh_user: gitlab-runner
+          ansible.builtin.systemd:
+            name: podman.socket
+            state: started
+            enabled: true
+            scope: user
+
+        - name: Set socket path fact
+          ansible.builtin.set_fact:
+            podman_user_socket: "unix:///run/user/{{ __runner_user.uid }}/podman/podman.sock"
+          tags: ["runner"]
+
   roles:
     - role: geerlingguy.docker
       tags: ["docker"]
 
     - role: gitlab_runner
       tags: ["runner"]
+
+  handlers:
+    - name: Reboot
+      ansible.builtin.reboot:

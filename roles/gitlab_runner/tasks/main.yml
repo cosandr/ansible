@@ -1,7 +1,7 @@
 ---
 
 - name: Install SELinux libraries
-  dnf:
+  ansible.builtin.dnf:
     name:
       - "python3-libselinux"
       - "python3-policycoreutils"
@@ -10,26 +10,26 @@
   tags: ["selinux"]
 
 - name: Install gitlab-runner repo
-  get_url:
+  ansible.builtin.get_url:
     dest: /etc/yum.repos.d/gitlab-runner.repo
     url: "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/config_file.repo?os=centos&dist={{ ansible_distribution_major_version }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when:
     - ansible_os_family == 'RedHat'
     - ansible_distribution != 'Fedora'
   tags: ["install"]
 
 - name: Install Gitlab Runner
-  dnf:
+  ansible.builtin.dnf:
     name: "gitlab-runner"
     state: present
   when: ansible_os_family == 'RedHat'
   tags: ["install"]
 
 - name: Get configured runners
-  command: /usr/bin/gitlab-runner --log-format=json list
+  ansible.builtin.command: /usr/bin/gitlab-runner --log-format=json list
   changed_when: false
   check_mode: false
   register: __runner_output
@@ -46,7 +46,7 @@
 # }
 
 - name: Parse output
-  set_fact:
+  ansible.builtin.set_fact:
     __runners: "{{ __runners | default([]) + [tmp_dict] }}"
   vars:
     tmp_dict: "{{ item | from_json }}"
@@ -54,7 +54,8 @@
   when: "'Executor' in tmp_dict"
 
 - name: Configure runners
-  command: >
+  throttle: 1
+  ansible.builtin.command: >
     /usr/bin/gitlab-runner register
       --non-interactive
       --url {{ gitlab_external_url | quote }}
@@ -71,7 +72,7 @@
   tags: ["register"]
 
 - name: Configure global max concurrent jobs
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "/etc/gitlab-runner/config.toml"
     regexp: '^concurrent ='
     line: "concurrent = {{ gitlab_runner_concurrent }}"

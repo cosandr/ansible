@@ -67,8 +67,8 @@ crs309 ansible_host=10.0.100.4
 gitlab01 ansible_host=10.0.10.40
 
 [gitrun]
-gitrun01 ansible_host=10.0.10.41
-gitrun02 ansible_host=10.0.10.42
+gitrun01 ansible_host=10.0.10.41 vm_host=gerd
+gitrun02 ansible_host=10.0.10.42 vm_host=ymir
 
 [prom]
 prom01 ansible_host=10.0.10.21

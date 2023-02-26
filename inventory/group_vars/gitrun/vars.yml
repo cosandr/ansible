@@ -1,12 +1,4 @@
 ---
 
-provisioned_disks:
-  - dev: "/dev/disk/by-id/virtio-data01"
-    vols:
-      - name: docker
-        path: "/var/lib/docker"
-        shrink: false
-        size: "100%FREE"
-
 docker_compose_install: false
 gitlab_runner_token: "{{ vault_gitlab_runner_token }}"

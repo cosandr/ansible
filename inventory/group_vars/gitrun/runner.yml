@@ -15,3 +15,8 @@ gitlab_runners:
     executor: docker
     tags: ["docker-socket"]
     args: '--docker-image "docker:latest" --docker-volumes /run/docker.sock:/var/run/docker.sock'
+
+  - name: "Podman Runner"
+    executor: docker
+    tags: ["podman"]
+    args: '--docker-privileged --docker-image "quay.io/podman/stable" --docker-host "{{ podman_user_socket }}"'
