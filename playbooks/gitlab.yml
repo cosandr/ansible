@@ -94,5 +94,8 @@
         file: ../tasks/common_servers.yml
       tags: ["always"]
   roles:
+    - role: geerlingguy.docker
+      tags: ["docker"]
+
     - role: gitlab_runner
       tags: ["runner"]
