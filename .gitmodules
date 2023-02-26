@@ -67,3 +67,6 @@
 [submodule "roles/keepalived"]
 	path = roles/keepalived
 	url = git@github.com:cosandr/ansible-keepalived.git
+[submodule "roles/nvme_exporter"]
+	path = roles/nvme_exporter
+	url = git@github.com:cosandr/ansible-role-nvme_exporter.git

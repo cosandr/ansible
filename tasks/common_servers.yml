@@ -57,6 +57,14 @@
     - node_exporter_installed | default(true)
   tags: ["node_exporter"]
 
+- name: Setup NVMe exporter
+  ansible.builtin.include_role:
+    name: nvme_exporter
+    apply:
+      tags: ["nvme_exporter"]
+  when: nvme_exporter_port | default(false)
+  tags: ["nvme_exporter"]
+
 - name: Setup promtail
   ansible.builtin.include_role:
     name: promtail
