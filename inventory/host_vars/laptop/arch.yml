@@ -10,6 +10,7 @@ host_pacman_packages:
   - intel-gpu-tools
   - intel-media-driver
   - intel-ucode
+  - libfido2
   - libva-intel-driver
   - libvirt
   - polkit-gnome
@@ -21,6 +22,7 @@ host_pacman_packages:
   - virt-manager
   - vulkan-intel
   - wireless-regdb
+  - yubikey-manager
 
 pacman_packages: "{{ base_pacman_packages + host_pacman_packages }}"
 aur_packages: "{{ base_aur_packages + host_aur_packages }}"
