@@ -51,34 +51,6 @@
           line: "FallbackDNS=1.1.1.1,8.8.8.8"
       tags: ["resolved"]
 
-    - name: Create libvirt NFS dir
-      ansible.builtin.file:
-        path: /var/lib/libvirt/theia
-        state: directory
-        owner: root
-        group: root
-        mode: 0755
-      tags: ["libvirt", "nfs"]
-
-    - name: Enable virt_use_nfs SELinux boolean
-      ansible.posix.seboolean:
-        name: virt_use_nfs
-        state: true
-        persistent: true
-      when:
-        - ansible_os_family == 'RedHat'
-        - ansible_selinux.status == "enabled"
-      tags: ["libvirt", "nfs", "selinux"]
-
-    - name: Define libvirt NFS pool
-      community.libvirt.virt_pool:
-        name: theia
-        command: define
-        xml: "{{ lookup('template', repo_base_dir + '/files/thinkcentre/libvirt/theia.xml.j2') }}"
-        state: "active"
-        autostart: true
-      tags: ["libvirt", "nfs"]
-
   handlers:
     - name: Restart systemd-resolved
       ansible.builtin.systemd:
