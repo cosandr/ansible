@@ -1,5 +1,6 @@
 ---
 
+vm_mem: 8192
 vm_root_size: "50G"
 # Sort to ensure it's consistent between runs
 __vm_host_list: "{{ ['theia'] + (groups['thinkcentre'] | sort) }}"
