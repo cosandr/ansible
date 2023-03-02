@@ -14,6 +14,7 @@ vm_extra_disks: []
 vm_started: true
 vm_cpu_mode: "{{ 'custom' if vm_cpu_model_name else 'host-passthrough' }}"
 vm_cpu_model_name: ""
+vm_seclabel: "system_u:system_r:svirt_t:s0:c{{ home_net.vm.vlan }},c{{ __host_num }}"
 
 vm_data_disks: []
 # vm_data_disks: ["200G", "150G"]
@@ -60,5 +61,10 @@ vm_default_definition:
   interfaces: "{{ vm_nics }}"
   cpu_mode: "{{ vm_cpu_mode }}"
   cpu_model_name: "{{ vm_cpu_model_name }}"
+  seclabel_options:
+    type: "static"
+    relabel: "yes"
+    model: "selinux"
+  seclabel_label: "{{ vm_seclabel }}"
 
 libvirt_vms: ["{{ vm_default_definition }}"]

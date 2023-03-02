@@ -3,7 +3,4 @@
 vm_cpus: 4
 vm_mem: 4096
 
-vm_template: "rocky9_networkd_packer.raw"
-vm_os_id: "http://rockylinux.org/rocky/9"
-
 vm_root_size: "50G"

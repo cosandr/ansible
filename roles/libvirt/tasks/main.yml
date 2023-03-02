@@ -14,13 +14,12 @@
   tags: ["install"]
 
 # https://libvirt.org/drvqemu.html#selinux-svirt-confinement
-- name: Disable sVirt confinement
+- name: Configure security_driver
   ansible.builtin.lineinfile:
     path: /etc/libvirt/qemu.conf
     regexp: '^#?security_driver'
-    line: 'security_driver = "none"'
+    line: 'security_driver = "{{ libvirt_security_driver }}"'
   notify: Restart libvirtd
-  when: libvirt_disable_svirt
 
 - name: Enable and start libvirtd
   ansible.builtin.systemd:

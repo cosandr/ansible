@@ -15,6 +15,3 @@ btrfs_subvols:
 
 btrfs_scrub_targets:
   - /
-
-# Required for live migrations
-libvirt_disable_svirt: true
