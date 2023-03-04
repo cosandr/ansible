@@ -49,10 +49,6 @@ chezmoi_overrides:
     QT_QPA_PLATFORMTHEME="qt5ct"
   xinitrc: |
     MOZ_X11_EGL="1"
-    xinput set-prop 'ELAN067C:00 04F3:31F9 Touchpad' 'libinput Natural Scrolling Enabled' 1
-    xinput set-prop 'ELAN067C:00 04F3:31F9 Touchpad' 'libinput Tapping Enabled' 1
-    xinput set-prop 'ELAN067C:00 04F3:31F9 Touchpad' 'libinput Accel Speed' 0.4
-    xinput set-prop 'TPPS/2 Elan TrackPoint' 'libinput Accel Speed' -0.5
   lock: |
     idle_hook="xidlehook_lock_screen_on"
     LOCKER="i3lock"

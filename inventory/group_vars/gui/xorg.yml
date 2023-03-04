@@ -1,0 +1,13 @@
+---
+
+xorg_conf_d: "{{ (__xorg_conf_d_group | default([])) + (__xorg_conf_d_host | default([])) }}"
+__xorg_conf_d_group:
+  - name: "50-mouse"
+    content: |
+      Section "InputClass"
+        Identifier "My Mouse"
+        Driver "libinput"
+        MatchIsPointer "yes"
+        Option "AccelProfile" "flat"
+        Option "AccelSpeed" "0"
+      EndSection

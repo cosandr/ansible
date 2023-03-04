@@ -1,11 +1,12 @@
 ---
 
-xorg_conf_d:
-  "20-nvidia.conf": |
-    Section "Device"
+__xorg_conf_d_host:
+  - name: "20-nvidia"
+    content: |
+      Section "Device"
         Identifier     "Device0"
         Driver         "nvidia"
         VendorName     "NVIDIA Corporation"
         BoardName      "GeForce RTX 3080"
         Option         "Coolbits" "28"
-    EndSection
+      EndSection

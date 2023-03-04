@@ -2,7 +2,7 @@
 
 - name: Install xorg packages
   become: true
-  pacman:
+  community.general.pacman:
     name: "{{ xorg_packages }}"
     state: present
   when: ansible_distribution == 'Archlinux'
@@ -10,12 +10,25 @@
 
 - name: Configure xorg
   become: true
-  copy:
-    dest: "/etc/X11/xorg.conf.d/{{ item.key }}"
+  ansible.builtin.copy:
+    dest: "/etc/X11/xorg.conf.d/{{ item.name }}.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     content: |
       {{ ansible_managed | comment }}
-      {{ item.value }}
-  with_dict: "{{ xorg_conf_d }}"
+      {{ item.content }}
+  loop: "{{ xorg_conf_d }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.state | default('present') == 'present'
+
+- name: Delete old configs
+  become: true
+  ansible.builtin.file:
+    path: "/etc/X11/xorg.conf.d/{{ item.name }}.conf"
+    state: absent
+  loop: "{{ xorg_conf_d }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: item.state | default('present') == 'absent'

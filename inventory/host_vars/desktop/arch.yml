@@ -1,20 +1,5 @@
 ---
 
-xorg_conf_d:
-  "10-monitor.conf": |
-    Section "ServerFlags"
-        Option "StandbyTime" "10"
-        Option "SuspendTime" "10"
-        Option "OffTime" "10"
-    EndSection
-  "20-nvidia.conf": |
-    Section "Device"
-        Identifier     "Device0"
-        Driver         "nvidia"
-        VendorName     "NVIDIA Corporation"
-        Option         "Coolbits" "28"
-    EndSection
-
 sbctl_bundles:
   - kernel: linux
     label: "Arch Linux"

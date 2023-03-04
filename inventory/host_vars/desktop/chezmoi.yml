@@ -15,8 +15,6 @@ chezmoi_overrides:
     MONITOR_MAP["HDMI-0"]="--off"
   xinitrc: |
     QT_AUTO_SCREEN_SCALE_FACTOR="1"
-    MOUSE_SENS="-0.65"
-    MOUSE_NAME="pointer:Logitech G502"
     NVIDIA_CORE_OFFSET="100"
     NVIDIA_MEM_OFFSET="1500"
     USE_AUTORANDR=0

@@ -1,18 +1,30 @@
 ---
 
-xorg_conf_d:
-  "10-monitor.conf": |
-    Section "Monitor"
+__xorg_conf_d_host:
+  - name: "10-monitor"
+    content: |
+      Section "Monitor"
         Identifier "eDP-1"
         Option "DPMS" "true"
-    EndSection
-  "30-touchpad.conf": |
-    Section "InputClass"
+      EndSection
+# https://cravencode.com/post/essentials/enable-tap-to-click-in-i3wm/
+  - name: "50-touchpad"
+    content: |
+      Section "InputClass"
         Identifier "touchpad"
         MatchIsTouchpad "true"
         MatchDriver "libinput"
         Option "NaturalScrolling" "true"
         Option "Tapping" "on"
         Option "TappingButtonMap" "lrm"
-        Option "Accel Speed" "0.4"
-    EndSection
+        Option "AccelSpeed" "0.4"
+      EndSection
+
+  - name: "55-trackpoint"
+    content: |
+      Section "InputClass"
+        Identifier "trackpoint"
+        MatchDriver "libinput"
+        MatchProduct "TPPS/2 Elan TrackPoint"
+        Option "AccelSpeed" "-0.5"
+      EndSection
