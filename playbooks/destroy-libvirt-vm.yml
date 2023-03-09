@@ -1,0 +1,29 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Destroy KVM VMs
+  hosts: libvirt
+  gather_facts: false
+  pre_tasks:
+    - name: Warn if no limit was passed
+      run_once: true
+      ansible.builtin.pause:
+        prompt: "WARNING: No limit in use"
+      when: not ansible_limit | default(false)
+
+  tasks:
+    - name: Destroy VM
+      delegate_to: "{{ vm_host }}"
+      community.libvirt.virt:
+        name: "{{ inventory_hostname }}"
+        state: destroyed
+      failed_when: __destroy.failed and 'virtual machine ' + inventory_hostname + ' not found' not in __destroy.msg
+      register: __destroy
+
+    - name: Undefine VM
+      delegate_to: "{{ vm_host }}"
+      ansible.builtin.command:
+        cmd: /usr/bin/virsh undefine --nvram --remove-all-storage {{ inventory_hostname }}
+      changed_when: "'has been undefined' in __virsh.stdout"
+      register: __virsh
+      when: "'virtual machine ' + inventory_hostname + ' not found' not in __destroy.msg | string | default('')"
