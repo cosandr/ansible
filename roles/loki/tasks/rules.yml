@@ -1,0 +1,37 @@
+---
+
+- name: Register previously copied alert rules
+  ansible.builtin.find:
+    paths: "{{ loki_workdir }}/rules/fake"
+    patterns:
+      - "*.rules"
+  register: __loki_present
+  when: loki_alert_rules_sync
+
+- name: Copy Loki alert rules
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ loki_workdir }}/rules/fake/{{ item | basename }}"
+    owner: root
+    group: loki
+    mode: "0644"
+  with_fileglob: "{{ loki_alert_rules_files }}"
+  register: __loki_copied
+  notify: Reload loki
+
+- name: Set list facts
+  ansible.builtin.set_fact:
+    __loki_present_list: "{{ __loki_present | json_query('files[*].path') | default([]) }}"
+    __loki_copied_list: "{{ __loki_copied_tmp + __loki_copied_tmp_check }}"
+  vars:
+    __loki_copied_tmp: "{{ __loki_copied.results | json_query('[*].dest') | default([]) }}"
+    __loki_copied_tmp_check: "{{ __loki_copied.results | json_query('[*].invocation.dest') | default([]) }}"
+  when: loki_alert_rules_sync
+
+- name: Remove alert rules not present on deployer machine
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ __loki_present_list | difference(__loki_copied_list) }}"
+  notify: Reload loki
+  when: loki_alert_rules_sync

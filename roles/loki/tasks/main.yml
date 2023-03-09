@@ -1,39 +1,46 @@
 ---
 
-- include_tasks: install.yml
+- name: Include installation tasks
+  ansible.builtin.include_tasks: install.yml
   tags: ["install"]
 
 - name: Ensure loki directories exist
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: loki
     group: loki
-    mode: 0750
+    mode: "0750"
   loop:
     - "/etc/loki"
     - "{{ loki_workdir }}"
+    # https://grafana.com/docs/loki/latest/operations/multi-tenancy/#grafana-loki-multi-tenancy
+    - "{{ loki_workdir }}/rules/fake"
   tags: ["config"]
 
 - name: Copy config
-  template:
+  ansible.builtin.template:
     src: config.yml.j2
     dest: /etc/loki/config.yml
     owner: loki
     group: loki
-    mode: 0640
-  notify: restart loki
+    mode: "0640"
+  notify: Restart loki
   tags: ["config"]
 
+- name: Include rules tasks
+  ansible.builtin.include_tasks: rules.yml
+  tags: ["config", "alerts"]
+
 - name: Enable and start loki
-  systemd:
+  ansible.builtin.systemd:
     name: loki.service
     enabled: true
     state: started
     daemon_reload: true
 
 - name: Include firewall role
-  include_role:
+  ansible.builtin.include_role:
     name: firewall_config
     apply:
       become: true

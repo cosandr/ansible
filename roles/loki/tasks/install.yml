@@ -75,7 +75,7 @@
     mode: 0755
     owner: root
     group: root
-  notify: restart loki
+  notify: Restart loki
 
 - name: Install service
   template:
@@ -84,4 +84,4 @@
     owner: root
     group: root
     mode: 0644
-  notify: restart loki
+  notify: Restart loki

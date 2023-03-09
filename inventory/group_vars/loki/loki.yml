@@ -2,6 +2,10 @@
 
 loki_allow_zone: "internal"
 
+loki_alertmanager_url: "http://{{ hostvars['prom01'].ansible_host }}:{{ hostvars['prom01'].alertmanager_port }}/"
+loki_alert_rules_files:
+  - "{{ repo_base_dir }}/files/loki/alerts/*.rules"
+
 loki_extra_config:
   compactor:
     retention_enabled: true
