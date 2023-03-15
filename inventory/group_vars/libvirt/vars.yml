@@ -12,9 +12,11 @@ vm_os_id: "http://rockylinux.org/rocky/9"
 vm_disk_pool: "cephfs"
 vm_extra_disks: []
 vm_started: true
+vm_customize: true
 vm_cpu_mode: "{{ 'custom' if vm_cpu_model_name else 'host-passthrough' }}"
 vm_cpu_model_name: ""
 vm_seclabel: "system_u:system_r:svirt_t:s0:c{{ home_net.vm.vlan }},c{{ __host_num }}"
+vm_qemu_args: []
 
 vm_data_disks: []
 # vm_data_disks: ["200G", "150G"]
@@ -48,7 +50,7 @@ vm_default_definition:
   machine: q35
   start: "{{ vm_started }}"
   autostart: "{{ vm_started }}"
-  customize: true
+  customize: "{{ vm_customize }}"
   enable_console: true
   enable_vnc: false
   name: "{{ inventory_hostname }}"
@@ -66,5 +68,6 @@ vm_default_definition:
     relabel: "yes"
     model: "selinux"
   seclabel_label: "{{ vm_seclabel }}"
+  qemu_commandline_args: "{{ vm_qemu_args }}"
 
 libvirt_vms: ["{{ vm_default_definition }}"]

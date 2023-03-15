@@ -77,6 +77,15 @@
       notify: Restore libvirt SELinux context
       tags: ["cephfs", "selinux"]
 
+    - name: Set libvirt ignition CephFS SELinux context
+      community.general.sefcontext:
+        target: "/mnt/ceph/libvirt/.*\\.ign"
+        seuser: system_u
+        setype: virt_content_t
+        state: present
+      notify: Restore libvirt SELinux context
+      tags: ["cephfs", "selinux"]
+
     - name: Define libvirt CephFS pool
       community.libvirt.virt_pool:
         name: cephfs

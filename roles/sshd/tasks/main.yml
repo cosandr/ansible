@@ -8,7 +8,9 @@
   ansible.builtin.package:
     name: "{{ _sshd_pkg }}"
     state: present
-  when: not chroot_path
+  when:
+    - not chroot_path
+    - _sshd_pkg | default('')
   tags: ["install"]
 
 - name: Check if sshd_config.d exists
@@ -27,6 +29,23 @@
     mode: "0600"
   notify: Reload sshd
   when: __ssh_conf_d.stat.exists
+
+- name: Get sshd_config stats
+  ansible.builtin.stat:
+    path: "{{ chroot_path }}/etc/ssh/sshd_config"
+  register: __sshd_info
+
+- name: Remove symlink on Flatcar
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ __sshd_info.stat.lnk_source }}"
+    dest: "{{ chroot_path }}/etc/ssh/sshd_config"
+    owner: root
+    group: root
+    mode: "0600"
+  when:
+    - __sshd_info.stat.islnk
+    - ansible_os_family == 'Flatcar'
 
 - name: Set up sshd_config
   become: true
