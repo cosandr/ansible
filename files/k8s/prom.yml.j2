@@ -1,0 +1,34 @@
+---
+
+alertmanager:
+  enabled: false
+grafana:
+  enabled: false
+prometheus:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - "prom.{{ kube_ingress_domain }}"
+    paths:
+      - /
+    pathType: ImplementationSpecific
+
+  prometheusSpec:
+    externalLabels: {}
+    externalUrl: "http://prom.{{ kube_ingress_domain }}"
+    retention: 1h
+    storageSpec:
+      emptyDir:
+        sizeLimit: "512Mi"
+prometheus-node-exporter:
+  extraArgs:
+    - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+    - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+    - --collector.systemd
+  extraHostVolumeMounts:
+    - name: systemd
+      hostPath: /run/dbus/system_bus_socket
+      mountPath: /var/run/dbus/system_bus_socket
+      readOnly: true
+      mountPropagation: None

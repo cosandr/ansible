@@ -33,6 +33,19 @@ wg_net:
 
 all_net: "{{ home_net | combine(internal_net) | combine(wg_net) }}"
 
+kube_vip_address: "{{ home_net.vm.cidr | ansible.utils.ipaddr('50') | ansible.utils.ipaddr('address') }}"
+kube_net: "10.85.0.0/16"
+kube_subnet:
+  svc:
+    # 10.85.0.0/18
+    cidr: "{{ kube_net | ansible.utils.ipsubnet(18, 0) }}"
+  pod:
+    # 10.85.64.0/18
+    cidr: "{{ kube_net | ansible.utils.ipsubnet(18, 1) }}"
+  lb:
+    # 10.85.128.0/26
+    cidr: "{{ kube_net | ansible.utils.ipsubnet(26, 512) }}"
+
 # These do not necessarily exist, but are useful for automation
 host_ips: >-
   {%- set tmp = {} -%}

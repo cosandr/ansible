@@ -1,0 +1,11 @@
+---
+
+# Only add VIP once
+mt_dns_entries: "{{ __mt_dns_entries_common + __mt_dns_entries_vip if inventory_hostname == groups['k8s_cluster'][0] else __mt_dns_entries_common }}"
+__mt_dns_entries_common:
+  - name: "{{ inventory_hostname }}.{{ domain }}"
+    address: "{{ ansible_host }}"
+
+__mt_dns_entries_vip:
+  - name: "k8s.{{ domains['hb'] }}"
+    address: "{{ kube_vip_address }}"

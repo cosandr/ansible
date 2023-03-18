@@ -1,0 +1,10 @@
+---
+
+metallb_enabled: true
+metallb_protocol: bgp
+metallb_ip_range:
+  - "{{ kube_subnet.lb.cidr }}"
+
+# Advertised by calico
+metallb_speaker_enabled: false
+metallb_avoid_buggy_ips: true

@@ -1,0 +1,41 @@
+---
+
+vm_mem: 6144
+vm_root_size: "50G"
+# Sort to ensure it's consistent between runs
+__vm_host_list: "{{ ['theia'] + (groups['thinkcentre'] | sort) }}"
+vm_host: "{{ __vm_host_list[groups['k8s_cluster'] | ansible.utils.index_of('eq', inventory_hostname) % (__vm_host_list | length)] }}"
+vm_template: "flatcar.raw"
+vm_customize: false
+vm_qemu_args:
+  - "-fw_cfg"
+  - "name=opt/org.flatcar-linux/config,file=/mnt/ceph/libvirt/{{ inventory_hostname }}.ign"
+vm_ignition:
+  ignition:
+    version: "2.3.0"
+  networkd:
+    units:
+      - name: enp1s0.network
+        contents: "{{ lookup('template', '{{ repo_base_dir }}/roles/libvirt_vm/templates/networkd.network.j2', template_vars=__ignition_networkd_vars) }}"
+  storage:
+    files:
+      - path: /etc/hostname
+        filesystem: "root"
+        contents:
+          source: "data:,{{ inventory_hostname }}"
+  passwd:
+    users:
+      - name: "{{ ansible_user }}"
+        passwordHash: "{{ lookup('community.general.passwordstore', 'ansible/vm_root_hash') }}"
+        sshAuthorizedKeys: "{{ ssh_authorized_keys }}"
+
+__ignition_networkd_vars:
+  name: "enp1s0"
+  bootproto: "static"
+  gateway: "{{ vm_default_nic.gateway | default(false) }}"
+  default_route: "{{ vm_default_nic.default_route | default('yes') }}"
+  address: "{{ vm_default_nic.address | default(false) }}"
+  prefix: "{{ vm_default_nic.prefix | default(24) }}"
+  dns_servers: "{{ vm_default_nic.dns_servers | default(['1.1.1.1', '8.8.8.8']) }}"
+  domain: "{{ vm_default_nic.domain | default(false) }}"
+  mtu: "{{ vm_default_nic.mtu | default(1500) }}"

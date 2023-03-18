@@ -1,18 +1,16 @@
 ---
 
+kube_proxy_strict_arp: true
+
 kube_vip_enabled: true
 
 kube_vip_controlplane_enabled: true
 kube_vip_services_enabled: false
-kube_vip_address: 10.0.10.50
+apiserver_loadbalancer_domain_name: "{{ __mt_dns_entries_vip[0].name }}"
 loadbalancer_apiserver:
   address: "{{ kube_vip_address }}"
   port: 6443
 
 kube_vip_arp_enabled: true
-# Can't get BGP to work, it's not showing up on the router
+# Can't use BGP on calico and kube-vip simultaneously
 kube_vip_bgp_enabled: false
-# kube_vip_local_as: "64510"
-# kube_vip_bgp_routerid: "{{ ansible_host }}"
-# kube_vip_bgp_peeraddress: "{{ peers[0].router_id }}"
-# kube_vip_bgp_peeras: "{{ peers[0].as }}"

@@ -1,36 +1,6 @@
 ---
-## Directory where the binaries will be installed
-bin_dir: /usr/local/bin
 
-calico_iptables_backend: "NFT"
-calico_bgp_listen_port: 179
-calico_network_backend: "bird"
-global_as_num: "64512"
-calico_vxlan_mode: "Never"
-calico_advertise_cluster_ips: true
-calico_advertise_service_loadbalancer_ips: "{{ metallb_ip_range }}"
-
-peer_with_router: true
-nat_outgoing: false
-
-peers:
-  - name: rb5009
-    as: 5009
-    router_id: "10.0.10.1"
-
-metallb_protocol: bgp
-metallb_ip_range:
-  - 10.0.15.0/24
-
-# Advertised by calico
-metallb_peers: []
-metallb_avoid_buggy_ips: true
-
-ingress_nginx_lb_ip: "10.0.15.91"
-# Need to deploy ingress-nginx-lb service in ingress-nginx namespace
-# See https://github.com/kubernetes/ingress-nginx/blob/b338cb391754125b7884196d7b8d4b55dbad14d8/docs/examples/static-ip/static-ip-svc.yaml
-ingress_nginx_extra_args:
-  - "--publish-service=$(POD_NAMESPACE)/ingress-nginx-lb"
+bin_dir: "/opt/bin"
 
 ## Local loadbalancer should use this port
 ## And must be set port 6443
@@ -39,11 +9,24 @@ loadbalancer_apiserver_port: 6443
 ## If loadbalancer_apiserver_healthcheck_port variable defined, enables proxy liveness check for nginx.
 loadbalancer_apiserver_healthcheck_port: 8081
 
-## Since workers are included in the no_proxy variable by default, docker engine will be restarted on all nodes (all
-## pods will restart) when adding or removing workers.  To override this behaviour by only including master nodes in the
-## no_proxy variable, set below to true:
-no_proxy_exclude_workers: false
+kube_network_plugin: calico
+kube_service_addresses: "{{ kube_subnet.svc.cidr }}"
+kube_pods_subnet: "{{ kube_subnet.pod.cidr }}"
+kube_network_node_prefix: 24
 
-## Variables for webhook token auth https://kubernetes.io/docs/reference/access-authn-authz/authentication/#webhook-token-authentication
-kube_webhook_token_auth: false
-kube_webhook_token_auth_url_skip_tls_verify: false
+# 10.85.128.2
+ingress_nginx_lb_ip: "{{ kube_subnet.lb.cidr | ansible.utils.ipaddr('2') | ansible.utils.ipaddr('address') }}"
+# 10.85.128.3
+prom_lb_ip: "{{ kube_subnet.lb.cidr | ansible.utils.ipaddr('3') | ansible.utils.ipaddr('address') }}"
+
+__node_labels_worker:
+  "node-role.kubernetes.io/worker": ""
+
+node_labels: "{{ __node_labels_worker if inventory_hostname not in groups['kube_control_plane'] else {} }}"
+
+cluster_name: "k8s.{{ domains['hb'] }}"
+dns_domain: "cluster.local"
+upstream_dns_servers: "{{ vm_default_nic.dns_servers[:2] }}"
+disable_host_nameservers: true
+auto_renew_certificates: true
+metrics_server_enabled: true

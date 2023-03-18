@@ -1,0 +1,14 @@
+---
+
+controller:
+  watchIngressWithoutClass: true
+  ingressClassByName: true
+  kind: DaemonSet
+  service:
+    externalTrafficPolicy: Local
+    type: LoadBalancer
+    loadBalancerIP: "{{ ingress_nginx_lb_ip }}"
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true

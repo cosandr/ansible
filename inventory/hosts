@@ -132,15 +132,16 @@ ansible_group_priority=10
 
 # kubespray
 [k8s_cluster]
-k8s01 ansible_host=10.0.10.51
-k8s02 ansible_host=10.0.10.52
-k8s03 ansible_host=10.0.10.53
+k8s01 ansible_host=10.0.10.51 etcd_member_name=etcd01 vm_mem=4096
+k8s02 ansible_host=10.0.10.52 etcd_member_name=etcd02
+k8s03 ansible_host=10.0.10.53 etcd_member_name=etcd03
+k8s04 ansible_host=10.0.10.54
 
-[kube_control_plane:children]
-k8s_cluster
+[kube_control_plane]
+k8s[01:03]
 
-[etcd:children]
-k8s_cluster
+[etcd]
+k8s[01:03]
 
-[kube_node:children]
-k8s_cluster
+[kube_node]
+k8s[02:04]

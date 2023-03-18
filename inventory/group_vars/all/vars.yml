@@ -26,6 +26,7 @@ locale_conf:
 systemd_script_install_path: "/usr/local/bin/systemd"
 
 s3_url: "https://s3.{{ domains['hb'] }}"
+kube_ingress_domain: "kube.{{ domains['hb'] }}"
 
 prometheus_blackbox_icmp_targets: ["{{ wireguard_ip | default(ansible_host) }}"]
 prometheus_node_targets: ["{{ wireguard_ip | default(ansible_host) + ':' + node_exporter_port | string }}"]
