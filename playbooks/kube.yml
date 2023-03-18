@@ -113,20 +113,26 @@
             label: "{{ item.name }}"
           tags: ["helm", "repos"]
 
+        # https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
         - name: Deploy ingress-nginx chart
           kubernetes.core.helm:
             name: ingress-nginx
             chart_ref: ingress-nginx/ingress-nginx
+            chart_version: "4.x"
             release_namespace: ingress-nginx
             create_namespace: true
+            update_repo_cache: true
             release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/ingress-nginx.yml.j2') | from_yaml }}"
           tags: ["helm", "nginx"]
 
+        # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
         - name: Deploy Prometheus chart
           kubernetes.core.helm:
             name: prometheus
             chart_ref: prometheus-community/kube-prometheus-stack
-            release_namespace: prometheus
+            chart_version: "45.x"
+            release_namespace: monitoring
             create_namespace: true
+            update_repo_cache: true
             release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/prom.yml.j2') | from_yaml }}"
           tags: ["helm", "prometheus"]
