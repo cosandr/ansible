@@ -31,6 +31,10 @@ __mt_wg_peers_auto: >-
   {{- tmp_dict.update({
     "preshared-key": hostvars[h].wireguard_unmanaged_peers.mt.preshared_key
   }) -}}
+  {%- elif hostvars[h].mt_wg_fetch_psk | default(false) -%}
+  {{- tmp_dict.update({
+    "preshared-key": lookup('community.general.passwordstore', 'network/' + h + '_wg_psk_mt')
+  }) -}}
   {%- endif -%}
   {%- if hostvars[h].wireguard_endpoint | default('') -%}
   {{- tmp_dict.update({

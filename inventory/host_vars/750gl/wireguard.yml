@@ -1,0 +1,29 @@
+---
+
+wireguard_addresses:
+  - "{{ wg_net.mt.cidr | ansible.utils.ipaddr('202') }}"
+  - "{{ wg_net.mt.cidr6 | ansible.utils.ipaddr('0x202' | int(base=16)) }}"
+wireguard_address: "{{ wireguard_addresses | join(', ') }}"
+wireguard_ip: "{{ wireguard_addresses[0] | ansible.utils.ipaddr('address') }}"
+wireguard_ipv6: "{{ wireguard_addresses[1] | ansible.utils.ipaddr('address') }}"
+wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
+wireguard_public_key: "{{ vault_wireguard_public_key }}"
+
+mt_wg_fetch_psk: true
+mt_wg_interfaces:
+  - name: WG1
+    listen-port: "{{ wireguard_endpoint.rsplit(':', 1)[1] | int }}"
+    private-key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
+
+mt_wg_allowed_addresses:
+  - "{{ wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') }}"
+  - "10.1.0.0/24"
+
+mt_wg_peers:
+  - comment: "rb5009"
+    allowed-address: "{{ hostvars['rb5009'].wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') | join(',') }}"
+    interface: "{{ mt_wg_interfaces[0].name }}"
+    public-key: "{{ hostvars['rb5009'].wireguard_public_key }}"
+    preshared-key: "{{ lookup('community.general.passwordstore', 'network/750gl_wg_psk_mt') }}"
+    endpoint-address: "{{ hostvars['rb5009'].wireguard_endpoint.rsplit(':', 1)[0] }}"
+    endpoint-port: "{{ hostvars['rb5009'].wireguard_endpoint.rsplit(':', 1)[1] | int }}"

@@ -62,6 +62,7 @@ pgbak01 ansible_host=10.0.10.9
 rb5009 ansible_host=10.0.50.1
 crs226 ansible_host=10.0.100.3
 crs309 ansible_host=10.0.100.4
+750gl  ansible_host=10.1.0.2
 
 [gitlab]
 gitlab01 ansible_host=10.0.10.40
