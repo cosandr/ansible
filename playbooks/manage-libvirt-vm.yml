@@ -1,0 +1,35 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Find libvirt hosts
+  hosts: all
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Add VM hosts
+      run_once: true
+      changed_when: false
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        group: libvirt_hosts
+      loop: "{{ groups['libvirt'] | map('extract', hostvars, 'vm_host') | list | select('defined') | list | unique }}"
+      tags: ["always"]
+
+- name: Manage KVM VMs
+  hosts: libvirt_hosts
+  gather_facts: false
+  pre_tasks:
+    - name: "Get list of {{ 'running' if 'stop' in ansible_run_tags else 'shutdown' }} VMs on host"  # noqa name[template]
+      check_mode: false
+      community.libvirt.virt:
+        state: "{{ 'running' if 'stop' in ansible_run_tags else 'shutdown' }}"
+        command: list_vms
+      register: vm_names
+      tags: ["always"]
+
+    - name: "{{ 'Shutdown' if 'stop' in ansible_run_tags else 'Start' }} VMs"  # noqa name[template]
+      community.libvirt.virt:
+        name: "{{ item }}"
+        state: "{{ 'shutdown' if 'stop' in ansible_run_tags else 'running' }}"
+      loop: "{{ vm_names.list_vms }}"
+      tags: ["start", "stop"]
