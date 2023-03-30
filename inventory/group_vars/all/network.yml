@@ -33,6 +33,25 @@ wg_net:
 
 all_net: "{{ home_net | combine(internal_net) | combine(wg_net) }}"
 
+ceph_nfs_vip:
+  # 10.0.50.20/24
+  general: "{{ all_net.general.cidr | ansible.utils.ipaddr('20') }}"
+  # 10.0.2.200/24
+  san: "{{ all_net.san.cidr | ansible.utils.ipaddr('200') }}"
+  # 10.0.10.210/24
+  vm: "{{ all_net.vm.cidr | ansible.utils.ipaddr('210') }}"
+
+ceph_nfs_vip_address: >-
+  {%- set tmp = {} -%}
+  {%- for k, v in ceph_nfs_vip.items() -%}
+  {{- tmp.update({k: v | ansible.utils.ipaddr('address')}) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+# 10.0.10.200/24
+swarm_vip: "{{ all_net.vm.cidr | ansible.utils.ipaddr('200') }}"
+swarm_vip_address: "{{ swarm_vip | ansible.utils.ipaddr('address') }}"
+
 kube_vip_address: "{{ home_net.vm.cidr | ansible.utils.ipaddr('50') | ansible.utils.ipaddr('address') }}"
 kube_net: "10.85.0.0/16"
 kube_subnet:

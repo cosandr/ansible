@@ -1,0 +1,50 @@
+---
+
+ceph_nfs_clusters:
+  - name: "general"
+    port: 2150
+    count: 3
+    config: |
+      NFSV4 {
+          Allow_Numeric_Owners = true;
+          Only_Numeric_Owners = true;
+      }
+    ingress:
+      - name: general
+        count: 2
+        port: 2050
+        monitor_port: 9050
+        vip: "{{ ceph_nfs_vip.general }}"
+
+      - name: san
+        count: 2
+        port: 2051
+        monitor_port: 9051
+        vip: "{{ ceph_nfs_vip.san }}"
+
+      - name: vm
+        count: 2
+        port: 2052
+        monitor_port: 9052
+        vip: "{{ ceph_nfs_vip.vm }}"
+
+ceph_nfs_exports:
+  - path: "/"
+    cluster_id: "{{ ceph_nfs_clusters[0].name }}"
+    pseudo: "/general"
+    clients:
+      - addresses:
+          - "{{ hostvars['desktop'].ansible_host | ansible.utils.ipaddr('host') }}"
+
+  - path: "/"
+    cluster_id: "{{ ceph_nfs_clusters[0].name }}"
+    pseudo: "/san"
+    clients:
+      - addresses:
+          - "{{ all_net.san.cidr }}"
+
+  - path: "/kube"
+    cluster_id: "{{ ceph_nfs_clusters[0].name }}"
+    pseudo: "/kube"
+    clients:
+      - addresses: "{{ groups['k8s_cluster'] | map('extract', hostvars, 'ansible_host') | ansible.utils.ipaddr('host') }}"

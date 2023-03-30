@@ -148,6 +148,11 @@
         exclusive: true
       tags: ["user", "ssh"]
 
+  roles:
+    - role: ceph_nfs
+      run_once: true
+      tags: ["nfs"]
+
   handlers:
     - name: Restore ceph SELinux context
       run_once: true

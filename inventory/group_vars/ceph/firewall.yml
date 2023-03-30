@@ -28,10 +28,14 @@ __cluster_firewall_rules:
   - port: "{{ rgw_ingress_port }}"
     zone: public
 
-  # NFS general export
-  - port: "2050"
+  # Ceph NFS general export
+  - port: "{{ ceph_nfs_clusters[0].ingress[0].port }}"
     zone: public
-    sources: ["{{ hostvars['desktop'].ansible_host }}"]
+    sources: "{{ ceph_nfs_exports[0].clients[0].addresses }}"
+  # Ceph NFS kube export
+  - port: "{{ ceph_nfs_clusters[0].ingress[2].port }}"
+    zone: public
+    sources: "{{ ceph_nfs_exports[2].clients[0].addresses }}"
 
   - port: "{{ ceph_exporter_port }}"
     zone: internal
