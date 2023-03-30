@@ -70,3 +70,6 @@
 [submodule "roles/nvme_exporter"]
 	path = roles/nvme_exporter
 	url = git@github.com:cosandr/ansible-role-nvme_exporter.git
+[submodule "roles/ceph_nfs"]
+	path = roles/ceph_nfs
+	url = git@github.com:cosandr/ansible-role-ceph_nfs.git
