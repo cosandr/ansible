@@ -165,3 +165,25 @@
     - name: Restore user SELinux context
       run_once: true
       ansible.builtin.command: "restorecon -r /mnt/ceph/{{ my_user }}"
+
+- name: Configure other stuff
+  hosts: ceph
+  tasks:
+    - name: Allow keepalived connections
+      ansible.posix.seboolean:
+        name: nis_enabled
+        state: true
+        persistent: true
+      when:
+        - ansible_os_family == 'RedHat'
+        - ansible_selinux.status == "enabled"
+      tags: ["keepalived"]
+
+    # Use include to avoid crash due to invalid keepalived_instances on some hosts
+    - name: Include keepalived role
+      ansible.builtin.include_role:
+        name: keepalived
+        apply:
+          tags: ["keepalived"]
+      when: inventory_hostname in keepalived_hosts
+      tags: ["keepalived"]

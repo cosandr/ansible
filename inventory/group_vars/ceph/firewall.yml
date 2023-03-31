@@ -28,14 +28,16 @@ __cluster_firewall_rules:
   - port: "{{ rgw_ingress_port }}"
     zone: public
 
-  # Ceph NFS general export
-  - port: "{{ ceph_nfs_clusters[0].ingress[0].port }}"
+  # NFS CephFS export on GENERAL and VM
+  - port: "{{ ceph_nfs_clusters[0].port }}"
     zone: public
-    sources: "{{ ceph_nfs_exports[0].clients[0].addresses | ansible.utils.ipaddr('address') }}"
-  # Ceph NFS kube export
-  - port: "{{ ceph_nfs_clusters[0].ingress[2].port }}"
-    zone: public
-    sources: "{{ ceph_nfs_exports[2].clients[0].addresses | ansible.utils.ipaddr('address') }}"
+    sources: "{{ __ceph_nfs_client_addresses | ansible.utils.reduce_on_network(all_net.general.cidr) +
+                 __ceph_nfs_client_addresses | ansible.utils.reduce_on_network(all_net.vm.cidr) }}"
+
+  # NFS CephFS export on SAN
+  - port: "{{ ceph_nfs_clusters[0].port }}"
+    zone: internal
+    sources: "{{ __ceph_nfs_client_addresses | ansible.utils.reduce_on_network(all_net.san.cidr) }}"
 
   - port: "{{ ceph_exporter_port }}"
     zone: internal
