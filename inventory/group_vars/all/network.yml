@@ -64,6 +64,9 @@ kube_subnet:
   lb:
     # 10.85.128.0/26
     cidr: "{{ kube_net | ansible.utils.ipsubnet(26, 512) }}"
+  monitoring:
+    # 10.85.128.64/26
+    cidr: "{{ kube_net | ansible.utils.ipsubnet(26, 513) }}"
 
 # These do not necessarily exist, but are useful for automation
 host_ips: >-

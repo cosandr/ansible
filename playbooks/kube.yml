@@ -117,6 +117,19 @@
     - name: Run on localhost
       delegate_to: localhost
       block:
+        - name: Apply Calico IPPools
+          kubernetes.core.k8s:
+            state: present
+            resource_definition:
+              apiVersion: projectcalico.org/v3
+              kind: IPPool
+              metadata:
+                name: monitoring
+              spec:
+                cidr: "{{ kube_subnet.monitoring.cidr }}"
+                allowedUses: ["Workload"]
+          tags: ["calico"]
+
         - name: Add helm repos
           kubernetes.core.helm_repository:
             name: "{{ item.name }}"
@@ -138,6 +151,18 @@
             release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/ingress-nginx.yml.j2') | from_yaml }}"
           tags: ["helm", "nginx"]
 
+        - name: Create monitoring namespace
+          kubernetes.core.k8s:
+            state: present
+            resource_definition:
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: monitoring
+                annotations:
+                  cni.projectcalico.org/ipv4pools: '["monitoring"]'
+          tags: ["helm", "prometheus"]
+
         # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
         - name: Deploy Prometheus chart
           kubernetes.core.helm:
@@ -145,7 +170,7 @@
             chart_ref: prometheus-community/kube-prometheus-stack
             chart_version: "45.x"
             release_namespace: monitoring
-            create_namespace: true
+            create_namespace: false
             update_repo_cache: true
             release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/prom.yml.j2') | from_yaml }}"
           tags: ["helm", "prometheus"]
