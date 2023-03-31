@@ -31,11 +31,11 @@ __cluster_firewall_rules:
   # Ceph NFS general export
   - port: "{{ ceph_nfs_clusters[0].ingress[0].port }}"
     zone: public
-    sources: "{{ ceph_nfs_exports[0].clients[0].addresses }}"
+    sources: "{{ ceph_nfs_exports[0].clients[0].addresses | ansible.utils.ipaddr('address') }}"
   # Ceph NFS kube export
   - port: "{{ ceph_nfs_clusters[0].ingress[2].port }}"
     zone: public
-    sources: "{{ ceph_nfs_exports[2].clients[0].addresses }}"
+    sources: "{{ ceph_nfs_exports[2].clients[0].addresses | ansible.utils.ipaddr('address') }}"
 
   - port: "{{ ceph_exporter_port }}"
     zone: internal
