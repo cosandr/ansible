@@ -84,6 +84,19 @@
         file: ../tasks/common_servers.yml
       tags: ["always"]
 
+    - name: Configure default NFS mount options
+      ansible.builtin.copy:
+        content: |
+          [ NFSMount_Global_Options ]
+            Background=True
+            atime=False
+            vers=4.2
+        dest: /etc/nfsmount.conf
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["nfs"]
+
 - name: Deploy charts and manifests
   hosts: kube_control_plane[0]
   gather_facts: false
