@@ -1,35 +1,36 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- name: Find libvirt hosts
-  hosts: all
-  become: false
-  gather_facts: false
-  tasks:
-    - name: Add VM hosts
-      run_once: true
-      changed_when: false
-      ansible.builtin.add_host:
-        name: "{{ item }}"
-        group: libvirt_hosts
-      loop: "{{ groups['libvirt'] | map('extract', hostvars, 'vm_host') | list | select('defined') | list | unique }}"
-      tags: ["always"]
-
-- name: Manage KVM VMs
-  hosts: libvirt_hosts
+- name: Manage VMs
+  hosts: libvirt
   gather_facts: false
   pre_tasks:
-    - name: "Get list of {{ 'running' if 'stop' in ansible_run_tags else 'shutdown' }} VMs on host"  # noqa name[template]
+    # Maybe have this a group... who designed this inventory??
+    - name: Set fact for all VM hosts
+      ansible.builtin.set_fact:
+        vm_hosts: "{{ groups['libvirt'] | map('extract', hostvars, 'vm_host') | list | select('defined') | list | unique }}"
+      tags: ["always"]
+
+    - name: Get list of VMs on all hosts
+      run_once: true
       check_mode: false
+      delegate_to: "{{ item }}"
       community.libvirt.virt:
         state: "{{ 'running' if 'stop' in ansible_run_tags else 'shutdown' }}"
         command: list_vms
-      register: vm_names
+      register: __vm_names
+      loop: "{{ vm_hosts }}"
       tags: ["always"]
 
-    - name: "{{ 'Shutdown' if 'stop' in ansible_run_tags else 'Start' }} VMs"  # noqa name[template]
+    - name: Find current host for self
+      ansible.builtin.set_fact:
+        current_host: "{{ __vm_names.results | selectattr('list_vms', 'search', inventory_hostname) | map(attribute='item') | list | first }}"
+      tags: ["always"]
+
+  tasks:
+    - name: "{{ 'Shutting down' if 'stop' in ansible_run_tags else 'Starting up' }}"
+      delegate_to: "{{ current_host }}"
       community.libvirt.virt:
-        name: "{{ item }}"
+        name: "{{ inventory_hostname }}"
         state: "{{ 'shutdown' if 'stop' in ansible_run_tags else 'running' }}"
-      loop: "{{ vm_names.list_vms }}"
       tags: ["start", "stop"]
