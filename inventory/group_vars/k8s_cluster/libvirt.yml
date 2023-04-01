@@ -32,10 +32,10 @@ vm_ignition:
 __ignition_networkd_vars:
   name: "enp1s0"
   bootproto: "static"
-  gateway: "{{ vm_default_nic.gateway | default(false) }}"
-  default_route: "{{ vm_default_nic.default_route | default('yes') }}"
-  address: "{{ vm_default_nic.address | default(false) }}"
-  prefix: "{{ vm_default_nic.prefix | default(24) }}"
-  dns_servers: "{{ vm_default_nic.dns_servers | default(['1.1.1.1', '8.8.8.8']) }}"
-  domain: "{{ vm_default_nic.domain | default(false) }}"
-  mtu: "{{ vm_default_nic.mtu | default(1500) }}"
+  gateway: "{{ vm_default_nic.gateway }}"
+  default_route: "yes"
+  address: "{{ vm_default_nic.address }}"
+  prefix: "{{ home_net.vm.cidr | ansible.utils.ipaddr('prefix') }}"
+  dns_servers: "{{ vm_default_nic.dns_servers[:2] }}"
+  domain: "{{ vm_default_nic.domain }}"
+  mtu: 1500
