@@ -1,0 +1,35 @@
+---
+
+- name: Fetch latest release
+  when: fluo_version == "latest"
+  block:
+    - name: Get latest release
+      ansible.builtin.uri:
+        url: "https://api.github.com/repos/flatcar/flatcar-linux-update-operator/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      register: _latest_release
+      until: _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set FLUO version to {{ _latest_release.json.tag_name }}"
+      ansible.builtin.set_fact:
+        fluo_version: "{{ _latest_release.json.tag_name }}"
+
+- name: Clone FLUO repo
+  become: false
+  delegate_to: localhost
+  ansible.builtin.git:
+    repo: "https://github.com/flatcar/flatcar-linux-update-operator"
+    dest: "/tmp/fluo"
+    version: "{{ fluo_version }}"
+
+- name: Apply manifests
+  delegate_to: "{{ fluo_k8s_delegate_to }}"
+  kubernetes.core.k8s:
+    state: present
+    resource_definition: "{{ lookup('kubernetes.core.kustomize', dir='/tmp/fluo/examples/deploy') }}"

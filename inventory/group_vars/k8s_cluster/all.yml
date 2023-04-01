@@ -30,3 +30,6 @@ upstream_dns_servers: "{{ vm_default_nic.dns_servers[:2] }}"
 disable_host_nameservers: true
 auto_renew_certificates: true
 metrics_server_enabled: true
+
+# Auto-updates handled by FLUO
+coreos_locksmithd_disable: true

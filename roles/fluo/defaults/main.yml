@@ -1,0 +1,4 @@
+---
+
+fluo_version: "latest"
+fluo_k8s_delegate_to: "localhost"
