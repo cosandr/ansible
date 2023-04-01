@@ -14,5 +14,5 @@ prometheus_node_targets: []
 
 firewall_frontend: "none"
 firewall_install: false
-promtail_bin_path: /opt/bin/promtail
+promtail_installed: false
 nfs_idmapping_configure: false

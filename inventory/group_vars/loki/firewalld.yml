@@ -13,6 +13,9 @@ firewalld_zones:
     # Allow prometheus
     sources: "{{ node_exporter_allow_ips }}"
 
+  - name: internal
+    sources: ["{{ kube_subnet.monitoring.cidr }}"]
+
 firewalld_services:
   - name: cockpit
     zone: public

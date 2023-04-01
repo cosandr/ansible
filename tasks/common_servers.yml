@@ -70,7 +70,9 @@
     name: promtail
     apply:
       tags: ["promtail"]
-  when: promtail_scrape_configs | default([])
+  when:
+    - promtail_installed | default(true)
+    - promtail_scrape_configs | default([])
   tags: ["promtail"]
 
 - name: Setup SSL cert sync
