@@ -113,6 +113,7 @@ minio01 ansible_host=10.0.10.7
 aegir ansible_host=10.0.100.21
 gerd ansible_host=10.0.100.22
 ymir ansible_host=10.0.100.23
+atla ansible_host=10.0.100.24
 
 [ceph:children]
 thinkcentre

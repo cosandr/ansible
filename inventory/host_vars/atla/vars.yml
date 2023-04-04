@@ -1,0 +1,6 @@
+---
+
+swapfile_path: ""
+btrfs_nocow_paths: []
+btrfs_subvols:
+  - "@snapshots"
