@@ -1,6 +1,6 @@
 ---
 
-dnf_packages:
+__host_dnf_packages:
   - ansible
   - ansible-lint
   - autoconf
@@ -17,15 +17,11 @@ dnf_packages:
   - gettext
   - git
   - gzip
-  - htop
-  - iotop
   - ipmitool
   - jq
   - libtool
   - libxml2-devel
   - libxslt-devel
-  - lm_sensors
-  - lsof
   - make
   - man-db
   - ncdu
@@ -39,12 +35,9 @@ dnf_packages:
   - policycoreutils-python-utils
   - powertop
   - python3-aiohttp
-  - python3-dnf-plugin-versionlock
   - python3-llfuse  # borg mount
-  - python3-lxml  # virt ansible modules
   - python3-netaddr
   - python3-websockets
-  - rsync
   - rubygems
   - ShellCheck
   - smartmontools
@@ -52,9 +45,7 @@ dnf_packages:
   - sshpass
   - sudo
   - telnet
-  - tmux
   - usbutils
-  - util-linux-user  # chsh
   - vim
   - which
   - zsh

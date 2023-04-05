@@ -1,0 +1,3 @@
+---
+
+cockpit_machines_list: "{{ groups['kvm_hv'] | difference([inventory_hostname]) }}"

@@ -4,14 +4,6 @@ __nfs_all_dataset_hosts:
   - "{{ groups['desktops'] | map('extract', hostvars, 'ansible_host') | list }}"
 
 nfs_shares:
-  # Kube shares
-  - path: /srv/kube
-    options: "rw,no_root_squash"
-    sources: "{{ groups['k8s_cluster'] | map('extract', hostvars, 'ansible_host') | list }}"
-  # libvirt shares
-  - path: /srv/libvirt
-    options: "rw,no_root_squash"
-    sources: "{{ groups['thinkcentre'] | map('extract', hostvars, 'host_ips') | map(attribute='san') | list }}"
   # Backup shares
   - path: /mnt/tank/borg/repos
     options: "rw,no_root_squash"

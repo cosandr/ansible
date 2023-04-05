@@ -1,6 +1,7 @@
 ---
 
-mt_dns_entries:
+__mt_dns_entries_group: []
+__mt_dns_entries_host:
   - name: "{{ inventory_hostname }}.{{ domains['hb'] }}"
     address: "{{ host_ips.general }}"
   - name: "{{ inventory_hostname }}.man.{{ domains['hb'] }}"
@@ -10,4 +11,5 @@ mt_dns_entries:
   - name: "{{ inventory_hostname }}.vm.{{ domains['hb'] }}"
     address: "{{ host_ips.vm }}"
   - name: "{{ inventory_hostname }}.ipmi.{{ domains['hb'] }}"
+    # 10.0.100.111
     address: "{{ home_net.mgmt.cidr | ansible.utils.ipaddr('111') | ansible.utils.ipaddr('address') }}"

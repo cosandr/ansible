@@ -4,14 +4,6 @@
 - name: Provision Theia
   hosts: theia
   pre_tasks:
-    - name: Install packages [EL]
-      ansible.builtin.dnf:
-        name: "{{ dnf_packages }}"
-        state: present
-      when:
-        - ansible_os_family == 'RedHat'
-      tags: ["install"]
-
     - name: Prepare Synology borg SSH
       ansible.builtin.include_role:
         name: auto_ssh
@@ -56,18 +48,6 @@
       tags: ["borg"]
 
   tasks:
-    - name: Include common tasks
-      ansible.builtin.include_tasks:
-        file: ../tasks/common_servers.yml
-      tags: ["always"]
-
-    - name: Include hypervisor tasks
-      ansible.builtin.include_tasks:
-        file: ../tasks/kvm_hypervisors.yml
-        apply:
-          tags: ["hypervisor"]
-      tags: ["always"]
-
     - name: Set tank SELinux context
       community.general.sefcontext:
         target: "/mnt/tank(/.*)?"
@@ -115,23 +95,11 @@
     # TODO: Install SELinux modules
 
   roles:
-    - role: systemd_networkd
-      tags: ["networkd"]
-
     - role: borg
       tags: ["borg"]
 
     - role: samba
       tags: ["samba"]
-
-    - role: fzf
-      tags: ["fzf"]
-
-    - role: btrbk
-      tags: ["btrbk"]
-
-    - role: chezmoi
-      tags: ["chezmoi"]
 
     - role: systemd
       tags: ["systemd", "rclone"]
@@ -141,9 +109,6 @@
 
     - role: nginx
       tags: ["nginx"]
-
-    - role: auto_ssh
-      tags: ["auto-ssh"]
 
   handlers:
     - name: Restore tank SELinux context

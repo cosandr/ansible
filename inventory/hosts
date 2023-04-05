@@ -13,16 +13,29 @@ m1bp    ansible_host=10.0.50.34
 romsto  ansible_host=10.1.0.6
 theia   ansible_host=10.0.50.2
 syno    ansible_host=10.0.100.8 ansible_user=andrei
+aegir   ansible_host=10.0.100.21
+gerd    ansible_host=10.0.100.22
+ymir    ansible_host=10.0.100.23
+atla    ansible_host=10.0.100.24
 
 [servers:children]
 webgw
 localgw
 rpi
 libvirt
-thinkcentre
 
 [servers:vars]
 ansible_group_priority=1
+
+[kvm_hv]
+theia
+aegir
+gerd
+ymir
+atla
+
+[kvm_hv:vars]
+ansible_group_priority=2
 
 [libvirt]
 localgw01
@@ -109,20 +122,11 @@ plex01 ansible_host=10.0.10.65
 [minio]
 minio01 ansible_host=10.0.10.7
 
-[thinkcentre]
-aegir ansible_host=10.0.100.21
-gerd ansible_host=10.0.100.22
-ymir ansible_host=10.0.100.23
-atla ansible_host=10.0.100.24
-
 [ceph:children]
-thinkcentre
-
-[ceph]
-theia
+kvm_hv
 
 [ceph:vars]
-ansible_group_priority=2
+ansible_group_priority=3
 
 [rom]
 romgw01

@@ -4,7 +4,8 @@ fstrim_timer_enabled: true
 libvirt_vm_engine: "kvm"
 
 vm_disk_format: "raw"
-vm_host: "theia"
+vm_host_list: "{{ groups['kvm_hv'] }}"
+vm_host: "{{ vm_host_list[0] }}"
 vm_cpus: 4
 vm_mem: 4096
 vm_template: "rocky9_packer.{{ vm_disk_format }}"

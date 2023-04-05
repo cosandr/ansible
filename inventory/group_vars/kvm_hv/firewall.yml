@@ -1,0 +1,50 @@
+---
+
+node_exporter_config_firewall: false
+
+firewalld_zones: "{{ __cluster_firewalld_zones + (__group_firewalld_zones | default([])) + (__host_firewalld_zones | default([])) }}"
+firewalld_services: "{{ __cluster_firewalld_services + (__group_firewalld_services | default([])) + (__host_firewalld_services | default([])) }}"
+firewall_rules: "{{ __cluster_firewall_rules + (__group_firewalld_rules | default([])) + (__host_firewalld_rules | default([])) }}"
+
+__firewall_ssh_public: "absent"
+__firewal_cockpit_zone: "internal"
+__group_firewalld_zones:
+  - name: internal
+    interfaces:
+      - MGMT
+      - SAN
+
+  - name: public
+    interfaces:
+      - GENERAL
+      - VM
+      - NOINET
+
+__group_firewalld_services:
+  - name: cockpit
+    zone: public
+    state: absent
+
+  - name: samba-client
+    zone: internal
+    state: absent
+
+  - name: samba-client
+    zone: public
+    state: absent
+
+  - name: ssh
+    zone: public
+    state: "{{ __firewall_ssh_public }}"
+
+  - name: nfs3
+    zone: internal
+
+  - name: cockpit
+    zone: "{{ __firewal_cockpit_zone }}"
+    sources: "{{ firewall_trusted_sources }}"
+
+__group_firewalld_rules:
+  - port: "{{ node_exporter_port }}"
+    zone: internal
+    sources: "{{ node_exporter_allow_ips }}"

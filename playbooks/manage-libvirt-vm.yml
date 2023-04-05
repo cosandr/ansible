@@ -5,12 +5,6 @@
   hosts: libvirt
   gather_facts: false
   pre_tasks:
-    # Maybe have this a group... who designed this inventory??
-    - name: Set fact for all VM hosts
-      ansible.builtin.set_fact:
-        vm_hosts: "{{ groups['libvirt'] | map('extract', hostvars, 'vm_host') | list | select('defined') | list | unique }}"
-      tags: ["always"]
-
     - name: Get list of VMs on all hosts
       run_once: true
       check_mode: false
@@ -19,7 +13,7 @@
         state: "{{ 'running' if 'stop' in ansible_run_tags else 'shutdown' }}"
         command: list_vms
       register: __vm_names
-      loop: "{{ vm_hosts }}"
+      loop: "{{ groups['kvm_hv'] }}"
       tags: ["always"]
 
     - name: Find current host for self

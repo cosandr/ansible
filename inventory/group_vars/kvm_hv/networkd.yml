@@ -1,7 +1,22 @@
 ---
 
+# https://wiki.debian.org/Bonding#Configuring_the_bond_device
+# https://serverfault.com/questions/1106863/bridge-on-a-bonded-interface-with-systemd-networkd
+# https://www.reddit.com/r/linux/comments/30hk8e/creating_a_bridge_for_virtual_machines_using/
+
 __bond0_primary_iface: "enp1s0"
 __bond0_backup_iface: "eno1"
+__bond0_config: |
+    Mode=active-backup
+    PrimaryReselectPolicy=always
+    MIIMonitorSec=1s
+__bond0_primary_options: |
+  PrimarySlave=true
+
+__mgmt_metric: 512
+__mgmt_dns: true
+__general_dns: false
+__general_route: false
 
 # Used for GENERAL and VM where 21, 22 and 23 are taken
 __ip_offset: 50
@@ -29,9 +44,7 @@ networkd_netdevs:
       MTUBytes=9000
 
       [Bond]
-      Mode=active-backup
-      PrimaryReselectPolicy=always
-      MIIMonitorSec=1s
+      {{ __bond0_config }}
 
   - bond0.2: |
       [NetDev]
@@ -164,7 +177,7 @@ networkd_config:
       [Network]
       Description=Trunk bond interface primary
       Bond=bond0
-      PrimarySlave=true
+      {{ __bond0_primary_options }}
 
   - bond0_backup: |
       [Match]
@@ -210,9 +223,18 @@ networkd_config:
 
       [Network]
       Address={{ __host_ips.general }}
+      {% if __general_dns %}
+      DNS={{ home_net.general.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
+      DNS=1.1.1.1
+      DNS=8.8.8.8
+      {% endif %}
 
       [Route]
+      {% if __general_route %}
+      {{ __general_route }}
+      {% else %}
       Scope=link
+      {% endif %}
 
   - MGMT: |
       [Match]
@@ -220,11 +242,12 @@ networkd_config:
 
       [Network]
       Address={{ __host_ips.mgmt }}
+      {% if __mgmt_dns %}
       DNS={{ all_net.mgmt.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
       DNS=1.1.1.1
       DNS=8.8.8.8
+      {% endif %}
 
       [Route]
       Gateway={{ all_net.mgmt.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
-      Metric=512
-      Scope=global
+      Metric={{ __mgmt_metric }}

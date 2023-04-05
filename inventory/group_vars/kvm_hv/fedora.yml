@@ -1,7 +1,7 @@
 ---
 
-dnf_packages:
-  - fzf
+dnf_packages: "{{ __group_dnf_packages + (__host_dnf_packages | default([])) }}"
+__group_dnf_packages:
   - htop
   - iftop
   - iotop

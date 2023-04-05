@@ -13,3 +13,12 @@ btrfs_scrub_targets:
   - /mnt/tank
 
 prometheus_node_targets: ["{{ host_ips.vm + ':' + node_exporter_port | string }}"]
+
+cryptenroll_crypttab_config: false
+grub_config:
+  - regexp: '^GRUB_TIMEOUT'
+    line: "GRUB_TIMEOUT=2"
+  - regexp: '^GRUB_CMDLINE_LINUX'
+    line: GRUB_CMDLINE_LINUX="rd.lvm.lv=main01/root rd.lvm.lv=main02/root crashkernel=auto nmi_watchdog=0"
+swapfile_path: ""
+ssh_conf_hosts: false

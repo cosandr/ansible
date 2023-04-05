@@ -1,6 +1,6 @@
 ---
 
-ssh_dest_hosts: "{{ groups['thinkcentre'] | difference([inventory_hostname]) }}"
+ssh_dest_hosts: "{{ groups['kvm_hv'] | difference([inventory_hostname]) }}"
 ssh_conf_hosts: true
 ssh_known_hosts_file: "/etc/ssh/ssh_known_hosts"
 ssh_conf_hosts_names:
