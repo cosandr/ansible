@@ -14,3 +14,12 @@ btrbk_volumes:
       - path: "@"
         options:
           snapshot_name: "root"
+
+  - path: "/mnt/tmp"
+    options:
+      snapshot_dir: ".snapshots"
+      snapshot_preserve: "6h 2d 1w"
+      target: "ssh://{{ hostvars['theia'].host_ips.san }}/mnt/tank/backup/btrbk/{{ inventory_hostname }}"
+      target_preserve: "1d 2w"
+    subvolumes:
+      - path: "podman"
