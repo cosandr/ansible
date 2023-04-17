@@ -6,28 +6,28 @@
   tags: ["install"]
 
 - name: Install chezmoi using package manager
-  package:
+  community.general.pacman:
     name: chezmoi
     state: present
   when: ansible_distribution in ['Archlinux']
   tags: ["install"]
 
 - name: Ensure overrides dir exists
-  file:
+  ansible.builtin.file:
     path: "{{ chezmoi_user_override }}"
     state: directory
     owner: "{{ chezmoi_user }}"
     group: "{{ chezmoi_user }}"
-    mode: 0755
+    mode: "0755"
   when: chezmoi_overrides | length > 0
 
 - name: Copy overrides
-  copy:
+  ansible.builtin.copy:
     content: "{{ item.value }}"
     dest: "{{ chezmoi_user_override }}/{{ item.key }}"
     owner: "{{ chezmoi_user }}"
     group: "{{ chezmoi_user }}"
-    mode: 0644
+    mode: "0644"
     force: "{{ chezmoi_overwrite }}"
   with_dict: "{{ chezmoi_overrides }}"
   loop_control:

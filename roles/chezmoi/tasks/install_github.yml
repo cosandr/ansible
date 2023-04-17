@@ -23,7 +23,7 @@
 
 - name: Set required facts
   ansible.builtin.set_fact:
-    __chezmoi_checksums: "{{ lookup('url', 'https://github.com/twpayne/chezmoi/releases/download/v' + chezmoi_version + '/checksums.txt', wantlist=True) | list }}"
+    __chezmoi_checksums: "{{ lookup('url', __chezmoi_checksum_url, wantlist=True) | list }}"
     __chezmoi_filename: >-
       {%- if ansible_os_family == 'Debian' -%}
       {{ __chezmoi_filename_deb }}
@@ -33,11 +33,12 @@
       {{ __chezmoi_filename_tar }}
       {%- endif -%}
   vars:
+    __chezmoi_checksum_url: "https://github.com/twpayne/chezmoi/releases/download/v{{ chezmoi_version }}/chezmoi_{{ chezmoi_version }}_checksums.txt"
     __chezmoi_filename_tar: "chezmoi_{{ chezmoi_version }}_linux_{{ chezmoi_arch }}.tar.gz"
     __chezmoi_filename_deb: "chezmoi_{{ chezmoi_version }}_linux_{{ chezmoi_arch }}.deb"
     __chezmoi_filename_rpm: "chezmoi-{{ chezmoi_version }}-{{ chezmoi_arch }}.rpm"
 
-- name: Download chezmoi to local folder
+- name: Download chezmoi to local folder  # noqa risky-file-permissions
   become: false
   ansible.builtin.get_url:
     url: "https://github.com/twpayne/chezmoi/releases/download/v{{ chezmoi_version }}/{{ __chezmoi_filename }}"
@@ -58,7 +59,7 @@
     dest: "/tmp/{{ __chezmoi_filename }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
 - name: Install deb package
   ansible.builtin.apt:
