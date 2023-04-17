@@ -2,19 +2,48 @@
 
 dnf_packages: "{{ __group_dnf_packages + (__host_dnf_packages | default([])) }}"
 __group_dnf_packages:
+  - bash-completion
+  - binutils
+  - efibootmgr
+  - ethtool
+  - file
+  - findutils
+  - firewalld
+  - gawk
+  - git
+  - gzip
   - htop
   - iftop
   - iotop
+  - jq
   - lm_sensors
   - logrotate
   - lsof
+  - make
+  - man-db
   - mlocate
+  - ncdu
+  - net-tools
+  - netcat
+  - openssh
+  - p7zip
+  - patch
   - pciutils
+  - pkgconf
+  - policycoreutils-python-utils
+  - powertop
   - python3-dnf-plugin-versionlock
   - python3-lxml  # virt ansible modules
   - rpmconf
   - rsync
+  - smartmontools
+  - sudo
+  - telnet
   - tmux
+  - usbutils
   - util-linux-user  # chsh
+  - vim
   - wget
+  - which
   - yum-utils
+  - zsh
