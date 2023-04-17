@@ -16,6 +16,12 @@ vm_started: true
 vm_customize: true
 vm_cpu_mode: "{{ 'custom' if vm_cpu_model_name else 'host-passthrough' }}"
 vm_cpu_model_name: ""
+# vm_cpu_model_name: "Skylake-Client-noTSX-IBRS"
+vm_cpu_features: []
+# vm_cpu_features:
+#   - ssbd
+#   - name: mpx
+#     policy: disable
 vm_seclabel: "system_u:system_r:svirt_t:s0:c{{ home_net.vm.vlan }},c{{ __host_num }}"
 vm_qemu_args: []
 
@@ -64,6 +70,7 @@ vm_default_definition:
   interfaces: "{{ vm_nics }}"
   cpu_mode: "{{ vm_cpu_mode }}"
   cpu_model_name: "{{ vm_cpu_model_name }}"
+  cpu_features: "{{ vm_cpu_features }}"
   seclabel_options:
     type: "static"
     relabel: "yes"
