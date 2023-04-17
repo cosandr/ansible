@@ -80,6 +80,14 @@
             join_token: "{{ __swarm_init.swarm_facts.JoinTokens[docker_swarm_role] }}"
           when: __swarm_init.get('swarm_facts', {}).get('JoinTokens', {}).get(docker_swarm_role, '')
 
+        - name: Configure node labels
+          delegate_to: "{{ docker_swarm_managers[0] }}"
+          community.docker.docker_node:
+            hostname: "{{ inventory_hostname }}"
+            labels: "{{ docker_node_labels }}"
+            labels_state: replace
+          tags: ["labels"]
+
     - name: Login to registries
       community.docker.docker_login:
         registry_url: "{{ item.url }}"

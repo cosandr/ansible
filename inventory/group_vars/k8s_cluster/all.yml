@@ -19,10 +19,14 @@ ingress_nginx_lb_ip: "{{ kube_subnet.lb.cidr | ansible.utils.ipaddr('2') | ansib
 # 10.85.128.3
 prom_lb_ip: "{{ kube_subnet.lb.cidr | ansible.utils.ipaddr('3') | ansible.utils.ipaddr('address') }}"
 
+__node_labels_common:
+  cpu_tier: "{{ hostvars[vm_host].cpu_tier }}"
+  vm_host: "{{ vm_host }}"
+
 __node_labels_worker:
   "node-role.kubernetes.io/worker": ""
 
-node_labels: "{{ __node_labels_worker if inventory_hostname not in groups['kube_control_plane'] else {} }}"
+node_labels: "{{ __node_labels_common | combine(__node_labels_worker) if inventory_hostname not in groups['kube_control_plane'] else __node_labels_common }}"
 
 cluster_name: "k8s.{{ domains['hb'] }}"
 dns_domain: "cluster.local"

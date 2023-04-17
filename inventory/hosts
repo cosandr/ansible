@@ -28,11 +28,11 @@ libvirt
 ansible_group_priority=1
 
 [kvm_hv]
-theia
-aegir
-gerd
-ymir
-atla
+theia cpu_tier=2
+aegir cpu_tier=3
+gerd  cpu_tier=3
+ymir  cpu_tier=3
+atla  cpu_tier=1
 
 [kvm_hv:vars]
 ansible_group_priority=2
