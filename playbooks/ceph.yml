@@ -45,7 +45,7 @@
         src: admin@.cephfs=/
         path: /mnt/ceph
         fstype: ceph
-        opts: "noatime"
+        opts: "noatime,nofail,x-systemd.device-timeout=30"
         state: mounted
       tags: ["cephfs"]
 
