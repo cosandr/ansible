@@ -19,14 +19,59 @@
   loop: "{{ ssh_dest_hosts }}"
   when: ssh_dest_create_dir | bool
 
-- name: Generate SSH keys
-  community.crypto.openssh_keypair:
-    path: "{{ ssh_src_dir }}/id_{{ ssh_key_type }}"
-    comment: "{{ ssh_key_comment }}"
-    type: "{{ ssh_key_type }}"
-    owner: "{{ ssh_src_user }}"
-    group: "{{ ssh_src_group }}"
-  register: __ssh_key
+# Stupid workaround for https://github.com/ansible/ansible/issues/37673
+- name: Generate keys
+  block:
+    - name: Generate SSH keys
+      community.crypto.openssh_keypair:
+        path: "{{ ssh_src_dir }}/id_{{ ssh_key_type }}"
+        comment: "{{ ssh_key_comment }}"
+        type: "{{ ssh_key_type }}"
+        owner: "{{ ssh_src_user }}"
+        group: "{{ ssh_src_group }}"
+      register: __ssh_key
+  rescue:
+    - name: Try to copy existing keys
+      ansible.builtin.copy:
+        src: "{{ ssh_src_dir }}/{{ item }}"
+        dest: "/tmp/{{ item }}"
+        owner: "{{ ssh_src_user }}"
+        group: "{{ ssh_src_group }}"
+        mode: "0600"
+        remote_src: true
+      failed_when: false
+      loop:
+        - "id_{{ ssh_key_type }}"
+        - "id_{{ ssh_key_type }}.pub"
+
+    - name: Generate keys in temporary path
+      community.crypto.openssh_keypair:
+        path: "/tmp/id_{{ ssh_key_type }}"
+        comment: "{{ ssh_key_comment }}"
+        type: "{{ ssh_key_type }}"
+        owner: "{{ ssh_src_user }}"
+        group: "{{ ssh_src_group }}"
+      register: __ssh_key
+
+    - name: Copy keys back
+      ansible.builtin.copy:
+        src: "/tmp/{{ item }}"
+        dest: "{{ ssh_src_dir }}/{{ item }}"
+        owner: "{{ ssh_src_user }}"
+        group: "{{ ssh_src_group }}"
+        mode: "preserve"
+        remote_src: true
+      loop:
+        - "id_{{ ssh_key_type }}"
+        - "id_{{ ssh_key_type }}.pub"
+
+    - name: Remove temporary keys
+      ansible.builtin.file:
+        path: "/tmp/{{ item }}"
+        state: absent
+      loop:
+        - "id_{{ ssh_key_type }}"
+        - "id_{{ ssh_key_type }}.pub"
 
 - name: Copy SSH keys
   delegate_to: "{{ item }}"
