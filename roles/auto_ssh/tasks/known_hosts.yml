@@ -43,7 +43,7 @@
     path: "{{ ssh_known_hosts_file }}"
     marker: "# {mark} {{ ssh_hosts_comment }}"
     create: true
-    mode: 0644
+    mode: "{{ ssh_known_hosts_mode }}"
     block: |
       {% for k in __host_keys.results | map(attribute='stdout') | sort %}
       {{ k }}

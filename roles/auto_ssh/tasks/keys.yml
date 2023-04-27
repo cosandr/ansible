@@ -6,7 +6,7 @@
     state: directory
     owner: "{{ ssh_src_user }}"
     group: "{{ ssh_src_group }}"
-    mode: 0700
+    mode: "0700"
 
 - name: Ensure SSH dir exists on targets
   delegate_to: "{{ item }}"
@@ -15,7 +15,7 @@
     state: directory
     owner: "{{ ssh_dest_user }}"
     group: "{{ ssh_dest_group }}"
-    mode: 0700
+    mode: "0700"
   loop: "{{ ssh_dest_hosts }}"
   when: ssh_dest_create_dir | bool
 

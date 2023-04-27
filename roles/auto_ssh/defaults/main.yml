@@ -21,3 +21,4 @@ ssh_dest_create_dir: true
 ssh_conf_hosts: false
 ssh_known_hosts_file: "{{ ssh_src_dir }}/known_hosts"
 ssh_known_hosts_config: true
+ssh_known_hosts_mode: "0644"
