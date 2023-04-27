@@ -1,5 +1,10 @@
 ---
 
+- name: Include unraid vars
+  ansible.builtin.include_vars:
+    file: unraid.yml
+  when: __borg_is_unraid
+
 - name: Include installation tasks
   ansible.builtin.include_tasks:
     file: install.yml
@@ -8,17 +13,30 @@
   when: borg_install | bool
   tags: ["install"]
 
-- name: Include borg server taskss
+- name: Initialize borg server
   ansible.builtin.include_tasks:
     file: server.yml
-    apply:
-      tags: ["install", "server"]
   when: borg_server | bool
-  tags: ["install", "server"]
+  tags: ["server"]
 
-- name: Include borg configuration tasks
+- name: Create borg scripts directory
+  ansible.builtin.file:
+    path: "{{ borg_backup_script_path }}"
+    owner: "{{ borg_root_user }}"
+    group: "{{ borg_root_group }}"
+    mode: "0750"
+    state: directory
+  when:
+    - not __borg_is_unraid
+    - borg_backups | length > 0
+
+- name: Configure backups
   ansible.builtin.include_tasks:
     file: configure.yml
     apply:
       tags: ["configure"]
+  loop: "{{ borg_backups }}"
+  loop_control:
+    loop_var: "conf"
+    label: "{{ conf.name }}"
   tags: ["configure"]

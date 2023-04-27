@@ -7,7 +7,7 @@ borg_backups:
     no_timer: true
     passphrase: "{{ borg_laptop_passphrase }}"
     repo: "{{ borg_home }}/borg/{{ ansible_hostname }}"
-    backup_name: "{{ ansible_hostname }}"
+    archive_name: "{{ ansible_hostname }}"
     pre_run: |
       if [[ ! -b /dev/disk/by-uuid/{{ borg_disk_uuid }} ]]; then
         echo "Disk not available"
@@ -27,18 +27,12 @@ borg_backups:
       - "/boot"
       - "/home/{{ my_user }}"
     create_args:
-      - "--stats"
-      - "--show-rc"
-      - "--compression auto,zstd"
       - "--one-file-system"
-      - "--exclude-caches"
       - "--exclude 're:^(/dev|/proc|/sys|/tmp|/run)'"
       - "--exclude '/home/*/.cache'"
       - "--exclude '/home/*/.local/share/baloo'"
       - "--exclude '/home/*/.local/share/containers'"
       - "--exclude '/**/.snapshots'"
     prune_args:
-      - "--list"
-      - "--show-rc"
       - "--keep-weekly 2"
       - "--keep-monthly 3"

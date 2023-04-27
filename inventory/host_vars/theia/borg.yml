@@ -1,5 +1,11 @@
 ---
 
+borg_server: true
+borg_server_self_dir: false
+borg_uid: 1002
+borg_gid: 1002
+borg_pool: "/mnt/tank/borg/repos"
+
 borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
 borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
 borg_cephfs_tank_passphrase: "{{ vault_borg_cephfs_tank_passphrase }}"
@@ -23,27 +29,17 @@ borg_backups:
     timer_description: "Backup tank to Synology every 14 days"
     oncalendar: "*-*-01/14 02:15:00"
     passphrase: "{{ borg_syno_tank_passphrase }}"
-    repo: "{{ hostvars['syno'].borg_remote_repo }}/tank"
-    backup_name: "tank"
+    target_host: "syno"
+    archive_name: "tank"
+    archive_path: "tank"
     pre_run: |
-      if ! ssh -q -o "BatchMode=yes" {{ hostvars['syno'].borg_ssh_check }} exit &>/dev/null
-      then
-          echo "Cannot SSH into remote server"
-          exit 1
-      fi
       {{ lookup('template', repo_base_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
     post_run: "{{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}"
     paths:
       - "."
     create_args:
-      - "--stats"
-      - "--show-rc"
-      - "--compression auto,zstd"
-      - "--exclude-caches"
       - "--exclude '**/.snapshots'"
     prune_args:
-      - "--list"
-      - "--show-rc"
       - "--keep-weekly 2"
       - "--keep-monthly 3"
       - "--keep-yearly 1"
@@ -52,28 +48,20 @@ borg_backups:
     timer_description: "Backup tank to remote location every 30 days"
     oncalendar: "*-*-01/30 00:12:00"
     passphrase: "{{ borg_remote_tank_passphrase }}"
-    repo: "{{ hostvars['romsto'].borg_remote_repo }}/tank"
-    backup_name: "tank"
+    target_host: "romsto"
+    # Need to manually update /boot/config/ssh/andrei.pubkeys
+    ssh_dest_dir: "/home/andrei"
+    archive_name: "tank"
+    archive_path: "tank"
     pre_run: |
-      if ! ssh -q -o "BatchMode=yes" {{ hostvars['romsto'].borg_ssh_check }} exit &>/dev/null
-      then
-          echo "Cannot SSH into remote server"
-          exit 1
-      fi
       {{ lookup('template', repo_base_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
     post_run: "{{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}"
     paths:
       - "."
     create_args:
-      - "--stats"
-      - "--show-rc"
-      - "--compression auto,zstd"
-      - "--exclude-caches"
       - "--exclude '**/.snapshots'"
       - "--upload-ratelimit 20000"
     prune_args:
-      - "--list"
-      - "--show-rc"
       - "--keep-monthly 3"
       - "--keep-yearly 2"
 
@@ -81,8 +69,8 @@ borg_backups:
     timer_description: "Backup CephFS to tank every 7 days"
     oncalendar: "*-*-01/7 01:21:00"
     passphrase: "{{ borg_cephfs_tank_passphrase }}"
-    repo: "/mnt/tank/borg/repos/cephfs"
-    backup_name: "cephfs"
+    archive_name: "cephfs"
+    repo: "{{ borg_pool }}/cephfs"
     pre_run: |
       snap_dir="/mnt/ceph/.snap/borg_tmp.$(date +%Y%m%dT%H%M)"
       mkdir -p "$snap_dir"
@@ -92,14 +80,7 @@ borg_backups:
       rmdir "$snap_dir"
     paths:
       - "."
-    create_args:
-      - "--stats"
-      - "--show-rc"
-      - "--compression auto,zstd"
-      - "--exclude-caches"
     prune_args:
-      - "--list"
-      - "--show-rc"
       - "--keep-weekly 2"
       - "--keep-monthly 3"
       - "--keep-yearly 1"

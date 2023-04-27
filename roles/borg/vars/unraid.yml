@@ -1,0 +1,7 @@
+---
+
+borg_install: false
+borg_create_user: false
+borg_systemd_install: false
+__borg_script_path: "/boot/config/plugins/user.scripts/scripts/backup-{{ conf.name }}/script"
+__borg_script_mode: "0700"

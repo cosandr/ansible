@@ -66,9 +66,6 @@
     - role: udev
       tags: ["udev"]
 
-    - role: borg
-      tags: ["borg"]
-
     - role: btrbk
       tags: ["btrbk"]
 

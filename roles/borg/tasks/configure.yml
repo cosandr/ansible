@@ -1,94 +1,57 @@
 ---
-- block:
-  - name: Generate authorized_keys
-    authorized_key:
-      user: "{{ borg_user }}"
-      key: "{{ item.key }}"
-      key_options: 'command="cd {{ borg_pool }}/{{ item.host }};{{ borg_serve_bin }} serve --restrict-to-path {{ borg_pool }}/{{ item.host }}",restrict'
-    with_items: "{{ borg_auth_users }}"
 
-  - name: Write authorized_keys
-    file:
-      path: "{{ borg_home }}/.ssh/authorized_keys"
-      owner: "{{ borg_user }}"
-      group: "{{ borg_group }}"
-      mode: 0600
-      state: file
-    when: borg_auth_users
+- name: Configure Borg target
+  ansible.builtin.include_tasks:
+    file: configure_target.yml
+  when:
+    - conf.target_host | default('')
 
-  - name: Create remote client repo directories
-    file:
-      path: "{{ borg_pool }}/{{ item.host }}"
-      owner: "{{ borg_user }}"
-      group: "{{ borg_group }}"
-      mode: 0700
-      state: directory
-    with_items: "{{ borg_auth_users }}"
+- name: Create user-script directory
+  ansible.builtin.file:
+    path: "{{ __borg_script_path | dirname }}"
+    owner: "root"
+    group: "root"
+    mode: "0700"
+  when: __borg_is_unraid
 
-  - name: Create localhost client repo directory
-    file:
-      path: "{{ borg_pool }}/{{ ansible_hostname }}"
-      owner: "{{ borg_user }}"
-      group: "{{ borg_group }}"
-      mode: 0700
-      state: directory
-    when: borg_local_repo
+- name: Copy scripts
+  ansible.builtin.template:
+    src: backup.sh.j2
+    dest: "{{ __borg_script_path }}"
+    owner: "{{ borg_root_user }}"
+    group: "{{ borg_root_group }}"
+    mode: "0750"
 
-  when: borg_server
+- name: Copy service files
+  ansible.builtin.template:
+    src: backup.service.j2
+    dest: "/etc/systemd/system/backup-{{ conf.name }}.service"
+    owner: "{{ borg_root_user }}"
+    group: "{{ borg_root_group }}"
+    mode: "0644"
+  notify: Reload systemd
+  when: borg_systemd_install | bool
 
-- block:
-  - name: Create borg scripts directory
-    file:
-      path: "{{ borg_backup_script_path }}"
-      owner: "root"
-      group: "root"
-      mode: 0750
-      state: directory
+- name: Copy timer files
+  ansible.builtin.template:
+    src: backup.timer.j2
+    dest: "/etc/systemd/system/backup-{{ conf.name }}.timer"
+    owner: "{{ borg_root_user }}"
+    group: "{{ borg_root_group }}"
+    mode: "0644"
+  notify: Reload systemd
+  when:
+    - borg_systemd_install | bool
+    - not conf.no_timer | default(false)
 
-  - name: Copy scripts
-    template:
-      src: templates/backup.sh.j2
-      dest: "{{ borg_backup_script_path }}/backup-{{ item.name }}"
-      owner: "root"
-      group: "root"
-      mode: 0750
-    with_items: "{{ borg_backups }}"
-    loop_control:
-      label: "{{item.name}}"
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
 
-  - name: Copy service files
-    template:
-      src: templates/backup.service.j2
-      dest: "/etc/systemd/system/backup-{{ item.name }}.service"
-      owner: "root"
-      group: "root"
-      mode: 0644
-    with_items: "{{ borg_backups }}"
-    notify: reload systemd
-    loop_control:
-      label: "{{item.name}}"
-
-  - name: Copy timer files
-    template:
-      src: templates/backup.timer.j2
-      dest: "/etc/systemd/system/backup-{{ item.name }}.timer"
-      owner: "root"
-      group: "root"
-      mode: 0644
-    with_items: "{{ borg_backups }}"
-    notify: reload systemd
-    loop_control:
-      label: "{{item.name}}"
-    when: item.no_timer is not defined or not item.no_timer
-
-  - name: Enable and start timers
-    service:
-      name: "backup-{{ item.name }}.timer"
-      enabled: true
-      state: started
-    with_items: "{{ borg_backups }}"
-    loop_control:
-      label: "{{item.name}}"
-    when: item.no_timer is not defined or not item.no_timer
-
-  when: borg_backups | length > 0
+- name: Enable and start timers
+  ansible.builtin.service:
+    name: "backup-{{ conf.name }}.timer"
+    enabled: true
+    state: started
+  when:
+    - borg_systemd_install | bool
+    - not conf.no_timer | default(false)

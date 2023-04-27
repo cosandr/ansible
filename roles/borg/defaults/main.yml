@@ -1,22 +1,25 @@
 ---
 
-borg_package_name: borg
+borg_package_name: "{{ __borg_pkg_map[ansible_os_family] | default('borgbackup') }}"
+borg_systemd_install: true
+borg_configure_target: true
+borg_configure_ssh: true
 borg_install: true
 borg_create_user: true
+borg_repo_name: "{{ inventory_hostname }}"
 borg_user: backup
 # borg_uid: 1002
 borg_group: backup
 # borg_gid: 1002
-borg_create_home: true
-borg_local_repo: false
+### Borg server vars ###
 borg_server: false
-borg_home: /home/backup
-borg_pool: "{{ home }}/repos"
+borg_server_self_dir: "{{ borg_backups | rejectattr('target_host', 'defined') | length > 0 }}"
+borg_create_home: true
+borg_home: "/home/{{ borg_user }}"
+### Borg server vars ###
+borg_pool: "{{ borg_home }}/repos"
 borg_backup_script_path: "/usr/local/bin/borg"
 borg_serve_bin: "borg"
-borg_auth_users: []
-#   - host: example
-#     key: "ssh-rsa <key> example@host"
 borg_backups: []
 # - name: "root"
 #   timer_description: "Backup root every day at 03:00"
@@ -34,3 +37,14 @@ borg_backups: []
 #     - "--keep-daily 2"
 #     - "--keep-weekly 2"
 #     - "--keep-monthly 6"
+borg_root_user: "root"
+# Might have to be changed on BSDs
+borg_root_group: "root"
+borg_default_create_args:
+  - "--stats"
+  - "--show-rc"
+  - "--compression auto,zstd"
+  - "--exclude-caches"
+borg_default_prune_args:
+  - "--list"
+  - "--show-rc"

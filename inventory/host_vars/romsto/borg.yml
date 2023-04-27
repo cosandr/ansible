@@ -1,7 +1,48 @@
 ---
 
 borg_user: "andrei"
+borg_group: "users"
 borg_pool: "/mnt/user/backup/borg"
+borg_server: true
 
 borg_ssh_check: "{{ borg_user }}@{{ wireguard_ip }}"
 borg_remote_repo: "ssh://{{ borg_ssh_check }}/."
+
+borg_backups:
+  - name: "docker"
+    paths:
+      - "/mnt/disks/datassd01/docker"
+    pre_run: |
+      export BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK=yes
+    create_args:
+      - "--exclude '/mnt/disks/datassd01/docker/docker.img'"
+    prune_args:
+      - "--keep-weekly 3"
+      - "--keep-monthly 1"
+
+  - name: "flash"
+    paths:
+      - "/boot"
+    pre_run: |
+      export BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK=yes
+    prune_args:
+      - "--keep-daily 2"
+      - "--keep-weekly 2"
+      - "--keep-monthly 2"
+
+  - name: "flash-remote"
+    passphrase: "{{ vault_borg_remote_passphrase }}"
+    target_host: "backup01"
+    ssh_check: "{{ hostvars['backup01'].borg_ssh_check_ip }}"
+    repo: "{{ hostvars['backup01'].borg_remote_repo_ip }}/boot"
+    ssh_known_hosts_mode: "0600"
+    archive_name: "boot"
+    paths:
+      - "/boot"
+    create_args:
+      - "--noatime"
+      - "--nobsdflags"
+      - "--exclude '*~'"
+    prune_args:
+      - "--keep-weekly 4"
+      - "--keep-monthly 3"

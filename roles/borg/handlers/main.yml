@@ -1,5 +1,8 @@
 ---
 
-- name: reload systemd
-  systemd:
+- name: Reload systemd
+  ansible.builtin.systemd:
     daemon_reload: true
+
+- name: Restore borg SELinux context
+  ansible.builtin.command: restorecon -r "{{ borg_home }}/.ssh"

@@ -1,14 +1,14 @@
 ---
 
-- name: Create "{{ borg_group }}" group
-  group:
+- name: Create borg group
+  ansible.builtin.group:
     name: "{{ borg_group }}"
     gid: "{{ borg_gid | default(omit) }}"
     state: present
   when: borg_create_user
 
-- name: Create "{{ borg_user }}" user
-  user:
+- name: Create borg user
+  ansible.builtin.user:
     name: "{{ borg_user }}"
     shell: /bin/bash
     home: "{{ borg_home }}"
@@ -18,48 +18,56 @@
     state: present
   when: borg_create_user
 
-- name: Set "{{ borg_home }}" permissions
-  file:
+- name: Set borg home permissions
+  ansible.builtin.file:
     path: "{{ borg_home }}"
     owner: "{{ borg_user }}"
     group: "{{ borg_group }}"
-    mode: 0700
+    mode: "0700"
     state: directory
 
 - name: Create borg .ssh directory
-  file:
+  ansible.builtin.file:
     path: "{{ borg_home }}/.ssh"
     owner: "{{ borg_user }}"
     group: "{{ borg_group }}"
-    mode: 0700
+    mode: "0700"
     state: directory
 
-- block:
-  - name: Install selinux libraries
-    dnf:
-      name:
-        - "python3-libselinux"
-        - "python3-policycoreutils"
-      state: present
+- name: Configure SELinux
+  when:
+    # Only bother if using non-standard path
+    - borg_home is not match('^/home/')
+    - borg_home is not match('^/root/')
+    - ansible_selinux.status == "enabled"
+  block:
+    - name: Install SELinux libraries
+      ansible.builtin.dnf:
+        name:
+          - "python3-libselinux"
+          - "python3-policycoreutils"
+        state: present
 
-  - name: Set SELinux context
-    sefcontext:
-      target: "{{ borg_home }}/.ssh(.*)?"
-      setype: ssh_home_t
-      state: present
-    register: __set_context
-
-  - name: Restore SELinux context
-    command: restorecon -r "{{ borg_home }}/.ssh"
-    changed_when: false
-    when: __set_context.changed
-
-  when: ansible_selinux.status == "enabled"
+    - name: Set SELinux context
+      community.general.sefcontext:
+        target: "{{ borg_home }}/.ssh(.*)?"
+        setype: ssh_home_t
+        state: present
+      notify: Restore borg SELinux context
 
 - name: Create pool directory
-  file:
+  ansible.builtin.file:
     path: "{{ borg_pool }}"
     owner: "{{ borg_user }}"
     group: "{{ borg_group }}"
-    mode: 0700
+    mode: "0700"
     state: directory
+
+- name: Create dir for self-backups
+  ansible.builtin.file:
+    path: "{{ borg_pool }}/{{ borg_repo_name }}"
+    owner: "{{ borg_user }}"
+    group: "{{ borg_group }}"
+    mode: "0750"
+    state: directory
+  when: borg_server_self_dir

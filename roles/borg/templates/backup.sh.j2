@@ -1,19 +1,49 @@
+{%- set archive_name = conf.archive_name | default(conf.name) -%}
+{%- set archive_path = conf.archive_path | default(conf.name) -%}
+{%- if conf.ssh_check is defined -%}
+{%- set ssh_check = conf.ssh_check -%}
+{%- elif conf.target_host is defined and hostvars[conf.target_host].borg_ssh_check is defined -%}
+{%- set ssh_check = hostvars[conf.target_host].borg_ssh_check -%}
+{%- else -%}
+{%- set ssh_check = "" -%}
+{%- endif -%}
 #!/bin/bash
 
+{% if __borg_is_unraid %}
+#name=backup-{{ conf.name }}
+#description=Borg backup for {{ conf.name }}
+#arrayStarted=true
+#noParity=true
+{% endif %}
 {{ ansible_managed | comment }}
 trap 'echo Backup interrupted >&2; exit 2' INT TERM
 
-export BORG_PASSPHRASE='{{ item.passphrase }}'
-export BORG_REPO="{{ item.repo }}"
-{% if item.remote_path is defined %}
-export BORG_REMOTE_PATH="{{ item.remote_path }}"
+{% if conf.passphrase is defined %}
+export BORG_PASSPHRASE='{{ conf.passphrase }}'
 {% endif %}
-{% if item.pre_run is defined %}
-{{ item.pre_run }}
+{% if conf.repo is defined %}
+export BORG_REPO="{{ conf.repo }}"
+{% elif conf.target_host is defined and hostvars[conf.target_host].borg_remote_repo is defined %}
+export BORG_REPO="{{ hostvars[conf.target_host].borg_remote_repo }}/{{ archive_path }}"
+{% elif conf.target_host is not defined and borg_server %}
+export BORG_REPO="{{ borg_pool }}/{{ borg_repo_name }}/{{ archive_path }}"
 {% endif %}
-{% if item.post_run is defined %}
+{% if conf.remote_path is defined %}
+export BORG_REMOTE_PATH="{{ conf.remote_path }}"
+{% endif %}
+{% if ssh_check %}
+if ! ssh -q -o "BatchMode=yes" {{ ssh_check }} exit &>/dev/null
+then
+    echo "Cannot SSH into remote server"
+    exit 1
+fi
+{% endif %}
+{% if conf.pre_run is defined %}
+{{ conf.pre_run }}
+{% endif %}
+{% if conf.post_run is defined %}
 post_run() {
-    {{ item.post_run }}
+    {{ conf.post_run }}
 }
 trap post_run EXIT
 {% endif %}
@@ -21,7 +51,7 @@ trap post_run EXIT
 # Check paths
 declare -a backup_paths=()
 declare -a check_paths=(
-{% for p in item.paths %}
+{% for p in conf.paths %}
     "{{ p }}"
 {% endfor %}
 )
@@ -51,13 +81,13 @@ fi
 echo "Starting backup"
 # shellcheck disable=SC2086
 {% endraw %}
-{% set name = item.backup_name | default('{hostname}') %}
+
 
 borg create \
-{% for a in item.create_args %}
+{% for a in borg_default_create_args + (conf.create_args | default([])) %}
     {{ a }} \
 {% endfor %}
-    ::'{{ name }}-{now}' \
+    ::'{{ archive_name }}-{now}' \
     ${backup_paths[*]}
 
 backup_exit=$?
@@ -65,10 +95,10 @@ backup_exit=$?
 echo "Pruning repository"
 
 borg prune \
-    --glob-archives '{{ name }}-*' \
-{% for a in item.prune_args %}
+{% for a in borg_default_prune_args + (conf.prune_args | default([])) %}
     {{ a }} \
 {% endfor %}
+    --glob-archives '{{ archive_name }}-*'
 {% raw %}
 prune_exit=$?
 

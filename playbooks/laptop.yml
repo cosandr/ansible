@@ -172,9 +172,6 @@
     - role: firewall_config
       tags: ["firewall"]
 
-    - role: borg
-      tags: ["borg"]
-
     - role: reflector
       when: ansible_distribution == 'Archlinux'
       tags: ["reflector"]

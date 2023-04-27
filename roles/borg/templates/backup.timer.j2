@@ -1,10 +1,10 @@
 {{ ansible_managed | comment }}
 [Unit]
-Description={{ item.timer_description | default('Scheduled borg backup for ' + item.name) }}
+Description={{ conf.timer_description | default('Scheduled borg backup for ' + conf.name) }}
 
 [Timer]
-OnCalendar={{ item.oncalendar | default('*-*-* ' + ansible_date_time.time) }}
-Persistent={{ item.persistent | bool_to_yes('yes') }}
+OnCalendar={{ conf.oncalendar | default('*-*-* ' + ansible_date_time.time) }}
+Persistent={{ conf.persistent | bool_to_yes('yes') }}
 
 [Install]
 WantedBy=timers.target
