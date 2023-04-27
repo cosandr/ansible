@@ -3,9 +3,9 @@
 - name: Include SSH key config
   ansible.builtin.include_tasks:
     file: keys.yml
-  when: ssh_key_config
+  when: ssh_key_config | bool
 
 - name: Include known_hosts config
   ansible.builtin.include_tasks:
     file: known_hosts.yml
-  when: ssh_known_hosts_config
+  when: ssh_known_hosts_config | bool

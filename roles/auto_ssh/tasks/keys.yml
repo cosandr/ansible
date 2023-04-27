@@ -17,7 +17,7 @@
     group: "{{ ssh_dest_group }}"
     mode: 0700
   loop: "{{ ssh_dest_hosts }}"
-  when: ssh_dest_create_dir
+  when: ssh_dest_create_dir | bool
 
 - name: Generate SSH keys
   community.crypto.openssh_keypair:

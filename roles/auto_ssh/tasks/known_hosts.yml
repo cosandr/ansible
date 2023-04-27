@@ -57,5 +57,5 @@
       {% for h in ssh_dest_hosts %}
       {{ hostvars[h].ansible_host }} {{ hostvars[h].ssh_conf_hosts_names | default(hostvars[h].__target_host_names | difference([hostvars[h].ansible_host])) | unique | join(' ') }}
       {% endfor %}
-  when: ssh_conf_hosts
+  when: ssh_conf_hosts | bool
   tags: ["hosts"]
