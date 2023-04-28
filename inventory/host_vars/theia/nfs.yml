@@ -5,9 +5,6 @@ __nfs_all_dataset_hosts:
 
 nfs_shares:
   # Backup shares
-  - path: /mnt/tank/borg/repos
-    options: "rw,no_root_squash"
-    sources: "{{ groups['backup'] | map('extract', hostvars, 'ansible_host') | list }}"
   - path: /mnt/tank/backup/pgsql
     options: "rw,no_root_squash"
     sources: "{{ groups['pg'] | map('extract', hostvars, 'ansible_host') | list }}"

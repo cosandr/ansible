@@ -4,8 +4,8 @@ borg_backups:
   - name: "nextcloud"
     timer_description: "Backup Nextcloud every midnight"
     oncalendar: "*-*-* 00:00:00"
-    target_host: "backup01"
-    passphrase: "{{ hostvars['backup01'].borg_server_passphrase }}"
+    target_host: "theia"
+    passphrase: "{{ borg_libvirt_passphrase }}"
     paths:
       - "/var/www/html/nextcloud"
     create_args:

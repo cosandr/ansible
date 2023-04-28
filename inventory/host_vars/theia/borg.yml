@@ -2,9 +2,21 @@
 
 borg_server: true
 borg_server_self_dir: false
+borg_home: "/home/backup"
+borg_user: "backup"
+borg_group: "backup"
 borg_uid: 1002
 borg_gid: 1002
 borg_pool: "/mnt/tank/borg/repos"
+
+borg_ssh_check: "{{ borg_user }}@{{ inventory_hostname }}.vm.{{ domain }}"
+borg_remote_repo: "ssh://{{ borg_ssh_check }}/."
+
+borg_ssh_check_ip: "{{ borg_user }}@{{ host_ips.vm }}"
+borg_remote_repo_ip: "ssh://{{ borg_ssh_check_ip }}/."
+
+borg_ssh_check_general: "{{ borg_user }}@{{ inventory_hostname }}.{{ domain }}"
+borg_remote_repo_general: "ssh://{{ borg_ssh_check_general }}/."
 
 borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
 borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"

@@ -42,7 +42,6 @@ localgw01
 prom01
 
 [libvirt:children]
-backup
 db
 gitlab
 gitrun
@@ -105,9 +104,6 @@ localgw
 
 [nextcloud]
 nextcloud01 ansible_host=10.0.10.60
-
-[backup]
-backup01 ansible_host=10.0.10.8
 
 [swarm]
 swarm01 ansible_host=10.0.10.61 vm_cpus=6 vm_mem=16384

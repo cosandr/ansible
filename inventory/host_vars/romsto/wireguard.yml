@@ -10,7 +10,7 @@ wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
   - "{{ hostvars['drepi'].ansible_host }}/32"
   - "{{ hostvars['prom01'].ansible_host }}/32"
-  - "{{ hostvars['backup01'].ansible_host }}/32"
+  - "{{ hostvars['theia'].host_ips.vm }}/32"
   - "{{ hostvars['loki01'].ansible_host }}/32"
 
 mt_wg_allowed_addresses:

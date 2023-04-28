@@ -6,6 +6,7 @@ ssh_known_hosts_file: "/etc/ssh/ssh_known_hosts"
 ssh_conf_hosts_names:
   - "{{ inventory_hostname }}"
 ssh_custom_host_names:
+  - "{{ host_ips.vm }}"
   - "{{ inventory_hostname }}.vm.{{ domain }}"
   - "{{ host_ips.san }}"
   - "{{ inventory_hostname }}.san.{{ domain }}"

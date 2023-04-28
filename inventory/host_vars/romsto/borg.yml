@@ -32,9 +32,9 @@ borg_backups:
 
   - name: "flash-remote"
     passphrase: "{{ vault_borg_remote_passphrase }}"
-    target_host: "backup01"
-    ssh_check: "{{ hostvars['backup01'].borg_ssh_check_ip }}"
-    repo: "{{ hostvars['backup01'].borg_remote_repo_ip }}/boot"
+    target_host: "theia"
+    ssh_check: "{{ hostvars['theia'].borg_ssh_check_ip }}"
+    repo: "{{ hostvars['theia'].borg_remote_repo_ip }}/boot"
     ssh_known_hosts_mode: "0600"
     archive_name: "boot"
     paths:

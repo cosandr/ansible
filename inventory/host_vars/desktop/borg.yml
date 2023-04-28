@@ -6,9 +6,10 @@ borg_backups:
     timer_description: "Backup root to server every 7 days at 20:00"
     oncalendar: "*-*-01/7 20:00:00"
     passphrase: "{{ borg_desktop_passphrase }}"
-    target_host: "backup01"
+    target_host: "theia"
+    ssh_check: "{{ hostvars['theia'].borg_ssh_check_general }}"
+    repo: "{{ hostvars['theia'].borg_remote_repo_general }}/arch"
     archive_name: "{{ ansible_hostname }}"
-    archive_path: "arch"
     pre_run: |
       BACKUP_USER_HOME=$(getent passwd {{ my_user }} | cut -d : -f 6)
     paths:
@@ -32,7 +33,9 @@ borg_backups:
     timer_description: "Backup windows to server every 3 days at 21:00"
     oncalendar: "*-*-01/3 21:00:00"
     passphrase: "{{ borg_desktop_passphrase }}"
-    target_host: "backup01"
+    target_host: "theia"
+    ssh_check: "{{ hostvars['theia'].borg_ssh_check_general }}"
+    repo: "{{ hostvars['theia'].borg_remote_repo_general }}/windows"
     archive_name: "{{ ansible_hostname }}"
     pre_run: |
       drives=('c' 'd')
