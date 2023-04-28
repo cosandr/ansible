@@ -12,8 +12,16 @@
     content: "{{ cockpit_machines | to_nice_json(indent=2) }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when: cockpit_machines
+
+- name: Disable cockpit MOTD
+  ansible.builtin.file:
+    src: /dev/null
+    dest: /etc/motd.d/cockpit
+    state: link
+    force: true
+  when: cockpit_disable_motd
 
 - name: Enable and start cockpit socket
   ansible.builtin.systemd:
