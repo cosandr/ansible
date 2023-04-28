@@ -2,6 +2,7 @@
 
 jellyfin_port: 8096
 mrbot_web_port: 8001
+plex_port: 32400
 
 docker_swarm_role: "{{ 'Manager' if groups['swarm'] | ansible.utils.index_of('eq', inventory_hostname) < 3 else 'Worker' }}"
 docker_swarm_managers: >-

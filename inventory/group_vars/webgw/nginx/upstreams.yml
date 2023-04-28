@@ -1,6 +1,5 @@
 ---
 
-
 __nginx_upstreams_common:
   - name: gitlab
     servers: ["{{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_nginx_listen_port }}"]
@@ -19,8 +18,7 @@ __nginx_upstreams_common:
     keepalive: 16
 
   - name: plex
-    servers: ["{{ hostvars['plex01'].ansible_host }}:{{ hostvars['plex01'].plex_port }}"]
-    keepalive: 16
+    servers: ["{{ swarm_vip_address }}:{{ hostvars['swarm01'].plex_port }}"]
 
   - name: dv-main
     servers: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].nginx_ports['www'] }}"]

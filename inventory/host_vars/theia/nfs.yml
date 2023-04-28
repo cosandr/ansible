@@ -24,10 +24,6 @@ nfs_shares:
   - path: /mnt/tank/media/motion
     options: "rw,no_root_squash"
     sources: "{{ [hostvars['drepi'].ansible_host] }}"
-  # Plex shares
-  - path: /mnt/tank/media
-    options: "ro,no_root_squash"
-    sources: "{{ groups['plex'] | map('extract', hostvars, 'ansible_host') | list }}"
   # Swarm shares
   - path: /mnt/tank/media
     options: "rw,no_root_squash"
