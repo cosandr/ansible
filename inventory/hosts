@@ -17,6 +17,8 @@ aegir   ansible_host=10.0.100.21
 gerd    ansible_host=10.0.100.22
 ymir    ansible_host=10.0.100.23
 atla    ansible_host=10.0.100.24
+nari    ansible_host=10.0.100.25
+nott    ansible_host=10.0.100.26
 
 [servers:children]
 webgw
@@ -33,6 +35,8 @@ aegir cpu_tier=3
 gerd  cpu_tier=3
 ymir  cpu_tier=3
 atla  cpu_tier=1
+nari  cpu_tier=3
+nott  cpu_tier=3
 
 [kvm_hv:vars]
 ansible_group_priority=2
