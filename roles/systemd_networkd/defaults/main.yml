@@ -4,6 +4,7 @@ chroot_path: ""
 
 resolved_link_stub: true
 networkd_provisioning_synced: true
+networkd_restart: true
 networkd_netdevs: []
 networkd_config:
   - wired: |
