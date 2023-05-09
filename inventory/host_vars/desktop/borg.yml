@@ -81,6 +81,7 @@ borg_backups:
     create_args:
       - "--noflags"
       - "--exclude '/win_c/Users/Andrei/AppData/Local/Packages/Spotify*'"
+      - "--exclude '/win_c/Users/Andrei/AppData/Local/Packages/CanonicalGroupLimited*'"
       - "--exclude '/win_c/Users/Andrei/Downloads'"
       - "--exclude '/win_d/src/valve-leak'"
     prune_args:
