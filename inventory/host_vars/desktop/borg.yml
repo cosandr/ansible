@@ -79,8 +79,7 @@ borg_backups:
       - "/win_d/Programs"
       - "/win_d/src"
     create_args:
-      - "--noatime"
-      - "--nobsdflags"
+      - "--noflags"
       - "--exclude '/win_c/Users/Andrei/AppData/Local/Packages/Spotify*'"
       - "--exclude '/win_c/Users/Andrei/Downloads'"
       - "--exclude '/win_d/src/valve-leak'"

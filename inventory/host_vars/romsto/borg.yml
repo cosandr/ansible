@@ -40,8 +40,7 @@ borg_backups:
     paths:
       - "/boot"
     create_args:
-      - "--noatime"
-      - "--nobsdflags"
+      - "--noflags"
       - "--exclude '*~'"
     prune_args:
       - "--keep-weekly 4"
