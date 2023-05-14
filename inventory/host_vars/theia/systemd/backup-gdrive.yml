@@ -38,5 +38,18 @@ __sd_backup_gdrive:
       content: |
         #!/bin/sh
 
+        global_exit=0
+
+        rclone() {
+          /usr/bin/rclone "$@"
+          tmp_exit=$?
+          global_exit=$(( tmp_exit > global_exit ? tmp_exit : global_exit ))
+        }
+
         rclone sync -v --exclude-if-present .rclone_ignore /mnt/tank/backup gsecret:tank-backup
         rclone sync -v /mnt/ceph/swarm/syncthing/data gsecret:syncthing
+
+        rclone sync -v /mnt/tank/archive/savegames gcrypt:savegames
+        rclone sync -v nextcloud: gcrypt:Nextcloud
+
+        exit $global_exit

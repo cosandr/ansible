@@ -8,18 +8,9 @@
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
       tags: ["always"]
-
-    - name: Install rclone
-      dnf:
-        name: rclone
-        state: present
-      tags: ["rclone"]
   roles:
     - role: firewalld_webgw
       tags: ["firewalld"]
 
     - role: cosandr.nextcloud
       tags: ["nextcloud"]
-
-    - role: systemd
-      tags: ["systemd", "rclone"]
