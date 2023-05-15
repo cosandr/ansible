@@ -112,6 +112,16 @@
             regexp: '^#?AutoEnable'
             line: 'AutoEnable=true'
 
+        # Required to get battery level reporting
+        # https://wiki.archlinux.org/title/Bluetooth_headset#Battery_level_reporting
+        - name: Enable bluetooth experimental
+          become: true
+          ansible.builtin.lineinfile:
+            path: '/etc/bluetooth/main.conf'
+            regexp: '^#?Experimental'
+            line: 'Experimental = true'
+          notify: Restart bluetooth
+
     # https://wiki.archlinux.org/title/Fwupd#Setup_for_UEFI_upgrade
     - name: Configure fwupd
       become: true
@@ -159,6 +169,12 @@
       become: true
       ansible.builtin.systemd:
         name: fwupd.service
+        state: restarted
+
+    - name: Restart bluetooth
+      become: true
+      ansible.builtin.systemd:
+        name: bluetooth.service
         state: restarted
 
   roles:
