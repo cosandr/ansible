@@ -3,7 +3,8 @@
 
 # TODO: Configure NFS share on Theia for /mnt/tank/backup/pgbackrest
 
-- hosts: db
+- name: Configure PG and pgbackrest
+  hosts: db
   pre_tasks:
     - name: Include common tasks
       ansible.builtin.include_tasks:
@@ -16,7 +17,8 @@
     - role: auto_ssh
       tags: ["auto-ssh"]
 
-- hosts: pg
+- name: Configure PostgreSQL
+  hosts: pg
   gather_facts: true
   vars:
     postgres_exporter_version: "latest"
@@ -30,13 +32,25 @@
         postgres_service_name: "{{ postgresql_daemon }}"
       tags: ["prometheus-stack", "postgres_exporter"]
 
-- hosts: pgbackrest
-  pre_tasks:
+- name: Configure pgbackrest
+  hosts: pgbackrest
+  tasks:
     - name: Mount NFS share
-      mount:
+      ansible.posix.mount:
         src: "{{ hostvars['theia'].host_ips.vm }}:/mnt/tank/backup/pgbackrest"
         path: "/var/lib/pgbackrest"
         opts: "defaults,vers=4,rw,noatime,bg"
         state: mounted
         fstype: nfs
       tags: ["nfs"]
+
+    - name: Exclude from rclone
+      ansible.builtin.file:
+        state: touch
+        path: /var/lib/pgbackrest/.rclone_ignore
+        owner: root
+        group: root
+        mode: "0644"
+        modification_time: preserve
+        access_time: preserve
+      tags: ["rclone"]

@@ -52,4 +52,8 @@ __sd_backup_gdrive:
         rclone sync -v /mnt/tank/archive/savegames gcrypt:savegames
         rclone sync -v nextcloud: gcrypt:Nextcloud
 
+        # Find latest pgbackrest backup
+        latest_pg_full="$(find /mnt/tank/backup/pgbackrest/backup/main -maxdepth 1 -type d -name '*F' -exec basename {} \; | sort -rn | head -n1)"
+        rclone sync -v --include "$latest_pg_full*/**" /mnt/tank/backup/pgbackrest/backup/main gsecret:pgbackrest
+
         exit $global_exit
