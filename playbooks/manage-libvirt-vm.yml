@@ -5,6 +5,18 @@
   hosts: libvirt
   gather_facts: false
   pre_tasks:
+    - name: Check if hypervisors are up
+      run_once: true
+      check_mode: false
+      delegate_to: localhost
+      ansible.builtin.command:
+        cmd: "ping -c1 -w1 {{ hostvars[item].ansible_host }}"
+      failed_when: false
+      changed_when: false
+      loop: "{{ groups['kvm_hv'] }}"
+      register: __hv_ping
+      tags: ["always"]
+
     - name: Get list of VMs on all hosts
       run_once: true
       check_mode: false
@@ -13,7 +25,7 @@
         state: "{{ 'running' if 'stop' in ansible_run_tags else 'shutdown' }}"
         command: list_vms
       register: __vm_names
-      loop: "{{ groups['kvm_hv'] }}"
+      loop: "{{ __hv_ping.results | selectattr('rc', 'eq', 0) | map(attribute='item') }}"
       tags: ["always"]
 
     - name: Find current host for self
