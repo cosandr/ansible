@@ -12,7 +12,7 @@ peers:
     scope: global
 
 calico_advertise_cluster_ips: true
-calico_advertise_service_loadbalancer_ips: "{{ metallb_ip_range }}"
+calico_advertise_service_loadbalancer_ips: "{{ metallb_config.address_pools.primary.ip_range }}"
 calico_apiserver_enabled: true
 calico_ip_auto_method: "interface=eth[0-9]+"
 calico_ipip_mode: 'Never'
