@@ -10,8 +10,10 @@
       check_mode: false
       delegate_to: localhost
       ansible.builtin.command:
-        cmd: "ping -c1 -w1 {{ hostvars[item].ansible_host }}"
-      failed_when: false
+        cmd: "ping -q -n -c1 -W1 {{ hostvars[item].ansible_host }}"
+      failed_when:
+        # 0 OK, 1 failure on Linux, 2 failure on MacOS
+        - __hv_ping.rc not in [0, 1, 2]
       changed_when: false
       loop: "{{ groups['kvm_hv'] }}"
       register: __hv_ping
