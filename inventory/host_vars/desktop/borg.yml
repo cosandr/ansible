@@ -75,6 +75,7 @@ borg_backups:
     paths:
       - "/win_c/Users/Andrei"
       - "/win_d/Drivers"
+      - "/win_d/Games/Switch"
       - "/win_d/Other"
       - "/win_d/Programs"
       - "/win_d/src"
@@ -84,6 +85,8 @@ borg_backups:
       - "--exclude '/win_c/Users/Andrei/AppData/Local/Packages/CanonicalGroupLimited*'"
       - "--exclude '/win_c/Users/Andrei/Downloads'"
       - "--exclude '/win_d/src/valve-leak'"
+      - "--exclude '/win_d/Games/Switch/Dumps'"
+      - "--exclude '/win_d/Games/Switch/Games'"
     prune_args:
       - "--keep-daily 4"
       - "--keep-weekly 2"
