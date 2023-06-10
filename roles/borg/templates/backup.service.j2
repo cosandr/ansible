@@ -1,6 +1,10 @@
 {{ ansible_managed | comment }}
 [Unit]
 Description=Borg backup for {{ conf.name }}
+{% if conf.ssh_check is defined or conf.target_host is defined %}
+Requires=network-online.target
+After=network-online.target
+{% endif %}
 
 [Service]
 ExecStart={{ borg_backup_script_path }}/backup-{{ conf.name }}
