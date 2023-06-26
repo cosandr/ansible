@@ -10,6 +10,8 @@ nextcloud_port: "25683"
 node_exporter_installed: false
 nfs_idmapping_configure: false
 
+prometheus_blackbox_http_targets:
+  - "https://cloud.{{ domain }}/index.php/login"
 prometheus_blackbox_icmp_targets:
   - "{{ ansible_host }}"
   - "{{ wireguard_ip }}"

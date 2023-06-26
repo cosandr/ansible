@@ -10,7 +10,7 @@ provisioned_disks:
 
 nextcloud_port: 443
 nextcloud_proxies: "{{ proxy_hosts }}"
-nextcloud_domain: "nextcloud.{{ domains['dv'] }}"
+nextcloud_domain: "cloud.{{ domains['dv'] }}"
 nextcloud_server_name: "{{ nextcloud_domain }}"
 
 webgw_ports:
@@ -22,3 +22,6 @@ nextcloud_certificate_alt_name:
   - "DNS:{{ ansible_host }}"
   - "DNS:{{ ansible_hostname }}"
   - "DNS:{{ nextcloud_domain }}"
+
+prometheus_blackbox_http_targets:
+  - "https://{{ nextcloud_domain }}/index.php/login"
