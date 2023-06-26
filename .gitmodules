@@ -73,3 +73,6 @@
 [submodule "roles/ceph_nfs"]
 	path = roles/ceph_nfs
 	url = git@github.com:cosandr/ansible-role-ceph_nfs.git
+[submodule "roles/nextcloud_exporter"]
+	path = roles/nextcloud_exporter
+	url = git@github.com:cosandr/ansible-role-nextcloud_exporter.git

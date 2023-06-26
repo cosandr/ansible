@@ -1,7 +1,8 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- hosts: nextcloud
+- name: Setup Nextcloud
+  hosts: nextcloud
   gather_facts: true
   pre_tasks:
     - name: Include common tasks
@@ -14,3 +15,6 @@
 
     - role: cosandr.nextcloud
       tags: ["nextcloud"]
+
+    - role: nextcloud_exporter
+      tags: ["nextcloud-exporter"]

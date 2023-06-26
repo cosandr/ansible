@@ -1,0 +1,5 @@
+---
+
+firewall_rules:
+  - port: "{{ nextcloud_exporter_port }}"
+    sources: "{{ node_exporter_allow_ips }}"

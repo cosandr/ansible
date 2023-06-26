@@ -18,3 +18,6 @@ prometheus_blackbox_icmp_targets:
 prometheus_node_targets: ["{{ ansible_host + ':' + node_exporter_port | string }}"]
 prometheus_node_labels:
   instance: "RomeoTV"
+
+prometheus_nextcloud_targets:
+  - "{{ wireguard_ip }}:9205"

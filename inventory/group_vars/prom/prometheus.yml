@@ -86,6 +86,18 @@ __prom_nvme_configs: >-
   {%- endfor -%}
   {{ tmp }}
 
+__prom_nextcloud_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nextcloud_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_nextcloud_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
 __prom_blackbox_icmp_targets: >-
   {%- set tmp = [] -%}
   {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_icmp_targets | default([]) -%}
@@ -208,6 +220,9 @@ __extra_prometheus_scrape_configs:
 
   - job_name: "nvme"
     static_configs: "{{ __prom_nvme_configs }}"
+
+  - job_name: "nextcloud"
+    static_configs: "{{ __prom_nextcloud_configs }}"
 
   - job_name: "pushgateway"
     static_configs:

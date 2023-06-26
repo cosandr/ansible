@@ -25,3 +25,11 @@ nextcloud_certificate_alt_name:
 
 prometheus_blackbox_http_targets:
   - "https://{{ nextcloud_domain }}/index.php/login"
+
+nextcloud_exporter_port: 9205
+nextcloud_exporter_listen_address: "{{ ansible_host }}:{{ nextcloud_exporter_port }}"
+nextcloud_exporter_server: "https://{{ nextcloud_server_name }}"
+nextcloud_exporter_auth_token: "{{ vault_nextcloud_exporter_auth_token }}"
+
+prometheus_nextcloud_targets:
+  - "{{ nextcloud_exporter_listen_address }}"
