@@ -9,34 +9,28 @@ desktop ansible_host=10.0.50.4
 laptop  ansible_host=10.0.50.5
 m1bp    ansible_host=10.0.50.34
 
+[kvm_hv]
+theia ansible_host=10.0.50.2   cpu_tier=2
+aegir ansible_host=10.0.100.21 cpu_tier=3
+gerd  ansible_host=10.0.100.22 cpu_tier=3
+ymir  ansible_host=10.0.100.23 cpu_tier=3
+; atla  ansible_host=10.0.100.24 cpu_tier=1
+; nari  ansible_host=10.0.100.25 cpu_tier=3
+; nott  ansible_host=10.0.100.26 cpu_tier=3
+
 [servers]
 romsto  ansible_host=10.1.0.6
-theia   ansible_host=10.0.50.2
 syno    ansible_host=10.0.100.8 ansible_user=andrei
-aegir   ansible_host=10.0.100.21
-gerd    ansible_host=10.0.100.22
-ymir    ansible_host=10.0.100.23
-atla    ansible_host=10.0.100.24
-nari    ansible_host=10.0.100.25
-nott    ansible_host=10.0.100.26
 
 [servers:children]
 webgw
 localgw
 rpi
 libvirt
+kvm_hv
 
 [servers:vars]
 ansible_group_priority=1
-
-[kvm_hv]
-theia cpu_tier=2
-aegir cpu_tier=3
-gerd  cpu_tier=3
-ymir  cpu_tier=3
-atla  cpu_tier=1
-nari  cpu_tier=3
-nott  cpu_tier=3
 
 [kvm_hv:vars]
 ansible_group_priority=2
