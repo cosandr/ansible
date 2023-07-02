@@ -9,9 +9,6 @@
         file: ../tasks/common_servers.yml
       tags: ["always"]
   roles:
-    - role: ceph_client
-      tags: ["ceph"]
-
     - role: geerlingguy.docker
       tags: ["docker"]
 
@@ -31,10 +28,10 @@
 
     - name: Mount CephFS
       ansible.posix.mount:
-        src: swarm@.cephfs=/swarm
+        src: "{{ ceph_nfs_vip_address.vm }}:/swarm"
         path: /mnt/ceph
-        fstype: ceph
-        opts: "noatime"
+        fstype: nfs
+        opts: "defaults,vers=4,port=2050,noatime"
         state: mounted
       tags: ["ceph"]
 

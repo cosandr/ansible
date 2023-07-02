@@ -31,4 +31,12 @@ ceph_nfs_exports:
       - access_type: "RW"
         addresses: "{{ groups['k8s_cluster'] | map('extract', hostvars, 'ansible_host') }}"
 
+  - path: "/swarm"
+    cluster_id: "{{ ceph_nfs_clusters[0].name }}"
+    pseudo: "/swarm"
+    access_type: "NONE"
+    clients:
+      - access_type: "RW"
+        addresses: "{{ groups['swarm'] | map('extract', hostvars, 'ansible_host') }}"
+
 __ceph_nfs_client_addresses: "{{ ceph_nfs_exports | map(attribute='clients') | flatten | map(attribute='addresses') | flatten | unique }}"
