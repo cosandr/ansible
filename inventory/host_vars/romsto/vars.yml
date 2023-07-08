@@ -22,10 +22,10 @@ prometheus_node_labels:
 prometheus_nextcloud_targets:
   - "{{ wireguard_ip }}:9205"
 
+user_scripts_path: "/boot/config/plugins/user.scripts/scripts"
 data_disk:
   dev: "/dev/disk/by-label/datassd01"
   path: "/mnt/disks/datassd01"
-  script: "/boot/config/plugins/user.scripts/scripts/0-mount-datassd/script"
 persistent_disk:
   dev: "/dev/disk/by-label/pstore"
   path: "/pstore"

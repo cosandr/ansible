@@ -23,7 +23,7 @@
 
     - name: Ensure user script dir exists
       ansible.builtin.file:
-        path: "{{ data_disk.script | dirname }}"
+        path: "{{ user_scripts_path }}/0-mount-datassd"
         state: directory
         owner: root
         group: root
@@ -32,10 +32,10 @@
 
     - name: Ensure data SSD is mounted on array start
       ansible.builtin.copy:
-        dest: "{{ data_disk.script }}"
+        dest: "{{ user_scripts_path }}/0-mount-datassd/script"
         owner: root
         group: root
-        mode: "0700"
+        mode: "0600"
         content: |
           #!/bin/bash
 
@@ -49,6 +49,40 @@
             mount -o {{ ssd_mount_opts }} {{ data_disk.dev }} {{ data_disk.path }}
           fi
       tags: ["datassd"]
+
+    - name: Configure mlocate
+      tags: ["mlocate"]
+      block:
+        - name: Create mlocate db dir
+          ansible.builtin.file:
+            path: "{{ persistent_disk.path }}/mlocate"
+            state: directory
+            owner: root
+            group: slocate
+            mode: "0750"
+
+        - name: Copy config file  # noqa line-length
+          ansible.builtin.copy:
+            dest: "{{ persistent_disk.path }}/updatedb.conf"
+            owner: root
+            group: root
+            mode: "0644"
+            content: |
+              PRUNE_BIND_MOUNTS = "yes"
+              PRUNEFS = "9p afs anon_inodefs auto autofs bdev binfmt_misc cgroup cifs coda configfs cpuset debugfs devpts ecryptfs exofs fuse fuse.sshfs fusectl gfs gfs2 gpfs hugetlbfs inotifyfs iso9660 jffs2 lustre mqueue ncpfs nfs nfs4 nfsd pipefs proc ramfs rootfs rpc_pipefs securityfs selinuxfs sfs sockfs sysfs tmpfs ubifs udf usbfs ceph fuse.ceph"
+              PRUNENAMES = ".git .hg .svn .bzr .arch-ids {arch} CVS"
+              PRUNEPATHS = "/afs /dev /media /mnt /net /proc /sys /tmp /usr/tmp /var/cache/ccache /var/lib/ceph /var/spool/cups /var/tmp /var/lib/docker {{ data_disk.path }}/docker/data /mnt/disk*"
+
+        - name: Configure mlocate on boot
+          ansible.builtin.blockinfile:
+            path: /boot/config/go
+            marker: "# {mark} mlocate"
+            block: |
+              ln -sf {{ persistent_disk.path }}/updatedb.conf /etc/updatedb.conf
+              [ -d /var/lib/mlocate ] && rm -rf /var/lib/mlocate
+              ln -s {{ persistent_disk.path }}/mlocate /var/lib/
+          tags: ["go"]
+
   roles:
     - role: nginx_site
       tags: ["nginx_site"]
