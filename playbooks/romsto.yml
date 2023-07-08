@@ -2,30 +2,10 @@
 ---
 
 - name: Romsto playbook
-  gather_facts: false
   hosts: romsto
-  vars:
-    data_disk:
-      dev: "/dev/disk/by-label/datassd01"
-      path: "/mnt/disks/datassd01"
-      script: "/boot/config/plugins/user.scripts/scripts/0-mount-datassd/script"
-    persistent_disk:
-      dev: "/dev/disk/by-label/pstore"
-      path: "/pstore"
-    swap_disk: "/dev/disk/by-uuid/eee1d5fb-be1e-4344-a1c7-9a3d3d990b53"
-    ssd_mount_opts: "space_cache=v2,compress-force=zstd,relatime,ssd,discard=async"
-  pre_tasks:
-    - name: Run common role
-      import_role:
-        name: common
-      tags: ["always"]
-
-    - name: Gather facts
-      setup:
-      tags: ["always"]
   tasks:
     - name: Setup extra SSD
-      blockinfile:
+      ansible.builtin.blockinfile:
         path: /boot/config/go
         marker: "# {mark} datassd"
         block: |
@@ -42,20 +22,20 @@
       tags: ["go", "datassd"]
 
     - name: Ensure user script dir exists
-      file:
+      ansible.builtin.file:
         path: "{{ data_disk.script | dirname }}"
         state: directory
         owner: root
         group: root
-        mode: 0700
+        mode: "0700"
       tags: ["datassd"]
 
     - name: Ensure data SSD is mounted on array start
-      copy:
+      ansible.builtin.copy:
         dest: "{{ data_disk.script }}"
         owner: root
         group: root
-        mode: 0700
+        mode: "0700"
         content: |
           #!/bin/bash
 
@@ -77,32 +57,31 @@
       tags: ["promtail"]
   post_tasks:
     - name: Ensure promtail is persistent
+      tags: ["promtail", "go"]
       block:
         - name: Copy promtail rc file
-          copy:
+          ansible.builtin.copy:
             src: /etc/rc.d/rc.promtail
             remote_src: true
-            dest: /pstore/promtail/rc.promtail
+            dest: "{{ persistent_disk.path }}/promtail/rc.promtail"
             owner: root
             group: root
-            mode: 0755
+            mode: "0755"
 
         - name: Copy promtail logrotate config
-          copy:
+          ansible.builtin.copy:
             src: /etc/logrotate.d/promtail
             remote_src: true
-            dest: /pstore/promtail/promtail.logrotate
+            dest: "{{ persistent_disk.path }}/promtail/promtail.logrotate"
             owner: root
             group: root
-            mode: 0644
+            mode: "0644"
 
         - name: Setup promtail on boot
-          blockinfile:
+          ansible.builtin.blockinfile:
             path: /boot/config/go
             marker: "# {mark} promtail"
             block: |
-              install -o root -g root -m755 /pstore/promtail/rc.promtail /etc/rc.d/rc.promtail
-              install -o root -g root -m644 /pstore/promtail/promtail.logrotate /etc/logrotate.d/promtail
+              install -o root -g root -m755 {{ persistent_disk.path }}/promtail/rc.promtail /etc/rc.d/rc.promtail
+              install -o root -g root -m644 {{ persistent_disk.path }}/promtail/promtail.logrotate /etc/logrotate.d/promtail
               /etc/rc.d/rc.promtail start
-
-      tags: ["promtail", "go"]

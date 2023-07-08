@@ -1,17 +1,8 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- hosts: gui
-  gather_facts: false
-  pre_tasks:
-    - name: Run common role
-      import_role:
-        name: common
-      tags: ["always"]
-
-    - name: Gather facts
-      setup:
-      tags: ["always"]
+- name: i3 playbook
+  hosts: gui
   roles:
     - role: arch-common
       tags: ["arch-common"]

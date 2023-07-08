@@ -7,16 +7,6 @@
   vars:
     desktop_environment: "kde"
     __startup_script_path: "/home/{{ my_user }}/.config/plasma-workspace/env"
-  pre_tasks:
-    - name: Run common role
-      import_role:
-        name: common
-      tags: ["always"]
-
-    # - name: Gather facts
-    #   setup:
-    #   tags: ["always"]
-
   tasks:
     - name: Enable HiDPI in SDDM
       become: true
