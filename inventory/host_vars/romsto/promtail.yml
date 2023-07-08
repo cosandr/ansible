@@ -5,6 +5,14 @@ promtail_conf_path: /pstore/promtail/config.yml
 promtail_workdir: /pstore/promtail/work
 
 promtail_scrape_configs:
+  - job_name: user_scripts
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: user_scripts
+          __path__: "/tmp/user.scripts/tmpScripts/*/log.txt"
+
   - job_name: system
     static_configs:
       - targets:
