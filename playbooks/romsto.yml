@@ -21,6 +21,19 @@
           mount -o {{ ssd_mount_opts }} {{ data_disk.dev }} {{ data_disk.path }}
       tags: ["go", "datassd"]
 
+    - name: Setup extra SSD scrub
+      ansible.builtin.copy:
+        dest: /etc/cron.weekly/datassd-scrub.sh
+        owner: root
+        group: root
+        mode: "0755"
+        content: |
+          #!/bin/bash
+
+          /sbin/btrfs scrub start {{ persistent_disk.path }} &> /dev/null
+          /sbin/btrfs scrub start {{ data_disk.path }} &> /dev/null
+      tags: ["datassd"]
+
     - name: Ensure user script dir exists
       ansible.builtin.file:
         path: "{{ user_scripts_path }}/0-mount-datassd"
