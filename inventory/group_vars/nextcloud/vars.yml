@@ -12,6 +12,7 @@ nextcloud_port: 443
 nextcloud_proxies: "{{ proxy_hosts }}"
 nextcloud_domain: "cloud.{{ domains['dv'] }}"
 nextcloud_server_name: "{{ nextcloud_domain }}"
+nextcloud_php_version: "8.2"  # Nextcloud 27+ requires PHP 8.1 or later
 
 webgw_ports:
   - "{{ nextcloud_port }}"
