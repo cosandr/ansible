@@ -26,4 +26,4 @@
         cmd: /usr/bin/virsh undefine --nvram --remove-all-storage {{ inventory_hostname }}
       changed_when: "'has been undefined' in __virsh.stdout"
       register: __virsh
-      when: "'virtual machine ' + inventory_hostname + ' not found' not in __destroy.msg | string | default('')"
+      when: "'virtual machine ' + inventory_hostname + ' not found' not in __destroy.msg | default('') | string"
