@@ -1,19 +1,19 @@
 ---
 
 - name: Install LVM
-  package:
+  ansible.builtin.package:
     name: lvm2
     state: present
 
 - name: Create LVG
-  lvg:
+  community.general.lvg:
     vg: "{{ vg_name }}"
     pvs: "{{ disk.dev }}"
     pesize: "32"
     state: present
 
 - name: Create LVOLs
-  lvol:
+  community.general.lvol:
     vg: "{{ vg_name }}"
     lv: "{{ item.name }}"
     size: "{{ item.size | default('100%VG') }}"
@@ -22,14 +22,14 @@
   loop: "{{ disk.vols }}"
 
 - name: Create filesystems
-  filesystem:
+  community.general.filesystem:
     fstype: "{{ item.fstype | default('ext4') }}"
     dev: "/dev/mapper/{{ vg_name }}-{{ item.name }}"
     opts: "{{ item.mkfs_opts | default(omit) }}"
   loop: "{{ disk.vols }}"
 
 - name: Create mountpoint
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
     owner: "{{ item.owner | default(omit) }}"
@@ -39,7 +39,7 @@
   when: item.path is defined
 
 - name: Mount filesystems
-  mount:
+  ansible.posix.mount:
     path: "{{ item.path }}"
     src: "/dev/mapper/{{ vg_name }}-{{ item.name }}"
     fstype: "{{ item.fstype | default('ext4') }}"

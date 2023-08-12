@@ -1,22 +1,21 @@
 ---
 - name: Create filesystem
-  filesystem:
+  community.general.filesystem:
     fstype: "{{ disk.fstype | default('ext4') }}"
     opts: "{{ disk.mkfs_opts | default(omit) }}"
     dev: "{{ disk.dev }}"
 
 - name: Create mountpoint
-  file:
-    path: "{{ item.path }}"
+  ansible.builtin.file:
+    path: "{{ disk.path }}"
     state: directory
-    owner: "{{ item.owner | default(omit) }}"
-    group: "{{ item.group | default(omit) }}"
-    mode: "{{ item.mode | default(omit) }}"
-  loop: "{{ disk.vols }}"
+    owner: "{{ disk.owner | default(omit) }}"
+    group: "{{ disk.group | default(omit) }}"
+    mode: "{{ disk.mode | default(omit) }}"
   when: disk.path is defined
 
 - name: Mount filesystem
-  mount:
+  ansible.posix.mount:
     path: "{{ disk.path }}"
     src: "{{ disk.dev }}"
     fstype: "{{ disk.fstype | default('ext4') }}"

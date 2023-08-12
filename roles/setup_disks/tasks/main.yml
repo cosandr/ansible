@@ -1,14 +1,14 @@
 ---
 
 - name: Setup raw disk
-  include_tasks: "raw.yml"
+  ansible.builtin.include_tasks: "raw.yml"
   loop: "{{ provisioned_disks }}"
   loop_control:
     loop_var: disk
   when: disk.vols is not defined
 
 - name: Setup disk with LVM
-  include_tasks: "lvm.yml"
+  ansible.builtin.include_tasks: "lvm.yml"
   loop: "{{ provisioned_disks }}"
   loop_control:
     loop_var: disk
