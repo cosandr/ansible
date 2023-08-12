@@ -9,9 +9,11 @@ swapfile_path: "/.swap/swapfile"
 swapfile_size: "16GB"
 btrfs_nocow_paths:
   - "{{ swapfile_path | dirname }}"
+  - "/var/lib/libvirt/images"
 btrfs_subvols:
   - "@snapshots"
   - "@swap"
+  - "@/var/lib/libvirt/images"
 
 btrfs_scrub_targets:
   - /
