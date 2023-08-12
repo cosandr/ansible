@@ -3,14 +3,23 @@
 btrbk_timestamp_format: "long"
 btrbk_snapshot_preserve_min: "latest"
 
-btrbk_volumes:
+btrbk_root_target: "ssh://{{ hostvars['theia'].host_ips.san }}/mnt/tank/backup/btrbk/{{ inventory_hostname }}"
+btrbk_volumes: "{{ btrbk_volumes_group | default([]) |
+  community.general.lists_mergeby(btrbk_volumes_host | default([]), 'path', recursive=true, list_merge='append') }}"
+
+btrbk_volumes_group:
   - path: "/mnt/btrfs_root"
     options:
       snapshot_dir: "@snapshots"
       snapshot_preserve: "1h 2d 1w"
-      target: "ssh://{{ hostvars['theia'].host_ips.san }}/mnt/tank/backup/btrbk/{{ inventory_hostname }}"
+      target: "{{ btrbk_root_target }}"
       target_preserve: "1d 2w"
     subvolumes:
       - path: "@"
         options:
           snapshot_name: "root"
+      - path: "@/var/lib/libvirt/images"
+        options:
+          snapshot_name: "libvirt"
+          snapshot_preserve: "3h 2d"
+          target_preserve: "1h 1d 1w"
