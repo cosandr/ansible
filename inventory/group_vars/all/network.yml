@@ -48,10 +48,6 @@ ceph_nfs_vip_address: >-
   {%- endfor -%}
   {{ tmp }}
 
-# 10.0.10.200/24
-swarm_vip: "{{ all_net.vm.cidr | ansible.utils.ipaddr('200') }}"
-swarm_vip_address: "{{ swarm_vip | ansible.utils.ipaddr('address') }}"
-
 kube_vip_address: "{{ home_net.vm.cidr | ansible.utils.ipaddr('50') | ansible.utils.ipaddr('address') }}"
 kube_net: "10.85.0.0/16"
 kube_subnet:

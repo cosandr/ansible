@@ -210,7 +210,7 @@ __extra_prometheus_scrape_configs:
         - '{job=~".+"}'
     static_configs:
       - targets:
-          - "{{ swarm_vip_address }}:9090"
+          - "{{ hostvars['docker01'].ansible_host }}:9090"
 
   - job_name: "ceph"
     scrape_interval: 15s

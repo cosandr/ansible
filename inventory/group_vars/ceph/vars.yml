@@ -15,8 +15,6 @@ dnf_automatic_excludes:
   - "podman*"
   - "container*"
 
-my_user_pass: "{{ vault_my_user_pass }}"
-
 nvme_exporter_port: 9998
 nvme_exporter_listen_address: "{{ host_ips.vm }}:{{ nvme_exporter_port }}"
 

@@ -1,5 +1,0 @@
----
-
-vm_mem: 8192
-vm_root_size: "50G"
-vm_host: "{{ vm_host_list[groups['swarm'] | ansible.utils.index_of('eq', inventory_hostname) % (vm_host_list | length)] }}"

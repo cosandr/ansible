@@ -1,0 +1,35 @@
+---
+
+systemd_units:
+  - name: docker-auto-update
+    service:
+      content: |
+        [Unit]
+        Description=Update all Docker containers
+        After=network-online.target docker.service
+        Requires=network-online.target docker.service
+
+        [Service]
+        Type=simple
+        WorkingDirectory=/mnt/containers
+        Environment=BUSY=1
+        Environment=BUILD=0
+        Environment=PULL=1
+        Environment=HOSTNAME={{ inventory_hostname }}
+        ExecStart=/usr/bin/bash run.sh up
+
+    # Every day at 05:00
+    timer:
+      enabled: true
+      state: started
+      content: |
+        [Unit]
+        Description=Update Docker containers daily
+
+        [Timer]
+        Persistent=yes
+        OnBootSec=2m
+        OnCalendar=*-*-* 05:00:00
+
+        [Install]
+        WantedBy=timers.target

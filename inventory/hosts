@@ -47,7 +47,7 @@ k8s_cluster
 loki
 minio
 nextcloud
-swarm
+docker
 
 [libvirt:vars]
 ansible_group_priority=2
@@ -103,11 +103,8 @@ localgw
 [nextcloud]
 nextcloud01 ansible_host=10.0.10.60
 
-[swarm]
-swarm01 ansible_host=10.0.10.61 vm_cpus=6 vm_mem=16384
-swarm02 ansible_host=10.0.10.62
-swarm03 ansible_host=10.0.10.63
-swarm04 ansible_host=10.0.10.64
+[docker]
+docker01 ansible_host=10.0.10.61 vm_host=aegir
 
 [minio]
 minio01 ansible_host=10.0.10.7

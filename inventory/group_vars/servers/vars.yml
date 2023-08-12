@@ -22,3 +22,5 @@ btrfs_scrub_from_email: "{{ smartd_from_address }}"
 
 gitlab_external_url: "https://gitlab.{{ domains['dv'] }}"
 gitlab_registry_external_url: "https://registry.{{ domains['dv'] }}"
+
+my_user_pass: "{{ vault_my_user_pass }}"

@@ -21,10 +21,13 @@ nfs_shares:
   - path: /mnt/tank/media/motion
     options: "rw,no_root_squash"
     sources: "{{ [hostvars['drepi'].ansible_host] }}"
-  # Swarm shares
+  # Docker shares
   - path: /mnt/tank/media
     options: "rw,no_root_squash"
-    sources: "{{ groups['swarm'] | map('extract', hostvars, 'ansible_host') | list }}"
+    sources: "{{ groups['docker'] | map('extract', hostvars, 'ansible_host') | list }}"
   - path: /mnt/tank/yes
     options: "ro,no_root_squash"
-    sources: "{{ groups['swarm'] | map('extract', hostvars, 'ansible_host') | list }}"
+    sources: "{{ groups['docker'] | map('extract', hostvars, 'ansible_host') | list }}"
+  - path: /mnt/tank/downloads
+    options: "rw,no_root_squash"
+    sources: "{{ groups['docker'] | map('extract', hostvars, 'ansible_host') | list }}"

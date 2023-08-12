@@ -18,16 +18,16 @@ __nginx_upstreams_common:
     keepalive: 16
 
   - name: plex
-    servers: ["{{ swarm_vip_address }}:{{ hostvars['swarm01'].plex_port }}"]
+    servers: ["{{ hostvars['docker01'].ansible_host }}:{{ hostvars['docker01'].plex_port }}"]
 
   - name: dv-main
     servers: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].nginx_ports['www'] }}"]
 
   - name: mrbot_web
-    servers: ["{{ swarm_vip_address }}:{{ hostvars['swarm01'].mrbot_web_port }}"]
+    servers: ["{{ hostvars['docker01'].ansible_host }}:{{ hostvars['docker01'].mrbot_web_port }}"]
 
   - name: jellyfin
-    servers: ["{{ swarm_vip_address }}:{{ hostvars['swarm01'].jellyfin_port }}"]
+    servers: ["{{ hostvars['docker01'].ansible_host }}:{{ hostvars['docker01'].jellyfin_port }}"]
 
 __nginx_upstreams_host:
   - name: nextcloud_ta

@@ -9,7 +9,6 @@ __sd_backup_gdrive:
       After=network-online.target mnt-tank.mount mnt-ceph.mount
       Requires=network-online.target mnt-tank.mount mnt-ceph.mount
       ConditionPathExists=/mnt/tank/backup
-      ConditionPathExists=/mnt/ceph/swarm/syncthing/data
 
       [Service]
       Type=simple
@@ -47,7 +46,6 @@ __sd_backup_gdrive:
         }
 
         rclone sync -v --exclude-if-present .rclone_ignore /mnt/tank/backup gsecret:tank-backup
-        rclone sync -v /mnt/ceph/swarm/syncthing/data gsecret:syncthing
 
         rclone sync -v /mnt/tank/archive/savegames gcrypt:savegames
         rclone sync -v nextcloud: gcrypt:Nextcloud

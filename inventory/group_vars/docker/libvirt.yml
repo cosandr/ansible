@@ -1,0 +1,9 @@
+---
+
+vm_cpus: 6
+vm_mem: 16384
+vm_disk_pool: default
+
+vm_root_size: "50G"
+vm_data_disks:
+  - "100G"
