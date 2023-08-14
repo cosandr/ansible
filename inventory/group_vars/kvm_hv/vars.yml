@@ -5,14 +5,11 @@ domain: "{{ domains['hb'] }}"
 btrfs_src: "LABEL=FEDORA-BTRFS"
 btrfs_root: "/mnt/btrfs_root"
 btrfs_opts: "compress=zstd:3,space_cache=v2"
-swapfile_path: "/.swap/swapfile"
-swapfile_size: "16GB"
+swapfile_path: ""
 btrfs_nocow_paths:
-  - "{{ swapfile_path | dirname }}"
   - "/var/lib/libvirt/images"
 btrfs_subvols:
   - "@snapshots"
-  - "@swap"
   - "@/var/lib/libvirt/images"
 
 btrfs_scrub_targets:
