@@ -156,6 +156,37 @@
           line: "FallbackDNS=1.1.1.1,8.8.8.8"
       tags: ["resolved"]
 
+    - name: Create my user
+      ansible.builtin.user:
+        name: "{{ my_user }}"
+        password: "{{ my_user_pass }}"
+        shell: "/usr/bin/zsh"
+        home: "/home/{{ my_user }}"
+        create_home: false
+        groups: wheel
+        append: true
+        uid: 1000
+      tags: ["user"]
+
+    - name: Ensure user home permissions are correct
+      ansible.builtin.file:
+        path: "/home/{{ my_user }}"
+        state: directory
+        owner: "{{ my_user }}"
+        group: "{{ my_user }}"
+        mode: "0700"
+      # Should only change after we created the subvolume
+      notify: Restore user SELinux context
+      tags: ["user"]
+
+    - name: Configure user SSH keys
+      ansible.posix.authorized_key:
+        user: "{{ my_user }}"
+        key: "{{ ssh_authorized_keys | join('\n') }}"
+        state: present
+        exclusive: true
+      tags: ["user", "ssh"]
+
   post_tasks:
     - name: Symlink cockpit certs
       ansible.builtin.file:
@@ -172,3 +203,6 @@
       ansible.builtin.systemd:
         name: systemd-resolved.service
         state: restarted
+
+    - name: Restore user SELinux context
+      ansible.builtin.command: "restorecon -r /home/{{ my_user }}"
