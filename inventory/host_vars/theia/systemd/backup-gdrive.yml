@@ -6,8 +6,8 @@ __sd_backup_gdrive:
     content: |
       [Unit]
       Description=Backup important files to Google Drive
-      After=network-online.target mnt-tank.mount mnt-ceph.mount
-      Requires=network-online.target mnt-tank.mount mnt-ceph.mount
+      After=network-online.target mnt-tank.mount
+      Requires=network-online.target mnt-tank.mount
       ConditionPathExists=/mnt/tank/backup
 
       [Service]
