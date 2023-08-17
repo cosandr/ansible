@@ -1,6 +1,4 @@
 ---
 
-dnf_automatic_excludes:
-  - "kernel*"
-  - "systemd*"
+__dnf_automatic_excludes_3:
   - "postgresql*"

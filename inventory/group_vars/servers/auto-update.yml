@@ -4,7 +4,15 @@ dnf_automatic_timer_enabled: true
 dnf_automatic_upgrade_type: "default"
 dnf_automatic_apply_updates: true
 dnf_automatic_download_updates: true
-dnf_automatic_excludes:
+
+dnf_automatic_excludes: >-
+  {%- set tmp = [] -%}
+  {%- for i in range(1, 5) -%}
+  {{- tmp.extend(lookup('ansible.builtin.vars', '__dnf_automatic_excludes_' + (i | string), default=[])) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__dnf_automatic_excludes_2:
   - "kernel*"
   - "kmod*"
   - "systemd*"

@@ -6,12 +6,7 @@ prometheus_node_labels:
 
 fstrim_timer_enabled: true
 
-dnf_automatic_excludes:
-  - "kernel*"
-  - "kmod*"
-  - "systemd*"
-  - "libvirt*"
-  - "qemu*"
+__dnf_automatic_excludes_4:
   - "podman*"
   - "container*"
 
