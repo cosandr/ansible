@@ -62,10 +62,10 @@ pg
 pgbackrest
 
 [pg]
-pg01 ansible_host=10.0.10.11
+pg01 ansible_host=10.0.10.11 vm_host=aegir
 
 [pgbackrest]
-pgbak01 ansible_host=10.0.10.9
+pgbak01 ansible_host=10.0.10.9 vm_host=aegir
 
 [mikrotik]
 rb5009 ansible_host=10.0.50.1
@@ -74,24 +74,24 @@ crs309 ansible_host=10.0.100.4
 750gl  ansible_host=10.1.0.2
 
 [gitlab]
-gitlab01 ansible_host=10.0.10.40
+gitlab01 ansible_host=10.0.10.40 vm_host=theia
 
 [gitrun]
 gitrun01 ansible_host=10.0.10.41 vm_host=gerd
 gitrun02 ansible_host=10.0.10.42 vm_host=ymir
 
 [prom]
-prom01 ansible_host=10.0.10.21
+prom01 ansible_host=10.0.10.21 vm_host=gerd
 webgw01
 
 [prom:vars]
 ansible_group_priority=10
 
 [loki]
-loki01 ansible_host=10.0.10.25
+loki01 ansible_host=10.0.10.25 vm_host=theia
 
 [localgw]
-localgw01 ansible_host=10.0.10.91
+localgw01 ansible_host=10.0.10.91 vm_host=ymir
 romgw01 ansible_host=10.1.0.91
 
 [webgw]
@@ -101,13 +101,13 @@ webgw01
 localgw
 
 [nextcloud]
-nextcloud01 ansible_host=10.0.10.60
+nextcloud01 ansible_host=10.0.10.60 vm_host=ymir
 
 [docker]
 docker01 ansible_host=10.0.10.61 vm_host=aegir
 
 [minio]
-minio01 ansible_host=10.0.10.7
+minio01 ansible_host=10.0.10.7 vm_host=theia
 
 [ceph:children]
 
