@@ -43,10 +43,6 @@ __firewall_rules_3:
     zone: internal
     sources: "{{ node_exporter_allow_ips }}"
 
-  - port: "{{ nvme_exporter_port }}"
-    zone: public
-    sources: "{{ node_exporter_allow_ips }}"
-
   - port: "{{ ceph_dashboard_port }}"
     zone: internal
     sources: "{{ firewall_trusted_sources }}"

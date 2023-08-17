@@ -61,6 +61,10 @@ __firewalld_services_2:
     zone: "{{ __firewall_cockpit_zone }}"
     sources: "{{ firewall_trusted_sources }}"
 
+  - port: "{{ nvme_exporter_port }}"
+    zone: public
+    sources: "{{ node_exporter_allow_ips }}"
+
 __firewall_rules_2:
   - port: "{{ node_exporter_port }}"
     zone: internal

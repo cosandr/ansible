@@ -4,13 +4,6 @@ prometheus_node_labels:
   cluster: "ceph"
   instance: "{{ inventory_hostname }}"
 
-fstrim_timer_enabled: true
-
 __dnf_automatic_excludes_4:
   - "podman*"
   - "container*"
-
-nvme_exporter_port: 9998
-nvme_exporter_listen_address: "{{ host_ips.vm }}:{{ nvme_exporter_port }}"
-
-prometheus_nvme_targets: ["{{ nvme_exporter_listen_address }}"]
