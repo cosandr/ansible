@@ -110,7 +110,6 @@ docker01 ansible_host=10.0.10.61 vm_host=aegir
 minio01 ansible_host=10.0.10.7
 
 [ceph:children]
-kvm_hv
 
 [ceph:vars]
 ansible_group_priority=3

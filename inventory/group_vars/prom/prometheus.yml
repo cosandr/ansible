@@ -126,13 +126,6 @@ __prom_blackbox_starttls_targets: >-
   {%- endfor -%}
   {{ tmp | flatten | unique | sort }}
 
-__prom_ceph_targets: >-
-  {%- set tmp = [] -%}
-  {%- for h in groups['ceph'] | sort if hostvars[h].ceph_mon | default(true) -%}
-  {{- tmp.append(hostvars[h].host_ips.mgmt + ':' + (ceph_exporter_port | string)) -}}
-  {%- endfor -%}
-  {{ tmp }}
-
 prometheus_scrape_configs: "{{ (__common_prometheus_scrape_configs | default([])) + (__extra_prometheus_scrape_configs | default([])) }}"
 
 __common_prometheus_scrape_configs:
@@ -211,12 +204,6 @@ __extra_prometheus_scrape_configs:
     static_configs:
       - targets:
           - "{{ hostvars['docker01'].ansible_host }}:9090"
-
-  - job_name: "ceph"
-    scrape_interval: 15s
-    honor_labels: true
-    static_configs:
-      - targets: "{{ __prom_ceph_targets }}"
 
   - job_name: "nvme"
     static_configs: "{{ __prom_nvme_configs }}"
