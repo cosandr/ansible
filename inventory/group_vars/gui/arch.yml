@@ -144,6 +144,7 @@ pacman_i3_packages:
   - feh
   - file-roller
   - gnome-calculator
+  - gnome-disk-utility
   - gnome-themes-extra
   - gvfs-mtp
   - gvfs-nfs
@@ -164,6 +165,8 @@ pacman_i3_packages:
   - scrot
   - thunar
   - thunar-archive-plugin
+  - thunar-media-tags-plugin
+  - thunar-volman
   - tumbler  # Thumbnailer for Thunar
   - xclip
   - xorg-server
