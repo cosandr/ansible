@@ -1,4 +1,4 @@
 ---
 
-__promtail_host_configs:
+__promtail_scrape_configs_2:
   - "{{ __promtail_scrape_config_map['docker'] }}"

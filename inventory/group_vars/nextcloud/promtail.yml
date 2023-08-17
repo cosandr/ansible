@@ -1,6 +1,6 @@
 ---
 
-__promtail_host_configs:
+__promtail_scrape_configs_2:
   - job_name: nextcloud
     static_configs:
       - targets:

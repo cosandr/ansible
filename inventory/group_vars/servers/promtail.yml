@@ -38,8 +38,13 @@ __promtail_scrape_config_map:
       - static_labels:
           job: docker
 
-__promtail_default_scrape_configs:
+__promtail_scrape_configs_3:
   - "{{ __promtail_scrape_config_map['system'] }}"
   - "{{ __promtail_scrape_config_map['journal'] }}"
 
-promtail_scrape_configs: "{{ __promtail_default_scrape_configs + (__promtail_host_configs | default([])) }}"
+promtail_scrape_configs: >-
+  {%- set tmp = [] -%}
+  {%- for i in range(1, 4) -%}
+  {{- tmp.extend(lookup('ansible.builtin.vars', '__promtail_scrape_configs_' + (i | string), default=[])) -}}
+  {%- endfor -%}
+  {{ tmp }}
