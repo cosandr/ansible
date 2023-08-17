@@ -2,17 +2,17 @@
 
 node_exporter_config_firewall: true
 
-__group_firewalld_rules: []
+__firewalld_rules_2: []
 __firewall_ssh_public: "present"
-__firewal_cockpit_zone: "public"
-__host_firewalld_services:
+__firewall_cockpit_zone: "public"
+__firewalld_services_1:
   - name: nfs3
     zone: public
 
   - name: samba
     zone: public
 
-__host_firewall_rules:
+__firewall_rules_1:
   - port: 8384
     zone: public
     sources: "{{ proxy_hosts }}"

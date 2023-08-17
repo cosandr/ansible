@@ -2,13 +2,30 @@
 
 node_exporter_config_firewall: false
 
-firewalld_zones: "{{ __cluster_firewalld_zones + (__group_firewalld_zones | default([])) + (__host_firewalld_zones | default([])) }}"
-firewalld_services: "{{ __cluster_firewalld_services + (__group_firewalld_services | default([])) + (__host_firewalld_services | default([])) }}"
-firewall_rules: "{{ __cluster_firewall_rules + (__group_firewalld_rules | default([])) + (__host_firewalld_rules | default([])) }}"
+firewalld_zones: >-
+  {%- set tmp = [] -%}
+  {%- for i in range(1, 4) -%}
+  {{- tmp.extend(lookup('ansible.builtin.vars', '__firewalld_zones_' + (i | string), default=[])) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+firewalld_services: >-
+  {%- set tmp = [] -%}
+  {%- for i in range(1, 4) -%}
+  {{- tmp.extend(lookup('ansible.builtin.vars', '__firewalld_services_' + (i | string), default=[])) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+firewall_rules: >-
+  {%- set tmp = [] -%}
+  {%- for i in range(1, 4) -%}
+  {{- tmp.extend(lookup('ansible.builtin.vars', '__firewall_rules_' + (i | string), default=[])) -}}
+  {%- endfor -%}
+  {{ tmp }}
 
 __firewall_ssh_public: "absent"
-__firewal_cockpit_zone: "internal"
-__group_firewalld_zones:
+__firewall_cockpit_zone: "internal"
+__firewalld_zones_2:
   - name: internal
     interfaces:
       - MGMT
@@ -20,7 +37,7 @@ __group_firewalld_zones:
       - VM
       - NOINET
 
-__group_firewalld_services:
+__firewalld_services_2:
   - name: cockpit
     zone: public
     state: absent
@@ -41,10 +58,10 @@ __group_firewalld_services:
     zone: internal
 
   - name: cockpit
-    zone: "{{ __firewal_cockpit_zone }}"
+    zone: "{{ __firewall_cockpit_zone }}"
     sources: "{{ firewall_trusted_sources }}"
 
-__group_firewalld_rules:
+__firewall_rules_2:
   - port: "{{ node_exporter_port }}"
     zone: internal
     sources: "{{ node_exporter_allow_ips }}"

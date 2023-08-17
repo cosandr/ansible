@@ -5,11 +5,11 @@ __cluster_sources:
   - "{{ groups['ceph'] | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='san') | list }}"
   - "{{ groups['ceph'] | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='mgmt') | list }}"
 
-__cluster_firewalld_zones:
+__firewalld_zones_3:
   - name: cluster
     sources: "{{ __cluster_sources | flatten }}"
 
-__cluster_firewalld_services:
+__firewalld_services_3:
   - name: ssh
     zone: cluster
 
@@ -24,7 +24,7 @@ __cluster_firewalld_services:
     zone: internal
     sources: ["{{ home_net.vm.cidr }}"]
 
-__cluster_firewall_rules:
+__firewall_rules_3:
   - port: "{{ rgw_ingress_port }}"
     zone: public
 
