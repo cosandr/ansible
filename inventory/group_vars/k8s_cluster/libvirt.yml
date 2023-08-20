@@ -5,6 +5,11 @@ vm_root_size: "50G"
 vm_host: "{{ vm_host_list[groups['k8s_cluster'] | ansible.utils.index_of('eq', inventory_hostname) % (vm_host_list | length)] }}"
 vm_template: "flatcar.raw"
 vm_customize: false
+
+# Used by OpenEBS LVM provisioner
+vm_data_disks:
+  - "200G"
+
 vm_qemu_args:
   - "-fw_cfg"
   - "name=opt/org.flatcar-linux/config,file={{ vm_ignition_path }}/{{ inventory_hostname }}.ign"
