@@ -33,7 +33,7 @@
       delegate_to: "{{ vm_host }}"
       ansible.builtin.copy:
         content: "{{ vm_ignition | to_json }}"
-        dest: "/mnt/ceph/libvirt/{{ inventory_hostname }}.ign"
+        dest: "{{ vm_ignition_path }}/{{ inventory_hostname }}.ign"
         owner: root
         group: qemu
         mode: "0640"

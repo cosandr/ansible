@@ -7,7 +7,7 @@ vm_template: "flatcar.raw"
 vm_customize: false
 vm_qemu_args:
   - "-fw_cfg"
-  - "name=opt/org.flatcar-linux/config,file=/mnt/ceph/libvirt/{{ inventory_hostname }}.ign"
+  - "name=opt/org.flatcar-linux/config,file={{ vm_ignition_path }}/{{ inventory_hostname }}.ign"
 vm_ignition:
   ignition:
     version: "2.3.0"

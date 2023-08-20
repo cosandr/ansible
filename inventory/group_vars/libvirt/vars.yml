@@ -11,7 +11,8 @@ vm_cpus: 4
 vm_mem: 4096
 vm_template: "rocky9_packer.{{ vm_disk_format }}"
 vm_os_id: "http://rockylinux.org/rocky/9"
-vm_disk_pool: "cephfs"
+vm_disk_pool: "default"
+vm_ignition_path: "/var/lib/libvirt/images"
 vm_extra_disks: []
 vm_started: true
 vm_customize: true

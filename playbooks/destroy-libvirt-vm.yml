@@ -4,6 +4,8 @@
 - name: Destroy KVM VMs
   hosts: libvirt
   gather_facts: false
+  vars:
+    delete_storage: false
   pre_tasks:
     - name: Warn if no limit was passed
       run_once: true
@@ -23,7 +25,18 @@
     - name: Undefine VM
       delegate_to: "{{ vm_host }}"
       ansible.builtin.command:
-        cmd: /usr/bin/virsh undefine --nvram --remove-all-storage {{ inventory_hostname }}
+        cmd: >-
+          /usr/bin/virsh undefine
+          --nvram
+          {% if delete_storage | bool %}--remove-all-storage{% endif %}
+          {{ inventory_hostname }}
       changed_when: "'has been undefined' in __virsh.stdout"
       register: __virsh
       when: "'virtual machine ' + inventory_hostname + ' not found' not in __destroy.msg | default('') | string"
+
+    - name: Remove ignition file
+      delegate_to: "{{ vm_host }}"
+      ansible.builtin.file:
+        path: "{{ vm_ignition_path }}/{{ inventory_hostname }}.ign"
+        state: absent
+      when: vm_ignition_path | default('')
