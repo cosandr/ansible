@@ -218,7 +218,7 @@
           kubernetes.core.helm:
             name: prometheus
             chart_ref: prometheus-community/kube-prometheus-stack
-            chart_version: "45.x"
+            chart_version: "48.x"
             release_namespace: monitoring
             create_namespace: false
             update_repo_cache: true

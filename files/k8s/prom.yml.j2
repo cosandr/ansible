@@ -15,6 +15,10 @@ prometheus:
     pathType: ImplementationSpecific
 
   prometheusSpec:
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
     externalLabels: {}
     externalUrl: "http://prom.{{ kube_ingress_domain }}"
     retention: 1h
