@@ -1,27 +1,27 @@
 ---
 
 - name: Include platform specific vars
-  include_vars: "{{ ansible_system }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_system }}.yml"
 
 - name: Include install tasks
-  include_tasks: install.yml
+  ansible.builtin.include_tasks: install.yml
   when: certbot_install | bool
   tags: ["install"]
 
 - name: Ensure /etc/letsencrypt exists
-  file:
+  ansible.builtin.file:
     path: "/etc/letsencrypt"
     state: directory
     owner: root
     group: "{{ __root_group }}"
-    mode: 0755
+    mode: "0755"
 
 - name: Configure certbot
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/letsencrypt/cli.ini"
     owner: root
     group: "{{ __root_group }}"
-    mode: 0600
+    mode: "0600"
     content: |
       rsa-key-size = 4096
       email = {{ certbot_email }}
@@ -29,11 +29,11 @@
   when: certbot_email | length > 0
 
 - name: Add credentials
-  copy:
+  ansible.builtin.copy:
     dest: "{{ certbot_credentials_path }}"
     owner: root
     group: "{{ __root_group }}"
-    mode: 0600
+    mode: "0600"
     content: "{{ certbot_credentials_content }}"
   when: certbot_credentials_content | length > 0
 
@@ -43,7 +43,7 @@
     state: directory
     owner: root
     group: "{{ __root_group }}"
-    mode: 0750
+    mode: "0750"
   vars:
     __path: "/etc/letsencrypt/renewal-hooks/{{ item.type }}"
   loop: "{{ certbot_renew_hooks }}"
@@ -52,19 +52,19 @@
   tags: ["hooks"]
 
 - name: Copy renew hooks
-  copy:
+  ansible.builtin.copy:
     content: "{{ item.content }}"
     dest: "/etc/letsencrypt/renewal-hooks/{{ item.type }}/{{ item.name }}"
     owner: root
     group: "{{ __root_group }}"
-    mode: 0750
+    mode: "0750"
   loop: "{{ certbot_renew_hooks }}"
   loop_control:
     label: "{{ item.type }} - {{ item.name }}"
   tags: ["hooks"]
 
 - name: Get certificates
-  command: "{{ certbot_generate_command }} -d '{{ item }}'"
+  ansible.builtin.command: "{{ certbot_generate_command }} -d '{{ item }}'"
   register: output
   changed_when:
     - output.rc == 0

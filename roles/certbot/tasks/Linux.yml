@@ -1,12 +1,21 @@
 ---
 
+- name: Install renew script
+  ansible.builtin.template:
+    src: certbot-renew.sh.j2
+    dest: /usr/local/bin/certbot-renew
+    owner: root
+    group: root
+    mode: "0755"
+  when: certbot_renew_pre_script
+
 - name: Install services
-  template:
+  ansible.builtin.template:
     src: "certbot-{{ item }}.service.j2"
     dest: "/etc/systemd/system/certbot-{{ item }}.service"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   loop:
     - "renew"
     - "update"
@@ -15,12 +24,12 @@
   tags: ["install"]
 
 - name: Install renew timer
-  template:
+  ansible.builtin.template:
     src: "certbot-{{ item }}.timer.j2"
     dest: "/etc/systemd/system/certbot-{{ item }}.timer"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   loop:
     - "renew"
     - "update"
