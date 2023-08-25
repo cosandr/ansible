@@ -32,13 +32,14 @@
 
     - name: Find current host for self
       ansible.builtin.set_fact:
-        current_host: "{{ __vm_names.results | selectattr('list_vms', 'search', inventory_hostname) | map(attribute='item') | list | first }}"
+        current_host_list: "{{ __vm_names.results | selectattr('list_vms', 'search', inventory_hostname) | map(attribute='item') | list }}"
       tags: ["always"]
 
   tasks:
     - name: "{{ 'Shutting down' if 'stop' in ansible_run_tags else 'Starting up' }}"
-      delegate_to: "{{ current_host }}"
+      delegate_to: "{{ current_host_list[0] }}"
       community.libvirt.virt:
         name: "{{ inventory_hostname }}"
         state: "{{ 'shutdown' if 'stop' in ansible_run_tags else 'running' }}"
+      when: current_host_list
       tags: ["start", "stop"]
