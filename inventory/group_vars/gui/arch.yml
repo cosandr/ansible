@@ -129,6 +129,7 @@ base_pacman_packages:
 base_aur_packages:
   - hunspell-nb
   - jetbrains-toolbox
+  - krew-bin
   - paru-bin
   - pyenv-virtualenv
   - shellcheck-bin
