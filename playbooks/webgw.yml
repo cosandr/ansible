@@ -201,15 +201,6 @@
           loop: "{{ firewalld_masquerade_zones }}"
           notify: reload firewalld
 
-        - name: Configure rich rules
-          firewalld:
-            zone: "{{ item.zone | default('public') }}"
-            rich_rule: "{{ item.rich_rule }}"
-            permanent: true
-            state: enabled
-          notify: reload firewalld
-          loop: "{{ firewalld_rich_rules }}"
-
         - name: Add Wireguard interface to internal zone
           firewalld:
             zone: "internal"
