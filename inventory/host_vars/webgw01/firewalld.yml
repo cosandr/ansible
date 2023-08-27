@@ -2,7 +2,11 @@
 
 # Override vars in other groups the host might be in
 firewalld_zones: []
-firewalld_services: []
+firewalld_services:
+  - name: dns
+    zone: public
+  - name: dns
+    zone: internal
 firewall_rules:
   # Alertmanager cluster, thanks masquarade
   - port: "{{ alertmanager_port }}"
@@ -19,3 +23,10 @@ firewall_rules:
     protocol: udp
     zone: internal
     source: "{{ hostvars['rb5009'].wireguard_ip }}"
+  - port: "{{ acmedns_api_port }}"
+    zone: internal
+  - port: "{{ acmedns_api_port }}"
+    zone: public
+    sources:
+      - "{{ lookup('community.general.dig', hostvars['rb5009'].wireguard_endpoint.split(':', 1)[0]) }}"
+      - "{{ lookup('community.general.dig', hostvars['romsto'].wireguard_endpoint.split(':', 1)[0]) }}"
