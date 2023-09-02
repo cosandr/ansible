@@ -6,12 +6,6 @@
 
 __bond0_primary_iface: "enp1s0"
 __bond0_backup_iface: "eno1"
-__bond0_config: |
-    Mode=active-backup
-    PrimaryReselectPolicy=always
-    MIIMonitorSec=1s
-__bond0_primary_options: |
-  PrimarySlave=true
 
 __mgmt_metric: 512
 __mgmt_dns: true
@@ -44,7 +38,9 @@ networkd_netdevs:
       MTUBytes=9000
 
       [Bond]
-      {{ __bond0_config }}
+      Mode=active-backup
+      PrimaryReselectPolicy=always
+      MIIMonitorSec=1s
 
   - bond0.2: |
       [NetDev]
@@ -177,7 +173,7 @@ networkd_config:
       [Network]
       Description=Trunk bond interface primary
       Bond=bond0
-      {{ __bond0_primary_options }}
+      PrimarySlave=true
 
   - bond0_backup: |
       [Match]

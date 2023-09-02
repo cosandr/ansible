@@ -2,13 +2,7 @@
 
 __ip_offset: 0
 __bond0_primary_iface: "enp43s0f0"
-__bond0_backup_iface: "enp43s0f1"
-__bond0_primary_options: ""
-__bond0_config: |
-  Mode=802.3ad
-  TransmitHashPolicy=layer2+3
-  MIIMonitorSec=1s
-  LACPTransmitRate=fast
+__bond0_backup_iface: "enp35s0"
 
 __mgmt_metric: 1024
 __mgmt_dns: false
