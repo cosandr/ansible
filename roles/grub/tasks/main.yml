@@ -6,19 +6,21 @@
   register: __grub_conf
   tags: ["grub"]
 
-- name: Look for grub.cfg
-  ansible.builtin.find:
-    paths: /boot/efi/EFI
-    patterns: 'grub.cfg'
-    recurse: true
-  register: __grub_search
+- name: Search EFI for config
   tags: ["grub"]
+  when: grub_search_efi | bool
+  block:
+    - name: Look for grub.cfg
+      ansible.builtin.find:
+        paths: /boot/efi/EFI
+        patterns: 'grub.cfg'
+        recurse: true
+      register: __grub_search
 
-- name: Set grub.cfg path
-  ansible.builtin.set_fact:
-    grub_cfg_path: "{{ __grub_search.files[0].path }}"
-  when: __grub_search.matched > 0
-  tags: ["grub"]
+    - name: Set grub.cfg path
+      ansible.builtin.set_fact:
+        grub_cfg_path: "{{ __grub_search.files[0].path }}"
+      when: __grub_search.matched > 0
 
 - name: Configure grub
   ansible.builtin.lineinfile:

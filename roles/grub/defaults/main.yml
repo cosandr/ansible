@@ -1,3 +1,4 @@
 ---
 
 grub_config: []
+grub_search_efi: false
