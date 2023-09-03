@@ -97,3 +97,20 @@
     enabled: true
   when: fstrim_timer_enabled | default(false)
   tags: ["fstrim"]
+
+- name: Check if dnf.conf exists
+  ansible.builtin.stat:
+    path: /etc/dnf/dnf.conf
+  register: __dnf_conf
+  tags: ["dnf"]
+
+- name: Disable deltarpm
+  community.general.ini_file:
+    path: /etc/dnf/dnf.conf
+    create: false
+    no_extra_spaces: true
+    section: main
+    option: deltarpm
+    value: false
+  when: __dnf_conf.stat.exists
+  tags: ["dnf"]
