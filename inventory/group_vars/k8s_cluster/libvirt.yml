@@ -7,8 +7,15 @@ vm_template: "flatcar.raw"
 vm_customize: false
 
 # Used by OpenEBS LVM provisioner
-vm_data_disks:
-  - "200G"
+vm_extra_disks:
+  - type: block
+    device: disk
+    format: raw
+    dev: "/dev/{{ 'vg02' if vm_host == 'theia' else 'vg01' }}/k8s"
+    serial: "raw01"
+    driver_options:
+      discard: "unmap"
+      cache: "none"
 
 vm_qemu_args:
   - "-fw_cfg"
