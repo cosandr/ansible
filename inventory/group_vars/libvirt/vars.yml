@@ -39,6 +39,8 @@ vm_root_disk:
   clone_image: "{{ vm_template }}"
   serial: "root01"
   pool: "{{ vm_disk_pool }}"
+  driver_options:
+    discard: "unmap"
 
 vm_default_nic:
   type: bridge

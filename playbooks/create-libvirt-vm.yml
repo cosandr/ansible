@@ -27,6 +27,8 @@
           capacity: "{{ item }}"
           serial: "{{ disk_name }}"
           pool: "{{ vm_disk_pool }}"
+          driver_options:
+            discard: "unmap"
       tags: ["always"]
 
     - name: Generate ignition
