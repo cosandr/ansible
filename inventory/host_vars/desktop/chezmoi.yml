@@ -4,17 +4,22 @@
 # Vertical lined up bottom 1680 offset, 1260 slightly higher, 840 middle lined up
 
 chezmoi_overrides:
+  gui: |
+    START_CMD=startx
+    export GTK_USE_PORTAL=1
+    export STEAM_FORCE_DESKTOPUI_SCALING=1.25
   i3: |
     WS["2"]="no-discord"
   polybar: |
     DPI_MAP["DP-0"]="144"
-  xorg: |
-    DPI=120
-    MONITOR_MAP["DP-2"]="--primary --mode 3840x2160 --rate 144"
-    MONITOR_MAP["DP-0"]="--above DP-2"
-    MONITOR_MAP["HDMI-0"]="--off"
   xinitrc: |
     QT_AUTO_SCREEN_SCALE_FACTOR="1"
+    MOUSE_SENS="-0.65"
+    MOUSE_NAME="pointer:Logitech G502"
     NVIDIA_CORE_OFFSET="100"
     NVIDIA_MEM_OFFSET="1500"
     USE_AUTORANDR=0
+  xorg: |
+    DPI=120
+    MONITOR_MAP["DP-2"]="--primary --mode 3840x2160 --rate 144"
+    MONITOR_MAP["HDMI-0"]="--mode 3840x2160 --rate 60 --above DP-2"

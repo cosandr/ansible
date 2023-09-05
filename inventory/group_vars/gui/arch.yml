@@ -170,6 +170,7 @@ pacman_i3_packages:
   - thunar-volman
   - tumbler  # Thumbnailer for Thunar
   - xclip
+  - xdg-user-dirs
   - xorg-server
   - xorg-xev
   - xorg-xinit
