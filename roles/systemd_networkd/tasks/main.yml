@@ -29,6 +29,7 @@
     patterns:
       - "*.network"
       - "*.netdev"
+      - "*.link"
   register: __networkd_present
   when: networkd_provisioning_synced
 
@@ -62,15 +63,36 @@
   register: __netdev_copied
   notify: Restart systemd-networkd
 
+- name: Copy networkd links
+  ansible.builtin.copy:
+    dest: "{{ chroot_path }}/etc/systemd/network/{{ item.key }}.link"
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      {{ ansible_managed | comment }}
+      {{ item.value }}
+  with_dict: "{{ networkd_links }}"
+  loop_control:
+    label: "{{ item.key }}"
+  register: __link_copied
+  notify: Restart systemd-networkd
+
 - name: Set list facts
   ansible.builtin.set_fact:
     __networkd_present_list: "{{ __networkd_present | json_query('files[*].path') | default([]) }}"
-    __networkd_copied_list: "{{ __network_copied_tmp + __network_copied_tmp_check + __netdev_copied_tmp + __netdev_copied_tmp_check }}"
+    __networkd_copied_list: "{{
+      __network_copied_tmp + __network_copied_tmp_check +
+      __netdev_copied_tmp + __netdev_copied_tmp_check +
+      __link_copied_tmp + __link_copied_tmp_check
+      }}"
   vars:
     __network_copied_tmp: "{{ __network_copied.results | json_query('[*].dest') | default([]) }}"
     __network_copied_tmp_check: "{{ __network_copied.results | json_query('[*].invocation.dest') | default([]) }}"
     __netdev_copied_tmp: "{{ __netdev_copied.results | json_query('[*].dest') | default([]) }}"
     __netdev_copied_tmp_check: "{{ __netdev_copied.results | json_query('[*].invocation.dest') | default([]) }}"
+    __link_copied_tmp: "{{ __link_copied.results | json_query('[*].dest') | default([]) }}"
+    __link_copied_tmp_check: "{{ __link_copied.results | json_query('[*].invocation.dest') | default([]) }}"
   when: networkd_provisioning_synced
 
 - name: Remove configs not present on deployer machine (synchronize)

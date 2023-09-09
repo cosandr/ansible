@@ -23,3 +23,5 @@ networkd_config:
 networkd_services:
   - "systemd-networkd.service"
   - "systemd-resolved.service"
+
+networkd_links: []
