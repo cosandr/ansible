@@ -39,8 +39,14 @@ wireguard_unmanaged_peers:
 
 wireguard_persistent_keepalive: 300
 wireguard_postup:
-  - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} started'
-  - iptables -t nat -A POSTROUTING -s "{{ wg_net.mt.cidr }}" -o br0 -j MASQUERADE
+  - "logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} started';/usr/local/emhttp/webGui/scripts/update_services"
+  - "iptables -t nat -A POSTROUTING -s {{ wg_net.mt.cidr }} -o br0 -j MASQUERADE"
+  - "ip -4 route flush table 200"
+  - "ip -4 route add default via {{ wireguard_ip }} dev {{ wireguard_interface }} table 200"
+  - "ip -4 route add 10.1.0.0/24 via 10.1.0.1 dev br0 table 200"
 wireguard_postdown:
-  - logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} stopped'
-  - iptables -t nat -D POSTROUTING -s "{{ wg_net.mt.cidr }}" -o br0 -j MASQUERADE
+  - "logger -t wireguard 'Tunnel WireGuard-{{ wireguard_interface }} stopped';/usr/local/emhttp/webGui/scripts/update_services"
+  - "iptables -t nat -D POSTROUTING -s {{ wg_net.mt.cidr }} -o br0 -j MASQUERADE"
+  - "ip -4 route flush table 200"
+  - "ip -4 route add unreachable default table 200"
+  - "ip -4 route add 10.1.0.0/24 via 10.1.0.1 dev br0 table 200"
