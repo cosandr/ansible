@@ -1,0 +1,17 @@
+---
+
+mt_bgp_peers: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_bgp_peers | default([])) -%}
+  {%- for item in hostvars[h].mt_bgp_peers -%}
+  {{- tmp.append(
+      {
+      "name": item.name | default(h),
+      "as": item.as,
+      "remote_address": item.remote_address | default(hostvars[h].ansible_host | ansible.utils.ipaddr('host')),
+      "local_role": item.local_role | default('ebgp'),
+    }
+  ) -}}
+  {%- endfor -%}
+  {%- endfor -%}
+  {{ tmp }}

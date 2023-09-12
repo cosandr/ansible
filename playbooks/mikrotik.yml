@@ -109,14 +109,67 @@
       ca_path: "{{ ca_publickey_path }}"
 
   tasks:
-    - name: Configure services
+    - name: Configure BGP
+      delegate_to: localhost
+      tags: ["bgp"]
+      when: mt_bgp_peers | default([])
+      block:
+        - name: Get BGP peers  # noqa args[module]
+          check_mode: false
+          community.routeros.api:
+            path: routing bgp connection
+          register: __bgp_peers
+
+        - name: Remove extra peers  # noqa args[module]
+          community.routeros.api:
+            path: routing bgp connection
+            remove: "{{ item['.id'] }}"
+          loop: "{{ __bgp_peers.msg }}"
+          loop_control:
+            label: "{{ item.name }}"
+          when: item.name not in mt_bgp_peers | map(attribute='name')
+
+        - name: Add missing peers  # noqa args[module]
+          community.routeros.api:
+            path: routing bgp connection
+            add: >-
+              as={{ item.as }}
+              local.role={{ item.local_role }}
+              name={{ item.name }}
+              remote.address={{ item.remote_address }}
+          loop: "{{ mt_bgp_peers }}"
+          loop_control:
+            label: "{{ item.name }}"
+          when: item.name not in __bgp_peers.msg | map(attribute='name')
+
+        - name: Update outdated peers  # noqa args[module]
+          vars:
+            old: "{{ __bgp_peers.msg | selectattr('name', 'eq', item.name) | first }}"
+          community.routeros.api:
+            path: routing bgp connection
+            update: >-
+              .id={{ old['.id'] }}
+              as={{ item.as }}
+              local.role={{ item.local_role }}
+              name={{ item.name }}
+              remote.address={{ item.remote_address }}
+          loop: "{{ mt_bgp_peers }}"
+          loop_control:
+            label: "{{ item.name }}"
+          when:
+            - item.name in __bgp_peers.msg | map(attribute='name')
+            - item.as | string != old['as'] | string or
+              item.local_role != old['local.role'] or
+              item.remote_address != old['remote.address']
+
+    - name: Configure services  # noqa args[module]
       delegate_to: localhost
       community.routeros.api_modify:
         path: ip service
         data: "{{ mt_services }}"
       tags: ["services"]
 
-    - name: Configure wireguard interfaces
+    - name: Configure wireguard interfaces  # noqa args[module]
       delegate_to: localhost
       community.routeros.api_modify:
         path: interface wireguard
@@ -126,7 +179,7 @@
       when: mt_wg_interfaces | default([])
       tags: ["wg", "interfaces"]
 
-    - name: Configure wireguard peers
+    - name: Configure wireguard peers  # noqa args[module]
       delegate_to: localhost
       community.routeros.api_modify:
         path: interface wireguard peers
@@ -139,7 +192,7 @@
     - name: Configure DNS
       tags: ["dns"]
       block:
-        - name: Get all DNS entries
+        - name: Get all DNS entries  # noqa args[module]
           delegate_to: localhost
           community.routeros.api_info:
             path: ip dns static
@@ -155,7 +208,7 @@
             __configured_hosts: "{{ mt_dns_entries | map(attribute='name') | list }}"
             __present_hosts: "{{ mt_dns_present | map(attribute='name') | list }}"
 
-        - name: Remove old entries
+        - name: Remove old entries  # noqa args[module]
           delegate_to: localhost
           vars:
             __delete_entries: >-
@@ -173,7 +226,7 @@
           loop_control:
             label: "{{ item.name }} [{{ item.address }}]"
 
-        - name: Add missing entries
+        - name: Add missing entries  # noqa args[module]
           delegate_to: localhost
           vars:
             __missing_entries: >-
@@ -188,7 +241,7 @@
             path: ip dns static
             data: "{{ __missing_entries }}"
 
-        - name: Update entries
+        - name: Update entries  # noqa args[module]
           delegate_to: localhost
           vars:
             __same_entries: >-

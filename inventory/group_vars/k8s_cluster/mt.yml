@@ -1,0 +1,4 @@
+---
+
+mt_bgp_peers:
+  - as: "{{ peers[0].as }}"

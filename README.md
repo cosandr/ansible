@@ -19,6 +19,18 @@ gopass edit -c network/<inventory_hostname>_wg_psk
 
 ## kubespray
 
+Run kube playbook first
+
+```sh
+./playbooks/kube.yml -t system
+```
+
+If IPs were changed or hosts were added/removed, BGP peers must also be updated
+
+```sh
+./playbooks/mikrotik.yml -l rb5009 -t bgp
+```
+
 Run Ansible from the kubespray submodule
 
 ```sh
