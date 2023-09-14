@@ -199,65 +199,37 @@
             handle_disabled: null-value
           register: __mt_dns
 
-        - name: Set fact for managed entries
-          ansible.builtin.set_fact:
-            mt_dns_present: "{{ __mt_dns.result | selectattr('comment', 'eq', mt_dns_managed_comment) | list }}"
-
-        - name: Set helper facts
-          ansible.builtin.set_fact:
-            __configured_hosts: "{{ mt_dns_entries | map(attribute='name') | list }}"
-            __present_hosts: "{{ mt_dns_present | map(attribute='name') | list }}"
-
-        - name: Remove old entries  # noqa args[module]
-          delegate_to: localhost
-          vars:
-            __delete_entries: >-
-              {%- set tmp = [] -%}
-              {%- for item in mt_dns_present -%}
-              {%- if item.name not in __configured_hosts -%}
-              {{- tmp.append(item) -}}
-              {%- endif -%}
-              {%- endfor -%}
-              {{ tmp }}
-          community.routeros.api:
-            path: ip dns static
-            remove: "{{ item['.id'] }}"
-          loop: "{{ __delete_entries }}"
-          loop_control:
-            label: "{{ item.name }} [{{ item.address }}]"
+        - name: Get add, update, remove lists  # noqa args[module] - it thinks api_info's 'result' is a string
+          mt_get_dns_entries:
+            existing: "{{ __mt_dns.result }}"
+            data: "{{ mt_dns_entries }}"
+            exclude_comment_regex: "^dhcp-.*"
+          register: __dns_lists
 
         - name: Add missing entries  # noqa args[module]
           delegate_to: localhost
-          vars:
-            __missing_entries: >-
-              {%- set tmp = [] -%}
-              {%- for item in mt_dns_entries -%}
-              {%- if item.name not in __present_hosts -%}
-              {{- tmp.append(item) -}}
-              {%- endif -%}
-              {%- endfor -%}
-              {{ tmp }}
           community.routeros.api_modify:
             path: ip dns static
-            data: "{{ __missing_entries }}"
+            data: "{{ __dns_lists.to_add }}"
 
-        - name: Update entries  # noqa args[module]
+        - name: Delete old DNS entries  # noqa args[module]
           delegate_to: localhost
-          vars:
-            __same_entries: >-
-              {%- set tmp = [] -%}
-              {%- for item in mt_dns_entries -%}
-              {%- if item.name in __present_hosts -%}
-              {{- tmp.append(item) -}}
-              {%- endif -%}
-              {%- endfor -%}
-              {{ tmp }}
+          community.routeros.api:
+            path: ip dns static
+            remove: "{{ item['.id'] }}"
+          loop: "{{ __dns_lists.to_remove }}"
+          loop_control:
+            label: "{{ item.name | default(item.regexp) }}"
+
+        - name: Update DNS entries  # noqa args[module]
+          delegate_to: localhost
           community.routeros.api_find_and_modify:
             path: ip dns static
             find:
-              name: "{{ item.name }}"
-              comment: "{{ item.comment | default(mt_dns_managed_comment) }}"
+              ".id": "{{ item['.id'] }}"
             values: "{{ item }}"
-          loop: "{{ __same_entries }}"
+            require_matches_min: 1
+            require_matches_max: 1
+          loop: "{{ __dns_lists.to_update }}"
           loop_control:
-            label: "{{ item.name }} [{{ item.address }}]"
+            label: "{{ item.name | default(item.regexp) }}"

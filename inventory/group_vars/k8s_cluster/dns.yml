@@ -9,3 +9,6 @@ __mt_dns_entries_common:
 __mt_dns_entries_vip:
   - name: "k8s.{{ domains['hb'] }}"
     address: "{{ kube_vip_address }}"
+  - regexp: ".*\\.kube\\.{{ domains['hb'] | regex_escape() }}$"
+    address: "{{ ingress_nginx_lb_ip }}"
+    ttl: 5m

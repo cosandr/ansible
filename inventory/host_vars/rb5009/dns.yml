@@ -1,18 +1,54 @@
 ---
 
 mt_dns_managed_comment: "ansible managed"
-mt_dns_entries: >-
+
+__mt_dns_entries_manual:
+  - name: "ax56u.{{ domains['hb'] }}"
+    comment: "{{ mt_dns_managed_comment }}"
+    address: "10.0.50.40"
+    ttl: "1h"
+  - name: "ha.{{ domains['hb'] }}"
+    comment: "{{ mt_dns_managed_comment }}"
+    address: "10.0.50.48"
+    ttl: "1h"
+
+__mt_dns_entries_auto: >-
   {%- set tmp = [] -%}
   {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_dns_entries | default([])) -%}
   {%- for item in hostvars[h].mt_dns_entries -%}
-  {{- tmp.append(
-      {
-      "name": item.name,
-      "address": item.address,
+  {%- set tmp_dict = {
       "comment": item.comment | default(mt_dns_managed_comment),
       "ttl": item.ttl | default('1h')
     }
-  ) -}}
+  -%}
+  {%- if 'name' in item -%}
+  {{- tmp_dict.update({
+    "name": item.name,
+  }) -}}
+  {%- endif -%}
+  {%- if 'regexp' in item -%}
+  {{- tmp_dict.update({
+    "regexp": item.regexp,
+  }) -}}
+  {%- endif -%}
+  {%- if 'address' in item -%}
+  {{- tmp_dict.update({
+    "address": item.address,
+  }) -}}
+  {%- endif -%}
+  {%- if 'cname' in item -%}
+  {{- tmp_dict.update({
+    "cname": item.cname,
+  }) -}}
+  {%- endif -%}
+  {%- if 'type' in item -%}
+  {{- tmp_dict.update({
+    "type": item.type,
+  }) -}}
+  {%- endif -%}
+  {{- tmp.append(tmp_dict) -}}
   {%- endfor -%}
   {%- endfor -%}
   {{ tmp }}
+
+mt_dns_entries: "{{ __mt_dns_entries_manual + __mt_dns_entries_auto }}"

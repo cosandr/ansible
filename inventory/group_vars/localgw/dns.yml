@@ -1,0 +1,28 @@
+---
+
+mt_dns_entries:
+  - name: "{{ inventory_hostname }}.{{ domain }}"
+    address: "{{ ansible_host }}"
+  - name: "{{ inventory_hostname }}.{{ domain }}"
+    type: AAAA
+    address: "{{ ansible_host6 }}"
+  - name: "grafana.{{ domain }}"
+    cname: "{{ inventory_hostname }}.{{ domain }}"
+    ttl: 5m
+    type: CNAME
+  - name: "syncthing.{{ domain }}"
+    cname: "{{ inventory_hostname }}.{{ domain }}"
+    ttl: 5m
+    type: CNAME
+  - name: "cloud.{{ domains['dv'] }}"
+    cname: "{{ inventory_hostname }}.{{ domain }}"
+    ttl: 5m
+    type: CNAME
+  - name: "gitlab.{{ domains['dv'] }}"
+    cname: "{{ inventory_hostname }}.{{ domain }}"
+    ttl: 5m
+    type: CNAME
+  - name: "plex.{{ domains['dv'] }}"
+    cname: "{{ inventory_hostname }}.{{ domain }}"
+    ttl: 5m
+    type: CNAME
