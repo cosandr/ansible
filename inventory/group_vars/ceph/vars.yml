@@ -7,3 +7,7 @@ prometheus_node_labels:
 __dnf_automatic_excludes_4:
   - "podman*"
   - "container*"
+
+__mt_dns_entries_vip:
+  - name: "rgw.{{ domain }}"
+    address: "{{ rgw_ingress_vip | ansible.utils.ipaddr('address') }}"
