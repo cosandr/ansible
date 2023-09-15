@@ -1,0 +1,34 @@
+---
+
+mt_bonds:
+  - name: bond_syno
+    mode: 802.3ad
+    slaves: ether3,ether4
+    transmit-hash-policy: layer-2-and-3
+    lacp-rate: 1sec
+    mtu: 9000
+
+mt_trunk_ports: [sfp-sfpplus1]
+
+mt_access_ports:
+  - vlan: GENERAL
+    ports:
+      - ether1
+      - ether5
+      - ether6
+      - ether7
+
+  - vlan: MGMT
+    ports:
+      - ether8
+      - bond_syno
+
+# !!! ether2 is WAN, do NOT add to bridge !!!
+mt_bridge_ports:
+  - bond_syno
+  - sfp-sfpplus1
+  - ether1
+  - ether5
+  - ether6
+  - ether7
+  - ether8

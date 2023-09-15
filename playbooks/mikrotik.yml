@@ -109,6 +109,64 @@
       ca_path: "{{ ca_publickey_path }}"
 
   tasks:
+    - name: Create bridges  # noqa args[module]
+      community.routeros.api_modify:
+        path: interface bridge
+        data:
+          - name: "{{ item.name }}"
+      loop: "{{ mt_bridges }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: mt_bridges | default([])
+      tags: ["interfaces", "bridge"]
+
+    - name: Configure bonds  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: interface bonding
+        data: "{{ mt_bonds }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_bonds | default([])
+      tags: ["interfaces", "bond"]
+
+    - name: Include VLAN role
+      ansible.builtin.include_role:
+        name: mt_vlans
+        apply:
+          tags: ["interfaces", "vlan"]
+      vars:
+        mt_networks: "{{ all_net }}"
+        mt_bridge_name: "{{ mt_bridges[0].name }}"
+      tags: ["interfaces", "vlan"]
+      when: mt_trunk_ports | default([]) or
+            mt_access_ports | default([])
+
+    - name: Enable VLAN filtering [legacy]  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_find_and_modify:
+        path: interface ethernet switch
+        find: {}
+        values:
+          drop-if-invalid-or-src-port-not-member-of-vlan-on-ports: "{{ mt_bridge_ports | join(',') }}"
+      tags: ["interfaces", "bridge"]
+      when:
+        - mt_bridges | default([])
+        - mt_bridge_ports | default([])
+        - mt_vlan_legacy | default(false)
+
+    - name: Enable VLAN filtering [modern]  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: interface bridge
+        data: "{{ mt_bridges }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      tags: ["interfaces", "bridge"]
+      when:
+        - mt_bridges | default([])
+        - not mt_vlan_legacy | default(false)
+
     - name: Configure BGP
       delegate_to: localhost
       tags: ["bgp"]
@@ -177,7 +235,7 @@
         handle_entries_content: remove_as_much_as_possible
         data: "{{ mt_wg_interfaces }}"
       when: mt_wg_interfaces | default([])
-      tags: ["wg", "interfaces"]
+      tags: ["interfaces", "wg",]
 
     - name: Configure wireguard peers  # noqa args[module]
       delegate_to: localhost

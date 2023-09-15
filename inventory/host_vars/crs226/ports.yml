@@ -1,0 +1,29 @@
+---
+
+mt_vlan_legacy: true
+
+mt_bridge_ports: [
+  sfp-sfpplus1, sfpplus2,
+  ether1, ether2, ether3, ether4, ether5, ether6, ether7, ether8,
+  ether9, ether10, ether11, ether12, ether13, ether14, ether15, ether16,
+  ether17, ether18, ether19, ether20, ether21, ether22, ether23, ether24,
+]
+
+mt_trunk_ports: [
+  sfp-sfpplus1, sfpplus2,
+  ether12, ether13, ether14, ether15, ether16, ether17, ether18,
+]
+
+mt_access_ports:
+  - vlan: GENERAL
+    ports:
+      - ether1
+      - ether2
+      - ether3
+      - ether4
+
+  - vlan: MGMT
+    ports:
+      - ether9
+      - ether10
+      - ether11

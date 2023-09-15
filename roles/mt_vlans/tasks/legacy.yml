@@ -1,0 +1,181 @@
+---
+
+- name: Get ingress VLAN translations  # noqa args[module]
+  check_mode: false
+  changed_when: false
+  community.routeros.api:
+    path: interface ethernet switch ingress-vlan-translation
+    timeout: 20
+    extended_query:
+      attributes:
+        - .id
+        - dynamic
+        - ports
+        - customer-vid
+        - new-customer-vid
+      where:
+        - attribute: "dynamic"
+          is: "=="
+          value: false
+    # # ERROR: 'customer-vid' must be '.id'
+    # query: "customer-vid new-customer-vid dynamic ports .id WHERE dynamic == false"
+  register: __vlan_ingress
+
+- name: Get switch VLAN ingress config
+  mt_get_interface_sw_ingress:
+    existing: "{{ __vlan_ingress.msg }}"
+    networks: "{{ mt_networks }}"
+    access_ports: "{{ mt_access_ports }}"
+  register: __sw_vlan_ingress_config
+
+- name: Add missing ingress translations  # noqa args[module]
+  delegate_to: "{{ inventory_hostname }}"
+  # api module complains about missing =switch= parameter
+  community.routeros.command:
+    commands: >-
+      /interface ethernet switch ingress-vlan-translation add
+        customer-vid={{ item['customer-vid'] }}
+        new-customer-vid={{ item['new-customer-vid'] }}
+        ports={{ item['ports'] }}
+  loop: "{{ __sw_vlan_ingress_config.to_add }}"
+  loop_control:
+    label: "{{ item['new-customer-vid'] }}"
+
+- name: Delete old ingress translations  # noqa args[module]
+  community.routeros.api:
+    path: interface ethernet switch ingress-vlan-translation
+    remove: "{{ item['.id'] }}"
+  loop: "{{ __sw_vlan_ingress_config.to_remove }}"
+  loop_control:
+    label: "{{ item['new-customer-vid'] }}"
+
+- name: Update ingress translations  # noqa args[module]
+  community.routeros.api_find_and_modify:
+    path: interface ethernet switch ingress-vlan-translation
+    find:
+      ".id": "{{ item['.id'] }}"
+    values: "{{ item }}"
+    require_matches_min: 1
+    require_matches_max: 1
+  loop: "{{ __sw_vlan_ingress_config.to_update }}"
+  loop_control:
+    label: "{{ item['new-customer-vid'] }}"
+
+- name: Get egress VLAN tags  # noqa args[module]
+  check_mode: false
+  changed_when: false
+  community.routeros.api:
+    path: interface ethernet switch egress-vlan-tag
+    timeout: 20
+    extended_query:
+      attributes:
+        - .id
+        - dynamic
+        - tagged-ports
+        - vlan-id
+      where:
+        - attribute: "dynamic"
+          is: "=="
+          value: false
+  register: __vlan_egress
+
+- name: Get switch VLAN egress config
+  mt_get_interface_sw_egress:
+    existing: "{{ __vlan_egress.msg }}"
+    networks: "{{ mt_networks }}"
+    trunk_ports: "{{ mt_trunk_ports }}"
+  register: __sw_vlan_egress_config
+
+- name: Add missing egress tags  # noqa args[module]
+  # api module complains about missing =switch= parameter
+  community.routeros.api:
+    path: interface ethernet switch egress-vlan-tag
+    timeout: 20
+    add: >-
+      vlan-id={{ item['vlan-id'] }}
+      tagged-ports={{ item['tagged-ports'] }}
+  loop: "{{ __sw_vlan_egress_config.to_add }}"
+  loop_control:
+    label: "{{ item['vlan-id'] }}"
+
+- name: Delete old egress tags  # noqa args[module]
+  community.routeros.api:
+    path: interface ethernet switch egress-vlan-tag
+    timeout: 20
+    remove: "{{ item['.id'] }}"
+  loop: "{{ __sw_vlan_egress_config.to_remove }}"
+  loop_control:
+    label: "{{ item['vlan-id'] }}"
+
+- name: Update egress tags  # noqa args[module]
+  community.routeros.api_find_and_modify:
+    path: interface ethernet switch egress-vlan-tag
+    timeout: 20
+    find:
+      ".id": "{{ item['.id'] }}"
+    values: "{{ item }}"
+    require_matches_min: 1
+    require_matches_max: 1
+  loop: "{{ __sw_vlan_egress_config.to_update }}"
+  loop_control:
+    label: "{{ item['vlan-id'] }}"
+
+- name: Get switch VLANs  # noqa args[module]
+  check_mode: false
+  changed_when: false
+  community.routeros.api:
+    path: interface ethernet switch vlan
+    timeout: 20
+    extended_query:
+      attributes:
+        - .id
+        - dynamic
+        - ports
+        - vlan-id
+      where:
+        - attribute: "dynamic"
+          is: "=="
+          value: false
+  register: __sw_vlans
+
+- name: Get switch VLAN config
+  mt_get_interface_sw_vlan:
+    existing: "{{ __sw_vlans.msg }}"
+    networks: "{{ mt_networks }}"
+    trunk_ports: "{{ mt_trunk_ports }}"
+    access_ports: "{{ mt_access_ports }}"
+  register: __sw_vlan_config
+
+- name: Add missing switch VLANs  # noqa args[module]
+  # api module complains about missing =switch= parameter
+  community.routeros.api:
+    path: interface ethernet switch vlan
+    timeout: 20
+    add: >-
+      vlan-id={{ item['vlan-id'] }}
+      ports={{ item['ports'] }}
+  loop: "{{ __sw_vlan_config.to_add }}"
+  loop_control:
+    label: "{{ item['vlan-id'] }}"
+
+- name: Delete old switch VLANs   # noqa args[module]
+  community.routeros.api:
+    path: interface ethernet switch vlan
+    timeout: 20
+    remove: "{{ item['.id'] }}"
+  loop: "{{ __sw_vlan_config.to_remove }}"
+  loop_control:
+    label: "{{ item['vlan-id'] }}"
+
+- name: Update switch VLANs   # noqa args[module]
+  community.routeros.api_find_and_modify:
+    path: interface ethernet switch vlan
+    timeout: 20
+    find:
+      ".id": "{{ item['.id'] }}"
+    values: "{{ item }}"
+    require_matches_min: 1
+    require_matches_max: 1
+  loop: "{{ __sw_vlan_config.to_update }}"
+  loop_control:
+    label: "{{ item['vlan-id'] }}"
