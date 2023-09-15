@@ -44,78 +44,78 @@ networkd_netdevs:
 
   - bond0.2: |
       [NetDev]
-      Name=bond0.2
+      Name=bond0.{{ all_net.san.vlan }}
       Kind=vlan
-      MTUBytes=9000
+      MTUBytes={{ all_net.san.mtu | default(1500) }}
 
       [VLAN]
-      Id=2
+      Id={{ all_net.san.vlan }}
 
   - bond0.10: |
       [NetDev]
-      Name=bond0.10
+      Name=bond0.{{ all_net.vm.vlan }}
       Kind=vlan
-      MTUBytes=1500
+      MTUBytes={{ all_net.vm.mtu | default(1500) }}
 
       [VLAN]
-      Id=10
+      Id={{ all_net.vm.vlan }}
 
   - bond0.20: |
       [NetDev]
-      Name=bond0.20
+      Name=bond0.{{ all_net.noinet.vlan }}
       Kind=vlan
-      MTUBytes=1500
+      MTUBytes={{ all_net.noinet.mtu | default(1500) }}
 
       [VLAN]
-      Id=20
+      Id={{ all_net.noinet.vlan }}
 
   - bond0.50: |
       [NetDev]
-      Name=bond0.50
+      Name=bond0.{{ all_net.general.vlan }}
       Kind=vlan
-      MTUBytes=1500
+      MTUBytes={{ all_net.general.mtu | default(1500) }}
 
       [VLAN]
-      Id=50
+      Id={{ all_net.general.vlan }}
 
   - bond0.100: |
       [NetDev]
-      Name=bond0.100
+      Name=bond0.{{ all_net.mgmt.vlan }}
       Kind=vlan
-      MTUBytes=1500
+      MTUBytes={{ all_net.mgmt.mtu | default(1500) }}
 
       [VLAN]
-      Id=100
+      Id={{ all_net.mgmt.vlan }}
 
   - SAN: |
       [NetDev]
       Name=SAN
       Kind=bridge
-      MTUBytes=9000
+      MTUBytes={{ all_net.san.mtu | default(1500) }}
 
   - VM: |
       [NetDev]
       Name=VM
       Kind=bridge
-      MTUBytes=1500
+      MTUBytes={{ all_net.vm.mtu | default(1500) }}
 
   - NOINET: |
       [NetDev]
       Name=NOINET
       Kind=bridge
-      MTUBytes=1500
+      MTUBytes={{ all_net.noinet.mtu | default(1500) }}
 
   - GENERAL: |
       [NetDev]
       Name=GENERAL
       Kind=bridge
-      MTUBytes=1500
+      MTUBytes={{ all_net.general.mtu | default(1500) }}
 
   - MGMT: |
       [NetDev]
       Name=MGMT
       Kind=bridge
-      MTUBytes=1500
+      MTUBytes={{ all_net.mgmt.mtu | default(1500) }}
 
 networkd_config:
   - bond0: |
@@ -123,45 +123,43 @@ networkd_config:
       Name=bond0
 
       [Network]
-      VLAN=bond0.2
-      VLAN=bond0.10
-      VLAN=bond0.20
-      VLAN=bond0.50
-      VLAN=bond0.100
+      {% for vid in all_net | dict2items | map(attribute='value') | selectattr('vlan', 'defined') | map(attribute='vlan') | sort %}
+      VLAN=bond0.{{ vid }}
+      {% endfor %}
       LinkLocalAddressing=no
       IPv6AcceptRA=no
 
   - bond0.2: |
       [Match]
-      Name=bond0.2
+      Name=bond0.{{ all_net.san.vlan }}
 
       [Network]
       Bridge=SAN
 
   - bond0.10: |
       [Match]
-      Name=bond0.10
+      Name=bond0.{{ all_net.vm.vlan }}
 
       [Network]
       Bridge=VM
 
   - bond0.20: |
       [Match]
-      Name=bond0.20
+      Name=bond0.{{ all_net.noinet.vlan }}
 
       [Network]
       Bridge=NOINET
 
   - bond0.50: |
       [Match]
-      Name=bond0.50
+      Name=bond0.{{ all_net.general.vlan }}
 
       [Network]
       Bridge=GENERAL
 
   - bond0.100: |
       [Match]
-      Name=bond0.100
+      Name=bond0.{{ all_net.mgmt.vlan }}
 
       [Network]
       Bridge=MGMT
