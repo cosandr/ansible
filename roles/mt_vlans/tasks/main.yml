@@ -1,5 +1,18 @@
 ---
 
+- name: Get VLAN config
+  mt_get_interface_vlan:
+    networks: "{{ mt_networks }}"
+    bridge_name: "{{ mt_bridge_name }}"
+  register: __vlans
+
+- name: Configure VLANs
+  community.routeros.api_modify:
+    path: interface vlan
+    data: "{{ __vlans.new_data }}"
+    handle_absent_entries: remove
+    handle_entries_content: remove_as_much_as_possible
+
 - name: Get bridge port config
   mt_get_interface_bridge_ports:
     networks: "{{ mt_networks }}"
