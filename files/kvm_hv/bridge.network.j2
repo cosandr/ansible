@@ -1,0 +1,23 @@
+{%- set overrides = (host_bridge_config | default({})).get(name, {}) -%}
+[Match]
+Name={{ name | upper }}
+
+[Network]
+Address={{ __host_ips[name] }}
+{% if overrides.get('dns') %}
+DNS={{ all_net[name].cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
+DNS=1.1.1.1
+DNS=8.8.8.8
+{% endif %}
+
+[Route]
+{% if overrides.get('route') %}
+{% if 'Gateway' not in overrides['route'] %}
+Gateway={{ all_net[name].cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
+{% endif %}
+{% for k, v in overrides['route'].items() %}
+{{ k }}={{ v }}
+{% endfor %}
+{% else %}
+Scope=link
+{% endif %}

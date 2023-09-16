@@ -1,0 +1,7 @@
+[NetDev]
+Name=bond0.{{ vlan }}
+Kind=vlan
+MTUBytes={{ mtu | default(1500) }}
+
+[VLAN]
+Id={{ vlan }}

@@ -1,0 +1,10 @@
+[NetDev]
+Name=bond0
+Description=Trunk bond interface
+Kind=bond
+MTUBytes={{ all_net | dict2items | map(attribute='value') | selectattr('mtu', 'defined') | map(attribute='mtu') | max | default(1500) }}
+
+[Bond]
+Mode=active-backup
+PrimaryReselectPolicy=always
+MIIMonitorSec=1s

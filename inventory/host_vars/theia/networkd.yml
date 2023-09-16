@@ -4,12 +4,14 @@ __ip_offset: 0
 __bond0_primary_iface: "enp43s0f0"
 __bond0_backup_iface: "enp35s0"
 
-__mgmt_metric: 1024
-__mgmt_dns: false
-__general_dns: true
-__general_route: |
-  Gateway={{ home_net.general.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
-  Metric=512
-  Scope=global
+host_bridge_config:
+  mgmt:
+    route:
+      Metric: 1024
+  general:
+    dns: true
+    route:
+      Metric: 512
+      Scope: global
 
 # TODO: ip route add 10.4.20.91/32 via 10.0.10.1 dev VM
