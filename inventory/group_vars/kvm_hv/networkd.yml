@@ -31,49 +31,49 @@ host_ips: >-
   {{ tmp }}
 
 __networkd_vlan_netdevs: >-
-  {%- set tmp = [] -%}
+  {%- set tmp = {} -%}
   {%- for config in all_net.values() if 'vlan' in config -%}
-  {{- tmp.append({
+  {{- tmp.update({
     'bond0.' + config.vlan | string: lookup('template', repo_base_dir + '/files/kvm_hv/vlan.netdev.j2', template_vars=config)
     }) -}}
   {%- endfor -%}
   {{ tmp }}
 
 __networkd_bridge_netdevs: >-
-  {%- set tmp = [] -%}
+  {%- set tmp = {} -%}
   {%- for name, config in all_net.items() if 'vlan' in config -%}
-  {{- tmp.append({
+  {{- tmp.update({
       name | upper: lookup('template', repo_base_dir + '/files/kvm_hv/bridge.netdev.j2', template_vars={'name': name, 'config': config})
     }) -}}
   {%- endfor -%}
   {{ tmp }}
 
 __networkd_bond_netdevs:
-  - bond0: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/bond0.netdev.j2') }}"
+  bond0: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/bond0.netdev.j2') }}"
 
-networkd_netdevs: "{{ __networkd_bond_netdevs + __networkd_vlan_netdevs + __networkd_bridge_netdevs }}"
+networkd_netdevs: "{{ __networkd_bond_netdevs | combine(__networkd_vlan_netdevs, __networkd_bridge_netdevs) }}"
 
 __networkd_vlan_configs: >-
-  {%- set tmp = [] -%}
+  {%- set tmp = {} -%}
   {%- for name, config in all_net.items() if 'vlan' in config -%}
-  {{- tmp.append({
+  {{- tmp.update({
       'bond0.' + config.vlan | string: lookup('template', repo_base_dir + '/files/kvm_hv/bond.network.j2', template_vars={'name': name, 'config': config})
     }) -}}
   {%- endfor -%}
   {{ tmp }}
 
 __networkd_bridge_configs: >-
-  {%- set tmp = [] -%}
+  {%- set tmp = {} -%}
   {%- for name, config in all_net.items() if 'vlan' in config -%}
-  {{- tmp.append({
+  {{- tmp.update({
       name | upper: lookup('template', repo_base_dir + '/files/kvm_hv/bridge.network.j2', template_vars={'name': name, 'config': config})
     }) -}}
   {%- endfor -%}
   {{ tmp }}
 
 __networkd_bond_configs:
-  - bond0: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/bond0.network.j2') }}"
-  - bond0_primary: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/bond0_primary.network.j2') }}"
-  - bond0_backup: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/bond0_backup.network.j2') }}"
+  bond0: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/bond0.network.j2') }}"
+  bond0_primary: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/bond0_primary.network.j2') }}"
+  bond0_backup: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/bond0_backup.network.j2') }}"
 
-networkd_config: "{{ __networkd_bond_configs + __networkd_vlan_configs + __networkd_bridge_configs }}"
+networkd_config: "{{ __networkd_bond_configs | combine(__networkd_vlan_configs, __networkd_bridge_configs) }}"

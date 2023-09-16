@@ -1,26 +1,26 @@
 ---
 
 networkd_config:
-  - wired: |
-      [Match]
-      Name=en*
+  wired: |
+    [Match]
+    Name=en*
 
-      [Network]
-      DHCP=yes
-      IPForward=yes
+    [Network]
+    DHCP=yes
+    IPForward=yes
 
-      [DHCP]
-      RouteMetric=1024
-  - wlan: |
-      [Match]
-      Type=wlan
+    [DHCP]
+    RouteMetric=1024
+  wlan: |
+    [Match]
+    Type=wlan
 
-      [Link]
-      RequiredForOnline=no
+    [Link]
+    RequiredForOnline=no
 
-      [Network]
-      DHCP=yes
-      IPForward=yes
+    [Network]
+    DHCP=yes
+    IPForward=yes
 
-      [DHCP]
-      RouteMetric=2048
+    [DHCP]
+    RouteMetric=2048

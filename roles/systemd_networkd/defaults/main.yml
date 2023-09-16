@@ -5,23 +5,23 @@ chroot_path: ""
 resolved_link_stub: true
 networkd_provisioning_synced: true
 networkd_restart: true
-networkd_netdevs: []
+networkd_netdevs: {}
 networkd_config:
-  - wired: |
-      [Match]
-      Name=en*
+  wired: |
+    [Match]
+    Name=en*
 
-      [Network]
-      DHCP=yes
-  - wlan: |
-      [Match]
-      Type=wlan
+    [Network]
+    DHCP=yes
+  wlan: |
+    [Match]
+    Type=wlan
 
-      [Network]
-      DHCP=yes
+    [Network]
+    DHCP=yes
 
 networkd_services:
   - "systemd-networkd.service"
   - "systemd-resolved.service"
 
-networkd_links: []
+networkd_links: {}

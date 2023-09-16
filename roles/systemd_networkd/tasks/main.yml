@@ -42,7 +42,7 @@
     content: |
       {{ ansible_managed | comment }}
       {{ item.value }}
-  with_dict: "{{ networkd_config }}"
+  loop: "{{ networkd_config | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
   register: __network_copied
@@ -57,7 +57,7 @@
     content: |
       {{ ansible_managed | comment }}
       {{ item.value }}
-  with_dict: "{{ networkd_netdevs }}"
+  loop: "{{ networkd_netdevs | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
   register: __netdev_copied
@@ -72,7 +72,7 @@
     content: |
       {{ ansible_managed | comment }}
       {{ item.value }}
-  with_dict: "{{ networkd_links }}"
+  loop: "{{ networkd_links | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
   register: __link_copied
