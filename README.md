@@ -68,26 +68,6 @@ Requires `requests google-auth` to be installed for the Python interpreter.
 
 Create service account with DNS Administrator role.
 
-## Vault
-
-Encrypt stuff:
-
-```sh
-# Generate with bitwarden
-bw generate --length 55 | ansible-vault encrypt_string --stdin-name 'gitea_secret_key'
-# Password from file
-ansible-vault encrypt_string --vault-password-file .vault_key --stdin-name 'gitea_secret_key'
-# Encrypt secrets
-ansible-vault encrypt .secrets/vars.yml --output roles/common/vars/vault.yml
-```
-
-Get vault key from bw:
-
-```sh
-# Must be unlocked already
-bw get item ansible | jq -j '.fields[] | select(.name == "vault") | .value' > .vault_key
-```
-
 ## Running
 
 ```sh
@@ -103,4 +83,30 @@ ansible-playbook playbook.yml --tags grafana
 ansible-playbook -i hosts_local server.yml --tags nginx
 # Run with sudo remote user
 ansible-playbook -i hosts -K -e 'ansible_user=andrei' playbooks/laptop.yml --diff --check --tags laptop
+```
+
+## MikroTik
+
+### Dump firewall rules
+
+```yml
+- name: Get FW rules
+  community.routeros.api_info:
+    path: ip firewall filter
+    handle_disabled: omit
+  register: __fw
+
+- name: Write to file
+  delegate_to: localhost
+  ansible.builtin.copy:
+    content: "{{ __fw.result | to_nice_yaml(indent=2) }}"
+    dest: "/tmp/{{ inventory_hostname }}.yml"
+```
+
+Cleanup
+
+```sh
+yq -iy 'map(del(.".id"))' /tmp/rb5009.yml
+sed -i -E "/^  (log|disabled): false.*/d;/^  log-prefix: ''/d;/^-.*/i\\ " /tmp/rb5009.yml
+sed -i 's/^ $//g' /tmp/rb5009.yml
 ```

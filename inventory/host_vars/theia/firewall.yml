@@ -20,3 +20,9 @@ __firewall_rules_1:
   - port: "{{ nginx_ports['www'] }}"
     zone: public
     sources: "{{ proxy_hosts }}"
+
+mt_firewall_address_lists:
+  - address: "{{ host_ips.vm }}"
+    list: backup
+  - address: "{{ host_ips.vm }}"
+    list: www

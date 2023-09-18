@@ -36,3 +36,7 @@ firewalld_services:
 firewall_rules:
   - port: "{{ node_exporter_port }}"
     zone: internal
+
+mt_firewall_address_lists:
+  - address: "{{ ansible_host }}"
+    list: loki

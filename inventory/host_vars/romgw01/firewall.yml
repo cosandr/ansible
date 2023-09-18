@@ -7,3 +7,5 @@ firewalld_rich_rules: []
 firewalld_http_zones:
   - public
   - internal
+
+mt_firewall_address_lists: []

@@ -1,0 +1,5 @@
+---
+
+mt_firewall_address_lists:
+  - address: "{{ ansible_host }}"
+    list: allow-lan

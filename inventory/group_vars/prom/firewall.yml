@@ -65,3 +65,9 @@ firewall_rules:
     protocol: udp
     zone: "{{ webgw_zone }}"
     sources: "{{ __am_fw_sources }}"
+
+mt_firewall_address_lists:
+  - address: "{{ ansible_host }}"
+    list: allow-lan
+  - address: "{{ ansible_host }}"
+    list: www

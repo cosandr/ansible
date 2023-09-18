@@ -247,6 +247,58 @@
       when: mt_wg_peers | default([])
       tags: ["wg", "peers"]
 
+    - name: Configure interface lists  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: interface list
+        data: "{{ mt_interface_list }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_interface_list | default([])
+      tags: ["interfaces", "firewall"]
+
+    - name: Configure interface members  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: interface list member
+        data: "{{ mt_interface_members }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_interface_members | default([])
+      tags: ["interfaces", "firewall"]
+
+    - name: Configure IPv4 firewall lists  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip firewall address-list
+        data: "{{ mt_firewall_address_lists }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_firewall_address_lists | default([])
+      tags: ["firewall", "lists"]
+
+    - name: Configure IPv4 firewall filters  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip firewall filter
+        data: "{{ mt_firewall_rules }}"
+        ensure_order: true
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_firewall_rules | default([])
+      tags: ["firewall"]
+
+    - name: Configure IPv4 firewall NAT  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip firewall nat
+        data: "{{ mt_firewall_nat }}"
+        ensure_order: true
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_firewall_nat | default([])
+      tags: ["firewall", "nat"]
+
     - name: Configure DNS
       tags: ["dns"]
       block:

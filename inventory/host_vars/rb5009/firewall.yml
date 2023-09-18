@@ -1,0 +1,62 @@
+---
+
+__mt_interface_members_manual:
+  - interface: "{{ mt_wan_port }}"
+    list: WAN
+
+__mt_interface_members_auto: >-
+  {%- set tmp = [] -%}
+  {%- for name, config in all_net.items() if 'mt_lists' in config -%}
+  {%- for list in config.mt_lists -%}
+  {{- tmp.append({'interface': name | upper, 'list': list}) -}}
+  {%- endfor -%}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_interface_members: "{{ __mt_interface_members_manual + __mt_interface_members_auto }}"
+
+mt_interface_list: >-
+  {%- set tmp = [] -%}
+  {%- for name in mt_interface_members | map(attribute='list') | unique -%}
+  {{- tmp.append({"name": name}) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_firewall_rules: "{{ vault_mt_firewall_rules }}"
+mt_firewall_nat: "{{ vault_mt_firewall_nat }}"
+
+__mt_firewall_address_lists_manual:
+  - address: "{{ wireguard_endpoint.split(':', 1)[0] }}"
+    list: WANs
+    comment: WAN
+  - address: "{{ kube_net }}"
+    list: kube
+    comment: kube
+  - address: "{{ ((__mt_wg_peers_manual | selectattr('comment', 'eq', 'p7') | first)['allowed-address'].split(',')
+      | ansible.utils.ipv4 | ansible.utils.ipaddr('address')) | first }}"
+    list: allow-general
+    comment: p7
+  - address: "10.0.50.51"
+    list: no-inet
+    comment: dht01
+  - address: "10.0.50.54"
+    list: no-inet
+    comment: dht04
+  - address: "10.0.50.55"
+    list: no-inet
+    comment: dht05
+
+__mt_firewall_address_lists_auto: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_firewall_address_lists | default([])) -%}
+  {%- for item in hostvars[h].mt_firewall_address_lists -%}
+  {{- tmp.append({
+    "address": item.address,
+    "list": item.list,
+    "comment": item.comment | default(h),
+  }) -}}
+  {%- endfor -%}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_firewall_address_lists: "{{ __mt_firewall_address_lists_manual + __mt_firewall_address_lists_auto }}"

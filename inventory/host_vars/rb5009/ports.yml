@@ -23,7 +23,8 @@ mt_access_ports:
       - ether8
       - bond_syno
 
-# !!! ether2 is WAN, do NOT add to bridge !!!
+# !!! Do NOT add to bridge !!!
+mt_wan_port: ether2
 mt_bridge_ports:
   - bond_syno
   - sfp-sfpplus1

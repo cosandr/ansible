@@ -3,3 +3,7 @@
 firewalld_services:
   - name: nfs3
     sources: "{{ nfs_shares | map(attribute='sources') | flatten }}"
+
+mt_firewall_address_lists:
+  - address: "{{ ansible_host }}"
+    list: www

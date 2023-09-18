@@ -39,3 +39,7 @@ firewall_rules:
   - port: 5678
     source: "fe80::/64"
     protocol: "udp"
+
+mt_firewall_address_lists:
+  - address: "{{ ansible_host }}"
+    list: smtp

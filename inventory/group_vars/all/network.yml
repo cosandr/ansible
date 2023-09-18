@@ -7,14 +7,17 @@ home_net:
     cidr: "10.0.10.0/24"
     cidr6: "fd00:10::0/64"
     vlan: 10
+    mt_lists: [LAN, NOSEC]
   general:
     cidr: "10.0.50.0/24"
     cidr6: "fd00:50::0/64"
     vlan: 50
+    mt_lists: [LAN, NOSEC]
   mgmt:
     cidr: "10.0.100.0/24"
     cidr6: "fd00:100::0/64"
     vlan: 100
+    mt_lists: [LAN, SEC]
 
 internal_net:
   san:
@@ -22,10 +25,12 @@ internal_net:
     cidr6: "fd00:2::0/64"
     vlan: 2
     mtu: 9000
+    mt_lists: [LAN, SEC, NOWAN, NOROUTE]
   noinet:
     cidr: "10.0.20.0/24"
     cidr6: "fd00:20::0/64"
     vlan: 20
+    mt_lists: [LAN, SEC, NOWAN]
 
 wg_net:
   mt:
