@@ -44,6 +44,45 @@
         label: "{{ item.name }}"
       tags: ["users"]
 
+    - name: Backup config
+      when: "'backup' in ansible_run_tags"
+      tags: ["backup"]
+      block:
+        - name: Get config content
+          community.routeros.command:
+            commands: /export show-sensitive
+          register: __config
+
+        - name: GPG encrypt config
+          become: false
+          delegate_to: localhost
+          check_mode: false
+          changed_when: false
+          ansible.builtin.command:
+            cmd: "gpg -e -r {{ hostvars['webgw01'].certbot_email }} --armor"
+            stdin: "{{ __config.stdout[0] }}"
+          register: __enc_config
+
+        - name: Create backup dir on theia
+          become: true
+          delegate_to: theia
+          ansible.builtin.file:
+            path: "/mnt/tank/backup/mikrotik"
+            state: directory
+            owner: root
+            group: root
+            mode: "0750"
+
+        - name: Write to file
+          become: true
+          delegate_to: theia
+          ansible.builtin.copy:
+            content: "{{ __enc_config.stdout }}"
+            dest: "/mnt/tank/backup/mikrotik/{{ inventory_hostname }}.rsc.asc"
+            owner: root
+            group: root
+            mode: "0640"
+
   post_tasks:
     - name: Generate and copy bundle
       tags: ["tls-setup"]
