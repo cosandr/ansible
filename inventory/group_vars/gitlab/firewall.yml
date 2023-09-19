@@ -35,3 +35,5 @@ firewalld_services:
 mt_firewall_address_lists:
   - address: "{{ ansible_host }}"
     list: www
+  - address: "{{ ansible_host6 }}"
+    list: www

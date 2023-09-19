@@ -22,7 +22,7 @@ mt_interface_list: >-
   {%- endfor -%}
   {{ tmp }}
 
-mt_firewall_rules: "{{ vault_mt_firewall_rules }}"
+mt_firewall_rules: "{{ lookup('template', repo_base_dir + '/files/mikrotik/firewall_vault.yml.j2', template_vars={'ipv4': true}) | from_yaml }}"
 mt_firewall_nat: "{{ vault_mt_firewall_nat }}"
 
 __mt_firewall_address_lists_manual:
@@ -49,7 +49,7 @@ __mt_firewall_address_lists_manual:
 __mt_firewall_address_lists_auto: >-
   {%- set tmp = [] -%}
   {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_firewall_address_lists | default([])) -%}
-  {%- for item in hostvars[h].mt_firewall_address_lists -%}
+  {%- for item in hostvars[h].mt_firewall_address_lists if item.address | ansible.utils.ipv4 -%}
   {{- tmp.append({
     "address": item.address,
     "list": item.list,
@@ -60,3 +60,94 @@ __mt_firewall_address_lists_auto: >-
   {{ tmp }}
 
 mt_firewall_address_lists: "{{ __mt_firewall_address_lists_manual + __mt_firewall_address_lists_auto }}"
+
+mt_firewall_mangle_ipv6:
+  # https://forum.mikrotik.com/viewtopic.php?t=162930#p802790
+  - action: change-mss
+    chain: forward
+    new-mss: clamp-to-pmtu
+    out-interface: "{{ mt_wan_port }}"
+    passthrough: true
+    protocol: tcp
+    tcp-flags: syn
+
+mt_firewall_nat_ipv6:
+  - chain: srcnat
+    action: masquerade
+    out-interface: WG1
+
+# https://help.mikrotik.com/docs/display/ROS/Building+Advanced+Firewall#BuildingAdvancedFirewall-IPv6AddressLists
+__mt_firewall_address_lists_ipv6_manual:
+  - address: ::/128
+    comment: 'defconf: unspecified address'
+    list: bad_ipv6
+  - address: ::1/128
+    comment: 'defconf: lo'
+    list: bad_ipv6
+  - address: fec0::/10
+    comment: 'defconf: site-local'
+    list: bad_ipv6
+  - address: ::ffff:0.0.0.0/96
+    comment: 'defconf: ipv4-mapped'
+    list: bad_ipv6
+  - address: ::/96
+    comment: 'defconf: ipv4 compat'
+    list: bad_ipv6
+  - address: 100::/64
+    comment: 'defconf: discard only '
+    list: bad_ipv6
+  - address: 2001:db8::/32
+    comment: 'defconf: documentation'
+    list: bad_ipv6
+  - address: 2001:10::/28
+    comment: 'defconf: ORCHID'
+    list: bad_ipv6
+  - address: 3ffe::/16
+    comment: 'defconf: 6bone'
+    list: bad_ipv6
+  - address: ::224.0.0.0/100
+    comment: 'defconf: other'
+    list: bad_ipv6
+  - address: ::127.0.0.0/104
+    comment: 'defconf: other'
+    list: bad_ipv6
+  - address: ::/104
+    comment: 'defconf: other'
+    list: bad_ipv6
+  - address: ::255.0.0.0/104
+    comment: 'defconf: other'
+    list: bad_ipv6
+  - address: 100::/64
+    comment: 'defconf: RFC6890 Discard-only'
+    list: not_global_ipv6
+  - address: 2001::/32
+    comment: 'defconf: RFC6890 TEREDO'
+    list: not_global_ipv6
+  - address: 2001:2::/48
+    comment: 'defconf: RFC6890 Benchmark'
+    list: not_global_ipv6
+  - address: fc00::/7
+    comment: 'defconf: RFC6890 Unique-Local'
+    list: not_global_ipv6
+  - address: "{{ wireguard_endpoint.split(':', 1)[0] }}"
+    list: WANs
+    comment: WAN
+
+__mt_firewall_address_lists_ipv6_auto: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_firewall_address_lists | default([])) -%}
+  {%- for item in hostvars[h].mt_firewall_address_lists if item.address | ansible.utils.ipv6 -%}
+  {{- tmp.append({
+    "address": item.address | ansible.utils.ipaddr('host'),
+    "list": item.list,
+    "comment": item.comment | default(h),
+  }) -}}
+  {%- endfor -%}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_firewall_address_lists_ipv6: "{{ __mt_firewall_address_lists_ipv6_manual + __mt_firewall_address_lists_ipv6_auto }}"
+
+mt_firewall_rules_ipv6: "{{ lookup('template', repo_base_dir + '/files/mikrotik/firewall_vault.yml.j2', template_vars={'ipv4': false}) | from_yaml }}"
+
+mt_firewall_raw_ipv6: "{{ vault_mt_firewall_raw_ipv6 }}"

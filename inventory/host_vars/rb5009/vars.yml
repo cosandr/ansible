@@ -1,0 +1,11 @@
+---
+
+mt_ipv6_nd:
+  - interface: all
+    ra-interval: 20s-1m
+
+mt_ipv6_dhcp_client:
+  - pool-name: pool1
+    interface: "{{ mt_wan_port }}"
+    add-default-route: true
+    request: address,prefix

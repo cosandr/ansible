@@ -22,3 +22,9 @@ mt_firewall_address_lists:
   - address: "{{ wireguard_ip }}"
     comment: "{{ inventory_hostname }}-wg"
     list: allow-lan
+  # TODO: Actually implement IPv6
+  # - address: "{{ ansible_host6 }}"
+  #   list: allow-lan
+  - address: "{{ wireguard_ipv6 }}"
+    comment: "{{ inventory_hostname }}-wg"
+    list: allow-lan

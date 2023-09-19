@@ -2,3 +2,4 @@
 *.csr diff=ansible-vault merge=binary
 *.key diff=ansible-vault merge=binary
 *vault.yml diff=ansible-vault merge=binary
+*vault.yml.j2 diff=ansible-vault merge=binary

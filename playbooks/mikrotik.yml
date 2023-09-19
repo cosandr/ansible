@@ -286,7 +286,7 @@
         handle_absent_entries: remove
         handle_entries_content: remove_as_much_as_possible
       when: mt_firewall_rules | default([])
-      tags: ["firewall"]
+      tags: ["firewall", "filter"]
 
     - name: Configure IPv4 firewall NAT  # noqa args[module]
       delegate_to: localhost
@@ -298,6 +298,81 @@
         handle_entries_content: remove_as_much_as_possible
       when: mt_firewall_nat | default([])
       tags: ["firewall", "nat"]
+
+    - name: Configure IPv6 ND  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ipv6 nd
+        data: "{{ mt_ipv6_nd }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_ipv6_nd | default([])
+      tags: ["ipv6", "nd"]
+
+    - name: Configure IPv6 DHCP client  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ipv6 dhcp-client
+        data: "{{ mt_ipv6_dhcp_client }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_ipv6_dhcp_client | default([])
+      tags: ["ipv6", "dhcp"]
+
+    - name: Configure IPv6 firewall mangle  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ipv6 firewall mangle
+        data: "{{ mt_firewall_mangle_ipv6 }}"
+        ensure_order: true
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_firewall_mangle_ipv6 | default([])
+      tags: ["firewall", "ipv6", "mangle"]
+
+    - name: Configure IPv6 firewall lists  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ipv6 firewall address-list
+        data: "{{ mt_firewall_address_lists_ipv6 }}"
+        ensure_order: true
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_firewall_address_lists_ipv6 | default([])
+      tags: ["firewall", "ipv6", "lists"]
+
+    - name: Configure IPv6 firewall filters  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ipv6 firewall filter
+        data: "{{ mt_firewall_rules_ipv6 }}"
+        ensure_order: true
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_firewall_rules_ipv6 | default([])
+      tags: ["firewall", "ipv6", "filter"]
+
+    - name: Configure IPv6 firewall NAT  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ipv6 firewall nat
+        data: "{{ mt_firewall_nat_ipv6 }}"
+        ensure_order: true
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_firewall_nat_ipv6 | default([])
+      tags: ["firewall", "ipv6", "nat"]
+
+    - name: Configure IPv6 firewall raw  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ipv6 firewall raw
+        data: "{{ mt_firewall_raw_ipv6 }}"
+        ensure_order: true
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_firewall_raw_ipv6 | default([])
+      tags: ["firewall", "ipv6", "raw"]
 
     - name: Configure DNS
       tags: ["dns"]
