@@ -374,6 +374,25 @@
       when: mt_firewall_raw_ipv6 | default([])
       tags: ["firewall", "ipv6", "raw"]
 
+    - name: Configure logging actions  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: system logging action
+        data: "{{ mt_logging_actions }}"
+        # Don't remove defaults
+      when: mt_logging_actions | default([])
+      tags: ["logging", "action"]
+
+    - name: Configure logging  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: system logging
+        data: "{{ mt_logging }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_logging | default([])
+      tags: ["logging"]
+
     - name: Configure DNS
       tags: ["dns"]
       block:

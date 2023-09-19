@@ -10,3 +10,37 @@ api_password: "{{ lookup('community.general.passwordstore', 'network/mt_ansible_
 
 prometheus_blackbox_icmp_targets: []
 prometheus_node_targets: []
+
+mt_logging_actions: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['prom'] if (hostvars[h].promtail_syslog_port | default(false)) -%}
+  {{- tmp.append({
+    "name": h,
+    "remote": hostvars[h].ansible_host,
+    "remote-port": 514,
+    "target": "remote",
+    "src-address": host_ips.mgmt,
+  }) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__mt_logging_manual:
+  - topics: info
+  - topics: error
+  - topics: warning
+  - action: echo
+    topics: critical
+
+__mt_logging_auto: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['prom'] if (hostvars[h].promtail_syslog_port | default(false)) -%}
+  {%- for topic in ['warning', 'error', 'critical'] -%}
+  {{- tmp.append({
+    "action": h,
+    "topics": topic,
+  }) -}}
+  {%- endfor -%}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_logging: "{{ __mt_logging_manual + __mt_logging_auto }}"
