@@ -23,7 +23,7 @@ keepalived_instances:
     unicast_peers: "{{ keepalived_hosts | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='general') | list }}"
     authentication_password: "{{ vault_keepalived_authentication_password }}"
     vips:
-      - "{{ ceph_nfs_vip.general }} dev GENERAL"
+      - "{{ vips_with_prefix.general.ceph_nfs }} dev GENERAL"
     track_scripts:
       - check_nfs_cephfs
 
@@ -36,7 +36,7 @@ keepalived_instances:
     unicast_peers: "{{ keepalived_hosts | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='san') | list }}"
     authentication_password: "{{ vault_keepalived_authentication_password }}"
     vips:
-      - "{{ ceph_nfs_vip.san }} dev SAN"
+      - "{{ vips_with_prefix.san.ceph_nfs }} dev SAN"
     track_scripts:
       - check_nfs_cephfs
 
@@ -49,6 +49,6 @@ keepalived_instances:
     unicast_peers: "{{ keepalived_hosts | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='vm') | list }}"
     authentication_password: "{{ vault_keepalived_authentication_password }}"
     vips:
-      - "{{ ceph_nfs_vip.vm }} dev VM"
+      - "{{ vips_with_prefix.vm.ceph_nfs }} dev VM"
     track_scripts:
       - check_nfs_cephfs

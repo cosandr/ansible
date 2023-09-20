@@ -10,14 +10,9 @@ loadbalancer_apiserver_port: 6443
 loadbalancer_apiserver_healthcheck_port: 8081
 
 kube_network_plugin: calico
-kube_service_addresses: "{{ kube_subnet.svc.cidr }}"
-kube_pods_subnet: "{{ kube_subnet.pod.cidr }}"
-kube_network_node_prefix: 24
-
-# 10.85.128.2
-ingress_nginx_lb_ip: "{{ kube_subnet.lb.cidr | ansible.utils.ipaddr('2') | ansible.utils.ipaddr('address') }}"
-# 10.85.128.3
-prom_lb_ip: "{{ kube_subnet.lb.cidr | ansible.utils.ipaddr('3') | ansible.utils.ipaddr('address') }}"
+kube_service_addresses: "{{ subnets.kube.svc | first }}"
+kube_pods_subnet: "{{ subnets.kube.pod | first }}"
+kube_network_node_prefix: "{{ all_net.vm.cidr | ansible.utils.ipaddr('prefix') }}"
 
 __node_labels_common:
   cpu_tier: "{{ hostvars[vm_host].cpu_tier }}"

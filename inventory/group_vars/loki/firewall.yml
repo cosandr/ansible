@@ -14,7 +14,7 @@ firewalld_zones:
     sources: "{{ node_exporter_allow_ips }}"
 
   - name: internal
-    sources: ["{{ kube_subnet.monitoring.cidr }}"]
+    sources: "{{ subnets.kube.mon }}"
 
 firewalld_services:
   - name: cockpit

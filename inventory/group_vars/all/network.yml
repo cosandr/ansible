@@ -32,43 +32,56 @@ internal_net:
     vlan: 2
     mtu: 9000
     mt_lists: [LAN, SEC, NOWAN, NOROUTE]
+  kube:
+    cidr: "10.85.0.0/16"
 
 wg_net:
   mt:
     cidr: "10.4.20.0/24"
     cidr6: "fd00:4:20::0/64"
 
-all_net: "{{ home_net | combine(internal_net) | combine(wg_net) }}"
+all_net: "{{ home_net | combine(internal_net, wg_net) }}"
 
-subnets: "{{ home_net | combine(internal_net) | default_subnet }}"
+subnet_overrides:
+  kube:
+    svc:
+      - "{{ all_net.kube.cidr | ansible.utils.ipsubnet(18, 0) }}"    # 10.85.0.0/18
+    pod:
+      - "{{ all_net.kube.cidr | ansible.utils.ipsubnet(18, 1) }}"    # 10.85.64.0/18
+    lb:
+      - "{{ all_net.kube.cidr | ansible.utils.ipsubnet(26, 512) }}"  # 10.85.128.0/26
+    mon:
+      - "{{ all_net.kube.cidr | ansible.utils.ipsubnet(26, 513) }}"  # 10.85.128.64/26
 
-ceph_nfs_vip:
-  general: "{{ all_net.general.cidr | ansible.utils.ipaddr('20') }}"  # 10.0.50.20/24
-  san: "{{ subnets.san.vips | ansible.utils.ipv4 | ipaddr_concat(1, prefixlen=24) }}"  # 10.0.2.33/24
-  vm: "{{ all_net.vm.cidr | ansible.utils.ipaddr('210') }}"  # 10.0.10.210/24
+subnets: "{{ home_net | combine(internal_net) | default_subnet | combine(subnet_overrides) }}"
 
-ceph_nfs_vip_address: >-
+# List of IPs with same number in a subnet
+# "{{ subnets | dict2items | map(attribute='value') | map(attribute='vips') | ansible.utils.ipv4 | ipaddr(2) | ipaddr('address') }}"
+vips:
+  # Consider using list and ansible.utils.reduce_on_network instead?
+  vm:
+    ceph_nfs: "{{ all_net.vm.cidr | ipaddr_concat(210) }}"  # 10.0.10.210
+    ceph_rgw: "{{ all_net.vm.cidr | ipaddr_concat(20) }}"   # 10.0.10.20
+    kube_cp: "{{ all_net.vm.cidr | ipaddr_concat(50) }}"    # 10.0.10.50
+  general:
+    ceph_nfs: "{{ all_net.general.cidr | ipaddr_concat(20) }}"  # 10.0.50.20
+  san:
+    ceph_nfs: "{{ subnets.san.vips | ansible.utils.ipv4 | ipaddr_concat(1) }}"  # 10.0.2.33
+  kube:
+    nginx: "{{ subnets.kube.lb | ipaddr_concat(1) }}"  # 10.85.128.1
+    prom: "{{ subnets.kube.lb | ipaddr_concat(2) }}"   # 10.85.128.2
+
+# Pretty nasty, might be easier with lists
+vips_with_prefix: >-
   {%- set tmp = {} -%}
-  {%- for k, v in ceph_nfs_vip.items() -%}
-  {{- tmp.update({k: v | ansible.utils.ipaddr('address')}) -}}
+  {%- for net_name, nets in vips.items() -%}
+  {%- set tmp2 = {} -%}
+  {%- for name, addr in nets.items() -%}
+  {{- tmp2.update({name: addr + "/" + (all_net[net_name].cidr | ansible.utils.ipaddr('prefix') | string)}) -}}
+  {%- endfor -%}
+  {{- tmp.update({net_name: tmp2}) -}}
   {%- endfor -%}
   {{ tmp }}
-
-kube_vip_address: "{{ home_net.vm.cidr | ansible.utils.ipaddr('50') | ansible.utils.ipaddr('address') }}"
-kube_net: "10.85.0.0/16"
-kube_subnet:
-  svc:
-    # 10.85.0.0/18
-    cidr: "{{ kube_net | ansible.utils.ipsubnet(18, 0) }}"
-  pod:
-    # 10.85.64.0/18
-    cidr: "{{ kube_net | ansible.utils.ipsubnet(18, 1) }}"
-  lb:
-    # 10.85.128.0/26
-    cidr: "{{ kube_net | ansible.utils.ipsubnet(26, 512) }}"
-  monitoring:
-    # 10.85.128.64/26
-    cidr: "{{ kube_net | ansible.utils.ipsubnet(26, 513) }}"
 
 # These do not necessarily exist, but are useful for automation
 host_ips: >-

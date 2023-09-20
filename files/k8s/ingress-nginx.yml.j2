@@ -7,7 +7,7 @@ controller:
   service:
     externalTrafficPolicy: Local
     type: LoadBalancer
-    loadBalancerIP: "{{ ingress_nginx_lb_ip }}"
+    loadBalancerIP: "{{ vips.kube.nginx }}"
   metrics:
     enabled: true
     serviceMonitor:

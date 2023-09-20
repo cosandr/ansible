@@ -146,7 +146,7 @@
               metadata:
                 name: monitoring
               spec:
-                cidr: "{{ kube_subnet.monitoring.cidr }}"
+                cidr: "{{ subnets.kube.mon | first }}"
                 allowedUses: ["Workload"]
           tags: ["calico"]
 

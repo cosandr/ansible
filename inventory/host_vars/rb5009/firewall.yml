@@ -29,7 +29,7 @@ __mt_firewall_address_lists_manual:
   - address: "{{ wireguard_endpoint.split(':', 1)[0] }}"
     list: WANs
     comment: WAN
-  - address: "{{ kube_net }}"
+  - address: "{{ all_net.kube.cidr }}"
     list: kube
     comment: kube
   - address: "{{ ((__mt_wg_peers_manual | selectattr('comment', 'eq', 'p7') | first)['allowed-address'].split(',')

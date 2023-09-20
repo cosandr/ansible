@@ -6,8 +6,7 @@ metallb_speaker_enabled: false
 metallb_config:
   address_pools:
     primary:
-      ip_range:
-        - "{{ kube_subnet.lb.cidr }}"
+      ip_range: "{{ subnets.kube.lb }}"
       auto_assign: true
   layer2:
     - primary
