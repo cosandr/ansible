@@ -2,6 +2,12 @@
 
 __host_num: "{{ ansible_host.rsplit('.', 1)[-1] }}"
 
+### The subnet dream ###
+# .0/28, 0000::/80 - Switches, routers, APs (CROSS VLAN)
+# .16/28, 0001::/80 - Hosts (CROSS VLAN)
+# .32/27, 0002::/80 - VIPs (CROSS VLAN)
+# .64/26, .128/25, 00003:/80 - VMs, clients
+
 home_net:
   vm:
     cidr: "10.0.10.0/24"
@@ -34,13 +40,12 @@ wg_net:
 
 all_net: "{{ home_net | combine(internal_net) | combine(wg_net) }}"
 
+subnets: "{{ home_net | combine(internal_net) | default_subnet }}"
+
 ceph_nfs_vip:
-  # 10.0.50.20/24
-  general: "{{ all_net.general.cidr | ansible.utils.ipaddr('20') }}"
-  # 10.0.2.200/24
-  san: "{{ all_net.san.cidr | ansible.utils.ipaddr('200') }}"
-  # 10.0.10.210/24
-  vm: "{{ all_net.vm.cidr | ansible.utils.ipaddr('210') }}"
+  general: "{{ all_net.general.cidr | ansible.utils.ipaddr('20') }}"  # 10.0.50.20/24
+  san: "{{ subnets.san.vips | ansible.utils.ipv4 | ipaddr_concat(1, prefixlen=24) }}"  # 10.0.2.33/24
+  vm: "{{ all_net.vm.cidr | ansible.utils.ipaddr('210') }}"  # 10.0.10.210/24
 
 ceph_nfs_vip_address: >-
   {%- set tmp = {} -%}
