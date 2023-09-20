@@ -19,7 +19,6 @@ __ip_offset: 50
 __host_ips:
   general: "{{ all_net.general.cidr | ansible.utils.ipaddr(__host_num | int + __ip_offset) }}"
   mgmt: "{{ all_net.mgmt.cidr | ansible.utils.ipaddr(__host_num) }}"
-  noinet: "{{ all_net.noinet.cidr | ansible.utils.ipaddr(__host_num) }}"
   san: "{{ all_net.san.cidr | ansible.utils.ipaddr(__host_num) }}"
   vm: "{{ all_net.vm.cidr | ansible.utils.ipaddr(__host_num | int + __ip_offset) }}"
 

@@ -35,7 +35,6 @@ __firewalld_zones_2:
     interfaces:
       - GENERAL
       - VM
-      - NOINET
 
 __firewalld_services_2:
   - name: cockpit
