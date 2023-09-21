@@ -3,12 +3,12 @@ from netaddr import IPNetwork
 from copy import deepcopy
 
 
-def split_network_v4(n):
+def split_network_v4(n, no_clients):
     """Returns IPv4 subnets from a CIDR"""
     if n.prefixlen > 24:
         Display().warning("default_subnet: '{}' too small".format(str(n)))
         return {}
-    return {
+    tmp = {
         "switches": [
             str(list(n.subnet(28))[0]),
         ],
@@ -18,20 +18,22 @@ def split_network_v4(n):
         "vips": [
             str(list(n.subnet(27))[1]),
         ],
-        "clients": [
+    }
+    if not no_clients:
+        tmp["clients"] = [
             str(list(n.subnet(26))[1]),
             str(list(n.subnet(25))[1]),
-        ],
-    }
+        ]
+    return tmp
 
 
-def split_network_v6(n):
+def split_network_v6(n, no_clients):
     """Returns IPv6 subnets from a CIDR"""
     if n.prefixlen != 64:
         Display().warning("default_subnet: '{}' must be of size /64".format(str(n)))
         return {}
     subnets = list(n.subnet(80, 4))
-    return {
+    tmp = {
         "switches": [
             str(subnets[0]),
         ],
@@ -41,10 +43,12 @@ def split_network_v6(n):
         "vips": [
             str(subnets[2]),
         ],
-        "clients": [
-            str(subnets[3]),
-        ],
     }
+    if not no_clients:
+        tmp["clients"] = [
+            str(subnets[3]),
+        ]
+    return tmp
 
 
 def merge_dicts(one, two):
@@ -57,7 +61,7 @@ def merge_dicts(one, two):
     return ret
 
 
-def run(network_defs):
+def run(network_defs, no_clients=None):
     """Generates the default subnet layout
     Input:
     "internal_net": {
@@ -89,13 +93,15 @@ def run(network_defs):
     }
     """
     ret = {}
+    no_clients = no_clients or []
     for k, v in network_defs.items():
+        k_nc = no_clients is True or k in no_clients
         v4_dict = {}
         v6_dict = {}
         if "cidr" in v:
-            v4_dict = split_network_v4(IPNetwork(v["cidr"]))
+            v4_dict = split_network_v4(IPNetwork(v["cidr"]), k_nc)
         if "cidr6" in v:
-            v6_dict = split_network_v6(IPNetwork(v["cidr6"]))
+            v6_dict = split_network_v6(IPNetwork(v["cidr6"]), k_nc)
         ret[k] = merge_dicts(v4_dict, v6_dict)
     return ret
 
