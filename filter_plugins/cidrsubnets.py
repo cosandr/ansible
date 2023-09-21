@@ -48,7 +48,7 @@ def fill_remaining(net, subnets, start=0):
     return subnets
 
 
-def run(net, *prefixes, fill=False, fill_only_end=True):
+def run(net, *prefixes, fill=False, fill_only_end=True, start=0):
     """
     Input: {{ '10.0.50.0/24' | cidrsubnets(29, 30, 28, fill=true) }}
     Output:
@@ -63,8 +63,10 @@ def run(net, *prefixes, fill=False, fill_only_end=True):
     """
     net = IPNetwork(net)
     subnets = []
+    if start:
+        start = net.first + start
     for p in prefixes:
-        subnets.append(next_of_size(net, subnets, p))
+        subnets.append(next_of_size(net, subnets, p, start))
     if fill:
         start = 0
         if fill_only_end and subnets:
