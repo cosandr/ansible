@@ -266,6 +266,56 @@
         data: "{{ mt_services }}"
       tags: ["services"]
 
+    - name: Configure scripts  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: system script
+        data: "{{ mt_scripts }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_scripts | default([])
+      tags: ["scripts"]
+
+    - name: Configure IPv4 pools  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip pool
+        data: "{{ mt_ip_pools }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_ip_pools | default([])
+      tags: ["dhcp", "pool"]
+
+    - name: Configure IPv4 DHCP servers  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip dhcp-server
+        data: "{{ mt_dhcp_servers }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_dhcp_servers | default([])
+      tags: ["dhcp"]
+
+    - name: Configure IPv4 DHCP networks  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip dhcp-server network
+        data: "{{ mt_dhcp_networks }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_dhcp_networks | default([])
+      tags: ["dhcp"]
+
+    - name: Configure IPv4 DHCP server leases  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip dhcp-server lease
+        data: "{{ mt_dhcp_leases }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_dhcp_leases | default([])
+      tags: ["dhcp"]
+
     - name: Configure wireguard interfaces  # noqa args[module]
       delegate_to: localhost
       community.routeros.api_modify:
@@ -274,7 +324,7 @@
         handle_entries_content: remove_as_much_as_possible
         data: "{{ mt_wg_interfaces }}"
       when: mt_wg_interfaces | default([])
-      tags: ["interfaces", "wg",]
+      tags: ["interfaces", "wg"]
 
     - name: Configure wireguard peers  # noqa args[module]
       delegate_to: localhost

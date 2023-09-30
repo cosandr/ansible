@@ -1,0 +1,44 @@
+---
+
+mt_scripts:
+  - name: dhcp-dns
+    policy: read,write
+    source: "{{ lookup('file', repo_base_dir + '/files/mikrotik/dhcp-leases-to-dns.rsc') }}"
+
+mt_ip_pools: >-
+  {%- set tmp = [] -%}
+  {%- for name, config in all_net.items() if 'dhcp_range' in config -%}
+  {{- tmp.append({'name': 'dhcp-' + name, 'ranges': config.dhcp_range}) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_dhcp_servers: >-
+  {%- set tmp = [] -%}
+  {%- for name, config in all_net.items() if 'dhcp_range' in config -%}
+  {{- tmp.append(
+    {
+      'name': 'dhcp-' + name,
+      'address-pool': 'dhcp-' + name,
+      'interface': name | upper,
+      'lease-script': 'dhcp-dns',
+      'lease-time': '1h',
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_dhcp_networks: >-
+  {%- set tmp = [] -%}
+  {%- for name, config in all_net.items() if 'dhcp_range' in config -%}
+  {{- tmp.append(
+    {
+      'address': config.cidr,
+      'dns-server': [host_ips[name], '1.1.1.1', '8.8.8.8'] | join(','),
+      'domain': config.domain | default(name + '.' + domains['hb']),
+      'gateway': host_ips[name],
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_dhcp_leases: "{{ vault_mt_dhcp_leases_manual }}"

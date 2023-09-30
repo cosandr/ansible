@@ -47,7 +47,7 @@ vm_default_nic:
   source:
     dev: 'VM'
   address: "{{ ansible_host }}"
-  domain: "vm.{{ domains['hb'] }}"
+  domain: "{{ all_net.vm.domain }}"
   gateway: "{{ home_net.vm.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
   dns_servers:
     - "{{ home_net.vm.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"

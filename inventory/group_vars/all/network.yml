@@ -14,16 +14,22 @@ home_net:
     cidr6: "fd00:10::0/64"
     vlan: 10
     mt_lists: [LAN, NOSEC]
+    dhcp_range: "10.0.10.10-10.0.10.254"
+    domain: "vm.{{ domains['hb'] }}"
   general:
     cidr: "10.0.50.0/24"
     cidr6: "fd00:50::0/64"
     vlan: 50
     mt_lists: [LAN, NOSEC]
+    dhcp_range: "10.0.50.100-10.0.50.254"
+    domain: "gen.{{ domains['hb'] }}"
   mgmt:
     cidr: "10.0.100.0/24"
     cidr6: "fd00:100::0/64"
     vlan: 100
     mt_lists: [LAN, SEC]
+    dhcp_range: "10.0.100.200-10.0.100.254"
+    domain: "man.{{ domains['hb'] }}"
 
 internal_net:
   san:
@@ -32,6 +38,7 @@ internal_net:
     vlan: 2
     mtu: 9000
     mt_lists: [LAN, SEC, NOWAN, NOROUTE]
+    domain: "san.{{ domains['hb'] }}"
   kube:
     cidr: "10.85.0.0/16"
 
