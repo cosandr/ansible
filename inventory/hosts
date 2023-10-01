@@ -1,3 +1,15 @@
+[all]
+# BEGIN AUTO GENERATED VARIABLES
+romsto      wireguard_ip="10.4.20.96"   wireguard_ip6="fd00:4:20:0:5::1"
+rompi       wireguard_ip="10.4.20.97"   wireguard_ip6="fd00:4:20:0:5::2"
+romgw01     wireguard_ip="10.4.20.98"   wireguard_ip6="fd00:4:20:0:5::3"
+750gl       wireguard_ip="10.4.20.99"   wireguard_ip6="fd00:4:20:0:5::4"
+# END AUTO GENERATED VARIABLES
+
+[all:vars]
+# Do not define these in group_vars, they override this file
+host_wg_net=mt
+
 [gui:children]
 desktops
 laptops

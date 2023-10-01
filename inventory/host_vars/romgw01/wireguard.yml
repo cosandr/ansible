@@ -3,21 +3,19 @@
 wireguard_port: "51821"
 wireguard_interface: "mt"
 wireguard_addresses:
-  - "{{ wg_net.mt.cidr | ansible.utils.ipaddr('209') }}"
-  - "{{ wg_net.mt.cidr6 | ansible.utils.ipaddr('0x209' | int(base=16)) }}"
+  - "{{ wireguard_ip }}/{{ wg_net[host_wg_net].cidr | ansible.utils.ipaddr('prefix') | string }}"
+  - "{{ wireguard_ip6 }}/{{ wg_net[host_wg_net].cidr6 | ansible.utils.ipaddr('prefix') | string }}"
 
 wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
   - "{{ hostvars['loki01'].ansible_host }}/32"
-  - "{{ hostvars['rb5009'].wireguard_ipv6 }}/128"
+  - "{{ hostvars['rb5009'].wireguard_ip6 }}/128"
 
 wireguard_webgw_allowed_ips:
   - "{{ hostvars['webgw01'].wireguard_ip }}/32"
-  - "{{ hostvars['webgw01'].wireguard_ipv6 }}/128"
+  - "{{ hostvars['webgw01'].wireguard_ip6 }}/128"
 
 wireguard_address: "{{ wireguard_addresses | join(', ') }}"
-wireguard_ip: "{{ wireguard_addresses[0] | ansible.utils.ipaddr('address') }}"
-wireguard_ipv6: "{{ wireguard_addresses[1] | ansible.utils.ipaddr('address') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
 wireguard_persistent_keepalive: 300

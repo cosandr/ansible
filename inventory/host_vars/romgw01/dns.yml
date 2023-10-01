@@ -6,5 +6,5 @@ mt_dns_entries:
     ttl: 5m
   - regexp: ".*\\.{{ domains['ti'] | regex_escape() }}$"
     type: AAAA
-    address: "{{ wireguard_ipv6 }}"
+    address: "{{ wireguard_ip6 }}"
     ttl: 5m
