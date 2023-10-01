@@ -78,6 +78,9 @@ def main():
 
     # Find entries to add or update
     for d in data:
+        if 'name' not in d and 'regexp' not in d:
+            module.warn("mt_get_dns_entries: Data missing 'name' and 'regexp', check for undefined variables.")
+            continue
         old = get_entry(existing_managed, d)
         if not old:
             to_add.append(d)
