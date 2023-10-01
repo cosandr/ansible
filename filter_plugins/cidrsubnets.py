@@ -48,7 +48,7 @@ def fill_remaining(net, subnets, start=0):
     return subnets
 
 
-def run(net, *prefixes, fill=False, fill_only_end=True, start=0):
+def run(net, *prefixes, fill=False, fill_only_end=True, start=0, num_prefixes=0, prefix_size=None, prefix_skip=0):
     """
     Input: {{ '10.0.50.0/24' | cidrsubnets(29, 30, 28, fill=true) }}
     Output:
@@ -61,10 +61,23 @@ def run(net, *prefixes, fill=False, fill_only_end=True, start=0):
         "10.0.50.128/25"
     ]
     """
+    if prefixes and num_prefixes:
+        raise AnsibleFilterError("prefixes and num_prefixes are mutually exclusive")
+    if prefix_skip and not prefix_size:
+        raise AnsibleFilterError("prefix_size is required for prefix_skip")
+    if prefix_skip and start:
+        raise AnsibleFilterError("prefix_skip and start are mutually exclusive")
+
     net = IPNetwork(net)
     subnets = []
     if start:
         start = net.first + start
+    elif prefix_skip:
+        start = net.first + (2 ** prefix_from_diff(net, prefix_size)) * (prefix_skip - 1)
+    if num_prefixes:
+        if not prefix_size:
+            raise AnsibleFilterError("prefix_size is required when using num_prefixes")
+        prefixes = [prefix_size for _ in range(num_prefixes)]
     for p in prefixes:
         subnets.append(next_of_size(net, subnets, p, start))
     if fill:
