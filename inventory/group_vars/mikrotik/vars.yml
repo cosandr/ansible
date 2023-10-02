@@ -50,6 +50,10 @@ __mt_logging_auto: >-
 
 mt_logging: "{{ __mt_logging_manual + __mt_logging_auto }}"
 
+mt_graphing_resources:
+  - allow-address: "{{ all_net.general.cidr }}"
+    store-on-disk: false
+
 mt_ip_routes:
   - gateway: "{{ hostvars['rb5009'].host_ips.mgmt }}"
 

@@ -273,6 +273,26 @@
         - mt_bridges | default([])
         - not mt_vlan_legacy | default(false)
 
+    - name: Configure graphing interfaces  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: tool graphing interface
+        data: "{{ mt_graphing_interfaces }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_graphing_interfaces | default([])
+      tags: ["graphing"]
+
+    - name: Configure graphing resources  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: tool graphing resource
+        data: "{{ mt_graphing_resources }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_graphing_resources | default([])
+      tags: ["graphing"]
+
     - name: Configure routing IDs  # noqa args[module]
       community.routeros.api_modify:
         path: routing id

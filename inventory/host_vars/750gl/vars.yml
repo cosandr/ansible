@@ -14,3 +14,7 @@ __mt_ip_addresses_manual:
     address: "{{ ansible_host }}/24"
 
 mt_admin_allowed_addresses: "{{ firewall_trusted_sources | ansible.utils.ipaddr('host') + ['10.1.0.0/24'] }}"
+
+mt_graphing_resources:
+  - allow-address: "10.1.0.0/24"
+    store-on-disk: false

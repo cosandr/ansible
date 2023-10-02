@@ -50,3 +50,17 @@ mt_upnp_interfaces: >-
   {{- tmp.append({'interface': mt_wan_port, 'type': 'external'}) -}}
   {%- endif -%}
   {{ tmp }}
+
+mt_graphing_interfaces:
+  - allow-address: "{{ all_net.general.cidr }}"
+    interface: "{{ mt_wan_port }}"
+    store-on-disk: true
+  - allow-address: "{{ all_net.general.cidr }}"
+    interface: GENERAL
+    store-on-disk: false
+  - allow-address: "{{ all_net.general.cidr }}"
+    interface: VM
+    store-on-disk: false
+  - allow-address: "{{ all_net.general.cidr }}"
+    interface: WG1
+    store-on-disk: false
