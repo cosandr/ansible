@@ -28,6 +28,7 @@ base_pacman_packages:
   - deluge-gtk
   - docker
   - docker-compose
+  - downgrade
   - efibootmgr
   - ethtool
   - expect
@@ -91,6 +92,7 @@ base_pacman_packages:
   - pkgconf
   - podman
   - podman-compose
+  - polkit-gnome
   - pyenv
   - python-aiohttp
   - python-jmespath    # ansible json filter
@@ -125,6 +127,7 @@ base_pacman_packages:
   - which
   - yamllint
   - zsh
+  - zsh-completions
 
 base_aur_packages:
   - hunspell-nb
@@ -171,6 +174,7 @@ pacman_i3_packages:
   - tumbler  # Thumbnailer for Thunar
   - xclip
   - xdg-user-dirs
+  - xdotool
   - xorg-server
   - xorg-xev
   - xorg-xinit
@@ -193,6 +197,7 @@ pacman_sway_packages:
   - sway
   - swaybg
   - swayidle
+  - swaylock
   - waybar
   - wl-clipboard
   - wofi
@@ -201,5 +206,5 @@ pacman_sway_packages:
   - xorg-xwayland
 
 aur_sway_packages:
-  - swaylock
   - wdisplays
+  - wev

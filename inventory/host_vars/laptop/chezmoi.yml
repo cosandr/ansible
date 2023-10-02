@@ -4,7 +4,7 @@ chezmoi_overrides:
   i3: |
     # Restore based on connected displays
     _hour=$(date +%-H)
-    if [[ $_hour -ge 8 && $_hour -lt 17 ]]; then
+    if [[ $_hour -ge 7 && $_hour -lt 17 ]]; then
       workhours=1
     else
       workhours=0
@@ -58,17 +58,25 @@ chezmoi_overrides:
     DPI=120
   xorg_2: |
     DPI=120
+    mon=$(xrandr --query | grep -oP '\S+\s+connected' | cut -d' ' -f1)
+    if [[ $mon =~ DP-3$ ]]; then
+      # Is it home monitor?
+      if xrandr --query | grep -qE '3840x2160.*120.00'; then
+        MONITOR_MAP["DP-3"]="--primary --mode 3840x2160 --rate 120"
+        MONITOR_MAP["eDP-1"]="--left-of DP-3 --mode 1920x1200"
+      fi
+    fi
   xorg_3: |
     DPI=120
     mon=$(xrandr --query | grep -oP '\S+\s+connected' | cut -d' ' -f1)
     if [[ $mon =~ DP-3$ && $mon =~ HDMI-1 ]]; then
       MONITOR_MAP["DP-3"]="--primary --mode 3840x2160 --rate 120"
       MONITOR_MAP["HDMI-1"]="--above DP-3 --mode 3840x2160"
-      MONITOR_MAP["eDP-1"]="--left-of DP-3 --mode 3840x2160"
+      MONITOR_MAP["eDP-1"]="--left-of DP-3 --mode 1920x1200"
     elif [[ $mon =~ DP-3-2$ && $mon =~ HDMI-1 ]]; then
       MONITOR_MAP["HDMI-1"]="--primary --mode 3840x2160"
-      MONITOR_MAP["DP-3-2"]="--left-of HDMI-1 --mode 3840x2160"
-      MONITOR_MAP["eDP-1"]="--right-of HDMI-1 --mode 3840x2160"
+      MONITOR_MAP["DP-3-2"]="--left-of HDMI-1 --mode 3840x2160 --rotate left"
+      MONITOR_MAP["eDP-1"]="--right-of HDMI-1 --mode 1920x1200"
     fi
   waybar.yaml: |
     monitor_map:

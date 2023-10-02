@@ -13,7 +13,7 @@ host_pacman_packages:
   - libfido2
   - libva-intel-driver
   - libvirt
-  - polkit-gnome
+  - minikube
   - powertop
   - qemu-full
   - sof-firmware
@@ -27,6 +27,7 @@ host_pacman_packages:
 pacman_packages: "{{ base_pacman_packages + host_pacman_packages }}"
 aur_packages: "{{ base_aur_packages + host_aur_packages }}"
 host_aur_packages:
+  - awsvpnclient
   - slack-desktop
   - upd72020x-fw
 
