@@ -3,3 +3,7 @@
 mt_dns_entries:
   - name: "{{ inventory_hostname }}.{{ all_net.mgmt.domain }}"
     address: "{{ ansible_host }}"
+
+mt_dns_settings:
+  - servers: "{{ hostvars['rb5009'].host_ips.mgmt }},1.1.1.1,8.8.8.8"
+    cache-size: 2048  # default, but module provides 2048KiB

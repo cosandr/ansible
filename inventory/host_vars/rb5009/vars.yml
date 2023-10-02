@@ -1,5 +1,28 @@
 ---
 
+host_ips: >-
+  {%- set tmp = {} -%}
+  {%- for name, config in all_net.items() if 'vlan' in config and 'NOROUTE' not in config.get('mt_lists', []) -%}
+  {{- tmp.update({name: config.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+host_ips6: >-
+  {%- set tmp = {} -%}
+  {%- for name, config in all_net.items() if 'vlan' in config and 'NOROUTE' not in config.get('mt_lists', []) -%}
+  {{- tmp.update({name: config.cidr6 | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+# mt_wan_ipv6_pool populated at runtime from /ipv6/dhcp-client
+__mt_ipv6_addresses_manual:
+  - interface: VM
+    from-pool: pool1
+    address: "{{ mt_wan_ipv6_pool | ansible.utils.ipsubnet(64, 0) | ansible.utils.ipaddr('1') }}"
+  - interface: GENERAL
+    from-pool: pool1
+    address: "{{ mt_wan_ipv6_pool | ansible.utils.ipsubnet(64, 1) | ansible.utils.ipaddr('1') }}"
+
 mt_ipv6_nd:
   - interface: all
     ra-interval: 20s-1m
@@ -9,3 +32,11 @@ mt_ipv6_dhcp_client:
     interface: "{{ mt_wan_port }}"
     add-default-route: true
     request: address,prefix
+
+mt_ip_routes:
+  - dst-address: 10.1.0.0/24
+    gateway: "{{ hostvars['750gl'].wireguard_ip }}"
+    distance: 1
+  # - dst-address: 10.1.0.0/24
+  #   gateway: "{{ hostvars['rompi'].wireguard_ip }}"
+  #   distance: 2

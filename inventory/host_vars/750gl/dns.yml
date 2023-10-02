@@ -1,3 +1,8 @@
 ---
 
 mt_dns_entries: []
+
+mt_dns_settings:
+  - allow-remote-requests: true
+    servers: "1.1.1.1,8.8.8.8"
+    cache-size: 2048  # default, but module provides 2048KiB

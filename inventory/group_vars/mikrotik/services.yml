@@ -11,10 +11,10 @@ mt_services:
     disabled: true
   - name: winbox
     disabled: false
-    address: "{{ firewall_trusted_sources | ansible.utils.ipaddr('host') | join(',') }}"
+    address: "{{ mt_admin_allowed_addresses | join(',') }}"
   - name: www-ssl
     disabled: false
-    address: "{{ firewall_trusted_sources | ansible.utils.ipaddr('host') | join(',') }}"
+    address: "{{ mt_admin_allowed_addresses | join(',') }}"
   - name: api-ssl
     disabled: false
-    address: "{{ (firewall_trusted_sources + node_exporter_allow_ips) | ansible.utils.ipaddr('host') | join(',') }}"
+    address: "{{ (mt_admin_allowed_addresses + (node_exporter_allow_ips | ansible.utils.ipaddr('host'))) | join(',') }}"

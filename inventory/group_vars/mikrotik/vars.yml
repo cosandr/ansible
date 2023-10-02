@@ -11,6 +11,11 @@ api_password: "{{ lookup('community.general.passwordstore', 'network/mt_ansible_
 prometheus_blackbox_icmp_targets: []
 prometheus_node_targets: []
 
+host_ips:
+  mgmt: "{{ ansible_host }}"
+
+mt_admin_allowed_addresses: "{{ firewall_trusted_sources | ansible.utils.ipaddr('host') + [all_net.mgmt.cidr] }}"
+
 mt_logging_actions: >-
   {%- set tmp = [] -%}
   {%- for h in groups['prom'] if (hostvars[h].promtail_syslog_port | default(false)) -%}
@@ -44,3 +49,43 @@ __mt_logging_auto: >-
   {{ tmp }}
 
 mt_logging: "{{ __mt_logging_manual + __mt_logging_auto }}"
+
+mt_ip_routes:
+  - gateway: "{{ hostvars['rb5009'].host_ips.mgmt }}"
+
+__mt_ip_addresses_auto: >-
+  {%- set tmp = [] -%}
+  {%- for name, ip in (host_ips | default({})).items() if name in all_net and name not in wg_net -%}
+  {{- tmp.append({
+    'interface': name | upper,
+    'address': ip + '/' + all_net[name].cidr | ansible.utils.ipaddr('prefix') | string,
+  }) -}}
+  {%- endfor -%}
+  {%- if wireguard_addresses | default([]) | ansible.utils.ipv4 and mt_wg_interfaces | default([]) -%}
+  {{- tmp.append({
+    'interface': mt_wg_interfaces[0].name,
+    'address': wireguard_addresses | ansible.utils.ipv4 | first,
+  }) -}}
+  {%- endif -%}
+  {{ tmp }}
+
+__mt_ipv6_addresses_auto: >-
+  {%- set tmp = [] -%}
+  {%- for name, ip in (host_ips6 | default({})).items() if name in all_net and name not in wg_net -%}
+  {{- tmp.append({
+    'interface': name | upper,
+    'address': ip + '/' + all_net[name].cidr6 | ansible.utils.ipaddr('prefix') | string,
+    'advertise': false,
+  }) -}}
+  {%- endfor -%}
+  {%- if wireguard_addresses | default([]) | ansible.utils.ipv6 and mt_wg_interfaces | default([]) -%}
+  {{- tmp.append({
+    'interface': mt_wg_interfaces[0].name,
+    'address': wireguard_addresses | ansible.utils.ipv6 | first,
+    'advertise': false,
+  }) -}}
+  {%- endif -%}
+  {{ tmp }}
+
+mt_ip_addresses: "{{ (__mt_ip_addresses_manual | default([])) + __mt_ip_addresses_auto }}"
+mt_ipv6_addresses: "{{ (__mt_ipv6_addresses_manual | default([])) + __mt_ipv6_addresses_auto }}"

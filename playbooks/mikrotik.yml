@@ -148,6 +148,73 @@
       ca_path: "{{ ca_publickey_path }}"
 
   tasks:
+    - name: Configure admin user allowed-ips  # noqa args[module]
+      # API user doesn't have permissions to edit admin
+      check_mode: true
+      delegate_to: localhost
+      community.routeros.api_find_and_modify:
+        path: user
+        find:
+          "name": "{{ ansible_user }}"
+        values:
+          address: "{{ mt_admin_allowed_addresses | join(',') }}"
+        require_matches_min: 1
+        require_matches_max: 1
+      when: mt_admin_allowed_addresses | default([])
+      notify: Apply admin allowed-ips
+      tags: ["user", "admin"]
+
+    - name: Configure identities  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: system identity
+        data:
+          - name: "{{ inventory_hostname }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      tags: ["identity"]
+
+    - name: Configure NTP clients  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: system ntp client
+        data:
+          - enabled: true
+            servers: 0.pool.ntp.org,1.pool.ntp.org
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      tags: ["ntp"]
+
+    - name: Configure system clock  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: system clock
+        data:
+          - time-zone-name: "Europe/Oslo"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      tags: ["clock"]
+
+    - name: Enable routerboard auto-upgrade  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: system routerboard settings
+        data:
+          - auto-upgrade: true
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      tags: ["routerboard"]
+
+    - name: Disable bandwidth-server  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: tool bandwidth-server
+        data:
+          - enabled: false
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      tags: ["bandwidth-server"]
+
     - name: Create bridges  # noqa args[module]
       community.routeros.api_modify:
         path: interface bridge
@@ -276,6 +343,25 @@
       when: mt_scripts | default([])
       tags: ["scripts"]
 
+    - name: Configure IPv4 addresses  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip address
+        data: "{{ mt_ip_addresses | default([]) }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      tags: ["address"]
+
+    - name: Configure IPv4 routes  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip route
+        data: "{{ mt_ip_routes }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_ip_routes | default([])
+      tags: ["route"]
+
     - name: Configure IPv4 pools  # noqa args[module]
       delegate_to: localhost
       community.routeros.api_modify:
@@ -285,6 +371,16 @@
         handle_entries_content: remove_as_much_as_possible
       when: mt_ip_pools | default([])
       tags: ["dhcp", "pool"]
+
+    - name: Configure IPv4 DHCP clients  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip dhcp-client
+        data: "{{ mt_dhcp_clients }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_dhcp_clients | default([])
+      tags: ["dhcp"]
 
     - name: Configure IPv4 DHCP servers  # noqa args[module]
       delegate_to: localhost
@@ -463,6 +559,33 @@
       when: mt_firewall_raw_ipv6 | default([])
       tags: ["firewall", "ipv6", "raw"]
 
+    - name: Get IPv6 DHCP info  # noqa args[module]
+      community.routeros.api_info:
+        path: ipv6 dhcp-client
+        unfiltered: true
+        handle_disabled: omit
+      when: mt_ipv6_dhcp_client | default([])
+      register: __ipv6_dhcp_info
+      tags: ["ipv6", "address"]
+
+    - name: Set fact for mt_wan_ipv6_pool
+      ansible.builtin.set_fact:
+        # "prefix": "2a01:...::/56, 4h44m33s"
+        mt_wan_ipv6_pool: "{{ (__ipv6_dhcp_info.result | selectattr('pool-name', 'eq', mt_ipv6_dhcp_client[0]['pool-name']) | first).prefix.split(',', 1)[0] }}"
+      when:
+        - mt_ipv6_dhcp_client | default([])
+        - __ipv6_dhcp_info.result | selectattr('pool-name', 'eq', mt_ipv6_dhcp_client[0]['pool-name'])
+      tags: ["ipv6", "address"]
+
+    - name: Configure IPv6 addresses  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ipv6 address
+        data: "{{ mt_ipv6_addresses | default([]) }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      tags: ["ipv6", "address"]
+
     - name: Configure logging actions  # noqa args[module]
       delegate_to: localhost
       community.routeros.api_modify:
@@ -482,8 +605,20 @@
       when: mt_logging | default([])
       tags: ["logging"]
 
-    - name: Configure DNS
+    - name: Configure IPv4 DNS settings  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip dns
+        data: "{{ mt_dns_settings }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_dns_settings | default([])
       tags: ["dns"]
+
+    - name: Configure DNS entries
+      tags: ["dns"]
+      # Ugly, consider using inventory
+      when: inventory_hostname == "rb5009"
       block:
         - name: Get all DNS entries  # noqa args[module]
           delegate_to: localhost
@@ -526,3 +661,14 @@
           loop: "{{ __dns_lists.to_update }}"
           loop_control:
             label: "{{ item.name | default(item.regexp) }}"
+
+  handlers:
+    - name: Apply admin allowed-ips
+      community.routeros.command:
+        commands:
+          - "/user set [find name={{ ansible_user }}] {{ user_args | community.routeros.join }}"
+      vars:
+        user_args:
+          - "address={{ mt_admin_allowed_addresses | join(',') | community.routeros.quote_argument_value }}"
+      # Bug in community.routeros
+      when: not ansible_check_mode
