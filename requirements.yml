@@ -8,9 +8,9 @@ collections:
     version: '>=5.2'
   - name: kubernetes.core
     version: '>=2.3'
-  - name: git@github.com:ansible-collections/community.routeros.git
+  - name: git@github.com:cosandr/community.routeros.git
     type: git
-    version: "main"
+    version: "merge"
 
 roles:
   - name: geerlingguy.docker

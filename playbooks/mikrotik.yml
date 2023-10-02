@@ -333,6 +333,26 @@
         data: "{{ mt_services }}"
       tags: ["services"]
 
+    - name: Configure UPnP  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip upnp
+        data:
+          - enabled: "{{ mt_upnp_interfaces | default([]) | length > 0 }}"
+            allow-disable-external-interface: false
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      tags: ["upnp"]
+
+    - name: Configure UPnP interfaces  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: ip upnp interfaces
+        data: "{{ mt_upnp_interfaces | default([]) }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      tags: ["upnp"]
+
     - name: Configure scripts  # noqa args[module]
       delegate_to: localhost
       community.routeros.api_modify:

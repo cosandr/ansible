@@ -23,6 +23,7 @@ home_net:
     mt_lists: [LAN, NOSEC]
     dhcp_range: "10.0.50.100-10.0.50.254"
     domain: "gen.{{ domains['hb'] }}"
+    upnp: true
   mgmt:
     cidr: "10.0.100.0/24"
     cidr6: "fd00:100::0/64"

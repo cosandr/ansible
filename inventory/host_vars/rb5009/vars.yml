@@ -3,14 +3,14 @@
 host_ips: >-
   {%- set tmp = {} -%}
   {%- for name, config in all_net.items() if 'vlan' in config and 'NOROUTE' not in config.get('mt_lists', []) -%}
-  {{- tmp.update({name: config.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }) -}}
+  {{- tmp.update({name: config.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address')}) -}}
   {%- endfor -%}
   {{ tmp }}
 
 host_ips6: >-
   {%- set tmp = {} -%}
   {%- for name, config in all_net.items() if 'vlan' in config and 'NOROUTE' not in config.get('mt_lists', []) -%}
-  {{- tmp.update({name: config.cidr6 | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }) -}}
+  {{- tmp.update({name: config.cidr6 | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address')}) -}}
   {%- endfor -%}
   {{ tmp }}
 
@@ -40,3 +40,13 @@ mt_ip_routes:
   # - dst-address: 10.1.0.0/24
   #   gateway: "{{ hostvars['rompi'].wireguard_ip }}"
   #   distance: 2
+
+mt_upnp_interfaces: >-
+  {%- set tmp = [] -%}
+  {%- for name, config in all_net.items() if 'vlan' in config and config.get('upnp', false) -%}
+  {{- tmp.append({'interface': name | upper, 'type': 'internal'}) -}}
+  {%- endfor -%}
+  {%- if tmp -%}
+  {{- tmp.append({'interface': mt_wan_port, 'type': 'external'}) -}}
+  {%- endif -%}
+  {{ tmp }}
