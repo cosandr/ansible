@@ -8,7 +8,7 @@ local_as: "{{ 65001 + (groups['k8s_cluster'] | ansible.utils.index_of('eq', inve
 peers:
   - name: "rb5009"
     as: "5009"
-    router_id: "10.0.10.1"
+    router_id: "{{ (hostvars['rb5009'].mt_routing_ids | selectattr('name', 'eq', 'vm') | first).id }}"
     scope: global
 
 calico_advertise_cluster_ips: true

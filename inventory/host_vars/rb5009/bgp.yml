@@ -1,5 +1,10 @@
 ---
 
+mt_routing_ids:
+  - id: "{{ host_ips.vm }}"
+    name: vm
+    select-from-vrf: main
+
 mt_bgp_peers: >-
   {%- set tmp = [] -%}
   {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_bgp_peers | default([])) -%}
@@ -7,9 +12,9 @@ mt_bgp_peers: >-
   {{- tmp.append(
       {
       "name": item.name | default(h),
-      "as": item.as,
-      "remote_address": item.remote_address | default(hostvars[h].ansible_host | ansible.utils.ipaddr('host')),
-      "local_role": item.local_role | default('ebgp'),
+      "as": item.as | int,
+      "remote.address": item.remote_address | default(hostvars[h].ansible_host | ansible.utils.ipaddr('host')),
+      "local.role": item.local_role | default('ebgp'),
     }
   ) -}}
   {%- endfor -%}

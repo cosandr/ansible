@@ -273,58 +273,24 @@
         - mt_bridges | default([])
         - not mt_vlan_legacy | default(false)
 
-    - name: Configure BGP
+    - name: Configure routing IDs  # noqa args[module]
+      community.routeros.api_modify:
+        path: routing id
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+        data: "{{ mt_routing_ids }}"
+      when: mt_routing_ids | default([])
+      tags: ["routing"]
+
+    - name: Configure BGP peers  # noqa args[module]
       delegate_to: localhost
-      tags: ["bgp"]
+      community.routeros.api_modify:
+        path: routing bgp connection
+        data: "{{ mt_bgp_peers }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
       when: mt_bgp_peers | default([])
-      block:
-        - name: Get BGP peers  # noqa args[module]
-          check_mode: false
-          community.routeros.api:
-            path: routing bgp connection
-          register: __bgp_peers
-
-        - name: Remove extra peers  # noqa args[module]
-          community.routeros.api:
-            path: routing bgp connection
-            remove: "{{ item['.id'] }}"
-          loop: "{{ __bgp_peers.msg }}"
-          loop_control:
-            label: "{{ item.name }}"
-          when: item.name not in mt_bgp_peers | map(attribute='name')
-
-        - name: Add missing peers  # noqa args[module]
-          community.routeros.api:
-            path: routing bgp connection
-            add: >-
-              as={{ item.as }}
-              local.role={{ item.local_role }}
-              name={{ item.name }}
-              remote.address={{ item.remote_address }}
-          loop: "{{ mt_bgp_peers }}"
-          loop_control:
-            label: "{{ item.name }}"
-          when: item.name not in __bgp_peers.msg | map(attribute='name')
-
-        - name: Update outdated peers  # noqa args[module]
-          vars:
-            old: "{{ __bgp_peers.msg | selectattr('name', 'eq', item.name) | first }}"
-          community.routeros.api:
-            path: routing bgp connection
-            update: >-
-              .id={{ old['.id'] }}
-              as={{ item.as }}
-              local.role={{ item.local_role }}
-              name={{ item.name }}
-              remote.address={{ item.remote_address }}
-          loop: "{{ mt_bgp_peers }}"
-          loop_control:
-            label: "{{ item.name }}"
-          when:
-            - item.name in __bgp_peers.msg | map(attribute='name')
-            - item.as | string != old['as'] | string or
-              item.local_role != old['local.role'] or
-              item.remote_address != old['remote.address']
+      tags: ["bgp"]
 
     - name: Configure services  # noqa args[module]
       delegate_to: localhost
