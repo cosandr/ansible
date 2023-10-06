@@ -1,13 +1,15 @@
 ---
 
 user_suspend: |
-  Type=oneshot
   Environment=DISPLAY=:0
   Environment=SYSTEMD_SUSPEND=1
-  ExecStart=-/usr/bin/playerctl pause
   {% if desktop_environment in ['i3', 'sway'] %}
-  # Only lock if not locked already
-  ExecStart=/bin/sh -c 'pgrep -u andrei -x my-screenlock || /home/andrei/.local/bin/my-screenlock'
+  Type=forking
+  ExecStartPre=-/usr/bin/playerctl pause
+  ExecStart=/home/andrei/.local/bin/my-screenlock
+  {% else %}
+  Type=oneshot
+  ExecStart=-/usr/bin/playerctl pause
   {% endif %}
 
 logind_config: |

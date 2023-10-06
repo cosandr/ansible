@@ -8,7 +8,7 @@ xidlehook_cmd: |
         'brightnessctl -q --save; brightnessctl -q set 10%' \
         'brightnessctl -q --restore' \
       --timer 10 \
-        'brightnessctl -q --restore; pgrep -u andrei -x my-screenlock || ${HOME}/.local/bin/my-screenlock' \
+        'brightnessctl -q --restore; ${HOME}/.local/bin/my-screenlock' \
         '' \
       --timer 1200 \
         'grep -q 1 /sys/class/power_supply/AC/online || systemctl suspend' \
