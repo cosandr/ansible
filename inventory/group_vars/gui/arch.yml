@@ -121,6 +121,7 @@ base_pacman_packages:
   - ttf-nerd-fonts-symbols-2048-em
   - usbutils
   - vim
+  - vim-ale
   - vlc
   - vulkan-icd-loader
   - wget

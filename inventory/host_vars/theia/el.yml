@@ -17,6 +17,4 @@ __host_dnf_packages:
   - python3-netaddr
   - python3-websockets
   - rubygems
-  - ShellCheck
-  - sshfs
   - sshpass

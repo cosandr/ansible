@@ -8,6 +8,7 @@ __group_dnf_packages:
   - ethtool
   - file
   - findutils
+  - fio
   - firewalld
   - gawk
   - git
@@ -15,34 +16,46 @@ __group_dnf_packages:
   - htop
   - iftop
   - iotop
+  - iperf3
   - jq
   - lm_sensors
   - logrotate
+  - lshw
   - lsof
   - make
   - man-db
+  - mc
   - mlocate
   - ncdu
   - net-tools
   - netcat
   - openssh
   - p7zip
+  - p7zip-plugins
   - patch
   - pciutils
   - pkgconf
   - policycoreutils-python-utils
+  - postgresql
   - powertop
   - python3-dnf-plugin-versionlock
   - python3-lxml  # virt ansible modules
+  - redhat-rpm-config  # Not sure what it's for
   - rpmconf
   - rsync
+  - setools-console  # seinfo
+  - ShellCheck
   - smartmontools
   - sudo
+  - sysstat
+  - tcpdump
   - telnet
   - tmux
+  - tree
   - usbutils
   - util-linux-user  # chsh
   - vim
+  - vim-ale
   - wget
   - which
   - yum-utils
