@@ -35,7 +35,7 @@ mt_ipv6_dhcp_client:
 
 mt_ip_routes:
   - dst-address: 10.1.0.0/24
-    gateway: "{{ hostvars['750gl'].wireguard_ip }}"
+    gateway: "{{ hostvars['romsto'].wireguard_ip }}"
     distance: 1
   # - dst-address: 10.1.0.0/24
   #   gateway: "{{ hostvars['rompi'].wireguard_ip }}"

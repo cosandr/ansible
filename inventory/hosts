@@ -3,7 +3,6 @@
 romsto      wireguard_ip="10.4.20.96"   wireguard_ip6="fd00:4:20:0:5::1"
 rompi       wireguard_ip="10.4.20.97"   wireguard_ip6="fd00:4:20:0:5::2"
 romgw01     wireguard_ip="10.4.20.98"   wireguard_ip6="fd00:4:20:0:5::3"
-750gl       wireguard_ip="10.4.20.99"   wireguard_ip6="fd00:4:20:0:5::4"
 # END AUTO GENERATED VARIABLES
 
 [all:vars]
@@ -83,7 +82,6 @@ pgbak01 ansible_host=10.0.10.9 vm_host=aegir
 rb5009 ansible_host=10.0.50.1
 crs226 ansible_host=10.0.100.3
 crs309 ansible_host=10.0.100.4
-750gl  ansible_host=10.1.0.2
 
 [gitlab]
 gitlab01 ansible_host=10.0.10.40 vm_host=theia
