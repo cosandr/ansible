@@ -15,6 +15,14 @@
   when: btrfs_scrub_targets | default([])
   tags: ["btrfs"]
 
+- name: Setup swapfile
+  ansible.builtin.include_role:
+    name: swapfile
+    apply:
+      tags: ["swap"]
+  when: swapfile_path | default(false) or swapfile_size | default(false)
+  tags: ["swap"]
+
 - name: Configure firewall
   ansible.builtin.include_role:
     name: firewall_config

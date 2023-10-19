@@ -25,10 +25,6 @@
     - role: btrbk
       tags: ["btrbk"]
 
-    - role: swapfile
-      when: swapfile_path | default('')
-      tags: ["swap"]
-
     - role: cpupower
       tags: ["cpupower"]
 

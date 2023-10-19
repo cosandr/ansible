@@ -18,3 +18,5 @@ docker_registries:
 sshd_extra_config: |
   Match User andrei
     StreamLocalBindUnlink yes
+
+swapfile_size: 4G

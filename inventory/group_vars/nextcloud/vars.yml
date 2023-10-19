@@ -34,3 +34,5 @@ nextcloud_exporter_auth_token: "{{ vault_nextcloud_exporter_auth_token }}"
 
 prometheus_nextcloud_targets:
   - "{{ nextcloud_exporter_listen_address }}"
+
+swapfile_size: 4G
