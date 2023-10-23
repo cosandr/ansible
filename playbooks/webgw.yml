@@ -166,11 +166,11 @@
       when: wireguard_address is defined
       tags: ["wireguard"]
 
-    - role: acme_dns
+    - role: acmedns
       when:
         - acmedns_domain is defined
         - acmedns_a_record is defined
-      tags: ["acme_dns"]
+      tags: ["acmedns"]
   tasks:
     - block:
         - name: Install firewalld
