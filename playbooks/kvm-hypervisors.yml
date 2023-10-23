@@ -80,17 +80,12 @@
             state: mounted
           tags: ["subvols"]
 
-        - name: Get existing subvolumes
-          ansible.builtin.shell: "set -o pipefail; btrfs sub list -t {{ btrfs_root }} | tail -n+3 | awk '{ print $4 }'"
-          check_mode: false
-          changed_when: false
-          register: __subvols
-          tags: ["subvols"]
-
-        - name: Create missing subvolumes  # noqa no-changed-when
-          ansible.builtin.command: "btrfs sub create {{ btrfs_root }}/{{ item }}"
+        - name: Create subvolumes
+          community.general.btrfs_subvolume:
+            name: "{{ item }}"
+            filesystem_label: "{{ btrfs_src | regex_replace('^LABEL=', '') }}"
+            state: present
           loop: "{{ btrfs_subvols | default([]) }}"
-          when: item not in __subvols.stdout_lines
           tags: ["subvols"]
 
         - name: Create root snapshots dir

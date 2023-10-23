@@ -34,15 +34,13 @@
       63626333366335643634373634386632653532633462383136343231333739383036333734313264
       38356561393566396665353761616536643866313165353033656238623030633938
   pre_tasks:
-    - name: Get existing subvolumes
-      ansible.builtin.shell: "set -o pipefail; btrfs sub list -t {{ btrfs_root }} | tail -n+3 | awk '{ print $4 }'"
-      changed_when: false
-      register: __subvols
-
-    - name: Create missing subvolumes
-      ansible.builtin.command: "btrfs sub create {{ btrfs_root }}/{{ item }}"
+    - name: Create subvolumes
+      community.general.btrfs_subvolume:
+        name: "{{ item }}"
+        filesystem_label: "{{ btrfs_src | regex_replace('^LABEL=', '') }}"
+        state: present
       loop: "{{ [env_name] + (mounts | map(attribute='subvol') | list) }}"
-      when: item not in __subvols.stdout_lines
+      tags: ["subvols"]
 
     - name: Prepare chroot mounts
       ansible.posix.mount:
