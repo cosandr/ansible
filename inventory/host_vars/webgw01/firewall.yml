@@ -27,6 +27,8 @@ firewall_rules:
     zone: internal
   - port: "{{ acmedns_api_port }}"
     zone: public
-    sources:
-      - "{{ lookup('community.general.dig', hostvars['rb5009'].wireguard_endpoint.split(':', 1)[0]) }}"
-      - "{{ lookup('community.general.dig', hostvars['romsto'].wireguard_endpoint.split(':', 1)[0]) }}"
+    sources: "{{ lookup('community.general.dig', *acmedns_firewall_domains, wantlist=true) }}"
+  - port: "{{ acmedns_api_port }}"
+    zone: public
+    family: ipv6
+    sources: "{{ lookup('community.general.dig', *acmedns_firewall_domains, qtype='AAAA', wantlist=true) }}"

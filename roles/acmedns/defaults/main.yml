@@ -25,3 +25,9 @@ acmedns_log_level: "warning"
 
 acmedns_db_engine: "sqlite3"
 acmedns_db_connection: "/var/lib/acme-dns/acme-dns.db"
+
+acmedns_manage_firewall: false
+acmedns_manage_firewall_oncalendar: '*-*-* 00/6:00:00'
+acmedns_firewall: "{{ firewall_frontend | default('firewalld') }}"
+acmedns_firewalld_zone: "public"
+acmedns_firewall_domains: []

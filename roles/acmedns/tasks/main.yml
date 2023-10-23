@@ -54,3 +54,11 @@
     state: started
     enabled: true
     daemon_reload: true
+
+- name: Include firewall tasks
+  ansible.builtin.include_tasks:
+    file: firewall.yml
+    apply:
+      tags: ["firewall"]
+  tags: ["firewall"]
+  when: acmedns_manage_firewall

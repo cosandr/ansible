@@ -1,0 +1,9 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Automatically update acme-dns dynamic DNS firewall rules
+
+[Timer]
+OnCalendar={{ acmedns_manage_firewall_oncalendar }}
+
+[Install]
+WantedBy=timers.target
