@@ -7,7 +7,12 @@ nsname = "{{ acmedns_nsname }}"
 nsadmin = "{{ acmedns_nsadmin }}"
 {% endif %}
 records = [
+{% if acmedns_a_record %}
     "{{ acmedns_domain }}. A {{ acmedns_a_record }}",
+{% endif %}
+{% if acmedns_aaaa_record %}
+    "{{ acmedns_domain }}. AAAA {{ acmedns_aaaa_record }}",
+{% endif %}
     "{{ acmedns_domain }}. NS {{ acmedns_domain }}.",
 {% for r in acmedns_extra_records %}
     "{{ r }}",

@@ -4,7 +4,7 @@
   ansible.builtin.assert:
     that:
       - acmedns_domain
-      - acmedns_a_record
+      - acmedns_a_record or acmedns_aaaa_record
 
 - name: Create acme-dns system group
   ansible.builtin.group:

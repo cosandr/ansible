@@ -9,6 +9,7 @@ acmedns_nsname: "{{ acmedns_domain }}"
 # admin email address, where @ is substituted with .
 acmedns_nsadmin: ""
 acmedns_a_record: ""
+acmedns_aaaa_record: ""
 acmedns_listen_address: "0.0.0.0:53"
 acmedns_api_ip: "0.0.0.0"
 acmedns_api_port: 443
