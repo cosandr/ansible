@@ -5,12 +5,11 @@ collections:
   - name: ansible.utils
   - name: community.docker
   - name: community.general
-    version: '>=5.2'
+    version: '>=7.5'
   - name: kubernetes.core
-    version: '>=2.3'
-  - name: git@github.com:cosandr/community.routeros.git
-    type: git
-    version: "merge"
+    version: '>=2.4'
+  - name: community.routeros
+    version: ">=2.10"
 
 roles:
   - name: geerlingguy.docker
