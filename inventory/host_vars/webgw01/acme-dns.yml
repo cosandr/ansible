@@ -2,6 +2,7 @@
 
 acmedns_domain: "{{ vault_acmedns_domain }}"
 acmedns_a_record: "{{ ansible_host }}"
+acmedns_aaaa_record: "{{ vault_acmedns_aaaa_record }}"
 acmedns_api_port: 4443
 
 acmedns_manage_firewall: true

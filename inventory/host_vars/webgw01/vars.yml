@@ -19,3 +19,6 @@ borg_backups: []
 prometheus_blackbox_icmp_targets:
   - "{{ ansible_host }}"
   - "{{ wireguard_ip }}"
+
+extra_host_ipv6_addresses:
+  - "{{ acmedns_aaaa_record }}"
