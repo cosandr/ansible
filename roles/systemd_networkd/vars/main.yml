@@ -1,0 +1,5 @@
+---
+
+networkd_packages:
+  - systemd-networkd
+  - systemd-resolved

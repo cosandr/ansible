@@ -7,3 +7,9 @@
   when:
     - not chroot_path
     - networkd_restart | bool
+
+- name: Start WireGuard interface
+  ansible.builtin.command: "wg-quick up {{ wireguard_interface }}"
+  changed_when: "'ip link add' in __wg_up.stderr"
+  register: __wg_up
+  ignore_errors: true  # Fails if resolved isn't running yet

@@ -11,11 +11,16 @@
     - ansible_os_family == 'RedHat'
   tags: ["install"]
 
-- name: Install networkd and resolved
+- name: Load OS-specific vars
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - files: ["{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"]
+      skip: true
+  tags: ["install"]
+
+- name: Install networkd packages
   ansible.builtin.package:
-    name:
-      - systemd-networkd
-      - systemd-resolved
+    name: "{{ networkd_packages }}"
     state: present
   when:
     - not chroot_path
@@ -103,6 +108,34 @@
   notify: Restart systemd-networkd
   when: networkd_provisioning_synced
 
+- name: Symlink resolv.conf
+  when: resolved_link_stub
+  block:
+    - name: Check if /etc/resolv.conf is mounted by WireGuard
+      ansible.builtin.command: "grep -qF {{ chroot_path }}/etc/resolv.conf /proc/mounts"
+      check_mode: false
+      changed_when: false
+      failed_when: false
+      when: wireguard_interface | default(false)
+      register: __resolv_mount
+
+    - name: Stop WireGuard interface
+      ansible.builtin.command: "wg-quick down {{ wireguard_interface }}"
+      changed_when: "'ip link delete' in __wg_down.stderr"
+      register: __wg_down
+      notify: Start WireGuard interface
+      when:
+        - __resolv_mount.rc is defined
+        - __resolv_mount.rc == 0
+
+    - name: Link resolved stub file to /etc/resolv.conf
+      ansible.builtin.file:
+        src: /run/systemd/resolve/stub-resolv.conf
+        dest: "{{ chroot_path }}/etc/resolv.conf"
+        state: link
+        force: true
+        follow: false
+
 - name: Check if NetworkManager is active  # noqa command-instead-of-module
   ansible.builtin.command: systemctl is-active -q NetworkManager.service
   check_mode: false
@@ -121,29 +154,22 @@
       ansible.builtin.systemd:
         name: NetworkManager
         state: stopped
+      when: networkd_immediate | bool
 
     - name: Disable NetworkManager
       ansible.builtin.systemd:
         name: NetworkManager
         enabled: false
 
-- name: Link resolved stub file to /etc/resolv.conf
-  ansible.builtin.file:
-    src: /run/systemd/resolve/stub-resolv.conf
-    dest: "{{ chroot_path }}/etc/resolv.conf"
-    state: link
-    force: true
-  when: resolved_link_stub
-
-- name: Enable and start systemd-networkd services
+- name: "Ensure systemd-networkd services are enabled {{ 'and started' if networkd_immediate | bool else '' }}"
   ansible.builtin.systemd:
     name: "{{ item }}"
     enabled: true
-    state: started
+    state: "{{ 'started' if networkd_immediate | bool else omit }}"
   loop: "{{ networkd_services }}"
   when: not chroot_path
 
-- name: Enable and start systemd-networkd services (chroot)
+- name: Enable systemd-networkd services (chroot)
   ansible.builtin.command: >-
     arch-chroot {{ chroot_path }} systemctl enable {{ item }}
   loop: "{{ networkd_services }}"

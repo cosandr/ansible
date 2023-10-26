@@ -1,0 +1,4 @@
+---
+
+networkd_packages:
+  - systemd-networkd
