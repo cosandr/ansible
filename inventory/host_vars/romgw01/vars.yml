@@ -3,3 +3,15 @@
 ansible_port: 22
 
 nginx_exporter_web_listen_address: "{{ wireguard_ip }}:{{ nginx_exporter_port }}"
+
+networkd_config:
+  enp1s0: |
+    [Match]
+    Name=enp1s0
+
+    [Network]
+    Address={{ ansible_host }}/24
+    DNS=10.1.0.1
+    DNS=1.1.1.1
+    DNS=8.8.8.8
+    Gateway=10.1.0.1

@@ -1,5 +1,15 @@
 ---
 
+- name: Setup systemd-networkd
+  ansible.builtin.include_role:
+    name: systemd_networkd
+    apply:
+      tags: ["networkd"]
+  when: networkd_config | default(false) or
+        networkd_netdevs | default(false) or
+        networkd_links | default(false)
+  tags: ["networkd"]
+
 - name: Setup disks
   ansible.builtin.include_role:
     name: setup_disks

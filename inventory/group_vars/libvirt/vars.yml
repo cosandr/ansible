@@ -84,3 +84,24 @@ vm_default_definition:
   qemu_commandline_args: "{{ vm_qemu_args }}"
 
 libvirt_vms: ["{{ vm_default_definition }}"]
+
+networkd_config: >-
+  {%- set tmp = {} -%}
+  {%- for nic in vm_nics -%}
+  {%- set v4_prefix = all_net[nic.source.dev | lower].cidr | ansible.utils.ipaddr('prefix') -%}
+  {%- set config = {
+    "name": 'enp' + (nic.bus | default(loop.index) | string) + 's0',
+    "addresses": [nic.address + '/' + (v4_prefix | string)],
+    "dns_servers": nic.dns_servers,
+    "mtu": nic.mtu | default(1500),
+    "gateway": nic.gateway,
+  } -%}
+  {%- if ansible_host6 | default(false) -%}
+  {%- set v6_prefix = all_net[nic.source.dev | lower].cidr6 | ansible.utils.ipaddr('prefix') -%}
+  {{- config['addresses'].append(ansible_host6 + '/' + (v6_prefix | string)) -}}
+  {%- endif -%}
+  {{- tmp.update({
+      config.name: lookup('template', repo_base_dir + '/files/networkd.network.j2', template_vars=config)
+    }) -}}
+  {%- endfor -%}
+  {{ tmp }}

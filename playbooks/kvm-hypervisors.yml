@@ -16,9 +16,6 @@
     - role: systemd_cryptenroll
       tags: ["cryptenroll"]
 
-    - role: systemd_networkd
-      tags: ["networkd"]
-
     - role: auto_ssh
       tags: ["auto-ssh"]
 

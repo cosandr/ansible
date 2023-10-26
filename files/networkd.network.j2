@@ -1,0 +1,17 @@
+[Match]
+Name={{ name }}
+
+[Network]
+{% for a in addresses %}
+Address={{ a }}
+{% endfor %}
+{% for d in dns_servers %}
+DNS={{ d }}
+{% endfor %}
+
+[Link]
+MTUBytes={{ mtu }}
+
+[Route]
+Gateway={{ gateway }}
+Scope=global
