@@ -1,0 +1,8 @@
+---
+
+kde_user: "{{ my_user }}"
+kde_startup_script_path: "/home/{{ kde_user }}/.config/plasma-workspace/env"
+plasma_startup_scripts: []
+sddm_dpi: 192
+kde_global_shortcuts: []
+kde_configs: []

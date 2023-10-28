@@ -320,6 +320,10 @@
         - desktop_environment == "sway"
       tags: ["sway"]
 
+    - role: setup_kde
+      when: desktop_environment == "kde"
+      tags: ["kde"]
+
     - role: aisbergg.snapper
       become: true
       when: snapper_configs | default([])

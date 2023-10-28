@@ -1,0 +1,74 @@
+- name: Enable HiDPI in SDDM
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [Wayland]
+      EnableHiDPI=true
+
+      [X11]
+      EnableHiDPI=true
+    dest: "/etc/sddm.conf.d/hidpi.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  tags: ["sddm"]
+
+- name: Configure SDDM DPI
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [X11]
+      ServerArguments=-nolisten tcp -dpi {{ sddm_dpi }}
+    dest: "/etc/sddm.conf.d/dpi.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  tags: ["sddm"]
+
+- name: Ensure startup script dir exists
+  ansible.builtin.file:
+    path: "{{ kde_startup_script_path }}"
+    owner: "{{ kde_user }}"
+    group: "{{ kde_user }}"
+    mode: "0755"
+    state: directory
+  tags: ["scripts"]
+
+- name: Copy startup scripts
+  ansible.builtin.copy:
+    content: |
+      #!/bin/bash
+
+      {{ item.content }}
+    dest: "{{ kde_startup_script_path }}/{{ item.name }}.sh"
+    owner: "{{ kde_user }}"
+    group: "{{ kde_user }}"
+    mode: "0755"
+  loop: "{{ plasma_startup_scripts }}"
+  tags: ["scripts"]
+
+# Doing it seperately because I'm not sure if the key is the same across installations
+- name: Configure Konsole shortcut
+  ansible.builtin.lineinfile:
+    path: "/home/{{ kde_user }}/.config/kglobalshortcutsrc"
+    backrefs: true
+    regexp: '^(.*)=([^,]+)(.*)Launch Konsole$'
+    line: '\1=Meta+Return\3Launch Konsole'
+  tags: ["shortcuts"]
+
+- name: Configure global shortcuts
+  ansible.builtin.lineinfile:
+    path: "/home/{{ kde_user }}/.config/kglobalshortcutsrc"
+    backrefs: true
+    regexp: '^({{ item.key | regex_escape() }})=([^,]+)(.*)$'
+    line: '\1={{ item.value }}\3'
+  with_dict: "{{ kde_global_shortcuts }}"
+  tags: ["shortcuts"]
+
+- name: Write KDE configs
+  become: true
+  become_user: "{{ kde_user }}"
+  changed_when: false
+  ansible.builtin.command: "kwriteconfig5 {{ item }}"
+  loop: "{{ kde_configs }}"
+  tags: ["kconfig"]
