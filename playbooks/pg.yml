@@ -5,11 +5,6 @@
 
 - name: Configure PG and pgbackrest
   hosts: db
-  pre_tasks:
-    - name: Include common tasks
-      ansible.builtin.include_tasks:
-        file: ../tasks/common_servers.yml
-      tags: ["always"]
   roles:
     - role: pgbackrest
       tags: ["pgbackrest"]

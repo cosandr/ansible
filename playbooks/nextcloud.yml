@@ -4,11 +4,6 @@
 - name: Setup Nextcloud
   hosts: nextcloud
   gather_facts: true
-  pre_tasks:
-    - name: Include common tasks
-      ansible.builtin.include_tasks:
-        file: ../tasks/common_servers.yml
-      tags: ["always"]
   roles:
     - role: firewalld_webgw
       tags: ["firewalld"]

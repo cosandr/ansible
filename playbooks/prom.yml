@@ -1,28 +1,25 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- hosts: prom
+- name: Setup Prometheus
+  hosts: prom
   gather_facts: true
   pre_tasks:
-    - name: Include common tasks
-      ansible.builtin.include_tasks:
-        file: ../tasks/common_servers.yml
-      tags: ["always"]
-
     - name: Configure rsyslog
       when: promtail_syslog_port
+      tags: ["rsyslog"]
       block:
         - name: Install rsyslog
-          dnf:
+          ansible.builtin.dnf:
             name: rsyslog
             state: present
 
         - name: Configure rsyslog
-          copy:
+          ansible.builtin.copy:
             dest: /etc/rsyslog.d/promtail.conf
             owner: root
             group: root
-            mode: 0644
+            mode: "0644"
             content: |
               module(load="imudp")
               input(type="imudp" port="514"
@@ -42,18 +39,16 @@
                            TCP_Framing="octet-counted"
                            KeepAlive="on")
               }
-          notify: restart rsyslog
+          notify: Restart rsyslog
 
         - name: Allow rsyslog remote connections
-          seboolean:
+          ansible.posix.seboolean:
             name: nis_enabled
             state: true
             persistent: true
           when:
             - ansible_os_family == 'RedHat'
             - ansible_selinux.status == "enabled"
-
-      tags: ["rsyslog"]
 
   roles:
     - role: firewalld_webgw
@@ -86,7 +81,25 @@
       tags: ["pushgateway"]
 
   handlers:
-    - name: restart rsyslog
-      service:
+    - name: Restart rsyslog
+      ansible.builtin.service:
         name: rsyslog
         state: restarted
+
+- name: Setup Thanos
+  hosts: prom, !webgw
+  gather_facts: true
+  pre_tasks:
+    # Must manually create user, create thanos policy and assign it to user
+    - name: Create Thanos bucket
+      delegate_to: localhost
+      amazon.aws.s3_bucket:
+        access_key: "{{ hostvars['minio01'].s3_admin_access_key }}"
+        secret_key: "{{ hostvars['minio01'].s3_admin_secret_key }}"
+        s3_url: "{{ s3_url }}"
+        name: thanos
+      tags: ["bucket"]
+
+  roles:
+    - role: thanos
+      tags: ["thanos"]

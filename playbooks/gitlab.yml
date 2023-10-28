@@ -4,11 +4,6 @@
 - name: Setup Gitlab
   hosts: gitlab
   gather_facts: true
-  pre_tasks:
-    - name: Include common tasks
-      ansible.builtin.include_tasks:
-        file: ../tasks/common_servers.yml
-      tags: ["always"]
   roles:
     - role: geerlingguy.gitlab
       tags: ["gitlab"]
@@ -89,11 +84,6 @@
 - name: Setup Gitlab runners
   hosts: gitrun
   pre_tasks:
-    - name: Include common tasks
-      ansible.builtin.include_tasks:
-        file: ../tasks/common_servers.yml
-      tags: ["always"]
-
     - name: Setup podman runner
       tags: ["podman"]
       block:

@@ -1,0 +1,35 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Run common tasks
+  hosts: libvirt,!k8s_cluster
+  gather_facts: true
+  pre_tasks:
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      tags: ["always"]
+
+- name: Import Docker playbook
+  ansible.builtin.import_playbook: docker.yml
+
+- name: Import Gitlab playbook
+  ansible.builtin.import_playbook: gitlab.yml
+
+- name: Import MinIO playbook
+  ansible.builtin.import_playbook: minio.yml
+
+- name: Import Nextcloud playbook
+  ansible.builtin.import_playbook: nextcloud.yml
+
+- name: Import PostgreSQL playbook
+  ansible.builtin.import_playbook: pg.yml
+
+- name: Import Prometheus playbook
+  ansible.builtin.import_playbook: prom.yml
+
+- name: Setup Loki
+  hosts: loki
+  roles:
+    - role: loki
+      tags: ["loki"]
