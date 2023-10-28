@@ -21,8 +21,8 @@
 
 - name: Configure using sshd_config.d
   become: true
-  ansible.builtin.copy:
-    content: "{{ sshd_config | map(attribute='line') | join('\n') }}\n"
+  ansible.builtin.template:
+    src: 00-ansible.conf.j2
     dest: "{{ chroot_path }}/etc/ssh/sshd_config.d/00-ansible.conf"
     owner: root
     group: root
@@ -65,5 +65,5 @@
   ansible.builtin.blockinfile:
     path: "{{ chroot_path }}/etc/ssh/sshd_config"
     block: "{{ sshd_extra_config }}"
-  when: sshd_extra_config | length > 0
+    state: "{{ (__ssh_conf_d.stat.exists or sshd_extra_config | length == 0) | ternary('absent', 'present') }}"
   notify: Reload sshd

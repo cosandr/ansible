@@ -1,0 +1,7 @@
+{% for line in sshd_config | map(attribute='line') %}
+{{ line }}
+{% endfor %}
+{% if sshd_extra_config | length > 0 %}
+
+{{ sshd_extra_config }}
+{% endif %}
