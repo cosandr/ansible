@@ -1,11 +1,21 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- name: Prepare target hosts group
+- name: Prepare dynamic groups
   hosts: all
   become: false
   gather_facts: false
   tasks:
+    - name: Add hosts with configured backups
+      run_once: true
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        group: borg
+      loop: "{{ groups['all'] }}"
+      when: hostvars[item].borg_backups | default([]) | length > 0 or
+            hostvars[item].borg_server | default(false)
+      tags: ["always"]
+
     - name: Add hosts with wireguard configs
       run_once: true
       ansible.builtin.add_host:
@@ -16,6 +26,14 @@
         - hostvars[item].wireguard_unmanaged_peers is defined
         - hostvars[item].wireguard_unmanaged_peers | length > 0
       tags: ["always"]
+
+- name: Setup borg
+  become: true
+  gather_facts: true
+  hosts: borg
+  roles:
+    - role: borg
+      tags: ["borg"]
 
 - name: Configure WireGuard hosts
   hosts: wireguard_hosts
