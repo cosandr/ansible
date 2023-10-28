@@ -6,7 +6,7 @@
   gather_facts: false
   pre_tasks:
     - name: Check if we can connect on configured port
-      wait_for:
+      ansible.builtin.wait_for:
         port: "{{ ansible_port }}"
         state: "started"
         host: "{{ ansible_host }}"
@@ -93,7 +93,7 @@
   gather_facts: true
   pre_tasks:
     - name: Enable SELinux
-      selinux:
+      ansible.posix.selinux:
         policy: targeted
         state: enforcing
       register: __selinux_state
@@ -101,7 +101,7 @@
       tags: ["selinux"]
 
     - name: Reboot if required
-      reboot:
+      ansible.builtin.reboot:
       when:
         - __selinux_state is defined
         - __selinux_state.reboot_required
@@ -114,7 +114,7 @@
       when: ansible_os_family == 'RedHat'
 
     - name: Set fail2ban facts
-      set_fact:
+      ansible.builtin.set_fact:
         fail2ban_ignoreip: "{{ (__f2b_extra_ignore + hostvars['laptop'].wireguard_mt_allowed_ips) | flatten }}"
       tags: ["fail2ban"]
 
@@ -206,23 +206,27 @@
         - acmedns_a_record is defined
       tags: ["acmedns"]
   tasks:
-    - block:
+    # TODO: Port to role
+    - name: Setup firewalld
+      when: ansible_os_family == 'RedHat'
+      tags: ["firewalld"]
+      block:
         - name: Install firewalld
-          dnf:
+          ansible.builtin.dnf:
             name: firewalld
             state: present
           tags: ["install"]
 
         - name: Remove cockpit from public zone
-          firewalld:
+          ansible.posix.firewalld:
             zone: "public"
             service: "cockpit"
             permanent: true
             state: disabled
-          notify: reload firewalld
+          notify: Reload firewalld
 
         - name: Allow http and https
-          firewalld:
+          ansible.posix.firewalld:
             zone: "{{ item.0 }}"
             service: "{{ item.1 }}"
             permanent: true
@@ -230,46 +234,46 @@
           with_nested:
             - "{{ firewalld_http_zones | default(['public']) }}"
             - ["http", "https"]
-          notify: reload firewalld
+          notify: Reload firewalld
 
         - name: Enable masquerade on configured zones
-          firewalld:
+          ansible.posix.firewalld:
             zone: "{{ item }}"
             masquerade: true
             permanent: true
             state: enabled
           loop: "{{ firewalld_masquerade_zones }}"
-          notify: reload firewalld
+          notify: Reload firewalld
 
         - name: Add Wireguard interface to internal zone
-          firewalld:
+          ansible.posix.firewalld:
             zone: "internal"
             interface: "{{ wireguard_interface }}"
             permanent: true
             state: enabled
           when: wireguard_interface is defined
-          notify: reload firewalld
+          notify: Reload firewalld
 
         - name: Allow wireguard through firewall
-          firewalld:
+          ansible.posix.firewalld:
             zone: "public"
             port: "{{ wireguard_port }}/udp"
             permanent: true
             state: enabled
           when: wireguard_port is defined
-          notify: reload firewalld
+          notify: Reload firewalld
 
         - name: Add prom server to internal zone
-          firewalld:
+          ansible.posix.firewalld:
             zone: "internal"
             source: "{{ hostvars['prom01'].ansible_host }}"
             permanent: true
             state: enabled
           when: wireguard_address is not defined
-          notify: reload firewalld
+          notify: Reload firewalld
 
         - name: Add ports to internal zone
-          firewalld:
+          ansible.posix.firewalld:
             zone: internal
             port: "{{ item }}/tcp"
             permanent: true
@@ -277,13 +281,10 @@
           loop:
             - "{{ node_exporter_port }}"
             - "{{ nginx_exporter_port }}"
-          notify: reload firewalld
-
-      tags: ["firewalld"]
-      when: ansible_os_family == 'RedHat'
+          notify: Reload firewalld
 
   handlers:
-    - name: reload firewalld
-      service:
+    - name: Reload firewalld
+      ansible.builtin.service:
         name: firewalld
         state: reloaded

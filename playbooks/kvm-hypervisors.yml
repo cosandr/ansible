@@ -194,3 +194,6 @@
 
     - name: Restore user SELinux context
       ansible.builtin.command: "restorecon -r /home/{{ my_user }}"
+
+- name: Import Theia playbook
+  ansible.builtin.import_playbook: theia.yml

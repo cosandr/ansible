@@ -62,7 +62,7 @@
         dest: /etc/dracut.conf.d/resume.conf
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
         content: |
           add_dracutmodules+=" resume "
       when:

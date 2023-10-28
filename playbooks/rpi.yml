@@ -15,6 +15,8 @@
       tags: ["ssh"]
 
     - name: Configure motion
+      when: motion_is_rpi | default(false)
+      tags: ["motion"]
       block:
         - name: Mount motion share
           ansible.posix.mount:
@@ -46,11 +48,9 @@
         #     state: present
         #   notify: Reboot
 
-      when: motion_is_rpi | default(false)
-      tags: ["motion"]
-
   tasks:
     - name: Configure interactive shell stuff
+      tags: ["bash", "vim"]
       block:
         - name: Install vim
           ansible.builtin.apt:
@@ -65,16 +65,15 @@
               alias ll='ls -lh'
               alias la='ll -A'
 
-      tags: ["bash", "vim"]
-
     - name: Configure locale
+      tags: ["locale"]
       block:
         - name: Set timezone
-          ansible.builtin.timezone:
+          community.general.timezone:
             name: "{{ system_timezone }}"
 
         - name: Ensure locale exists
-          ansible.builtin.locale_gen:
+          community.general.locale_gen:
             name: "{{ system_locale }}"
             state: present
           notify: Update locale
@@ -86,8 +85,6 @@
             vtype: 'string'
             value: "{{ system_locale }}"
           notify: Update locale
-
-      tags: ["locale"]
 
     - name: Configure dhcpcd
       ansible.builtin.blockinfile:
@@ -139,7 +136,7 @@
     - name: Reboot
       ansible.builtin.reboot: {}
 
-    - name: Update locale
+    - name: Update locale  # noqa no-changed-when - handler
       ansible.builtin.command: "/usr/sbin/update-locale LANG={{ system_locale }}"
 
     - name: Restart dhcpcd

@@ -80,3 +80,4 @@ postgresql_global_config_options:
     value: "replica"
 
 postgres_exporter_port: "9187"
+postgres_exporter_version: "latest"

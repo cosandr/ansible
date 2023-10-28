@@ -1,12 +1,13 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- hosts: servers, !romsto, !syno
+- name: Upgrade OS with dnf or apt
+  hosts: servers, !romsto, !syno
   gather_facts: true
   become: true
   tasks:
     - name: Upgrade with dnf # noqa package-latest
-      dnf:
+      ansible.builtin.dnf:
         name: '*'
         state: latest
         update_cache: true
@@ -14,7 +15,7 @@
       when: ansible_os_family == 'RedHat'
 
     - name: Upgrade with apt # noqa package-latest
-      apt:
+      ansible.builtin.apt:
         name: '*'
         state: latest
         update_cache: true
@@ -22,18 +23,18 @@
       when: ansible_os_family == 'Debian'
 
     - name: Print dnf results
-      debug:
+      ansible.builtin.debug:
         msg: "{{ __dnf_result.results }}"
       when:
         - __dnf_result is defined
         - __dnf_result.results | default([])
 
     - name: Print apt results
-      debug:
+      ansible.builtin.debug:
         msg: "{{ __apt_result.stdout_lines }}"
       when:
-         - __apt_result is defined
-         - __apt_result.stdout_lines | default([])
+        - __apt_result is defined
+        - __apt_result.stdout_lines | default([])
 
     # - name: Reboot if required [dnf]
     #   async: 30

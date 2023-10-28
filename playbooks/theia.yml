@@ -74,8 +74,8 @@
       tags: ["nginx"]
 
   handlers:
-    - name: Restore tank SELinux context
+    - name: Restore tank SELinux context  # noqa no-changed-when - handler
       ansible.builtin.command: restorecon -r /mnt/tank
 
-    - name: Dracut regenerate
-      command: dracut -f --regenerate-all
+    - name: Dracut regenerate  # noqa no-changed-when - handler
+      ansible.builtin.command: dracut -f --regenerate-all

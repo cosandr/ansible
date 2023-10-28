@@ -32,7 +32,7 @@
         path: "{{ gitlab_backup_upload_connection.local_root }}"
         owner: git
         group: git
-        mode: 0750
+        mode: "0750"
         state: directory
       tags: ["gitlab", "nfs"]
 
@@ -51,7 +51,7 @@
         dest: "/etc/systemd/system/registry-garbage-collect.timer"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
       notify:
         - Reload systemd
         - Enable and start garbage collection
@@ -63,12 +63,12 @@
         dest: "/etc/systemd/system/registry-garbage-collect.service"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
       notify: Reload systemd
       tags: ["gitlab", "gc"]
 
   handlers:
-    - name: Restore git contexts
+    - name: Restore git contexts  # noqa no-changed-when - handler
       ansible.builtin.command: restorecon -r /var/opt/gitlab/.ssh
 
     - name: Reload systemd
@@ -132,7 +132,7 @@
           failed_when: false
           register: __user_status
 
-        - name: Enable linger
+        - name: Enable linger  # noqa no-changed-when - when
           ansible.builtin.command:
             cmd: loginctl enable-linger gitlab-runner
           when: "'Linger=yes' not in __user_status.stdout or 'not logged in or lingering' in __user_status.stderr"

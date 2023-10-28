@@ -154,15 +154,15 @@
       tags: ["nfs"]
 
   handlers:
-    - name: Restore ceph SELinux context
+    - name: Restore ceph SELinux context  # noqa no-changed-when - handler
       run_once: true
       ansible.builtin.command: restorecon -r /mnt/ceph
 
-    - name: Restore libvirt SELinux context
+    - name: Restore libvirt SELinux context  # noqa no-changed-when - handler
       run_once: true
       ansible.builtin.command: restorecon -r /mnt/ceph/libvirt
 
-    - name: Restore user SELinux context
+    - name: Restore user SELinux context  # noqa no-changed-when - handler
       run_once: true
       ansible.builtin.command: "restorecon -r /mnt/ceph/{{ my_user }}"
 

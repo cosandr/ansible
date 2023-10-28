@@ -15,9 +15,6 @@
 - name: Configure PostgreSQL
   hosts: pg
   gather_facts: true
-  vars:
-    postgres_exporter_version: "latest"
-
   roles:
     - role: postgresql
       tags: ["pg"]

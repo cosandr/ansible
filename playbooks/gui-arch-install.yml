@@ -66,7 +66,7 @@
         force: false
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
     - name: Ensure no packages are ignored
       ansible.builtin.lineinfile:
@@ -97,7 +97,7 @@
         path: "{{ item }}"
         owner: root
         group: root
-        mode: 0755
+        mode: "0755"
         state: directory
       loop:
         - "{{ chroot_path }}/{{ btrfs_root }}"
@@ -120,7 +120,7 @@
         dest: "{{ chroot_path }}/etc/fstab"
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
         content: |
           # Static information about the filesystems.
           # See fstab(5) for details.
@@ -172,7 +172,7 @@
       register: __passwd
       tags: ["user"]
 
-    - name: Create my user if it's missing
+    - name: Create my user if it's missing  # noqa no-changed-when - when
       ansible.builtin.command:
         cmd: >-
           arch-chroot {{ chroot_path }}
