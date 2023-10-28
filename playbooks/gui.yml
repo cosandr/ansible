@@ -1,10 +1,15 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- name: Laptop playbook
+- name: GUI playbook
   gather_facts: true
-  hosts: laptop
+  hosts: gui
   pre_tasks:
+    - name: End host if Mac
+      ansible.builtin.meta: end_host
+      when: ansible_distribution == "MacOSX"
+      tags: ["always"]
+
     - name: Check if GDM is active  # noqa command-instead-of-module
       ansible.builtin.command: systemctl is-active -q gdm.service
       check_mode: false
@@ -60,7 +65,9 @@
         mode: 0644
         content: |
           add_dracutmodules+=" resume "
-      when: ansible_os_family == 'RedHat'
+      when:
+        - "'laptops' in group_names"
+        - ansible_os_family == 'RedHat'
       notify: Dracut regenerate
       tags: ["hibernate"]
 
@@ -96,6 +103,8 @@
       tags: ["i3", "pip"]
 
     - name: Configure bluetooth
+      when:
+        - "'laptops' in group_names"
       tags: ["bluetooth"]
       block:
         - name: Ensure bluetooth is enabled
@@ -156,12 +165,12 @@
             dest: /usr/lib/fwupd/efi/fwupdx64.efi.signed
             owner: root
             group: root
-            mode: 0644
+            mode: "0644"
             remote_src: true
             force: false
 
   handlers:
-    - name: Dracut regenerate
+    - name: Dracut regenerate  # noqa no-changed-when
       become: true
       ansible.builtin.command: dracut -f --regenerate-all
 
@@ -179,6 +188,7 @@
 
   roles:
     - role: laptop
+      when: "'laptops' in group_names"
       tags: ["laptop"]
 
     - role: arch-common
@@ -249,18 +259,20 @@
       tags: ["pipewire"]
 
     - role: google-chrome
+      when: "'laptops' in group_names"
       tags: ["google-chrome"]
 
     - role: tlp
-      when: desktop_environment in ["i3", "sway"]
+      when:
+        - "'laptops' in group_names"
+        - desktop_environment in ["i3", "sway"]
       tags: ["tlp"]
 
     - role: cups
-      when: ansible_distribution == 'Archlinux'
+      when:
+        - "'laptops' in group_names"
+        - ansible_distribution == 'Archlinux'
       tags: ["cups"]
-
-    # - role: xss-lock
-    #   tags: ["xss-lock"]
 
     - role: xorg
       when:
@@ -286,9 +298,6 @@
     - role: gnome-keyring
       tags: ["gnome-keyring"]
 
-    # - role: thinkfan
-    #   tags: ["thinkfan"]
-
     - role: udev
       tags: ["udev"]
 
@@ -313,7 +322,13 @@
 
     - role: aisbergg.snapper
       become: true
+      when: snapper_configs | default([])
       tags: ["snapper"]
+
+    - role: btrbk
+      become: true
+      when: btrbk_volumes | default([])
+      tags: ["btrbk"]
 
     - role: node_exporter
       become: true

@@ -1,5 +1,41 @@
 ---
 
+firewalld_zones:
+  - name: public
+    interfaces:
+      - wlan0
+      - enp42s0
+
+  - name: home
+    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+
+firewall_rules:
+  - port: "{{ aquaero_exporter_port }}"
+    zone: home
+    sources: "{{ node_exporter_allow_ips }}"
+
+  - port: "{{ node_exporter_port }}"
+    zone: home
+    sources: "{{ node_exporter_allow_ips }}"
+
+  - port: "{{ nvidia_exporter_port }}"
+    zone: home
+    sources: "{{ node_exporter_allow_ips }}"
+
+firewalld_services:
+  - name: ssh
+    zone: home
+
+  - name: mdns
+    zone: home
+
+  - name: samba-client
+    zone: home
+
+  - name: ssh
+    state: absent
+    zone: public
+
 mt_firewall_address_lists:
   - address: "{{ ansible_host }}"
     list: allow-lan
