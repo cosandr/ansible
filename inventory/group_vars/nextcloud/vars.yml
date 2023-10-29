@@ -36,3 +36,7 @@ prometheus_nextcloud_targets:
   - "{{ nextcloud_exporter_listen_address }}"
 
 swapfile_size: 4G
+# Define here to use vm_mem instead of ansible_memtotal which can change
+# See roles/cosandr.nextcloud/defaults/main.yml
+nextcloud_avg_proc_mem: 65
+__pm_max_children: "{{ (vm_mem * 0.9 / nextcloud_avg_proc_mem) | int }}"
