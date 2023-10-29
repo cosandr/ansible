@@ -12,9 +12,18 @@ collections:
     version: ">=2.10"
 
 roles:
+  # https://www.jeffgeerling.com/blog/2023/ansible-galaxy-error-unable-compare-role-versions
   - name: geerlingguy.docker
+    src: https://github.com/geerlingguy/ansible-role-docker.git
+    version: 7.0.1
+
   - name: geerlingguy.gitlab
+    src: https://github.com/geerlingguy/ansible-role-gitlab.git
+    version: master
+
   - name: cloudalchemy.pushgateway
+    src: https://github.com/cloudalchemy/ansible-pushgateway.git
+    version: master
 
   - name: cosandr.dnf_automatic
     src: https://github.com/cosandr/ansible-role-dnf-automatic.git
@@ -23,4 +32,4 @@ roles:
   - name: cosandr.nextcloud
     src: https://github.com/cosandr/ansible-role-nextcloud.git
     scm: git
-    version: v1.2.0
+    version: v1.3.1
