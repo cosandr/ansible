@@ -36,6 +36,11 @@ firewalld_services:
     state: absent
     zone: public
 
+  - name: ssh
+    zone: public
+    # Allow trusted wireguard sources
+    sources: "{{ firewall_trusted_sources | ansible.utils.reduce_on_network(wg_net.mt.cidr) }}"
+
 mt_firewall_address_lists:
   - address: "{{ ansible_host }}"
     list: allow-lan
