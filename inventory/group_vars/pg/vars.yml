@@ -34,20 +34,20 @@ postgresql_global_config_options:
     quoted: true
   # Memory
   - option: shared_buffers
-    value: "{{ (ansible_memtotal_mb / 4) | int }}MB"
+    value: "{{ (vm_mem / 4) | int }}MB"
   - option: effective_cache_size
-    value: "{{ (ansible_memtotal_mb * 0.75) | int }}MB"
+    value: "{{ (vm_mem * 0.75) | int }}MB"
   - option: maintenance_work_mem
-    value: "{{ (ansible_memtotal_mb / 8) | int }}MB"
+    value: "{{ (vm_mem / 8) | int }}MB"
   - option: work_mem
-    value: "{{ (ansible_memtotal_mb / 800) | int }}MB"
+    value: "{{ (vm_mem / 800) | int }}MB"
   # Parallelism
   - option: max_worker_processes
-    value: "{{ ((ansible_processor_vcpus * 4) - 1) | int }}"
+    value: "{{ ((vm_cpus * 4) - 1) | int }}"
   - option: max_parallel_workers_per_gather
-    value: "{{ (ansible_processor_vcpus / 2) | int }}"
+    value: "{{ (vm_cpus / 2) | int }}"
   - option: max_parallel_workers
-    value: "{{ ansible_processor_vcpus }}"
+    value: "{{ vm_cpus }}"
   # WAL
   - option: wal_buffers
     value: "16MB"
