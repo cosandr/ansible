@@ -13,3 +13,4 @@ fail2ban_sshd_extra: {}
   # bantime: 8h
 fail2ban_bitwarden_install: false
 fail2ban_bitwarden_ports: [80, 443]
+fail2ban_extra_conf: ""
