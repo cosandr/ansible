@@ -7,6 +7,7 @@ user_suspend: |
   Type=forking
   ExecStartPre=-/usr/bin/playerctl pause
   ExecStart=/home/andrei/.local/bin/my-screenlock
+  ExecStartPost=/usr/bin/sleep 1
   {% else %}
   Type=oneshot
   ExecStart=-/usr/bin/playerctl pause
