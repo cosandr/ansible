@@ -10,3 +10,9 @@ __xorg_conf_d_host:
         BoardName      "GeForce RTX 3080"
         Option         "Coolbits" "28"
       EndSection
+  - name: "99-freesync"
+    content: |
+      Section "Screen"
+        Identifier     "Screen0"
+        Option         "metamodes" "DP-2: 3840x2160_144 +0+2160 {AllowGSYNCCompatible=On}, DP-0: 3840x2160_60 +0+0 {AllowGSYNCCompatible=On}"
+      EndSection

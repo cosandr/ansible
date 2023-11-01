@@ -1,12 +1,30 @@
 ---
 
+- name: Include OS-specific vars if possible
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - files: ["{{ ansible_distribution }}.yml"]
+      skip: true
+  when:
+    - ansible_distribution is defined
+    - not xorg_packages
+  tags: ["install"]
+
 - name: Install xorg packages
   become: true
-  community.general.pacman:
+  ansible.builtin.package:
     name: "{{ xorg_packages }}"
     state: present
-  when: ansible_distribution == 'Archlinux'
+  when: xorg_packages
   tags: ["install"]
+
+- name: Register previously copied xorg files
+  ansible.builtin.find:
+    paths: "/etc/X11/xorg.conf.d"
+    patterns:
+      - "*.conf"
+  register: __xorg_present
+  when: xorg_provisioning_synced
 
 - name: Configure xorg
   become: true
@@ -18,17 +36,35 @@
     content: |
       {{ ansible_managed | comment }}
       {{ item.content }}
-  loop: "{{ xorg_conf_d }}"
+  loop: "{{ xorg_conf_d | selectattr('state', 'undefined') + xorg_conf_d | selectattr('state', 'defined') | selectattr('state', 'eq', 'present') }}"
   loop_control:
     label: "{{ item.name }}"
-  when: item.state | default('present') == 'present'
+  register: __xorg_copied
 
-- name: Delete old configs
+- name: Delete absent configs
   become: true
   ansible.builtin.file:
     path: "/etc/X11/xorg.conf.d/{{ item.name }}.conf"
     state: absent
-  loop: "{{ xorg_conf_d }}"
+  loop: "{{ xorg_conf_d | selectattr('state', 'defined') | selectattr('state', 'eq', 'absent') }}"
   loop_control:
     label: "{{ item.name }}"
-  when: item.state | default('present') == 'absent'
+
+- name: Set synchronize facts
+  ansible.builtin.set_fact:
+    __xorg_present_list: "{{ __xorg_present | json_query('files[*].path') | default([]) }}"
+    __xorg_copied_list: "{{ __xorg_copied_tmp + __xorg_copied_tmp_check }}"
+  vars:
+    __xorg_copied_tmp: "{{ __xorg_copied.results | json_query('[*].dest') | default([]) }}"
+    __xorg_copied_tmp_check: "{{ __xorg_copied.results | json_query('[*].invocation.dest') | default([]) }}"
+  when: xorg_provisioning_synced
+  tags: ["xorg"]
+
+- name: Remove configs not present on deployer machine (synchronize)
+  become: true
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ __xorg_present_list | difference(__xorg_copied_list) }}"
+  when: xorg_provisioning_synced
+  tags: ["xorg"]
