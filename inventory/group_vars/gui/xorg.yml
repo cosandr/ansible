@@ -11,3 +11,11 @@ __xorg_conf_d_group:
         Option "AccelProfile" "flat"
         Option "AccelSpeed" "0"
       EndSection
+  - name: "50-keyboard"
+    content: |
+      Section "InputClass"
+        Identifier "My Keyboard"
+        MatchIsKeyboard "yes"
+        Option "XkbLayout" "us,no"
+        Option "XkbOptions" "grp:rctrl_rshift_toggle"
+      EndSection
