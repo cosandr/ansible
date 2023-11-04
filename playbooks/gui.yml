@@ -214,7 +214,7 @@
 
     - role: systemd_networkd
       when: network_manager == "systemd-networkd"
-      tags: ["systemd-networkd"]
+      tags: ["networkd"]
 
     - role: chezmoi
       tags: ["chezmoi"]

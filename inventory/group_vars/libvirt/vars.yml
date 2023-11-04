@@ -85,6 +85,11 @@ vm_default_definition:
 
 libvirt_vms: ["{{ vm_default_definition }}"]
 
+resolved_config:
+  DNS: "{{ all_net[vm_default_nic.source.dev | lower].cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
+  FallbackDNS: "1.1.1.1 8.8.8.8"
+  Domains: "{{ domains['hb'] }} vm.{{ domains['hb'] }}"
+
 networkd_config: >-
   {%- set tmp = {} -%}
   {%- for nic in vm_nics -%}
@@ -92,7 +97,7 @@ networkd_config: >-
   {%- set config = {
     "name": 'enp' + (nic.bus | default(loop.index) | string) + 's0',
     "addresses": [nic.address + '/' + (v4_prefix | string)],
-    "dns_servers": nic.dns_servers,
+    "dns_servers": nic.dns_servers | default([]),
     "mtu": nic.mtu | default(1500),
     "gateway": nic.gateway,
   } -%}

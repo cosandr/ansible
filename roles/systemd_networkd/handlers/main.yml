@@ -8,6 +8,13 @@
     - not chroot_path
     - networkd_restart | bool
 
+- name: Restart systemd-resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved.service
+    state: restarted
+  when:
+    - not chroot_path
+
 - name: Start WireGuard interface
   ansible.builtin.command: "wg-quick up {{ wireguard_interface }}"
   changed_when: "'ip link add' in __wg_up.stderr"

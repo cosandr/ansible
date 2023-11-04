@@ -26,3 +26,5 @@ networkd_services:
   - "systemd-resolved.service"
 
 networkd_links: {}
+
+resolved_config: {}

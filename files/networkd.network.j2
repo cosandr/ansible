@@ -5,7 +5,7 @@ Name={{ name }}
 {% for a in addresses %}
 Address={{ a }}
 {% endfor %}
-{% for d in dns_servers %}
+{% for d in dns_servers | default([]) %}
 DNS={{ d }}
 {% endfor %}
 

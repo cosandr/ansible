@@ -7,6 +7,10 @@
 __bond0_primary_iface: "enp1s0"
 __bond0_backup_iface: "eno1"
 
+resolved_config:
+  DNS: "{{ all_net.mgmt.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
+  FallbackDNS: "1.1.1.1 8.8.8.8"
+
 host_bridge_config:
   mgmt:
     dns: true

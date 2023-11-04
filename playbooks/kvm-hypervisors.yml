@@ -130,20 +130,6 @@
           loop: "{{ btrfs_nocow_paths | default([]) }}"
           tags: ["swap"]
 
-    - name: Configure systemd-resolved
-      ansible.builtin.lineinfile:
-        dest: "/etc/systemd/resolved.conf"
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
-        state: present
-      notify: Restart systemd-resolved
-      loop:
-        - regexp: "^#?DNS="
-          line: "DNS={{ all_net.mgmt.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
-        - regexp: "^#?FallbackDNS"
-          line: "FallbackDNS=1.1.1.1,8.8.8.8"
-      tags: ["resolved"]
-
     - name: Create my user
       ansible.builtin.user:
         name: "{{ my_user }}"
@@ -187,11 +173,6 @@
       tags: ["cockpit"]
 
   handlers:
-    - name: Restart systemd-resolved
-      ansible.builtin.systemd:
-        name: systemd-resolved.service
-        state: restarted
-
     - name: Restore user SELinux context
       ansible.builtin.command: "restorecon -r /home/{{ my_user }}"
 

@@ -1,0 +1,55 @@
+---
+
+- name: Symlink resolv.conf
+  when: resolved_link_stub
+  block:
+    - name: Check if /etc/resolv.conf is mounted by WireGuard
+      ansible.builtin.command: "grep -qF {{ chroot_path }}/etc/resolv.conf /proc/mounts"
+      check_mode: false
+      changed_when: false
+      failed_when: false
+      when: wireguard_interface | default(false)
+      register: __resolv_mount
+
+    - name: Stop WireGuard interface
+      ansible.builtin.command: "wg-quick down {{ wireguard_interface }}"
+      changed_when: "'ip link delete' in __wg_down.stderr"
+      register: __wg_down
+      notify: Start WireGuard interface
+      when:
+        - __resolv_mount.rc is defined
+        - __resolv_mount.rc == 0
+
+    - name: Link resolved stub file to /etc/resolv.conf
+      ansible.builtin.file:
+        src: /run/systemd/resolve/stub-resolv.conf
+        dest: "{{ chroot_path }}/etc/resolv.conf"
+        state: link
+        force: true
+        follow: false
+
+- name: Create resolved.conf.d
+  ansible.builtin.file:
+    path: "{{ chroot_path }}/etc/systemd/resolved.conf.d"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: resolved_config
+
+- name: Copy resolved config
+  ansible.builtin.template:
+    src: resolved.conf.j2
+    dest: "{{ chroot_path }}/etc/systemd/resolved.conf.d/00-ansible.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart systemd-resolved
+  when: resolved_config
+
+- name: Remove resolved config
+  ansible.builtin.file:
+    path: "{{ chroot_path }}/etc/systemd/resolved.conf.d/00-ansible.conf"
+    state: absent
+  notify: Restart systemd-resolved
+  when: not resolved_config
