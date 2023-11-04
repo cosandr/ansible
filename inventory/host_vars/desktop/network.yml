@@ -1,30 +1,5 @@
 ---
 
-networkd_config:
-  wired: |
-    [Match]
-    Name=en*
-
-    [Network]
-    DHCP=yes
-    IPForward=yes
-
-    [DHCP]
-    RouteMetric=1024
-  wlan: |
-    [Match]
-    Type=wlan
-
-    [Link]
-    RequiredForOnline=no
-
-    [Network]
-    DHCP=yes
-    IPForward=yes
-
-    [DHCP]
-    RouteMetric=2048
-
 resolved_config:
   DNS: "{{ all_net.general.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
   FallbackDNS: "1.1.1.1 8.8.8.8"

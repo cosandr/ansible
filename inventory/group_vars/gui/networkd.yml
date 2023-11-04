@@ -5,14 +5,21 @@ networkd_config:
     [Match]
     Name=en*
 
+    {% if 'laptops' in group_names %}
     [Link]
     RequiredForOnline=no
+    {% endif %}
 
     [Network]
-    DHCP=yes
+    DHCP=ipv4
     IPForward=yes
+    IPv6PrivacyExtensions=yes
+    IPv6AcceptRA=yes
 
     [DHCP]
+    RouteMetric=1024
+
+    [IPv6AcceptRA]
     RouteMetric=1024
   wlan: |
     [Match]
@@ -22,8 +29,13 @@ networkd_config:
     RequiredForOnline=no
 
     [Network]
-    DHCP=yes
+    DHCP=ipv4
     IPForward=yes
+    IPv6PrivacyExtensions=yes
+    IPv6AcceptRA=yes
 
     [DHCP]
+    RouteMetric=2048
+
+    [IPv6AcceptRA]
     RouteMetric=2048
