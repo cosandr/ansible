@@ -2,9 +2,7 @@
 
 firewalld_zones:
   - name: public
-    interfaces:
-      - wlan0
-      - enp42s0
+    interfaces: "{{ host_nic_names }}"
 
   - name: home
     sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"

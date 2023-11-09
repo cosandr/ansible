@@ -90,6 +90,17 @@ resolved_config:
   FallbackDNS: "1.1.1.1 8.8.8.8"
   Domains: "{{ domains['hb'] }} vm.{{ domains['hb'] }}"
 
+host_nic_names: >-
+  {%- set tmp = [] -%}
+  {%- for nic in vm_nics -%}
+  {{- tmp.append('enp' + (nic.bus | default(loop.index) | string) + 's0') -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+firewalld_zones:
+  - name: public
+    interfaces: "{{ host_nic_names }}"
+
 networkd_config: >-
   {%- set tmp = {} -%}
   {%- for nic in vm_nics -%}

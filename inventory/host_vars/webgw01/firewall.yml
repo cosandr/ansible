@@ -1,7 +1,9 @@
 ---
 
 # Override vars in other groups the host might be in
-firewalld_zones: []
+firewalld_zones:
+  - name: public
+    interfaces: ["eth0"]
 firewalld_services:
   - name: dns
     zone: public

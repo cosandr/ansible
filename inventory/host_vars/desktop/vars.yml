@@ -20,3 +20,7 @@ ignored_packages:
   - chromium
 
 sddm_dpi: 144
+
+host_nic_names:
+  - wlan0
+  - enp42s0

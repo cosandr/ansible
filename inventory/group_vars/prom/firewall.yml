@@ -4,6 +4,9 @@ webgw_zone: '0-webgw'
 __am_fw_sources: "{{ __prom_node_ips | difference([wireguard_ip | default(ansible_host)]) }}"
 
 firewalld_zones:
+  - name: public
+    interfaces: "{{ host_nic_names }}"
+
   - name: internal
     sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
 

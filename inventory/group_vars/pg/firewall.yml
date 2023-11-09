@@ -1,6 +1,9 @@
 ---
 
 firewalld_zones:
+  - name: public
+    interfaces: "{{ host_nic_names }}"
+
   - name: internal
     sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
 

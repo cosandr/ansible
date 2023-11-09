@@ -1,6 +1,9 @@
 ---
 
 firewalld_zones:
+  - name: public
+    interfaces: "{{ host_nic_names }}"
+
   - name: internal
     # Allow prometheus and webgw
     sources: "{{ node_exporter_allow_ips + proxy_hosts }}"
