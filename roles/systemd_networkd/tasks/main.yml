@@ -6,7 +6,7 @@
     apply:
       tags: ["install"]
   when:
-    - not chroot_path
+    - networkd_install | bool
     - ansible_distribution != 'Fedora'
     - ansible_os_family == 'RedHat'
   tags: ["install"]
@@ -16,6 +16,8 @@
   with_first_found:
     - files: ["{{ ansible_os_family }}-{{ ansible_distribution_major_version }}.yml"]
       skip: true
+  when:
+    - networkd_install | bool
   tags: ["install"]
 
 - name: Install networkd packages
@@ -23,7 +25,7 @@
     name: "{{ networkd_packages }}"
     state: present
   when:
-    - not chroot_path
+    - networkd_install | bool
     # They are part of the systemd package on Arch
     - ansible_distribution != "Archlinux"
   tags: ["install"]

@@ -2,6 +2,7 @@
 
 chroot_path: ""
 
+networkd_install: "{{ not chroot_path }}"
 resolved_link_stub: true
 networkd_provisioning_synced: true
 networkd_restart: "{{ networkd_immediate }}"
