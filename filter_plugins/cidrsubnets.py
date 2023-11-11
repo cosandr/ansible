@@ -68,6 +68,10 @@ def run(net, *prefixes, fill=False, fill_only_end=True, start=0, num_prefixes=0,
     if prefix_skip and start:
         raise AnsibleFilterError("prefix_skip and start are mutually exclusive")
 
+    # Kinda nasty workaround to make it work with zip in strict mode.
+    if not net:
+        return ["" for _ in range(len(prefixes) or num_prefixes)]
+
     net = IPNetwork(net)
     subnets = []
     if start:
