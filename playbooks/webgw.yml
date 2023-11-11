@@ -122,40 +122,6 @@
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
       tags: ["always"]
-
-    - name: Check if we have network-scripts
-      ansible.builtin.stat:
-        path: /etc/sysconfig/network-scripts/ifcfg-eth0
-      register: __network_scripts
-      tags: ["ipv6"]
-
-    # https://docs.hetzner.com/robot/dedicated-server/network/net-config-cent-os/#dedicated-root-servers-1
-    - name: Configure IPv6
-      tags: ["ipv6"]
-      when: __network_scripts.stat.exists
-      block:
-        - name: Configure IPv6
-          ansible.builtin.lineinfile:
-            path: /etc/sysconfig/network-scripts/ifcfg-eth0
-            line: "{{ item.line }}"
-            regexp: "{{ item.regexp }}"
-          loop:
-            - line: "IPV6INIT=yes"
-              regexp: "^IPV6INIT="
-            - line: "IPV6ADDR={{ ansible_host6 }}/64"
-              regexp: "^IPV6ADDR="
-            - line: "IPV6_DEFAULTGW=fe80::1"
-              regexp: "^IPV6_DEFAULTGW="
-            - line: "IPV6_DEFAULTDEV=eth0"
-              regexp: "^IPV6_DEFAULTDEV="
-          when: ansible_host6 | default('')
-
-        - name: Configure additional IPv6 addresses
-          ansible.builtin.lineinfile:
-            path: /etc/sysconfig/network-scripts/ifcfg-eth0
-            line: "IPV6ADDR_SECONDARIES={{ extra_host_ipv6_addresses | map('regex_replace', '$', '/64') | join(' ') }}"
-            regexp: '^IPV6ADDR_SECONDARIES='
-          when: extra_host_ipv6_addresses | default([])
   roles:
     - role: fail2ban
       tags: ["fail2ban"]
