@@ -3,7 +3,3 @@
 ssh_keys:
   root: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCNmdSfKHim4BJlPkf40WmeFb75FPy5HpQOC6lAZO5V root@desktop"
   andrei: "{{ lookup('url', 'https://raw.githubusercontent.com/cosandr/dotfiles/master/private_dot_ssh/private_desktop_ed25519.pub') | trim }}"
-
-sshd_extra_config: |
-  Match Address {{ firewall_trusted_sources | difference([ansible_host]) | join(',') }}
-      PermitRootLogin prohibit-password

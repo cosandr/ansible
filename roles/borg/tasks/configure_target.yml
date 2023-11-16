@@ -30,6 +30,7 @@
     # Can't clean up much, see https://stackoverflow.com/a/50662757
     ssh_key_config: "{{ conf.ssh_key_config | default(true) }}"
     ssh_conf_hosts: "{{ conf.ssh_conf_hosts | default(false) }}"
+    ssh_dest_hosts_ip_var: "{{ conf.ssh_dest_hosts_ip_var | default('ansible_host') }}"
     ssh_known_hosts_config: "{{ conf.ssh_known_hosts_config | default(true) }}"
     ssh_known_hosts_mode: "{{ conf.ssh_known_hosts_mode | default('0644') }}"
     ssh_hosts_comment: "borg {{ inventory_hostname }}-{{ conf.target_host }}"

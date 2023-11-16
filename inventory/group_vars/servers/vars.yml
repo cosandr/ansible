@@ -1,8 +1,11 @@
 ---
 
-proxy_hosts:
-  - "{{ hostvars['webgw01'].wireguard_ip }}"
-  - "{{ hostvars['localgw01'].ansible_host }}"
+proxy_hosts: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['webgw'] | difference(groups['rom']) -%}
+  {{- tmp.append(hostvars[h].wireguard_ip | default(hostvars[h].ansible_host)) -}}
+  {%- endfor -%}
+  {{ tmp }}
 
 smartd_email: "{{ my_email }}"
 # Send from root domain

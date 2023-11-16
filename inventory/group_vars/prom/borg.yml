@@ -5,6 +5,7 @@ borg_backups:
     timer_description: "Backup Prometheus every midnight"
     oncalendar: "*-*-* 00:00:00"
     target_host: "theia"
+    ssh_dest_hosts_ip_var: "borg_ansible_host_general"
     passphrase: "{{ borg_libvirt_passphrase }}"
     paths:
       - "/var/lib/prometheus"

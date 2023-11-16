@@ -15,16 +15,3 @@ pip_i3_packages:
   - dbus_next  # Used by various bar modules
 
 network_manager: "{{ 'systemd-networkd' if desktop_environment in ['i3', 'sway'] else 'NetworkManager' }}"
-
-mt_firewall_address_lists:
-  - address: "{{ ansible_host }}"
-    list: allow-lan
-  - address: "{{ wireguard_ip }}"
-    comment: "{{ inventory_hostname }}-wg"
-    list: allow-lan
-  # TODO: Actually implement IPv6
-  # - address: "{{ ansible_host6 }}"
-  #   list: allow-lan
-  - address: "{{ wireguard_ip6 }}"
-    comment: "{{ inventory_hostname }}-wg"
-    list: allow-lan

@@ -7,7 +7,7 @@ controller:
   service:
     externalTrafficPolicy: Local
     type: LoadBalancer
-    loadBalancerIP: "{{ vips.kube.nginx }}"
+    loadBalancerIP: "{{ vips.kube.nginx | ansible.utils.ipv4 | first }}"
   metrics:
     enabled: true
     serviceMonitor:

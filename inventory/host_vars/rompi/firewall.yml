@@ -2,9 +2,7 @@
 
 __ssh_sources:
   - "{{ wg_net.mt.cidr }}"
-  - "{{ wg_net.mt.cidr6 }}"
-  - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
-  - "{{ home_net | dict2items | json_query('[].value.cidr6') }}"
+  - "{{ home_net | json_query('*.cidr') }}"
   - "10.1.0.0/24"
 
 ufw_trusted_sources: []

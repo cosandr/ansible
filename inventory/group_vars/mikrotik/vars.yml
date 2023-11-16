@@ -14,7 +14,7 @@ prometheus_node_targets: []
 host_ips:
   mgmt: "{{ ansible_host }}"
 
-mt_admin_allowed_addresses: "{{ firewall_trusted_sources | ansible.utils.ipaddr('host') + [all_net.mgmt.cidr] }}"
+mt_admin_allowed_addresses: "{{ firewall_trusted_sources + [all_net.mgmt.cidr] }}"
 
 mt_logging_actions: >-
   {%- set tmp = [] -%}

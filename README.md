@@ -1,5 +1,14 @@
 # Ansible
 
+## Network changes
+
+Change general network stuff (VLANs, changing CIDRs) using the [templates](./files/inventory).
+
+Change `host_net`, `host_num` and/or `ansible_host` in [hosts](./inventory/hosts).
+
+When changes are made, [generate_inventory.yml](./playbooks/generate_inventory.yml) MUST be run.
+If both were changed, it must be run **TWICE**.
+
 ## Wireguard
 
 Generate keys on the command line with `wg genkey | tee /dev/stderr | wg pubkey`, private is the first string.

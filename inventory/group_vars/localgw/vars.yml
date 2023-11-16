@@ -1,6 +1,3 @@
 ---
 
-# 91h == 145d
-ansible_host6: "{{ home_net.vm.cidr6 | ansible.utils.ipaddr('145') | ansible.utils.ipaddr('address') }}"
-
 nginx_exporter_web_listen_address: "{{ ansible_host }}:{{ nginx_exporter_port }}"

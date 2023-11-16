@@ -6,8 +6,6 @@ firewalld_zones:
     interfaces: ["eth0"]
 firewalld_services:
   - name: dns
-    zone: public
-  - name: dns
     zone: internal
 firewall_rules:
   # Alertmanager cluster, thanks masquarade
@@ -25,12 +23,3 @@ firewall_rules:
     protocol: udp
     zone: internal
     source: "{{ hostvars['rb5009'].wireguard_ip }}"
-  - port: "{{ acmedns_api_port }}"
-    zone: internal
-  - port: "{{ acmedns_api_port }}"
-    zone: public
-    sources: "{{ lookup('community.general.dig', *acmedns_firewall_domains, wantlist=true) }}"
-  - port: "{{ acmedns_api_port }}"
-    zone: public
-    family: ipv6
-    sources: "{{ lookup('community.general.dig', *acmedns_firewall_domains, qtype='AAAA', wantlist=true) }}"

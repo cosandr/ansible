@@ -1,100 +1,204 @@
 ---
 
-__host_num: "{{ ansible_host.rsplit('.', 1)[-1] }}"
-
 ### The subnet dream ###
 # .0/28, 0000::/80 - Switches, routers, APs (CROSS VLAN)
 # .16/28, 0001::/80 - Hosts (CROSS VLAN)
 # .32/27, 0002::/80 - VIPs (CROSS VLAN)
 # .64/26, .128/25, 00003:/80 - VMs, clients
 
-home_net:
-  vm:
-    cidr: "10.0.10.0/24"
-    cidr6: "fd00:10::0/64"
-    vlan: 10
-    mt_lists: [LAN, NOSEC]
-    dhcp_range: "10.0.10.10-10.0.10.254"
-    domain: "vm.{{ domains['hb'] }}"
-  general:
-    cidr: "10.0.50.0/24"
-    cidr6: "fd00:50::0/64"
-    vlan: 50
-    mt_lists: [LAN, NOSEC]
-    dhcp_range: "10.0.50.100-10.0.50.254"
-    domain: "gen.{{ domains['hb'] }}"
-    upnp: true
-  mgmt:
-    cidr: "10.0.100.0/24"
-    cidr6: "fd00:100::0/64"
-    vlan: 100
-    mt_lists: [LAN, SEC]
-    dhcp_range: "10.0.100.200-10.0.100.254"
-    domain: "man.{{ domains['hb'] }}"
-
-internal_net:
-  san:
-    cidr: "10.0.2.0/24"
-    cidr6: "fd00:2::0/64"
-    vlan: 2
-    mtu: 9000
-    mt_lists: [LAN, SEC, NOWAN, NOROUTE]
-    domain: "san.{{ domains['hb'] }}"
-  kube:
-    cidr: "10.85.0.0/16"
-
-wg_net:
-  mt:
-    cidr: "10.4.20.0/24"
-    cidr6: "fd00:4:20::0/64"
-
-all_net: "{{ home_net | combine(internal_net, wg_net) }}"
-
-subnet_overrides:
-  kube:
-    svc:
-      - "{{ all_net.kube.cidr | ansible.utils.ipsubnet(18, 0) }}"    # 10.85.0.0/18
-    pod:
-      - "{{ all_net.kube.cidr | ansible.utils.ipsubnet(18, 1) }}"    # 10.85.64.0/18
-    lb:
-      - "{{ all_net.kube.cidr | ansible.utils.ipsubnet(26, 512) }}"  # 10.85.128.0/26
-    mon:
-      - "{{ all_net.kube.cidr | ansible.utils.ipsubnet(26, 513) }}"  # 10.85.128.64/26
-
-subnets: "{{ home_net | combine(internal_net) | default_subnet | combine(subnet_overrides) }}"
+## Default host_num based on order in inventory, probably a bad idea
+# host_num: "{{ groups['all'] | ansible.utils.index_of('eq', inventory_hostname) }}"
 
 # List of IPs with same number in a subnet
 # "{{ subnets | dict2items | map(attribute='value') | map(attribute='vips') | ansible.utils.ipv4 | ipaddr(2) | ipaddr('address') }}"
-vips:
-  # Consider using list and ansible.utils.reduce_on_network instead?
+
+host_ips_group: "{{ {host_net: ansible_host} }}"
+host_ips: "{{ (host_ips_group | default({})) | combine(host_ips_host | default({})) }}"
+host_ips_with_prefix: >-
+  {%- set tmp = {} -%}
+  {%- for net_name, addr in host_ips.items() if net_name in all_net -%}
+  {{- tmp.update({net_name: addr + "/" + (all_net[net_name].cidr | ansible.utils.ipaddr('prefix') | string)}) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+supernets:
+  cidr: "10.0.0.0/16"
+  # cidr6: "fd00::/56"
+
+all_net: "{{ home_net | combine(internal_net, wg_net) }}"
+
+# BEGIN AUTO GENERATED VARIABLES
+home_net:
   vm:
-    ceph_nfs: "{{ all_net.vm.cidr | ipaddr_concat(210) }}"  # 10.0.10.210
-    ceph_rgw: "{{ all_net.vm.cidr | ipaddr_concat(20) }}"   # 10.0.10.20
-    kube_cp: "{{ all_net.vm.cidr | ipaddr_concat(50) }}"    # 10.0.10.50
+    cidr: 10.0.10.0/24
+    vlan: 10
+    mt_lists:
+      - LAN
+      - NOSEC
+    dhcp_range: 10.0.10.112/28
+    domain: vm.{{ domains['hb'] }}
   general:
-    ceph_nfs: "{{ all_net.general.cidr | ipaddr_concat(20) }}"  # 10.0.50.20
+    cidr: 10.0.50.0/24
+    vlan: 50
+    mt_lists:
+      - LAN
+      - NOSEC
+    upnp: true
+    dhcp_range: 10.0.50.128/25
+    domain: gen.{{ domains['hb'] }}
+
+internal_net:
+  mgmt:
+    cidr: 10.0.100.0/24
+    vlan: 100
+    mt_lists:
+      - LAN
+      - SEC
+    dhcp_range: 10.0.100.128/25
+    domain: man.{{ domains['hb'] }}
   san:
-    ceph_nfs: "{{ subnets.san.vips | ansible.utils.ipv4 | ipaddr_concat(1) }}"  # 10.0.2.33
+    cidr: 10.0.2.0/24
+    vlan: 2
+    mtu: 9000
+    mt_lists:
+      - LAN
+      - SEC
+      - NOWAN
+      - NOROUTE
+    domain: san.{{ domains['hb'] }}
   kube:
-    nginx: "{{ subnets.kube.lb | ipaddr_concat(1) }}"  # 10.85.128.1
-    prom: "{{ subnets.kube.lb | ipaddr_concat(2) }}"   # 10.85.128.2
+    cidr: 172.27.0.0/16
 
-# Pretty nasty, might be easier with lists
-vips_with_prefix: >-
-  {%- set tmp = {} -%}
-  {%- for net_name, nets in vips.items() -%}
-  {%- set tmp2 = {} -%}
-  {%- for name, addr in nets.items() -%}
-  {{- tmp2.update({name: addr + "/" + (all_net[net_name].cidr | ansible.utils.ipaddr('prefix') | string)}) -}}
-  {%- endfor -%}
-  {{- tmp.update({net_name: tmp2}) -}}
-  {%- endfor -%}
-  {{ tmp }}
+wg_net:
+  mt:
+    cidr: 10.4.20.0/24
 
-# These do not necessarily exist, but are useful for automation
-host_ips: >-
-  {%- set tmp = {} -%}
-  {%- for k, v in all_net.items() -%}
-  {{- tmp.update({k: v.cidr | ansible.utils.ipaddr(__host_num) | ansible.utils.ipaddr('address')}) -}}
-  {%- endfor -%}
-  {{ tmp }}
+subnets:
+  vm:
+    switches:
+      - 10.0.10.0/28
+    hosts:
+      - 10.0.10.16/28
+    vips:
+      - 10.0.10.32/27
+    k8s_cluster:
+      - 10.0.10.64/28
+    localgw:
+      - 10.0.10.80/30
+    pg:
+      - 10.0.10.84/30
+    pgbackrest:
+      - 10.0.10.88/31
+    gitlab:
+      - 10.0.10.90/31
+    gitrun:
+      - 10.0.10.92/30
+    loki:
+      - 10.0.10.96/30
+    minio:
+      - 10.0.10.100/30
+    nextcloud:
+      - 10.0.10.104/31
+    docker:
+      - 10.0.10.106/31
+    prom:
+      - 10.0.10.108/31
+    clients:
+      - 10.0.10.112/28
+  general:
+    switches:
+      - 10.0.50.0/28
+    hosts:
+      - 10.0.50.16/28
+    vips:
+      - 10.0.50.32/27
+    trusted:
+      - 10.0.50.64/28
+    noinet:
+      - 10.0.50.80/28
+    clients:
+      - 10.0.50.128/25
+  mgmt:
+    switches:
+      - 10.0.100.0/28
+    hosts:
+      - 10.0.100.16/28
+    vips:
+      - 10.0.100.32/27
+    ipmi:
+      - 10.0.100.64/27
+    clients:
+      - 10.0.100.128/25
+  san:
+    switches:
+      - 10.0.2.0/28
+    hosts:
+      - 10.0.2.16/28
+    vips:
+      - 10.0.2.32/27
+    clients:
+      - 10.0.2.64/26
+      - 10.0.2.128/25
+  kube:
+    svc:
+      - 172.27.0.0/18
+    pod:
+      - 172.27.64.0/18
+    lb:
+      - 172.27.128.0/26
+    mon:
+      - 172.27.128.64/26
+  mt:
+    switches:
+      - 10.4.20.0/28
+    hosts:
+      - 10.4.20.16/28
+    trusted:
+      - 10.4.20.64/28
+    webgw:
+      - 10.4.20.80/30
+    rom:
+      - 10.4.20.96/28
+    clients:
+      - 10.4.20.128/26
+
+vips:
+  vm:
+    ceph_nfs:
+      - 10.0.10.33
+    ceph_rgw:
+      - 10.0.10.34
+    kube_cp:
+      - 10.0.10.35
+  general:
+    ceph_nfs:
+      - 10.0.50.33
+  san:
+    ceph_nfs:
+      - 10.0.2.33
+  kube:
+    nginx:
+      - 172.27.128.1
+    prom:
+      - 172.27.128.2
+
+vips_with_prefix:
+  vm:
+    ceph_nfs:
+      - 10.0.10.33/24
+    ceph_rgw:
+      - 10.0.10.34/24
+    kube_cp:
+      - 10.0.10.35/24
+  general:
+    ceph_nfs:
+      - 10.0.50.33/24
+  san:
+    ceph_nfs:
+      - 10.0.2.33/24
+  kube:
+    nginx:
+      - 172.27.128.1/16
+    prom:
+      - 172.27.128.2/16
+# END AUTO GENERATED VARIABLES

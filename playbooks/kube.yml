@@ -146,7 +146,7 @@
               metadata:
                 name: monitoring
               spec:
-                cidr: "{{ subnets.kube.mon | first }}"
+                cidr: "{{ subnets.kube.mon | ansible.utils.ipv4 | first }}"
                 allowedUses: ["Workload"]
           tags: ["calico"]
 

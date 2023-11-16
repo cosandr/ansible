@@ -7,13 +7,6 @@ host_ips: >-
   {%- endfor -%}
   {{ tmp }}
 
-host_ips6: >-
-  {%- set tmp = {} -%}
-  {%- for name, config in all_net.items() if 'vlan' in config and 'NOROUTE' not in config.get('mt_lists', []) -%}
-  {{- tmp.update({name: config.cidr6 | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address')}) -}}
-  {%- endfor -%}
-  {{ tmp }}
-
 # mt_wan_ipv6_pool populated at runtime from /ipv6/dhcp-client
 __mt_ipv6_addresses_manual:
   - interface: VM

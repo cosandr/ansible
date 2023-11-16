@@ -1,0 +1,30 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Generate network vars
+  hosts: localhost
+  become: false
+  gather_facts: false
+  vars:
+    network_files: "{{ (repo_base_dir + '/files/inventory/network*') | fileglob | sort }}"
+    network_dest: "{{ repo_base_dir }}/inventory/group_vars/all/network.yml"
+    hosts_dest: "{{ repo_base_dir }}/inventory/hosts"
+  tasks:
+    - name: Add block to network group vars
+      delegate_to: localhost
+      run_once: true
+      ansible.builtin.blockinfile:
+        content: "{{ lookup('andrei.utils.generate_network', network_files) }}"
+        dest: "{{ network_dest }}"
+        marker: "# {mark} AUTO GENERATED VARIABLES"
+      tags: ["network"]
+
+    - name: Add block to hosts file
+      delegate_to: localhost
+      run_once: true
+      ansible.builtin.blockinfile:
+        content: "{{ lookup('andrei.utils.generate_hosts') }}"
+        dest: "{{ hosts_dest }}"
+        marker: "# {mark} AUTO GENERATED VARIABLES"
+        insertafter: '^\[\all]$'
+      tags: ["hosts"]

@@ -15,6 +15,8 @@ ssh_dest_dir: "/root/.ssh"
 ssh_dest_user: "root"
 ssh_dest_group: "{{ ssh_dest_user }}"
 ssh_dest_hosts: []
+ssh_dest_hosts_ip_var: "ansible_host"
+ssh_dest_hosts_ip_var_map: {}
 ssh_dest_authorized_keys_name: "authorized_keys"
 ssh_dest_create_dir: true
 

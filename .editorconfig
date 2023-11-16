@@ -10,3 +10,7 @@ indent_size = 4
 
 [*.conf{,.j2}]
 indent_size = 4
+
+[Makefile]
+indent_style = tab
+indent_size = 4

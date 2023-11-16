@@ -6,6 +6,8 @@ __pycache__
 .vscode/
 !.vscode/settings.json
 files/k8s/credentials/*
+ansible_collections/*
+!ansible_collections/andrei
 roles/geerlingguy.*
 roles/cosandr.*
 roles/cloudalchemy.*

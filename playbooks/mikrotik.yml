@@ -634,7 +634,7 @@
           register: __mt_dns
 
         - name: Get add, update, remove lists  # noqa args[module] - it thinks api_info's 'result' is a string
-          mt_get_dns_entries:
+          andrei.utils.mt_get_dns_entries:
             existing: "{{ __mt_dns.result }}"
             data: "{{ mt_dns_entries }}"
             exclude_comment_regex: "^dhcp-.*"

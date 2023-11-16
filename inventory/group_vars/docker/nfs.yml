@@ -3,4 +3,4 @@
 nfs_shares:
   - path: /mnt/containers
     options: "rw,no_root_squash"
-    sources: "{{ groups['desktops'] | map('extract', hostvars, 'ansible_host') | list }}"
+    sources: "{{ subnets.general.trusted }}"

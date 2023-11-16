@@ -1,0 +1,37 @@
+{% set __home_net_late_merge = {
+  "vm": {
+    "dhcp_range": subnets.vm.clients | ansible.utils.ipv4 | last | default(""),
+    "domain": "vm.{{ domains['hb'] }}",
+  },
+  "general": {
+    "dhcp_range": subnets.general.clients | ansible.utils.ipv4 | last | default(""),
+    "domain": "gen.{{ domains['hb'] }}",
+  },
+} %}
+
+{% set __internal_net_late_merge = {
+  "mgmt": {
+    "dhcp_range": subnets.mgmt.clients | ansible.utils.ipv4 | last | default(""),
+    "domain": "man.{{ domains['hb'] }}",
+  },
+  "san": {
+    "domain": "san.{{ domains['hb'] }}",
+  },
+} %}
+
+home_net: {{ home_net | combine(__home_net_late_merge, recursive=true) }}
+internal_net: {{ internal_net | combine(__internal_net_late_merge, recursive=true) }}
+
+vips:
+  # Consider using list and ansible.utils.reduce_on_network instead?
+  vm:
+    ceph_nfs: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
+    ceph_rgw: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(2, wantlist=true) }}
+    kube_cp: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(3, wantlist=true) }}
+  general:
+    ceph_nfs: {{ subnets.general.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
+  san:
+    ceph_nfs: {{ subnets.san.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
+  kube:
+    nginx: {{ subnets.kube.lb | andrei.utils.ipaddr_concat(1, wantlist=true) }}
+    prom: {{ subnets.kube.lb | andrei.utils.ipaddr_concat(2, wantlist=true) }}

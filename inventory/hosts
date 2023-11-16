@@ -1,37 +1,84 @@
 [all]
 # BEGIN AUTO GENERATED VARIABLES
-romsto      wireguard_ip="10.4.20.96"   wireguard_ip6="fd00:4:20:0:5::1"
-rompi       wireguard_ip="10.4.20.97"   wireguard_ip6="fd00:4:20:0:5::2"
-romgw01     wireguard_ip="10.4.20.98"   wireguard_ip6="fd00:4:20:0:5::3"
+k8s01        ansible_host="10.0.10.64"
+k8s02        ansible_host="10.0.10.65"
+k8s03        ansible_host="10.0.10.66"
+k8s04        ansible_host="10.0.10.67"
+k8s05        ansible_host="10.0.10.68"
+localgw01    ansible_host="10.0.10.80"
+pg01         ansible_host="10.0.10.84"
+pgbak01      ansible_host="10.0.10.88"
+gitlab01     ansible_host="10.0.10.90"
+gitrun01     ansible_host="10.0.10.92"
+gitrun02     ansible_host="10.0.10.93"
+loki01       ansible_host="10.0.10.96"
+minio01      ansible_host="10.0.10.100"
+nextcloud01  ansible_host="10.0.10.104"
+docker01     ansible_host="10.0.10.106"
+prom01       ansible_host="10.0.10.108"
+desktop      ansible_host="10.0.50.64"
+laptop       ansible_host="10.0.50.65"   wireguard_ip="10.4.20.65"
+m1bp         ansible_host="10.0.50.66"   wireguard_ip="10.4.20.66"
+bme01        ansible_host="10.0.50.81"
+bme04        ansible_host="10.0.50.84"
+bme05        ansible_host="10.0.50.85"
+drepi        ansible_host="10.0.50.128"
+oldpi        ansible_host="10.0.50.129"
+ax56u        ansible_host="10.0.50.133"
+ha           ansible_host="10.0.50.134"
+ipad         ansible_host="10.0.50.138"  wireguard_ip="10.4.20.138"
+p7           ansible_host="10.0.50.139"  wireguard_ip="10.4.20.139"
+lgtv         ansible_host="10.0.50.148"
+ps5          ansible_host="10.0.50.149"
+deltaco_plug ansible_host="10.0.50.158"
+rb5009       ansible_host="10.0.100.1"   wireguard_ip="10.4.20.1"
+crs226       ansible_host="10.0.100.2"
+crs309       ansible_host="10.0.100.3"
+theia        ansible_host="10.0.100.16"
+syno         ansible_host="10.0.100.128"
+webgw01      wireguard_ip="10.4.20.80"
+romsto       wireguard_ip="10.4.20.96"
+rompi        wireguard_ip="10.4.20.97"
+romgw01      wireguard_ip="10.4.20.98"
 # END AUTO GENERATED VARIABLES
 
 [all:vars]
 # Do not define these in group_vars, they override this file
+host_net=general
+host_subnet=clients
 host_wg_net=mt
 
 [gui:children]
 desktops
 laptops
 
+[gui:vars]
+host_subnet=trusted
+host_wg_subnet=trusted
+
 [desktops]
-desktop ansible_host=10.0.50.4
+desktop host_num=0
 
 [laptops]
-laptop  ansible_host=10.0.50.5
-m1bp    ansible_host=10.0.50.34
+laptop  host_num=1 host_wg_num=1
+m1bp    host_num=2 host_wg_num=2
 
 [kvm_hv]
-theia ansible_host=10.0.50.2   cpu_tier=2 host_num=1
-aegir ansible_host=10.0.100.21 cpu_tier=3 host_num=2
-gerd  ansible_host=10.0.100.22 cpu_tier=3 host_num=3
-ymir  ansible_host=10.0.100.23 cpu_tier=3 host_num=4
-; atla  ansible_host=10.0.100.24 cpu_tier=1 host_num=5
-; nari  ansible_host=10.0.100.25 cpu_tier=3 host_num=6
-; nott  ansible_host=10.0.100.26 cpu_tier=3 host_num=7
+theia cpu_tier=2 host_num=0
+; aegir cpu_tier=3 host_num=1
+; gerd  cpu_tier=3 host_num=2
+; ymir  cpu_tier=3 host_num=3
+; atla  cpu_tier=1 host_num=4
+; nari  cpu_tier=3 host_num=5
+; nott  cpu_tier=3 host_num=6
+
+[kvm_hv:vars]
+host_net=mgmt
+host_subnet=hosts
 
 [servers]
 romsto  ansible_host=10.1.0.6
-syno    ansible_host=10.0.100.8 ansible_user=andrei
+syno    ansible_user=andrei host_net=mgmt host_num=0
 
 [servers:children]
 webgw
@@ -61,63 +108,102 @@ nextcloud
 docker
 
 [libvirt:vars]
+host_net=vm
 ansible_group_priority=2
 
 [rpi]
-drepi   ansible_host=10.0.50.21  ansible_user=andrei
-oldpi   ansible_host=10.0.50.23  ansible_user=andrei
-rompi   ansible_host=10.1.0.3    ansible_user=andrei
+drepi   ansible_user=andrei host_num=0
+oldpi   ansible_user=andrei host_num=1
+rompi   ansible_user=andrei ansible_host=10.1.0.3
 
 [db:children]
 pg
 pgbackrest
 
 [pg]
-pg01 ansible_host=10.0.10.11 vm_host=aegir
+pg01 host_num=0 vm_host=aegir
+
+[pg:vars]
+host_subnet=pg
 
 [pgbackrest]
-pgbak01 ansible_host=10.0.10.9 vm_host=aegir
+pgbak01 host_num=0 vm_host=aegir
+
+[pgbackrest:vars]
+host_subnet=pgbackrest
 
 [mikrotik]
-rb5009 ansible_host=10.0.50.1
-crs226 ansible_host=10.0.100.3
-crs309 ansible_host=10.0.100.4
+rb5009 host_num=1 host_wg_num=1
+crs226 host_num=2
+crs309 host_num=3
+
+[mikrotik:vars]
+host_net=mgmt
+host_subnet=switches
+host_num6_offset=false
+host_wg_num6_offset=false
+host_wg_subnet=switches
 
 [gitlab]
-gitlab01 ansible_host=10.0.10.40 vm_host=theia
+gitlab01 host_num=0 vm_host=theia
+
+[gitlab:vars]
+host_subnet=gitlab
 
 [gitrun]
-gitrun01 ansible_host=10.0.10.41 vm_host=gerd
-gitrun02 ansible_host=10.0.10.42 vm_host=ymir
+gitrun01 host_num=0 vm_host=gerd
+gitrun02 host_num=1 vm_host=ymir
+
+[gitrun:vars]
+host_subnet=gitrun
 
 [prom]
-prom01 ansible_host=10.0.10.21 vm_host=gerd
+prom01 host_num=0 vm_host=gerd
 webgw01
 
 [prom:vars]
+host_subnet=prom
 ansible_group_priority=10
 
 [loki]
-loki01 ansible_host=10.0.10.25 vm_host=theia
+loki01 host_num=0 vm_host=theia
+
+[loki:vars]
+host_subnet=loki
 
 [localgw]
-localgw01 ansible_host=10.0.10.91 vm_host=ymir
+localgw01 host_num=0 vm_host=ymir
 romgw01 ansible_host=10.1.0.91
 
+[localgw:vars]
+host_subnet=localgw
+
 [webgw]
-webgw01
+webgw01 host_wg_num=0
 
 [webgw:children]
 localgw
 
+[webgw:vars]
+host_wg_subnet=webgw
+
 [nextcloud]
-nextcloud01 ansible_host=10.0.10.60 vm_host=ymir
+nextcloud01 host_num=0 vm_host=ymir
+
+[nextcloud:vars]
+host_subnet=nextcloud
 
 [docker]
-docker01 ansible_host=10.0.10.61 vm_host=aegir
+docker01 host_num=0 vm_host=aegir
+
+[docker:vars]
+host_subnet=docker
 
 [minio]
-minio01 ansible_host=10.0.10.7 vm_host=theia
+minio01 host_num=0 vm_host=theia
+
+[minio:vars]
+host_subnet=minio
 
 [ceph:children]
 
@@ -125,20 +211,24 @@ minio01 ansible_host=10.0.10.7 vm_host=theia
 ansible_group_priority=3
 
 [rom]
-romgw01
-rompi
-romsto
+# Can't use rom vars because webgw has higher priority somehow
+romgw01 host_wg_subnet=rom host_wg_num=2
+rompi host_wg_subnet=rom host_wg_num=1
+romsto host_wg_subnet=rom host_wg_num=0
 
 [rom:vars]
 ansible_group_priority=10
 
 # kubespray
 [k8s_cluster]
-k8s01 ansible_host=10.0.10.51 etcd_member_name=etcd01 vm_mem=4096
-k8s02 ansible_host=10.0.10.52 etcd_member_name=etcd02
-k8s03 ansible_host=10.0.10.53 etcd_member_name=etcd03
-k8s04 ansible_host=10.0.10.54
-k8s05 ansible_host=10.0.10.55
+k8s01 host_num=0 etcd_member_name=etcd01 vm_mem=4096
+k8s02 host_num=1 etcd_member_name=etcd02
+k8s03 host_num=2 etcd_member_name=etcd03
+k8s04 host_num=3
+k8s05 host_num=4
+
+[k8s_cluster:vars]
+host_subnet=k8s_cluster
 
 [kube_control_plane]
 k8s[01:03]
@@ -148,3 +238,20 @@ k8s[01:03]
 
 [kube_node]
 k8s[02:05]
+
+[unmanaged_hosts]
+ax56u        host_num=5
+ha           host_num=6
+ipad         host_num=10 host_wg_num=10
+p7           host_num=11 host_wg_num=11
+lgtv         host_num=20
+ps5          host_num=21
+deltaco_plug host_num=30
+bme01        host_num=1  host_subnet=noinet
+bme04        host_num=4  host_subnet=noinet
+bme05        host_num=5  host_subnet=noinet
+
+[unmanaged_hosts:vars]
+host_net=general
+host_subnet=clients
+host_wg_subnet=clients

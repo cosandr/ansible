@@ -27,10 +27,12 @@ __firewall_ssh_public: "absent"
 __firewall_cockpit_zone: "internal"
 __firewalld_zones_2:
   - name: internal
+    # TODO: Extract all with 'vlan' from internal_net
     interfaces:
       - MGMT
       - SAN
 
+  # TODO: Extract all with 'vlan' from home_net
   - name: public
     interfaces:
       - GENERAL

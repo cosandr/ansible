@@ -1,0 +1,4 @@
+---
+
+prometheus_blackbox_icmp_targets: []
+prometheus_node_targets: []

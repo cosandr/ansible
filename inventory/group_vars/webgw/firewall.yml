@@ -6,9 +6,3 @@ firewalld_masquerade_zones:
 firewalld_rich_rules:
   - zone: public
     rich_rule: "rule family=ipv4 destination address={{ ansible_host }} forward-port port=22 protocol=tcp to-port=22 to-addr={{ hostvars['gitlab01'].ansible_host }}"
-
-mt_firewall_address_lists:
-  - address: "{{ wireguard_ip | default(ansible_host) }}"
-    list: allow-www
-  - address: "{{ wireguard_ip6 | default(ansible_host6) }}"
-    list: www

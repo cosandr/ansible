@@ -24,7 +24,7 @@ vm_cpu_features: []
 #   - ssbd
 #   - name: mpx
 #     policy: disable
-vm_seclabel: "system_u:system_r:svirt_t:s0:c{{ home_net.vm.vlan }},c{{ __host_num }}"
+vm_seclabel: "system_u:system_r:svirt_t:s0:c{{ all_net[host_net].vlan }},c{{ ansible_host | andrei.utils.host_num_in_net }}"
 vm_qemu_args: []
 
 vm_data_disks: []
@@ -48,9 +48,9 @@ vm_default_nic:
     dev: 'VM'
   address: "{{ ansible_host }}"
   domain: "{{ all_net.vm.domain }}"
-  gateway: "{{ home_net.vm.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
+  gateway: "{{ hostvars['rb5009'].host_ips.vm }}"
   dns_servers:
-    - "{{ home_net.vm.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
+    - "{{ hostvars['rb5009'].host_ips.vm }}"
     - 1.1.1.1
     - 8.8.8.8
 
@@ -97,6 +97,7 @@ host_nic_names: >-
   {%- endfor -%}
   {{ tmp }}
 
+# TODO: Broken in prom's group_vars
 firewalld_zones:
   - name: public
     interfaces: "{{ host_nic_names }}"

@@ -4,7 +4,6 @@ wireguard_port: "51820"
 wireguard_interface: "wg0"
 wireguard_addresses:
   - "{{ wireguard_ip }}/{{ wg_net[host_wg_net].cidr | ansible.utils.ipaddr('prefix') | string }}"
-  # - "{{ wireguard_ip6 }}/{{ wg_net[host_wg_net].cidr6 | ansible.utils.ipaddr('prefix') | string }}"
 
 wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"

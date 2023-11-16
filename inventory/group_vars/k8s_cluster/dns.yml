@@ -10,5 +10,5 @@ __mt_dns_entries_vip:
   - name: "k8s.{{ domains['hb'] }}"
     address: "{{ kube_vip_address }}"
   - regexp: ".*\\.kube\\.{{ domains['hb'] | regex_escape() }}$"
-    address: "{{ vips.kube.nginx }}"
+    address: "{{ vips.kube.nginx | ansible.utils.ipv4 | first }}"
     ttl: 5m

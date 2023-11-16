@@ -1,0 +1,6 @@
+---
+
+prometheus_blackbox_icmp_targets: ["{{ ansible_host }}"]
+mt_dns_entries:
+  - name: "{{ inventory_hostname }}.{{ domains['hb'] }}"
+    address: "{{ ansible_host }}"

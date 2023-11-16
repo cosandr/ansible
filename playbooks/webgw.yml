@@ -165,12 +165,6 @@
     - role: wireguard
       when: wireguard_address is defined
       tags: ["wireguard"]
-
-    - role: acmedns
-      when:
-        - acmedns_domain is defined
-        - acmedns_a_record is defined
-      tags: ["acmedns"]
   tasks:
     # TODO: Port to role
     - name: Setup firewalld

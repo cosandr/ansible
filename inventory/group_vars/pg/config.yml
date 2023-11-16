@@ -1,12 +1,18 @@
 ---
 
 # https://www.postgresql.org/docs/13/auth-pg-hba-conf.html
-postgresql_hba_entries:
+__postgresql_hba_entries_manual:
   - { type: local, database: all, user: postgres, auth_method: peer }
-  - { type: host, database: all, user: all, address: "{{ hostvars['desktop'].ansible_host }}/32", auth_method: "md5" }
-  - { type: host, database: all, user: all, address: "{{ hostvars['laptop'].ansible_host }}/32", auth_method: "md5" }
-  - { type: host, database: all, user: all, address: "{{ hostvars['laptop'].wireguard_ip }}/32", auth_method: "md5" }
-  - { type: host, database: all, user: all, address: "{{ hostvars['m1bp'].ansible_host }}/32", auth_method: "md5" }
-  - { type: host, database: all, user: all, address: "{{ hostvars['m1bp'].wireguard_ip }}/32", auth_method: "md5" }
-  - { type: host, database: all, user: all, address: "{{ home_net.vm.cidr }}", auth_method: "md5" }
+  - { type: host, database: all, user: all, address: "{{ all_net.vm.cidr }}", auth_method: "md5" }
   - { type: host, database: certs, user: certs_reader, address: "all", auth_method: "md5" }
+
+__postgresql_hba_entries_trusted: >-
+  {%- set tmp = [] -%}
+  {%- for net in subnets | json_query('*.trusted') | flatten -%}
+  {{- tmp.append(
+    { 'type': 'host', 'database': 'all', 'user': 'all', 'address': net, 'auth_method': 'md5' }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+postgresql_hba_entries: "{{ __postgresql_hba_entries_manual + __postgresql_hba_entries_trusted }}"

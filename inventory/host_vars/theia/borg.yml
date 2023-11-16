@@ -9,6 +9,8 @@ borg_uid: 1002
 borg_gid: 1002
 borg_pool: "/mnt/tank/borg/repos"
 
+borg_ansible_host_general: "{{ host_ips.general }}"
+borg_ansible_host_vm: "{{ host_ips.vm }}"
 borg_ssh_check: "{{ borg_user }}@{{ inventory_hostname }}.vm.{{ domain }}"
 borg_remote_repo: "ssh://{{ borg_ssh_check }}/."
 

@@ -17,22 +17,6 @@ host_bridge_config:
     route:
       Metric: 512
 
-# Used for GENERAL and VM where 21, 22 and 23 are taken
-__ip_offset: 50
-
-__host_ips:
-  general: "{{ all_net.general.cidr | ansible.utils.ipaddr(__host_num | int + __ip_offset) }}"
-  mgmt: "{{ all_net.mgmt.cidr | ansible.utils.ipaddr(__host_num) }}"
-  san: "{{ subnets.san.hosts | ansible.utils.ipv4 | ipaddr_concat(host_num, prefixlen=24) }}"
-  vm: "{{ all_net.vm.cidr | ansible.utils.ipaddr(__host_num | int + __ip_offset) }}"
-
-host_ips: >-
-  {%- set tmp = {} -%}
-  {%- for k, v in __host_ips.items() -%}
-  {{- tmp.update({k: v | ansible.utils.ipaddr('address')}) -}}
-  {%- endfor -%}
-  {{ tmp }}
-
 __networkd_vlan_netdevs: >-
   {%- set tmp = {} -%}
   {%- for config in all_net.values() if 'vlan' in config -%}

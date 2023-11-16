@@ -5,7 +5,7 @@ firewalld_zones:
     interfaces: "{{ host_nic_names }}"
 
   - name: home
-    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+    sources: "{{ home_net | json_query('*.cidr') }}"
 
 firewall_rules:
   - port: "{{ aquaero_exporter_port }}"
@@ -38,7 +38,3 @@ firewalld_services:
     zone: public
     # Allow trusted wireguard sources
     sources: "{{ firewall_trusted_sources | ansible.utils.reduce_on_network(wg_net.mt.cidr) }}"
-
-mt_firewall_address_lists:
-  - address: "{{ ansible_host }}"
-    list: allow-lan

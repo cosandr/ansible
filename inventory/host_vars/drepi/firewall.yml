@@ -2,8 +2,7 @@
 
 __smtp_sources:
   - "{{ wg_net.mt.cidr }}"
-  - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
-  - "{{ home_net | dict2items | json_query('[].value.cidr6') }}"
+  - "{{ home_net | json_query('*.cidr') }}"
 
 firewall_rules:
   - port: 22

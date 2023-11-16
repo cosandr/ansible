@@ -1,7 +1,5 @@
 ---
 
-ansible_host6: "{{ home_net.vm.cidr6 | ansible.utils.ipaddr('0x40' | int(base=16)) | ansible.utils.ipaddr('address') }}"
-
 provisioned_disks:
   - dev: "/dev/disk/by-id/virtio-data01"
     vols:
@@ -32,11 +30,11 @@ gitlab_nginx_listen_https: "false"
 gitlab_nginx_listen_port: 80
 gitlab_nginx_ssl_verify_client: ""
 gitlab_nginx_ssl_client_certificate: ""
-gitlab_nginx_trusted_addresses: "{{ proxy_hosts }}"
+gitlab_nginx_trusted_addresses: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
 
 gitlab_registry_enable: "true"
 gitlab_registry_port: 5005
-gitlab_registry_nginx_trusted_addresses: "{{ proxy_hosts }}"
+gitlab_registry_nginx_trusted_addresses: "{{ gitlab_nginx_trusted_addresses }}"
 gitlab_registry_nginx_listen_https: 'false'
 gitlab_registry_nginx_listen_port: 5000
 

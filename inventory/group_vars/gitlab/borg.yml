@@ -5,6 +5,7 @@ borg_backups:
     timer_description: "Backup gitlab every Friday night"
     oncalendar: "Fri *-*-* 23:00:00"
     target_host: "theia"
+    ssh_dest_hosts_ip_var: "borg_ansible_host_general"
     passphrase: "{{ borg_libvirt_passphrase }}"
     paths:
       - "/var/opt/gitlab"

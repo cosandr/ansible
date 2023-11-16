@@ -1,0 +1,49 @@
+home_net:
+  vm:
+{% if 'cidr' in supernets %}
+    cidr: "{{ supernets.cidr | ansible.utils.ipsubnet(24, 10) }}"
+{% endif %}
+{% if 'cidr6' in supernets %}
+    cidr6: "{{ supernets.cidr6 | ansible.utils.ipsubnet(64, 10) }}"
+{% endif %}
+    vlan: 10
+    mt_lists: [LAN, NOSEC]
+  general:
+{% if 'cidr' in supernets %}
+    cidr: "{{ supernets.cidr | ansible.utils.ipsubnet(24, 50) }}"
+{% endif %}
+{% if 'cidr6' in supernets %}
+    cidr6: "{{ supernets.cidr6 | ansible.utils.ipsubnet(64, 50) }}"
+{% endif %}
+    vlan: 50
+    mt_lists: [LAN, NOSEC]
+    upnp: true
+
+internal_net:
+  mgmt:
+{% if 'cidr' in supernets %}
+    cidr: "{{ supernets.cidr | ansible.utils.ipsubnet(24, 100) }}"
+{% endif %}
+{% if 'cidr6' in supernets %}
+    cidr6: "{{ supernets.cidr6 | ansible.utils.ipsubnet(64, 100) }}"
+{% endif %}
+    vlan: 100
+    mt_lists: [LAN, SEC]
+  san:
+{% if 'cidr' in supernets %}
+    cidr: "{{ supernets.cidr | ansible.utils.ipsubnet(24, 2) }}"
+{% endif %}
+{% if 'cidr6' in supernets %}
+    cidr6: "{{ supernets.cidr6 | ansible.utils.ipsubnet(64, 2) }}"
+{% endif %}
+    vlan: 2
+    mtu: 9000
+    mt_lists: [LAN, SEC, NOWAN, NOROUTE]
+  kube:
+    cidr: "172.27.0.0/16"
+    # cidr6: "fd00:172:27::/56"
+
+wg_net:
+  mt:
+    cidr: "10.4.20.0/24"
+    # cidr6: "fd00:4:20::/64"

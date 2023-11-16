@@ -1,6 +1,8 @@
 ---
 
-__ip_offset: 0
+host_ips_host:
+  ipmi: "{{ subnets.mgmt.ipmi | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"
+
 __bond0_primary_iface: "enp43s0f0"
 __bond0_backup_iface: "enp35s0"
 

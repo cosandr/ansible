@@ -9,5 +9,5 @@ node_exporter_no_collectors:
   - textfile
 
 node_exporter_config_firewall: "{{ firewall_enabled | default(true) }}"
-node_exporter_allow_ips: "{{ groups['prom'] | difference(groups['webgw']) | map('extract', hostvars, 'ansible_host') | list }}"
+node_exporter_allow_ips: "{{ subnets.vm.prom }}"
 node_exporter_port: 9100

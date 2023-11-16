@@ -7,4 +7,3 @@ serial_proxies:
 
 node_exporter_allow_ips:
   - "{{ wg_net.mt.cidr }}"
-  - "{{ wg_net.mt.cidr6 }}"

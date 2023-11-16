@@ -19,3 +19,14 @@ sshd_config:
     line: "ClientAliveInterval 30"
   - regexp: "^#?ClientAliveCountMax"
     line: "ClientAliveCountMax 3"
+
+sshd_extra_config: |
+  Match Address 127.0.0.1,{{ ansible_host }}
+      PermitRootLogin no
+  Match Address {{ firewall_trusted_sources | join(',') }}
+      PermitRootLogin prohibit-password
+
+  Match User {{ my_user }}
+    StreamLocalBindUnlink yes
+    AllowTcpForwarding yes
+    X11Forwarding yes

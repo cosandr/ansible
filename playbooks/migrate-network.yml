@@ -1,0 +1,154 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+# Add old IPs to hosts file, checkout old branch and run
+# ansible localhost -m copy -a "dest=/tmp/old_hosts content='{% for h in groups['all'] | sort %}{{ h }} old_ansible_host={{ hostvars[h].ansible_host }}\n{% endfor %}'"
+
+- name: Change IP address
+  hosts: all,!mikrotik,!rom,!syno
+  gather_facts: false
+  tasks:
+    - name: End host if it's not managed by networkd
+      ansible.builtin.meta: end_host
+      when: not networkd_config | default(false) or old_ansible_host is not defined
+      tags: ["always"]
+
+    - name: Try to gather facts with old IP
+      ansible.builtin.setup:
+        gather_timeout: 1
+        gather_subset:
+          - min
+      vars:
+        ansible_host: "{{ old_ansible_host }}"
+      ignore_unreachable: true
+      register: __old_ip_facts
+      tags: ["always"]
+
+    - name: Try to gather facts with new IP
+      ansible.builtin.setup:
+        gather_timeout: 1
+        gather_subset:
+          - min
+      ignore_unreachable: true
+      register: __new_ip_facts
+      tags: ["always"]
+
+    - name: End host if neither IP worked
+      ansible.builtin.meta: end_host
+      when:
+        - __old_ip_facts.unreachable is defined
+        - __new_ip_facts.unreachable is defined
+      tags: ["always"]
+
+    - name: Set connect_ip fact
+      ansible.builtin.set_fact:
+        connect_ip: >-
+          {%- if __old_ip_facts.unreachable is not defined and __old_ip_facts.ansible_facts.ansible_hostname == inventory_hostname -%}
+          {{ old_ansible_host }}
+          {%- elif __new_ip_facts.unreachable is not defined and __new_ip_facts.ansible_facts.ansible_hostname == inventory_hostname -%}
+          {{ ansible_host }}
+          {%- elif __new_ip_facts.unreachable is not defined and __new_ip_facts.ansible_facts.ansible_hostname != inventory_hostname -%}
+          {{ old_ansible_host }}
+          {%- else -%}
+          {{ old_ansible_host }}
+          {%- endif -%}
+      tags: ["always"]
+
+    - name: End host if it's already using the correct IP
+      ansible.builtin.meta: end_host
+      when: connect_ip == ansible_host
+      tags: ["always"]
+
+    - name: Gather facts with connect_ip
+      ansible.builtin.setup:
+        gather_timeout: 1
+        gather_subset:
+          - min
+      ignore_unreachable: true
+      vars:
+        ansible_host: "{{ connect_ip }}"
+      register: __connect_ip_facts
+      tags: ["always"]
+
+    - name: End host if we didn't find the expected host
+      ansible.builtin.meta: end_host
+      when: __connect_ip_facts.unreachable is defined or
+            __connect_ip_facts.ansible_facts.ansible_hostname != inventory_hostname
+      tags: ["always"]
+
+    - name: Print connect_ip
+      ansible.builtin.debug:
+        var: connect_ip
+      tags: ["always"]
+
+    - name: Add host to change required group
+      ansible.builtin.add_host:
+        name: "{{ item }}"
+        groups:
+          - change_ip
+        connect_ip: "{{ hostvars[item].connect_ip }}"
+      loop: "{{ ansible_play_hosts }}"
+      tags: ["always"]
+
+- name: Change IPs
+  hosts: change_ip
+  gather_facts: false
+  vars:
+    ansible_ssh_host: "{{ connect_ip }}"
+  pre_tasks:
+    - name: Reset firewalld
+      when: firewall_frontend == 'firewalld'
+      tags: ["firewall", "firewalld"]
+      block:
+        - name: Find all firewalld configs
+          ansible.builtin.find:
+            paths: "/etc/firewalld/zones"
+            patterns:
+              - "*.xml"
+            excludes:
+              - "docker.xml"
+          register: __zones_present
+
+        - name: Disable all firewalld configs
+          ansible.builtin.command:
+            cmd: "mv {{ item.path }} {{ item.path }}.bak"
+            removes: "{{ item.path }}"
+          loop: "{{ __zones_present.files }}"
+          loop_control:
+            label: "{{ item.path }}"
+
+        - name: Reload firewalld
+          ansible.builtin.systemd:
+            name: firewalld.service
+            state: reloaded
+
+    - name: Reset ufw
+      community.general.ufw:
+        state: reset
+      when: firewall_frontend == 'ufw'
+      tags: ["firewall", "ufw"]
+
+  roles:
+    - role: systemd_networkd
+      vars:
+        networkd_install: false
+        # Reboot after fixing stuff
+        networkd_immediate: false
+      tags: ["networkd"]
+
+    - role: firewall_config
+      vars:
+        firewall_install: false
+        firewall_reload_handlers: false
+      tags: ["firewall"]
+
+  post_tasks:
+    - name: Reboot
+      ansible.builtin.reboot:
+      when: "'reboot' in ansible_run_tags"
+      tags: ["reboot"]
+
+    - name: Shutdown
+      community.general.shutdown:
+      when: "'shutdown' in ansible_run_tags"
+      tags: ["shutdown"]

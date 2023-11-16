@@ -34,9 +34,3 @@ firewalld_services:
   - name: samba-client
     zone: public
     state: absent
-
-mt_firewall_address_lists:
-  - address: "{{ ansible_host }}"
-    list: www
-  - address: "{{ ansible_host6 }}"
-    list: www

@@ -25,6 +25,19 @@ mt_interface_list: >-
 mt_firewall_rules: "{{ lookup('template', repo_base_dir + '/files/mikrotik/firewall_vault.yml.j2', template_vars={'ipv4': true}) | from_yaml }}"
 mt_firewall_nat: "{{ vault_mt_firewall_nat }}"
 
+__mt_firewall_subnet_lists:
+  - "{{ subnets.general.noinet | andrei.utils.items2dictlist('address', list='no-inet', comment='general-no-inet') }}"
+  - "{{ subnets.general.trusted | andrei.utils.items2dictlist('address', list='allow-lan', comment='general-trusted') }}"
+  - "{{ subnets.mt.trusted | andrei.utils.items2dictlist('address', list='allow-lan', comment='wg-trusted') }}"
+  - "{{ subnets.mt.webgw | andrei.utils.items2dictlist('address', list='allow-www', comment='wg-webgw') }}"
+  - "{{ subnets.vm.docker | andrei.utils.items2dictlist('address', list='www', comment='vm-docker') }}"
+  - "{{ subnets.vm.gitlab | andrei.utils.items2dictlist('address', list='www', comment='vm-gitlab') }}"
+  - "{{ subnets.vm.localgw | andrei.utils.items2dictlist('address', list='allow-www', comment='vm-localgw') }}"
+  - "{{ subnets.vm.loki | andrei.utils.items2dictlist('address', list='loki', comment='vm-loki') }}"
+  - "{{ subnets.vm.nextcloud | andrei.utils.items2dictlist('address', list='www', comment='vm-nextcloud') }}"
+  - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='allow-lan', comment='vm-prom') }}"
+  - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='www', comment='vm-prom') }}"
+
 __mt_firewall_address_lists_manual:
   - address: "{{ wireguard_endpoint.split(':', 1)[0] }}"
     list: WANs
@@ -32,19 +45,9 @@ __mt_firewall_address_lists_manual:
   - address: "{{ all_net.kube.cidr }}"
     list: kube
     comment: kube
-  - address: "{{ ((__mt_wg_peers_manual | selectattr('comment', 'eq', 'p7') | first)['allowed-address'].split(',')
-      | ansible.utils.ipv4 | ansible.utils.ipaddr('address')) | first }}"
+  - address: "{{ hostvars['p7'].wireguard_ip }}"
     list: allow-general
     comment: p7
-  - address: "10.0.50.51"
-    list: no-inet
-    comment: dht01
-  - address: "10.0.50.54"
-    list: no-inet
-    comment: dht04
-  - address: "10.0.50.55"
-    list: no-inet
-    comment: dht05
 
 __mt_firewall_address_lists_auto: >-
   {%- set tmp = [] -%}
@@ -57,9 +60,12 @@ __mt_firewall_address_lists_auto: >-
   }) -}}
   {%- endfor -%}
   {%- endfor -%}
+  {%- for item in __mt_firewall_subnet_lists | flatten if item.address | ansible.utils.ipv4 -%}
+  {{- tmp.append(item) -}}
+  {%- endfor -%}
   {{ tmp }}
 
-mt_firewall_address_lists: "{{ __mt_firewall_address_lists_manual + __mt_firewall_address_lists_auto }}"
+mt_firewall_address_lists: "{{ __mt_firewall_address_lists_manual | flatten + __mt_firewall_address_lists_auto }}"
 
 mt_firewall_mangle_ipv6:
   # https://forum.mikrotik.com/viewtopic.php?t=162930#p802790
@@ -143,6 +149,9 @@ __mt_firewall_address_lists_ipv6_auto: >-
     "comment": item.comment | default(h),
   }) -}}
   {%- endfor -%}
+  {%- endfor -%}
+  {%- for item in __mt_firewall_subnet_lists | flatten if item.address | ansible.utils.ipv6 -%}
+  {{- tmp.append(item) -}}
   {%- endfor -%}
   {{ tmp }}
 

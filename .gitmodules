@@ -76,3 +76,6 @@
 [submodule "roles/nextcloud_exporter"]
 	path = roles/nextcloud_exporter
 	url = git@github.com:cosandr/ansible-role-nextcloud_exporter.git
+[submodule "ansible_collections/andrei/utils"]
+	path = ansible_collections/andrei/utils
+	url = git@github.com:cosandr/ansible-collection-utils.git

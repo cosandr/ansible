@@ -33,6 +33,7 @@ borg_backups:
   - name: "flash-remote"
     passphrase: "{{ vault_borg_remote_passphrase }}"
     target_host: "theia"
+    ssh_dest_hosts_ip_var: "borg_ansible_host_vm"
     ssh_check: "{{ hostvars['theia'].borg_ssh_check_ip }}"
     repo: "{{ hostvars['theia'].borg_remote_repo_ip }}/boot"
     ssh_known_hosts_mode: "0600"

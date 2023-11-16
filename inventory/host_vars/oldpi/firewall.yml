@@ -2,16 +2,14 @@
 
 __ssh_sources:
   - "{{ wg_net.mt.cidr }}"
-  - "{{ wg_net.mt.cidr6 }}"
-  - "{{ home_net | dict2items | json_query('[].value.cidr') }}"
-  - "{{ home_net | dict2items | json_query('[].value.cidr6') }}"
+  - "{{ home_net | json_query('*.cidr') }}"
 
 firewall_rules:
   - port: 22
     sources: "{{ __ssh_sources | flatten }}"
 
   - port: "{{ (serial_proxies | selectattr('name', 'eq', 'pwr') | first).port }}"
-    source: "10.0.50.48"
+    source: "{{ hostvars['ha'].ansible_host }}"
 
   # RouterOS neighbour discovery
   - port: 5678

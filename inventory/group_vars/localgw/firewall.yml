@@ -8,7 +8,4 @@ firewalld_rich_rules:
     rich_rule: "rule family=ipv4 destination address={{ ansible_host }} forward-port port=22 protocol=tcp to-port=22 to-addr={{ hostvars['gitlab01'].ansible_host }}"
 
   - zone: public
-    rich_rule: "rule family=ipv6 destination address={{ ansible_host6 }} forward-port port=22 protocol=tcp to-port=22 to-addr={{ hostvars['gitlab01'].ansible_host6 }}"
-
-  - zone: public
     rich_rule: "rule family=ipv6 masquerade"

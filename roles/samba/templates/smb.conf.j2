@@ -17,7 +17,7 @@
 {% endif %}
 
 {% for name, value in samba_extra_global_options.items() %}
-    {{ name }} = {{ value | bool_to_yes }}
+    {{ name }} = {{ value | andrei.utils.bool_to_yes }}
 {% endfor %}
 
 #============================ Share Definitions ==============================
@@ -25,6 +25,6 @@
 
 [{{ name }}]
 {% for k, v in vars.items() %}
-    {{ k }} = {{ v | bool_to_yes }}
+    {{ k }} = {{ v | andrei.utils.bool_to_yes }}
 {% endfor %}
 {% endfor %}

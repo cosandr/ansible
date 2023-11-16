@@ -1,0 +1,15 @@
+{% set all_net = home_net | combine(internal_net, wg_net) %}
+# Pretty nasty, might be easier with lists
+{% set tmp = {} %}
+{% for net_name, nets in vips.items() %}
+{% set tmp2 = {} %}
+{% for name, addrs in nets.items() %}
+{% set tmp3 = [] %}
+{% for addr in addrs %}
+{{- tmp3.append(addr + "/" + ((addr | ansible.utils.ipv4) | ternary(all_net[net_name].cidr, all_net[net_name].cidr6) | ansible.utils.ipaddr('prefix') | string)) -}}
+{% endfor %}
+{{- tmp2.update({name: tmp3}) -}}
+{% endfor %}
+{{- tmp.update({net_name: tmp2}) -}}
+{% endfor %}
+vips_with_prefix: {{ tmp }}

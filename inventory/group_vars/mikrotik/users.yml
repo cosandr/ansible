@@ -17,4 +17,4 @@ mt_users:
     args:
       - "password={{ lookup('community.general.passwordstore', 'network/mt_prom_pass') }}"
       - "group=prometheus"
-      - "address={{ hostvars['prom01'].ansible_host }}/32"
+      - "address={{ subnets.vm.prom | join(',') }}"

@@ -4,7 +4,7 @@ Description={{ conf.timer_description | default('Scheduled borg backup for ' + c
 
 [Timer]
 OnCalendar={{ conf.oncalendar | default('*-*-* ' + ansible_date_time.time) }}
-Persistent={{ conf.persistent | bool_to_yes('yes') }}
+Persistent={{ conf.persistent | andrei.utils.bool_to_yes('yes') }}
 
 [Install]
 WantedBy=timers.target

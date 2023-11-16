@@ -6,7 +6,7 @@ metallb_speaker_enabled: false
 metallb_config:
   address_pools:
     primary:
-      ip_range: "{{ subnets.kube.lb }}"
+      ip_range: "{{ subnets.kube.lb | ansible.utils.ipv4 }}"
       auto_assign: true
   layer2:
     - primary

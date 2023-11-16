@@ -7,7 +7,7 @@ firewalld_zones:
     interfaces: "{{ host_nic_names }}"
 
   - name: internal
-    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+    sources: "{{ home_net | json_query('*.cidr') }}"
 
   - name: internal
     sources: ["{{ wg_net.mt.cidr }}"]
@@ -17,7 +17,7 @@ firewalld_zones:
     sources: "{{ node_exporter_allow_ips }}"
 
   - name: internal
-    sources: "{{ subnets.kube.mon }}"
+    sources: "{{ subnets.kube.mon | ansible.utils.ipv4 }}"
 
 firewalld_services:
   - name: cockpit
@@ -39,7 +39,3 @@ firewalld_services:
 firewall_rules:
   - port: "{{ node_exporter_port }}"
     zone: internal
-
-mt_firewall_address_lists:
-  - address: "{{ ansible_host }}"
-    list: loki

@@ -4,16 +4,13 @@ wireguard_port: "51821"
 wireguard_interface: "mt"
 wireguard_addresses:
   - "{{ wireguard_ip }}/{{ wg_net[host_wg_net].cidr | ansible.utils.ipaddr('prefix') | string }}"
-  - "{{ wireguard_ip6 }}/{{ wg_net[host_wg_net].cidr6 | ansible.utils.ipaddr('prefix') | string }}"
 
 wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
   - "{{ hostvars['loki01'].ansible_host }}/32"
-  - "{{ hostvars['rb5009'].wireguard_ip6 }}/128"
 
 wireguard_webgw_allowed_ips:
   - "{{ hostvars['webgw01'].wireguard_ip }}/32"
-  - "{{ hostvars['webgw01'].wireguard_ip6 }}/128"
 
 wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"

@@ -5,14 +5,7 @@ firewalld_zones:
     interfaces: "{{ host_nic_names }}"
 
   - name: internal
-    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
-
-  - name: internal
-    sources:
-      - "{{ hostvars['laptop'].wireguard_ip }}"
-
-  - name: internal
-    sources: "{{ groups['pgbackrest'] | map('extract', hostvars, 'ansible_host') }}"
+    sources: "{{ home_net | json_query('*.cidr') + subnets.mt.trusted }}"
 
 firewalld_services:
   - name: postgresql

@@ -7,10 +7,10 @@ firewalld_zones:
     interfaces: "{{ host_nic_names }}"
 
   - name: internal
-    sources: "{{ home_net | dict2items | json_query('[].value.cidr') }}"
+    sources: "{{ home_net | json_query('*.cidr') }}"
 
   - name: internal
-    sources: "{{ wg_net | dict2items | json_query('[].value.cidr') }}"
+    sources: "{{ wg_net | json_query('*.cidr') }}"
 
 firewalld_services:
   - name: cockpit

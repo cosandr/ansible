@@ -3,9 +3,10 @@
 Name={{ name | upper }}
 
 [Network]
-Address={{ __host_ips[name] }}
+{% if name in host_ips_with_prefix %}
+Address={{ host_ips_with_prefix[name] }}
 {% if overrides.get('dns') %}
-DNS={{ all_net[name].cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
+DNS={{ hostvars['rb5009'].host_ips[name] }}
 DNS=1.1.1.1
 DNS=8.8.8.8
 {% endif %}
@@ -13,11 +14,15 @@ DNS=8.8.8.8
 [Route]
 {% if overrides.get('route') %}
 {% if 'Gateway' not in overrides['route'] %}
-Gateway={{ all_net[name].cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
+Gateway={{ hostvars['rb5009'].host_ips[name] }}
 {% endif %}
 {% for k, v in overrides['route'].items() %}
 {{ k }}={{ v }}
 {% endfor %}
 {% else %}
 Scope=link
+{% endif %}
+{% else %}
+LinkLocalAddressing=no
+IPv6AcceptRA=no
 {% endif %}
