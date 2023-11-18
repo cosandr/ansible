@@ -3,7 +3,17 @@
 mikrotik_exporter_listen_address: ":9436"
 mikrotik_exporter_port: "{{ mikrotik_exporter_listen_address.split(':')[1] }}"
 mikrotik_exporter_config:
-  devices: "{{ vault_mikrotik_exporter_devices }}"
+  devices: >-
+    {%- set tmp = [] -%}
+    {%- for h in groups['mikrotik'] if hostvars[h].mt_users | default([]) | selectattr('name', 'eq', 'prometheus') -%}
+    {{- tmp.append({
+      "name": h,
+      "user": "prometheus",
+      "address": hostvars[h].host_ips.get(host_net) | default(hostvars[h].ansible_host, true),
+      "password": lookup('community.general.passwordstore', 'network/mt_prom_pass'),
+    }) -}}
+    {%- endfor -%}
+    {{ tmp }}
 
   features:
     dhcp: true
