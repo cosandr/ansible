@@ -1,5 +1,0 @@
----
-
-webgw_zone: '0-webgw'
-webgw_ports: []
-webgw_sources: "{{ groups['webgw'] }}"

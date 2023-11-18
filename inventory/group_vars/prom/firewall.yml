@@ -14,6 +14,9 @@ firewalld_zones:
   - name: internal
     sources: "{{ firewall_trusted_sources | ansible.utils.ipaddr(wg_net.mt.cidr) }}"
 
+  - name: "0-webgw"
+    sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
+
 firewalld_services:
   - name: cockpit
     zone: public
@@ -32,6 +35,8 @@ firewalld_services:
     state: absent
 
 firewall_rules:
+  - port: "{{ grafana_port }}"
+    zone: "0-webgw"
   - port: "{{ node_exporter_port }}"
     zone: public
     sources: "{{ __am_fw_sources }}"

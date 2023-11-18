@@ -51,10 +51,6 @@
             - ansible_selinux.status == "enabled"
 
   roles:
-    - role: firewalld_webgw
-      when: webgw_ports
-      tags: ["firewall"]
-
     - role: prometheus
       tags: ["prometheus"]
 

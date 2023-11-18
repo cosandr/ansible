@@ -13,7 +13,6 @@ ipmi_exporter_modules: {}
 mikrotik_exporter_config: {}
 promtail_syslog_port: ""
 pushgateway_port: ""
-webgw_ports: []
 provisioned_disks: []
 borg_backups: []
 prometheus_blackbox_icmp_targets:

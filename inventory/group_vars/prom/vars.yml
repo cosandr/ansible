@@ -17,9 +17,6 @@ provisioned_disks:
         shrink: false
         size: "100%FREE"
 
-webgw_ports:
-  - "{{ grafana_port }}"
-
 node_exporter_config_firewall: false
 prometheus_alertmanager_targets: ["{{ wireguard_ip | default(ansible_host) + ':' + alertmanager_port | string }}"]
 prometheus_prometheus_targets: ["{{ wireguard_ip | default(ansible_host) + ':' + prometheus_port | string }}"]

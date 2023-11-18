@@ -5,9 +5,6 @@
   hosts: nextcloud
   gather_facts: true
   roles:
-    - role: firewalld_webgw
-      tags: ["firewalld"]
-
     - role: cosandr.nextcloud
       tags: ["nextcloud"]
 

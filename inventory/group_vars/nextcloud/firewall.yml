@@ -1,5 +1,14 @@
 ---
 
+firewalld_zones:
+  - name: public
+    interfaces: "{{ host_nic_names }}"
+
+  - name: "0-webgw"
+    sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
+
 firewall_rules:
+  - port: "{{ nextcloud_port }}"
+    zone: "0-webgw"
   - port: "{{ nextcloud_exporter_port }}"
     sources: "{{ node_exporter_allow_ips }}"

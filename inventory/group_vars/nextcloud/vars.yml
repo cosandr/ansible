@@ -14,10 +14,6 @@ nextcloud_domain: "cloud.{{ domains['dv'] }}"
 nextcloud_server_name: "{{ nextcloud_domain }}"
 nextcloud_php_version: "8.2"  # Nextcloud 27+ requires PHP 8.1 or later
 
-# TODO: Remove
-webgw_ports:
-  - "{{ nextcloud_port }}"
-
 nextcloud_generate_certificate: true
 nextcloud_certificate_cn: "{{ inventory_hostname }}.vm.{{ domains['dv'] }}"
 nextcloud_certificate_alt_name:
