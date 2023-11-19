@@ -1,12 +1,24 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- name: Setup Prometheus
+- name: Setup Prometheus common
+  hosts: prom_common
+  gather_facts: true
+  roles:
+    - role: prometheus
+      tags: ["prometheus"]
+
+    - role: alertmanager
+      tags: ["alertmanager"]
+
+    - role: blackbox_exporter
+      tags: ["blackbox_exporter"]
+
+- name: Setup on-prem Prometheus servers
   hosts: prom
   gather_facts: true
   pre_tasks:
     - name: Configure rsyslog
-      when: promtail_syslog_port
       tags: ["rsyslog"]
       block:
         - name: Install rsyslog
@@ -50,42 +62,6 @@
             - ansible_os_family == 'RedHat'
             - ansible_selinux.status == "enabled"
 
-  roles:
-    - role: prometheus
-      tags: ["prometheus"]
-
-    - role: alertmanager
-      tags: ["alertmanager"]
-
-    - role: blackbox_exporter
-      tags: ["blackbox_exporter"]
-
-    - role: ipmi_exporter
-      when: ipmi_exporter_modules
-      tags: ["ipmi_exporter"]
-
-    - role: mikrotik_exporter
-      when: mikrotik_exporter_config
-      tags: ["mikrotik_exporter"]
-
-    - role: grafana
-      when: grafana_database
-      tags: ["grafana"]
-
-    - role: cloudalchemy.pushgateway
-      when: pushgateway_port
-      tags: ["pushgateway"]
-
-  handlers:
-    - name: Restart rsyslog
-      ansible.builtin.service:
-        name: rsyslog
-        state: restarted
-
-- name: Setup Thanos
-  hosts: prom, !webgw
-  gather_facts: true
-  pre_tasks:
     # Must manually create user, create thanos policy and assign it to user
     - name: Create Thanos bucket
       delegate_to: localhost
@@ -97,5 +73,23 @@
       tags: ["bucket"]
 
   roles:
+    - role: ipmi_exporter
+      tags: ["ipmi_exporter"]
+
+    - role: mikrotik_exporter
+      tags: ["mikrotik_exporter"]
+
+    - role: grafana
+      tags: ["grafana"]
+
+    - role: cloudalchemy.pushgateway
+      tags: ["pushgateway"]
+
     - role: thanos
       tags: ["thanos"]
+
+  handlers:
+    - name: Restart rsyslog
+      ansible.builtin.service:
+        name: rsyslog
+        state: restarted

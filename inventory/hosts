@@ -95,7 +95,6 @@ ansible_group_priority=2
 
 [libvirt]
 localgw01
-prom01
 
 [libvirt:children]
 db
@@ -106,6 +105,7 @@ loki
 minio
 nextcloud
 docker
+prom
 
 [libvirt:vars]
 host_net=vm
@@ -157,9 +157,14 @@ gitrun02 host_num=1 vm_host=ymir
 [gitrun:vars]
 host_subnet=gitrun
 
+[prom_common]
+webgw01
+
+[prom_common:children]
+prom
+
 [prom]
 prom01 host_num=0 vm_host=gerd
-webgw01
 
 [prom:vars]
 host_subnet=prom

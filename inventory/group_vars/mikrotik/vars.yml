@@ -18,7 +18,7 @@ mt_admin_allowed_addresses: "{{ firewall_trusted_sources + [all_net.mgmt.cidr] }
 
 mt_logging_actions: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['prom'] if (hostvars[h].promtail_syslog_port | default(false)) -%}
+  {%- for h in groups['prom'] -%}
   {{- tmp.append({
     "name": h,
     "remote": hostvars[h].ansible_host,
@@ -38,7 +38,7 @@ __mt_logging_manual:
 
 __mt_logging_auto: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['prom'] if (hostvars[h].promtail_syslog_port | default(false)) -%}
+  {%- for h in groups['prom'] -%}
   {%- for topic in ['warning', 'error', 'critical'] -%}
   {{- tmp.append({
     "action": h,

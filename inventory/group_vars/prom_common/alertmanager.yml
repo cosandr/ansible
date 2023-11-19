@@ -3,7 +3,7 @@
 alertmanager_version: latest
 alertmanager_port: 9093
 alertmanager_peer_port: 9094
-alertmanager_web_listen_address: "0.0.0.0:{{ alertmanager_port }}"
+alertmanager_web_listen_address: "{{ wireguard_ip | default('0.0.0.0') }}:{{ alertmanager_port }}"
 alertmanager_web_external_url: "http://{{ wireguard_ip | default(ansible_host) }}:{{ alertmanager_port }}/"
 
 alertmanager_cluster:

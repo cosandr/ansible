@@ -97,7 +97,6 @@ host_nic_names: >-
   {%- endfor -%}
   {{ tmp }}
 
-# TODO: Broken in prom's group_vars
 firewalld_zones:
   - name: public
     interfaces: "{{ host_nic_names }}"

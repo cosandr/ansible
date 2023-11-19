@@ -1,0 +1,161 @@
+---
+
+__prom_node_ips: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['prom_common'] -%}
+  {{- tmp.append(hostvars[h].wireguard_ip | default(hostvars[h].ansible_host)) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+prometheus_version: latest
+prometheus_port: 9090
+prometheus_storage_retention: "365d"
+prometheus_web_listen_address: "{{ wireguard_ip | default('0.0.0.0') }}:{{ prometheus_port }}"
+prometheus_web_external_url: "http://{{ wireguard_ip | default(ansible_host) }}:{{ prometheus_port }}"
+prometheus_global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+__prom_auto_target_group: "all"
+prometheus_alertmanager_config:
+  - static_configs:
+      - targets: "{{ __prom_node_ips | map('regex_replace', '$', ':' + (alertmanager_port | string)) | list }}"
+
+__prom_am_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['prom_common'] | sort if hostvars[h].prometheus_alertmanager_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_alertmanager_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_prom_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['prom_common'] | sort if hostvars[h].prometheus_prometheus_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_prometheus_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_node_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_node_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_node_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_nginx_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nginx_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_nginx_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_nvme_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nvme_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_nvme_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_nextcloud_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nextcloud_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_nextcloud_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_blackbox_icmp_targets: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_icmp_targets | default([]) -%}
+  {{- tmp.append(hostvars[h].prometheus_blackbox_icmp_targets) -}}
+  {%- endfor -%}
+  {{ tmp | flatten | unique | sort }}
+
+__prom_blackbox_http_targets: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_http_targets | default([]) -%}
+  {{- tmp.append(hostvars[h].prometheus_blackbox_http_targets) -}}
+  {%- endfor -%}
+  {{ tmp | flatten | unique | sort }}
+
+__prom_blackbox_tls_targets: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_tls_targets | default([]) -%}
+  {{- tmp.append(hostvars[h].prometheus_blackbox_tls_targets) -}}
+  {%- endfor -%}
+  {{ tmp | flatten | unique | sort }}
+
+__prom_blackbox_starttls_targets: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_starttls_targets | default([]) -%}
+  {{- tmp.append(hostvars[h].prometheus_blackbox_starttls_targets) -}}
+  {%- endfor -%}
+  {{ tmp | flatten | unique | sort }}
+
+prometheus_scrape_configs: "{{ (__common_prometheus_scrape_configs | default([])) + (__extra_prometheus_scrape_configs | default([])) }}"
+
+__common_prometheus_scrape_configs:
+  - job_name: "alertmanager"
+    static_configs: "{{ __prom_am_configs }}"
+
+  - job_name: "prometheus"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs: "{{ __prom_prom_configs }}"
+
+  - job_name: 'blackbox_icmp4'
+    metrics_path: '/probe'
+    params:
+      module: [icmp_ipv4]
+    static_configs:
+      - targets: "{{ __prom_blackbox_icmp_targets }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "localhost:{{ blackbox_exporter_port }}"
+      - source_labels: [instance]
+        target_label: __host_ip
+
+  - job_name: "node"
+    static_configs: "{{ __prom_node_configs }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __host_ip
+        regex: '([^:]+):\d+'
+
+prometheus_alert_rules_files:
+  - "{{ repo_base_dir }}/files/prometheus/alerts/*.rules"
+
+prometheus_alert_rules: []

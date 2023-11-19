@@ -1,5 +1,5 @@
 ---
-domain: "{{ domains['hb'] }}"
+
 provisioned_disks:
   - dev: "/dev/disk/by-id/virtio-data01"
     vols:
@@ -17,16 +17,7 @@ provisioned_disks:
         shrink: false
         size: "100%FREE"
 
-node_exporter_config_firewall: false
-prometheus_alertmanager_targets: ["{{ wireguard_ip | default(ansible_host) + ':' + alertmanager_port | string }}"]
-prometheus_prometheus_targets: ["{{ wireguard_ip | default(ansible_host) + ':' + prometheus_port | string }}"]
-
 prometheus_blackbox_icmp_targets:
   - "{{ wireguard_ip | default(ansible_host) }}"
   - "google.com"
   - "1.1.1.1"
-
-prometheus_blackbox_http_targets:
-  - "https://google.com"
-  - "https://{{ grafana_domain }}"
-  - "https://ha.{{ domains['hb'] }}"

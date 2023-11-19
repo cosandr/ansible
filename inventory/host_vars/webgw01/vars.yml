@@ -7,18 +7,6 @@ ansible_become: true
 
 sys_timezone: "Etc/UTC"
 
-# Override vars from prom group_vars
-grafana_database: {}
-ipmi_exporter_modules: {}
-mikrotik_exporter_config: {}
-promtail_syslog_port: ""
-pushgateway_port: ""
-provisioned_disks: []
-borg_backups: []
-prometheus_blackbox_icmp_targets:
-  - "{{ ansible_host }}"
-  - "{{ wireguard_ip }}"
-
 extra_host_ipv6_addresses:
   - "{{ acmedns_aaaa_record }}"
 

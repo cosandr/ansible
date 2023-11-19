@@ -1,0 +1,3 @@
+---
+
+grafana_domain: "grafana.{{ domains['hb'] }}"
