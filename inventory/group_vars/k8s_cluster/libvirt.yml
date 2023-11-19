@@ -39,6 +39,9 @@ vm_ignition:
         passwordHash: "{{ lookup('community.general.passwordstore', 'ansible/vm_root_hash') }}"
         sshAuthorizedKeys: "{{ ssh_authorized_keys }}"
 
+resolved_config: {}
+networkd_config: {}
+
 __ignition_networkd_vars:
   name: "enp1s0"
   bootproto: "static"
