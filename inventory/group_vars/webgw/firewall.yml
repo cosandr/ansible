@@ -1,8 +1,46 @@
 ---
 
-firewalld_masquerade_zones:
-  - "internal"
+firewalld_zones:
+  - name: public
+    interfaces: "{{ host_nic_names }}"
 
-firewalld_rich_rules:
-  - zone: public
-    rich_rule: "rule family=ipv4 destination address={{ ansible_host }} forward-port port=22 protocol=tcp to-port=22 to-addr={{ hostvars['gitlab01'].ansible_host }}"
+  - name: internal
+    sources: "{{ wireguard_interface is defined | ternary([], node_exporter_allow_ips) }}"
+    interfaces: "{{ wireguard_interface is defined | ternary([wireguard_interface], []) }}"
+
+firewalld_services: >-
+  {%- set tmp = [] -%}
+  {%- for i in range(1, 4) -%}
+  {{- tmp.extend(lookup('ansible.builtin.vars', '__firewalld_services_' + (i | string), default=[])) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+firewall_rules: >-
+  {%- set tmp = [] -%}
+  {%- for i in range(1, 4) -%}
+  {{- tmp.extend(lookup('ansible.builtin.vars', '__firewall_rules_' + (i | string), default=[])) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__firewalld_services_2:
+  - name: cockpit
+    state: absent
+    zone: public
+
+  - name: http
+    zone: public
+
+  - name: https
+    zone: public
+
+__firewall_rules_2:
+  - port: 22
+    zone: public
+
+  - port: "{{ node_exporter_port }}"
+    zone: internal
+
+  - port: "{{ nginx_exporter_port }}"
+    zone: internal
+
+__firewall_rules_3: "{{ wireguard_endpoint is defined | ternary([{'port': wireguard_endpoint.rsplit(':', 1)[1], 'protocol': 'udp', 'zone': 'public'}], []) }}"

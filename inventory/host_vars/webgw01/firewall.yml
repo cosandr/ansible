@@ -1,13 +1,10 @@
 ---
 
-# Override vars in other groups the host might be in
-firewalld_zones:
-  - name: public
-    interfaces: ["eth0"]
-firewalld_services:
+__firewalld_services_1:
   - name: dns
     zone: internal
-firewall_rules:
+
+__firewall_rules_1:
   # Alertmanager cluster, thanks masquarade
   - port: "{{ alertmanager_port }}"
     zone: internal

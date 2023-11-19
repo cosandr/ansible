@@ -1,11 +1,10 @@
 ---
 
-firewalld_masquerade_zones: []
+__firewalld_services_1:
+  - name: http
+    zone: internal
 
-firewalld_rich_rules: []
-
-firewalld_http_zones:
-  - public
-  - internal
+  - name: https
+    zone: internal
 
 mt_firewall_address_lists: []

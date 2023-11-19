@@ -22,3 +22,6 @@ networkd_config:
     Address={{ ip }}/64
     {% endfor %}
     Gateway=fe80::1
+
+host_nic_names:
+  - eth0

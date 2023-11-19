@@ -9,3 +9,17 @@ __f2b_extra_ignore:
   - "::1"
 
 prometheus_nginx_targets: ["{{ wireguard_ip | default(ansible_host) + ':' + nginx_exporter_port | string }}"]
+
+selinux_modules:
+  - name: nginx-ssh-proxy
+    content: |
+      module nginx-ssh-proxy 1.0;
+
+      require {
+        type httpd_t;
+        type ssh_port_t;
+        class tcp_socket name_bind;
+      }
+
+      #============= httpd_t ==============
+      allow httpd_t ssh_port_t:tcp_socket name_bind;

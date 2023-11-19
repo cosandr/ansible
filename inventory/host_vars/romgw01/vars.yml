@@ -17,3 +17,6 @@ networkd_config:
     DNS=1.1.1.1
     DNS=8.8.8.8
     Gateway=10.1.0.1
+
+host_nic_names:
+  - enp1s0
