@@ -132,3 +132,13 @@
     value: false
   when: __dnf_conf.stat.exists
   tags: ["dnf"]
+
+- name: Setup SELinux policies
+  ansible.builtin.include_role:
+    name: selinux_modules
+    apply:
+      tags: ["selinux", "selinux_modules"]
+  when:
+    - ansible_os_family == 'RedHat'
+    - selinux_modules | default([])
+  tags: ["selinux", "selinux_modules"]

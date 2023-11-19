@@ -1,5 +1,0 @@
----
-
-sshd_extra_config: |
-  Match Address {{ subnets.mt.webgw | join(',') }}
-      PermitRootLogin no

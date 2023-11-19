@@ -41,6 +41,13 @@ gitlab_rails['ldap_allow_username_or_email_login'] = true
 gitlab_rails['ldap_base'] = '{{ gitlab_ldap_base }}'
 {% endif %}
 
+# Gitlab sshd
+# https://docs.gitlab.com/ee/administration/operations/gitlab_sshd.html
+gitlab_sshd['enable'] = true
+gitlab_sshd['listen_address'] = '[::]:{{ gitlab_sshd_port }}'
+gitlab_sshd['proxy_protocol'] = true
+gitlab_sshd['proxy_policy'] = "require"
+
 # GitLab Nginx
 ## See https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/settings/nginx.md
 {% if gitlab_nginx_listen_port is defined %}

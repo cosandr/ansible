@@ -1,5 +1,7 @@
 ---
 
+nginx_extra_conf_options: ""
+
 nginx_upstreams:
   - name: nextcloud_ta
     servers: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].nextcloud_port }}"]

@@ -1,0 +1,17 @@
+---
+
+nginx_extra_conf_options: |
+  stream {
+    upstream gitlab-ssh {
+  {% for h in groups['gitlab'] %}
+      server {{ hostvars[h].ansible_host }}:{{ hostvars[h].gitlab_sshd_port }};
+  {% endfor %}
+    }
+
+    server {
+      listen 22;
+      listen [::]:22;
+      proxy_pass gitlab-ssh;
+      proxy_protocol on;
+    }
+  }

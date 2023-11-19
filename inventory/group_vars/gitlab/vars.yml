@@ -51,6 +51,8 @@ gitlab_smtp_authentication: ''
 gitlab_smtp_enable_starttls_auto: "true"
 gitlab_smtp_openssl_verify_mode: "peer"
 
+gitlab_sshd_port: 2222
+
 gitlab_letsencrypt_enable: "false"
 gitlab_ldap_enabled: "false"
 

@@ -4,6 +4,8 @@ ansible_port: 22
 
 nginx_exporter_web_listen_address: "{{ wireguard_ip }}:{{ nginx_exporter_port }}"
 
+selinux_modules: []
+
 networkd_config:
   enp1s0: |
     [Match]

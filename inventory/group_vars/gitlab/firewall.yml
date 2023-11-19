@@ -6,13 +6,16 @@ firewalld_zones:
 
   - name: internal
     # Allow prometheus and webgw
-    sources: "{{ node_exporter_allow_ips + proxy_hosts }}"
+    sources: "{{ node_exporter_allow_ips + subnets.vm.localgw + subnets.mt.webgw }}"
 
 firewall_rules:
   - port: "{{ gitlab_nginx_listen_port }}"
     zone: internal
 
   - port: "{{ gitlab_registry_nginx_listen_port }}"
+    zone: internal
+
+  - port: "{{ gitlab_sshd_port }}"
     zone: internal
 
   - port: "{{ node_exporter_port }}"
@@ -24,6 +27,10 @@ firewalld_services:
     state: absent
 
   - name: cockpit
+    zone: internal
+    state: absent
+
+  - name: ssh
     zone: internal
     state: absent
 
