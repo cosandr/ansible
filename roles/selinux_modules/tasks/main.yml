@@ -1,0 +1,49 @@
+---
+# https://github.com/evrardjp/ansible-keepalived/blob/a73191c2e49cc7ce1c4a17fd90ef460c76439e94/tasks/keepalived_selinux.yml
+# Copyright 2017, Major Hayden <major@mhtx.net>
+# Copyright 2023, Andrei Costescu
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Install requirements
+  ansible.builtin.dnf:
+    name:
+      - policycoreutils
+      - checkpolicy
+    state: present
+  tags: ["install"]
+
+- name: Get list of present modules
+  changed_when: false
+  check_mode: false
+  ansible.builtin.command:
+    cmd: semodule -l
+  register: __present_mods
+
+- name: Install SELinux modules
+  ansible.builtin.include_tasks:
+    file: compile.yml
+  loop: "{{ selinux_modules }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - item.state | default('present') == 'present'
+    - item.name not in __present_mods.stdout or selinux_modules_force | bool
+
+- name: Remove SELinux modules
+  ansible.builtin.command:
+    cmd: "semodule -r {{ item.name }}"
+    removes: "/etc/selinux/targeted/active/modules/400/{{ item.name }}/cil"
+  loop: "{{ selinux_modules | selectattr('state', 'defined') | selectattr('state', 'eq', 'absent') }}"
+  loop_control:
+    label: "{{ item.name }}"

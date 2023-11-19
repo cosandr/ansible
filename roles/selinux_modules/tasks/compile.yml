@@ -1,0 +1,53 @@
+---
+# Copyright 2017, Major Hayden <major@mhtx.net>
+# Copyright 2023, Andrei Costescu
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Fail if both src and content are defined
+  ansible.builtin.fail:
+    msg: "src and content are mutually exclusive"
+  when:
+    - item.src is defined
+    - item.content is defined
+
+- name: Create directory for compiling SELinux role
+  ansible.builtin.file:
+    path: "/tmp/ansible-selinux-{{ item.name }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0750"
+
+- name: Deploy SELinux policy source file
+  ansible.builtin.copy:
+    src: "{{ item.src | default(omit) }}"
+    content: "{{ item.content | default(omit) }}"
+    dest: "/tmp/ansible-selinux-{{ item.name }}/{{ item.name }}.te"
+    owner: root
+    group: root
+    mode: "0640"
+
+- name: Compile and load SELinux module
+  ansible.builtin.shell:
+    cmd: >-
+      checkmodule -M -m -o {{ item.name }}.mod {{ item.name }}.te &&
+      semodule_package -o {{ item.name }}.pp -m {{ item.name }}.mod &&
+      semodule -i {{ item.name }}.pp
+    creates: "/etc/selinux/targeted/active/modules/400/{{ item.name }}/cil"
+    chdir: "/tmp/ansible-selinux-{{ item.name }}"
+
+- name: Remove temporary directory
+  ansible.builtin.file:
+    path: "/tmp/ansible-selinux-{{ item.name }}"
+    state: absent
