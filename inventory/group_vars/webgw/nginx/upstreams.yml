@@ -1,6 +1,13 @@
 ---
 
-__nginx_upstreams_common:
+nginx_upstreams: >-
+  {%- set tmp = [] -%}
+  {%- for i in range(1, 4) -%}
+  {{- tmp.extend(lookup('ansible.builtin.vars', '__nginx_upstreams_' + (i | string), default=[])) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__nginx_upstreams_3:
   - name: gitlab
     servers: ["{{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_nginx_listen_port }}"]
     keepalive: 16
@@ -29,9 +36,7 @@ __nginx_upstreams_common:
   - name: jellyfin
     servers: ["{{ hostvars['docker01'].ansible_host }}:{{ hostvars['docker01'].jellyfin_port }}"]
 
-__nginx_upstreams_host:
+__nginx_upstreams_2:
   - name: nextcloud_ta
     servers: ["{{ hostvars['romsto'].wireguard_ip }}:{{ hostvars['romsto'].nextcloud_port }}"]
     keepalive: 16
-
-nginx_upstreams: "{{ (__nginx_upstreams_common | default([])) + (__nginx_upstreams_host | default([])) }}"
