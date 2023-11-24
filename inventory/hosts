@@ -121,13 +121,13 @@ pg
 pgbackrest
 
 [pg]
-pg01 host_num=0 vm_host=aegir
+pg01 host_num=0
 
 [pg:vars]
 host_subnet=pg
 
 [pgbackrest]
-pgbak01 host_num=0 vm_host=aegir
+pgbak01 host_num=0
 
 [pgbackrest:vars]
 host_subnet=pgbackrest
@@ -145,14 +145,14 @@ host_wg_num6_offset=false
 host_wg_subnet=switches
 
 [gitlab]
-gitlab01 host_num=0 vm_host=theia
+gitlab01 host_num=0
 
 [gitlab:vars]
 host_subnet=gitlab
 
 [gitrun]
-gitrun01 host_num=0 vm_host=gerd
-gitrun02 host_num=1 vm_host=ymir
+gitrun01 host_num=0
+gitrun02 host_num=1
 
 [gitrun:vars]
 host_subnet=gitrun
@@ -164,20 +164,20 @@ webgw01
 prom
 
 [prom]
-prom01 host_num=0 vm_host=gerd
+prom01 host_num=0
 
 [prom:vars]
 host_subnet=prom
 ansible_group_priority=10
 
 [loki]
-loki01 host_num=0 vm_host=theia
+loki01 host_num=0
 
 [loki:vars]
 host_subnet=loki
 
 [localgw]
-localgw01 host_num=0 vm_host=ymir
+localgw01 host_num=0
 romgw01
 
 [localgw:vars]
@@ -193,19 +193,19 @@ localgw
 host_wg_subnet=webgw
 
 [nextcloud]
-nextcloud01 host_num=0 vm_host=ymir
+nextcloud01 host_num=0
 
 [nextcloud:vars]
 host_subnet=nextcloud
 
 [docker]
-docker01 host_num=0 vm_host=aegir
+docker01 host_num=0
 
 [docker:vars]
 host_subnet=docker
 
 [minio]
-minio01 host_num=0 vm_host=theia
+minio01 host_num=0
 
 [minio:vars]
 host_subnet=minio

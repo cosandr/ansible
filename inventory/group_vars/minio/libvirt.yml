@@ -1,6 +1,4 @@
 ---
 
-vm_host: "theia"
-
 vm_data_disks:
   - "200G"
