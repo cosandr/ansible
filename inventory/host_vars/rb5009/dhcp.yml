@@ -45,4 +45,18 @@ mt_dhcp_networks: >-
   {%- endfor -%}
   {{ tmp }}
 
-mt_dhcp_leases: "{{ vault_mt_dhcp_leases_manual }}"
+__mt_dhcp_leases_auto: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_dhcp_leases | default([])) -%}
+  {%- for item in hostvars[h].mt_dhcp_leases if item.address | ansible.utils.ipv4 -%}
+  {{- tmp.append({
+    "address": item.address,
+    "mac-address": item.mac_address,
+    "server": item.server | default('dhcp-' + hostvars[h].host_net),
+    "comment": item.comment | default(h),
+  }) -}}
+  {%- endfor -%}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_dhcp_leases: "{{ __mt_dhcp_leases_auto + vault_mt_dhcp_leases_manual }}"
