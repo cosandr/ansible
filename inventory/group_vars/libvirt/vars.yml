@@ -3,6 +3,7 @@
 borg_libvirt_passphrase: "{{ vault_borg_libvirt_passphrase }}"
 fstrim_timer_enabled: true
 libvirt_vm_engine: "kvm"
+libvirt_vm_default_uuid_deterministic: true
 
 vm_disk_format: "raw"
 vm_host_list: "{{ groups['kvm_hv'] }}"
@@ -42,10 +43,14 @@ vm_root_disk:
   driver_options:
     discard: "unmap"
 
+# Seperate var so it's accessible using hostvars
+vm_default_mac: "{{ '52:54:{:02x}'.format(all_net[host_net].vlan) | community.general.random_mac(seed=inventory_hostname) }}"
+
 vm_default_nic:
   type: bridge
   source:
     dev: 'VM'
+  mac: "{{ vm_default_mac }}"
   address: "{{ ansible_host }}"
   domain: "{{ all_net.vm.domain }}"
   gateway: "{{ hostvars['rb5009'].host_ips.vm }}"
