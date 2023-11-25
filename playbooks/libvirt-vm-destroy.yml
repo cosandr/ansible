@@ -40,3 +40,9 @@
         path: "{{ vm_ignition_path }}/{{ inventory_hostname }}.ign"
         state: absent
       when: vm_ignition_path | default('')
+
+    - name: Remove QEMU log file
+      delegate_to: "{{ vm_host }}"
+      ansible.builtin.file:
+        path: "/var/log/libvirt/qemu/{{ inventory_hostname }}.log"
+        state: absent
