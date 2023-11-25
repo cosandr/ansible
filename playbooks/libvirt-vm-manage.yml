@@ -41,5 +41,6 @@
       community.libvirt.virt:
         name: "{{ inventory_hostname }}"
         state: "{{ 'shutdown' if 'stop' in ansible_run_tags else 'running' }}"
+        autostart: "{{ autostart | default(vm_started) | bool }}"
       when: current_host_list
       tags: ["start", "stop"]
