@@ -5,6 +5,8 @@ k8s02        ansible_host="10.0.10.65"
 k8s03        ansible_host="10.0.10.66"
 k8s04        ansible_host="10.0.10.67"
 k8s05        ansible_host="10.0.10.68"
+k8s06        ansible_host="10.0.10.69"
+k8s07        ansible_host="10.0.10.70"
 localgw01    ansible_host="10.0.10.80"
 pg01         ansible_host="10.0.10.84"
 pgbak01      ansible_host="10.0.10.88"
@@ -230,6 +232,8 @@ k8s02 host_num=1 etcd_member_name=etcd02
 k8s03 host_num=2 etcd_member_name=etcd03
 k8s04 host_num=3
 k8s05 host_num=4
+k8s06 host_num=5
+k8s07 host_num=6 vm_mem=4096
 
 [k8s_cluster:vars]
 host_subnet=k8s_cluster
@@ -241,7 +245,7 @@ k8s[01:03]
 k8s[01:03]
 
 [kube_node]
-k8s[02:05]
+k8s[02:07]
 
 [unmanaged_hosts]
 ax56u        host_num=5
