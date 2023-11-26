@@ -51,7 +51,7 @@ __mt_dhcp_leases_auto: >-
   {%- for item in hostvars[h].mt_dhcp_leases if item.address | ansible.utils.ipv4 -%}
   {{- tmp.append({
     "address": item.address,
-    "mac-address": item.mac_address,
+    "mac-address": item.mac_address | upper,
     "server": item.server | default('dhcp-' + hostvars[h].host_net),
     "comment": item.comment | default(h),
   }) -}}
