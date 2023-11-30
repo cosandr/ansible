@@ -5,6 +5,7 @@ vm_root_size: "50G"
 vm_host: "{{ vm_host_list[groups['k8s_cluster'] | ansible.utils.index_of('eq', inventory_hostname) % (vm_host_list | length)] }}"
 vm_template: "flatcar.raw"
 vm_customize: false
+vm_autostart: false
 
 # Used by OpenEBS LVM provisioner
 vm_extra_disks:

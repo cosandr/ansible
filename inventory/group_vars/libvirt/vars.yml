@@ -16,6 +16,7 @@ vm_disk_pool: "default"
 vm_ignition_path: "/var/lib/libvirt/images"
 vm_extra_disks: []
 vm_started: true
+vm_autostart: "{{ vm_started }}"
 vm_customize: true
 vm_cpu_mode: "{{ 'custom' if vm_cpu_model_name else 'host-passthrough' }}"
 vm_cpu_model_name: ""
@@ -65,7 +66,7 @@ vm_default_definition:
   state: present
   machine: q35
   start: "{{ vm_started }}"
-  autostart: "{{ vm_started }}"
+  autostart: "{{ vm_autostart }}"
   customize: "{{ vm_customize }}"
   enable_console: true
   enable_vnc: false
