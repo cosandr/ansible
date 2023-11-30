@@ -19,12 +19,24 @@
       register: __hv_ping
       tags: ["always"]
 
+    - name: Set state filter from tags
+      ansible.builtin.set_fact:
+        vm_state_filter: >-
+          {%- if 'stop' in ansible_run_tags -%}
+          running
+          {%- elif 'start' in ansible_run_tags -%}
+          shutdown
+          {%- else -%}
+          false
+          {%- endif -%}
+      tags: ["always"]
+
     - name: Get list of VMs on all hosts
       run_once: true
       check_mode: false
       delegate_to: "{{ item }}"
       community.libvirt.virt:
-        state: "{{ 'running' if 'stop' in ansible_run_tags else 'shutdown' }}"
+        state: "{{ vm_state_filter | default(omit, true) }}"
         command: list_vms
       register: __vm_names
       loop: "{{ __hv_ping.results | selectattr('rc', 'eq', 0) | map(attribute='item') }}"
@@ -35,12 +47,47 @@
         current_host_list: "{{ __vm_names.results | selectattr('list_vms', 'search', inventory_hostname) | map(attribute='item') | list }}"
       tags: ["always"]
 
+    - name: Set delegate_host var
+      ansible.builtin.set_fact:
+        delegate_host: "{{ current_host_list[0] if current_host_list else vm_host }}"
+      tags: ["always"]
+
   tasks:
-    - name: "{{ 'Shutting down' if 'stop' in ansible_run_tags else 'Starting up' }}"
-      delegate_to: "{{ current_host_list[0] }}"
+    - name: Start VMs
+      delegate_to: "{{ delegate_host }}"
       community.libvirt.virt:
         name: "{{ inventory_hostname }}"
-        state: "{{ 'shutdown' if 'stop' in ansible_run_tags else 'running' }}"
+        state: "running"
         autostart: "{{ vm_autostart | bool }}"
-      when: current_host_list
-      tags: ["start", "stop"]
+      tags: ["start"]
+      when: "'start' in ansible_run_tags"
+
+    - name: Stop VMs
+      delegate_to: "{{ delegate_host }}"
+      community.libvirt.virt:
+        name: "{{ inventory_hostname }}"
+        state: "shutdown"
+      tags: ["stop"]
+      when: "'stop' in ansible_run_tags"
+
+    - name: "Ensure autostart is {{ vm_autostart | bool | ternary('enabled', 'disabled') }}"
+      delegate_to: "{{ delegate_host }}"
+      community.libvirt.virt:
+        name: "{{ inventory_hostname }}"
+        autostart: "{{ vm_autostart | bool }}"
+      tags: ["autostart"]
+
+    - name: Run provided virsh command  # noqa no-changed-when
+      delegate_to: "{{ delegate_host }}"
+      ansible.builtin.command:
+        # NOTE: Multiple arguments don't work, only first word is passed
+        cmd: "virsh {{ cmd }} --domain {{ inventory_hostname }}"
+      tags: ["cmd"]
+      register: __virsh
+      when: cmd is defined
+
+    - name: Show output
+      ansible.builtin.debug:
+        msg: "{{ __virsh.stdout_lines }}"
+      when: __virsh.stdout_lines is defined
+      tags: ["cmd"]
