@@ -1,0 +1,14 @@
+---
+apiVersion: projectcalico.org/v3
+kind: FelixConfiguration
+metadata:
+  name: default
+spec:
+  bpfEnabled: {{ calico_ebpf_enabled | lower }}
+  bpfExternalServiceMode: Tunnel
+  bpfLogLevel: ""
+  ipipEnabled: false
+  logSeverityScreen: Info
+  reportingInterval: 0s
+  vxlanEnabled: false
+  wireguardEnabled: false

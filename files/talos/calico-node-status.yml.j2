@@ -1,0 +1,12 @@
+---
+apiVersion: projectcalico.org/v3
+kind: CalicoNodeStatus
+metadata:
+  name: "{{ inventory_hostname }}"
+spec:
+  classes:
+    - Agent
+    - BGP
+    - Routes
+  node: "{{ inventory_hostname }}"
+  updatePeriodSeconds: 10

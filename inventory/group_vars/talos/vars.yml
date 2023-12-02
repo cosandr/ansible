@@ -1,0 +1,21 @@
+---
+
+host_num: "{{ groups['talos'] | ansible.utils.index_of('eq', inventory_hostname) }}"
+
+talos_version: "1.5.5"
+calico_node_as: "{{ 65201 + (groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
+calico_node_status: true
+# https://github.com/projectcalico/calico/issues/7892
+calico_ebpf_enabled: false
+
+talos_kubeprism_enabled: false
+talos_kubeproxy_enabled: "{{ not calico_ebpf_enabled }}"
+talos_kubeproxy_mode: ipvs
+
+# https://www.talos.dev/v1.5/talos-guides/install/boot-assets/#image-factory
+# Contains qemu-guest-agent
+talos_schematic: ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515
+
+kube_api_server: "talos.{{ domains['hb'] }}"
+talos_kubectl_context: "admin@{{ kube_api_server }}"
+kube_ingress_domain: "{{ kube_api_server }}"

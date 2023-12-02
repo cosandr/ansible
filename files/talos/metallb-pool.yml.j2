@@ -1,0 +1,13 @@
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: "default"
+  namespace: metallb-system
+spec:
+  addresses:
+{% for cidr in subnets.talos.lb %}
+  - "{{ cidr }}"
+{% endfor %}
+  autoAssign: true
+  avoidBuggyIPs: true

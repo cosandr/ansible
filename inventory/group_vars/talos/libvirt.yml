@@ -1,0 +1,26 @@
+---
+
+vm_mem: 4096
+vm_host: "{{ vm_host_list[groups['talos'] | ansible.utils.index_of('eq', inventory_hostname) % (vm_host_list | length)] }}"
+vm_template: false
+vm_customize: false
+vm_autostart: false
+
+vm_extra_disks:
+  # TODO: Consider changing to LVM passthrough
+  - name: "{{ inventory_hostname }}-data01.{{ vm_disk_format }}"
+    format: "{{ vm_disk_format }}"
+    device: "disk"
+    capacity: "25G"
+    serial: "data01"
+    pool: "{{ vm_disk_pool }}"
+    target: "vdb"
+    driver_options:
+      discard: "unmap"
+      cache: "none"
+
+  - name: "talos-boot.iso"
+    type: "file"
+    target: "vdc"
+    device: "cdrom"
+    format: "raw"

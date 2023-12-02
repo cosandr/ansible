@@ -1,0 +1,23 @@
+cluster:
+  network:
+    podSubnets: {{ subnets.talos.pod | to_json }}
+    serviceSubnets: {{ subnets.talos.svc | to_json }}
+    cni:
+      name: none
+  proxy:
+    disabled: {{ not talos_kubeproxy_enabled }}
+    mode: {{ talos_kubeproxy_mode }}
+
+machine:
+  install:
+    image: "factory.talos.dev/installer/{{ talos_schematic }}:v{{ talos_version }}"
+    disk: /dev/disk/by-id/virtio-root01
+  network:
+    nameservers: {{ vm_default_nic.dns_servers[:2] | to_json }}
+  kubelet:
+    extraArgs:
+      rotate-server-certificates: true
+  features:
+    kubePrism:
+      enabled: {{ talos_kubeprism_enabled }}
+      port: 7445

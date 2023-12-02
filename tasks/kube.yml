@@ -1,0 +1,179 @@
+---
+
+- name: Set subnet fact
+  ansible.builtin.set_fact:
+    kube_name: "{{ ('talos' in group_names) | ternary('talos', 'kube') }}"
+  tags: ["always"]
+
+- name: Install Helm diff plugin
+  delegate_to: localhost
+  kubernetes.core.helm_plugin:
+    plugin_path: https://github.com/databus23/helm-diff
+    state: present
+  tags: ["helm", "plugins"]
+
+- name: Apply Calico IPPools
+  kubernetes.core.k8s:
+    state: present
+    resource_definition:
+      apiVersion: projectcalico.org/v3
+      kind: IPPool
+      metadata:
+        name: monitoring
+      spec:
+        cidr: "{{ subnets[kube_name].mon | ansible.utils.ipv4 | first }}"
+        allowedUses: ["Workload"]
+  tags: ["calico", "pool"]
+
+- name: Add helm repos
+  kubernetes.core.helm_repository:
+    name: "{{ item.name }}"
+    repo_url: "{{ item.repo_url }}"
+  loop:
+    - name: prometheus-community
+      repo_url: "https://prometheus-community.github.io/helm-charts"
+    - name: ingress-nginx
+      repo_url: "https://kubernetes.github.io/ingress-nginx"
+    - name: grafana
+      repo_url: "https://grafana.github.io/helm-charts"
+    - name: jetstack
+      repo_url: "https://charts.jetstack.io"
+    - name: cert-manager-webhook-hetzner
+      repo_url: "https://vadimkim.github.io/cert-manager-webhook-hetzner"
+    - name: openebs-lvmlocalpv
+      repo_url: "https://openebs.github.io/lvm-localpv"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: ["helm", "repos"]
+
+- name: Install OpenEBS LVM CSI driver
+  kubernetes.core.helm:
+    name: lvm-localpv
+    chart_ref: openebs-lvmlocalpv/lvm-localpv
+    chart_version: "~1.2"
+    release_namespace: openebs
+    create_namespace: true
+    update_repo_cache: true
+    wait: true
+  # TODO: Implement for Talos
+  when: "'k8s_cluster' in group_names"
+  tags: ["lvm"]
+
+- name: Create LVM StorageClass
+  kubernetes.core.k8s:
+    state: present
+    resource_definition:
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: openebs-lvmpv
+      allowVolumeExpansion: true
+      provisioner: local.csi.openebs.io
+      parameters:
+        storage: "lvm"
+        volgroup: "localpv"
+        fsType: "ext4"
+      mountOptions:
+        - "defaults"
+        - "noatime"
+  when: "'k8s_cluster' in group_names"
+  tags: ["lvm"]
+
+- name: Create monitoring namespace
+  kubernetes.core.k8s:
+    state: present
+    resource_definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: monitoring
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+        annotations:
+          cni.projectcalico.org/ipv4pools: '["monitoring"]'
+  tags: ["helm", "prometheus"]
+
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+- name: Deploy Prometheus chart
+  kubernetes.core.helm:
+    name: prometheus
+    chart_ref: prometheus-community/kube-prometheus-stack
+    chart_version: "48.x"
+    release_namespace: monitoring
+    create_namespace: false
+    update_repo_cache: true
+    release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/prom.yml.j2') | from_yaml }}"
+  tags: ["helm", "prometheus"]
+
+# https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
+- name: Deploy ingress-nginx chart
+  kubernetes.core.helm:
+    name: ingress-nginx
+    chart_ref: ingress-nginx/ingress-nginx
+    chart_version: "4.x"
+    release_namespace: ingress-nginx
+    create_namespace: true
+    update_repo_cache: true
+    release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/ingress-nginx.yml.j2') | from_yaml }}"
+  tags: ["helm", "nginx"]
+
+# https://github.com/grafana/helm-charts/tree/main/charts/promtail
+- name: Deploy Promtail chart
+  kubernetes.core.helm:
+    name: promtail
+    chart_ref: grafana/promtail
+    chart_version: "6.x"
+    release_namespace: monitoring
+    create_namespace: false
+    update_repo_cache: true
+    release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/promtail.yml.j2') | from_yaml }}"
+  tags: ["helm", "promtail"]
+
+- name: Cert-manager tasks
+  tags: ["cert-manager"]
+  # TODO: Implement RFC-2136
+  when: false
+  block:
+    - name: Deploy cert-manager chart
+      kubernetes.core.helm:
+        name: cert-manager
+        chart_ref: jetstack/cert-manager
+        chart_version: "1.x"
+        release_namespace: cert-manager
+        create_namespace: true
+        update_repo_cache: true
+        release_values:
+          installCRDs: true
+      tags: ["helm"]
+
+    - name: Deploy cert-manager-hetzner chart
+      kubernetes.core.helm:
+        name: cert-manager-webhook-hetzner
+        chart_ref: cert-manager-webhook-hetzner/cert-manager-webhook-hetzner
+        chart_version: "1.x"
+        release_namespace: cert-manager
+        create_namespace: false
+        update_repo_cache: true
+        release_values:
+          groupName: "{{ cert_manager_group_name }}"
+      tags: ["helm"]
+
+    - name: Create hetzner secret
+      kubernetes.core.k8s:
+        state: present
+        resource_definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: hetzner-secret
+            namespace: cert-manager
+          type: Opaque
+          data:
+            api-key: "{{ cert_manager_hetzner_secret | b64encode }}"
+
+    - name: Create hetzner cluster issuer
+      kubernetes.core.k8s:
+        state: present
+        resource_definition: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/cluster-issuer.yml.j2') | from_yaml }}"

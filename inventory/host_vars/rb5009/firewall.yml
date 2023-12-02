@@ -25,6 +25,13 @@ mt_interface_list: >-
 mt_firewall_rules: "{{ lookup('template', repo_base_dir + '/files/mikrotik/firewall_vault.yml.j2', template_vars={'ipv4': true}) | from_yaml }}"
 mt_firewall_nat: "{{ vault_mt_firewall_nat }}"
 
+__kube_cidr_map: >-
+  {%- set tmp = {} -%}
+  {%- for name, config in all_net.items() if name in ['kube', 'talos'] -%}
+  {{- tmp.update({name: ([config.get('cidr')] + [config.get('cidr6')]) | select }) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
 __mt_firewall_subnet_lists:
   - "{{ subnets.general.noinet | andrei.utils.items2dictlist('address', list='no-inet', comment='general-no-inet') }}"
   - "{{ subnets.general.trusted | andrei.utils.items2dictlist('address', list='allow-lan', comment='general-trusted') }}"
@@ -37,14 +44,14 @@ __mt_firewall_subnet_lists:
   - "{{ subnets.vm.nextcloud | andrei.utils.items2dictlist('address', list='www', comment='vm-nextcloud') }}"
   - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='allow-lan', comment='vm-prom') }}"
   - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='www', comment='vm-prom') }}"
+  - "{{ __kube_cidr_map.kube | andrei.utils.items2dictlist('address', list='kube', comment='kube') }}"
+  - "{{ __kube_cidr_map.talos | andrei.utils.items2dictlist('address', list='talos', comment='talos') }}"
+  - "{{ __kube_cidr_map.values() | flatten | andrei.utils.items2dictlist('address', list='all_kube', comment='all_kube') }}"
 
 __mt_firewall_address_lists_manual:
   - address: "{{ wireguard_endpoint.split(':', 1)[0] }}"
     list: WANs
     comment: WAN
-  - address: "{{ all_net.kube.cidr }}"
-    list: kube
-    comment: kube
   - address: "{{ hostvars['p7'].wireguard_ip }}"
     list: allow-general
     comment: p7

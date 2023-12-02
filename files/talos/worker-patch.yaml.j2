@@ -1,0 +1,13 @@
+machine:
+  certSANs:
+    - "{{ inventory_hostname }}.{{ domain }}"
+  network:
+    hostname: "{{ inventory_hostname }}"
+    interfaces:
+      - deviceSelector:
+          hardwareAddr: "{{ vm_default_mac }}"
+        dhcp: true
+  nodeLabels:
+    cpu_tier: "{{ hostvars[vm_host].cpu_tier }}"
+    vm_host: "{{ vm_host }}"
+    "node-role.kubernetes.io/worker": ""

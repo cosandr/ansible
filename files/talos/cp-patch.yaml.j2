@@ -1,0 +1,14 @@
+machine:
+  certSANs:
+    - "{{ inventory_hostname }}.{{ domain }}"
+  network:
+    hostname: "{{ inventory_hostname }}"
+    interfaces:
+      - deviceSelector:
+          hardwareAddr: "{{ vm_default_mac }}"
+        dhcp: true
+        vip:
+          ip: "{{ vips.vm.talos_cp | ansible.utils.ipv4 | first }}"
+  nodeLabels:
+    cpu_tier: "{{ hostvars[vm_host].cpu_tier }}"
+    vm_host: "{{ vm_host }}"

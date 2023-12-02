@@ -29,6 +29,8 @@ prometheus-node-exporter:
   extraArgs:
     - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
     - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+# permission denied
+{% if 'talos' not in group_names %}
     - --collector.systemd
   extraHostVolumeMounts:
     - name: systemd
@@ -36,3 +38,4 @@ prometheus-node-exporter:
       mountPath: /var/run/dbus/system_bus_socket
       readOnly: true
       mountPropagation: None
+{% endif %}

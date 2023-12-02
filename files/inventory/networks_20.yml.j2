@@ -7,6 +7,7 @@ __subnet_overrides:
   "mon": 26,
 } %}
   kube: {{ all_net.kube | andrei.utils.subnets_from_map(__subnet_map, v6_size=64) }}
+  talos: {{ all_net.talos | andrei.utils.subnets_from_map(__subnet_map, v6_size=64) }}
 
 {% set __subnet_map = {
   "switches": 28,
@@ -36,6 +37,10 @@ __subnet_extensions:
   "docker": 31,
   "prom": 31,
   "_r1": 31,
+  "talos": 28,
+  "_r2": 26,
+  "_r3": 27,
+  "_r4": 28,
   "clients": 28,
 } %}
   vm: {{ all_net.vm | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80) }}
