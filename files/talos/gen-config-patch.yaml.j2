@@ -10,7 +10,7 @@ cluster:
 
 machine:
   install:
-    image: "factory.talos.dev/installer/{{ talos_schematic }}:v{{ talos_version }}"
+    image: "{{ talos_image }}"
     disk: /dev/disk/by-id/virtio-root01
   network:
     nameservers: {{ vm_default_nic.dns_servers[:2] | to_json }}

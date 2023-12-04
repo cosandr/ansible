@@ -94,6 +94,7 @@
             {% if force | bool %}
             --force
             {% endif %}
+            --kubernetes-version {{ kube_version }}
             --additional-sans="{{ vips.vm.talos_cp | join(',') }}"
             --with-docs=false
             --with-examples=false
@@ -209,6 +210,46 @@
       environment:
         TALOSCONFIG: "{{ tmp_dir }}/talosconfig"
       tags: ["kubeconfig"]
+
+    - name: Upgrade Talos and Kubernetes
+      tags: ["upgrade"]
+      when: '"upgrade" in ansible_run_tags'
+      environment:
+        TALOSCONFIG: "{{ tmp_dir }}/talosconfig"
+      block:
+        - name: Get current Talos version
+          check_mode: false
+          changed_when: false
+          failed_when: false
+          ansible.builtin.command:
+            chdir: "{{ tmp_dir }}"
+            cmd: "talosctl -n {{ ansible_host }} version --short"
+          register: __version
+
+        - name: Upgrade if required  # noqa no-changed-when
+          throttle: 1
+          ansible.builtin.command:
+            chdir: "{{ tmp_dir }}"
+            cmd: "talosctl -n {{ ansible_host }} upgrade --image {{ talos_image }}"
+          vars:
+            server_tag: "{{ __version.stdout | regex_search('^Server:\\n.+\\n\\s+Tag:\\s+v(\\S+)$', '\\1', multiline=true) | first }}"
+          when: server_tag is version(talos_version, '<')
+
+        - name: Get node info
+          run_once: true
+          kubernetes.core.k8s_info:
+            context: "{{ talos_kubectl_context }}"
+            kind: Node
+          register: __node
+
+        - name: Upgrade Kubernetes if required  # noqa no-changed-when
+          run_once: true
+          ansible.builtin.command:
+            chdir: "{{ tmp_dir }}"
+            cmd: "talosctl -n {{ ansible_host }} upgrade-k8s --to {{ kube_version }}"
+          vars:
+            cmp_vers: "v{{ kube_version }}"
+          when: __node.resources | json_query('[].status.nodeInfo.kubeletVersion') | select('version', cmp_vers, '<')
 
   post_tasks:
     - name: Eject boot disk
