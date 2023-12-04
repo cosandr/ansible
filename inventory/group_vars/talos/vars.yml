@@ -5,7 +5,7 @@ host_num: "{{ groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)
 talos_version: "1.5.5"
 kube_version: "1.28.4"
 calico_node_as: "{{ 65201 + (groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
-calico_node_status: true
+calico_node_status: false
 # https://github.com/projectcalico/calico/issues/7892
 calico_ebpf_enabled: false
 
@@ -21,3 +21,13 @@ talos_image: "factory.talos.dev/installer/{{ talos_schematic }}:v{{ talos_versio
 kube_api_server: "talos.{{ domains['hb'] }}"
 talos_kubectl_context: "admin@{{ kube_api_server }}"
 kube_ingress_domain: "{{ kube_api_server }}"
+
+__node_labels_common:
+  cluster-type: "talos"
+  cpu-tier: "{{ hostvars[vm_host].cpu_tier }}"
+  vm-host: "{{ vm_host }}"
+
+__node_labels_worker:
+  "node-role.kubernetes.io/worker": ""
+
+node_labels: "{{ __node_labels_common | combine(__node_labels_worker) if inventory_hostname not in groups['talos_cp'] else __node_labels_common }}"

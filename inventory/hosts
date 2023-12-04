@@ -44,12 +44,6 @@ rb5009       ansible_host="10.0.100.1"   wireguard_ip="10.4.20.1"
 crs226       ansible_host="10.0.100.2"
 crs309       ansible_host="10.0.100.3"
 theia        ansible_host="10.0.100.16"
-aegir        ansible_host="10.0.100.17"
-gerd         ansible_host="10.0.100.18"
-ymir         ansible_host="10.0.100.19"
-atla         ansible_host="10.0.100.20"
-nari         ansible_host="10.0.100.21"
-nott         ansible_host="10.0.100.22"
 syno         ansible_host="10.0.100.128"
 webgw01      wireguard_ip="10.4.20.80"
 romsto       wireguard_ip="10.4.20.96"
@@ -80,12 +74,12 @@ m1bp    host_num=2 host_wg_num=2
 
 [kvm_hv]
 theia cpu_tier=2 host_num=0
-aegir cpu_tier=3 host_num=1
-gerd  cpu_tier=3 host_num=2
-ymir  cpu_tier=3 host_num=3
-atla  cpu_tier=1 host_num=4
-nari  cpu_tier=3 host_num=5
-nott  cpu_tier=3 host_num=6
+; aegir cpu_tier=3 host_num=1
+; gerd  cpu_tier=3 host_num=2
+; ymir  cpu_tier=3 host_num=3
+; atla  cpu_tier=1 host_num=4
+; nari  cpu_tier=3 host_num=5
+; nott  cpu_tier=3 host_num=6
 
 [kvm_hv:vars]
 host_net=mgmt

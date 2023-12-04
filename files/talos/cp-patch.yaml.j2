@@ -9,6 +9,4 @@ machine:
         dhcp: true
         vip:
           ip: "{{ vips.vm.talos_cp | ansible.utils.ipv4 | first }}"
-  nodeLabels:
-    cpu_tier: "{{ hostvars[vm_host].cpu_tier }}"
-    vm_host: "{{ vm_host }}"
+  nodeLabels: {{ node_labels | to_json }}

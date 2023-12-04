@@ -411,11 +411,23 @@
         wait: true
       tags: ["calico", "status"]
 
-    - name: Create calico node status
+    - name: "Ensure calico node status are {{ status_state }}"
       kubernetes.core.k8s:
-        state: "{{ calico_node_status | bool | ternary('present', 'absent') }}"
+        state: "{{ status_state }}"
         template: "{{ repo_base_dir }}/files/talos/calico-node-status.yml.j2"
+      vars:
+        status_state: "{{ calico_node_status | bool | ternary('present', 'absent') }}"
       tags: ["calico", "status"]
+
+    - name: Apply node labels
+      kubernetes.core.k8s:
+        kind: Node
+        name: "{{ inventory_hostname }}"
+        state: patched
+        resource_definition:
+          metadata:
+            labels: "{{ node_labels }}"
+      tags: ["node", "labels"]
 
 - name: Setup Kubernetes
   hosts: talos_cp[0]

@@ -15,8 +15,9 @@ kube_pods_subnet: "{{ subnets.kube.pod | ansible.utils.ipv4 | first }}"
 kube_network_node_prefix: "{{ all_net[host_net].cidr | ansible.utils.ipaddr('prefix') }}"
 
 __node_labels_common:
-  cpu_tier: "{{ hostvars[vm_host].cpu_tier }}"
-  vm_host: "{{ vm_host }}"
+  cluster-type: "kubespray"
+  cpu-tier: "{{ hostvars[vm_host].cpu_tier }}"
+  vm-host: "{{ vm_host }}"
 
 __node_labels_worker:
   "node-role.kubernetes.io/worker": ""

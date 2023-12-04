@@ -7,6 +7,9 @@ cluster:
   proxy:
     disabled: {{ not talos_kubeproxy_enabled }}
     mode: {{ talos_kubeproxy_mode }}
+    extraArgs:
+      # Prometheus pod needs to be able to connect
+      metrics-bind-address: "0.0.0.0:10249"
 
 machine:
   install:
