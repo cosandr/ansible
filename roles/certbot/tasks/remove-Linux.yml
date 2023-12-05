@@ -1,0 +1,26 @@
+---
+
+- name: Disable and stop timers
+  ansible.builtin.systemd:
+    name: "certbot-{{ item }}.timer"
+    state: stopped
+    enabled: false
+  register: __svc
+  failed_when:
+    - __svc.failed
+    - "'Could not find the requested service' not in __svc.msg"
+  loop:
+    - "renew"
+    - "update"
+
+- name: Remove files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/local/bin/certbot-renew
+    - /etc/systemd/system/certbot-renew.service
+    - /etc/systemd/system/certbot-update.service
+    - /etc/systemd/system/certbot-renew.service
+    - /etc/systemd/system/certbot-update.service
+  notify: reload systemd

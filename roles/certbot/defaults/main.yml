@@ -1,5 +1,6 @@
 ---
 
+certbot_state: present
 certbot_install: true
 certbot_auto_renew: true
 certbot_email: ""

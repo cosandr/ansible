@@ -5,69 +5,19 @@
 
 - name: Include install tasks
   ansible.builtin.include_tasks: install.yml
-  when: certbot_install | bool
+  when:
+    - certbot_state == 'present'
+    - certbot_install | bool
   tags: ["install"]
 
-- name: Ensure /etc/letsencrypt exists
-  ansible.builtin.file:
-    path: "/etc/letsencrypt"
-    state: directory
-    owner: root
-    group: "{{ __root_group }}"
-    mode: "0755"
+- name: Include configure tasks
+  ansible.builtin.include_tasks: configure.yml
+  when:
+    - certbot_state == 'present'
+  tags: ["configure"]
 
-- name: Configure certbot
-  ansible.builtin.copy:
-    dest: "/etc/letsencrypt/cli.ini"
-    owner: root
-    group: "{{ __root_group }}"
-    mode: "0600"
-    content: |
-      rsa-key-size = 4096
-      email = {{ certbot_email }}
-      agree-tos = true
-  when: certbot_email | length > 0
-
-- name: Add credentials
-  ansible.builtin.copy:
-    dest: "{{ certbot_credentials_path }}"
-    owner: root
-    group: "{{ __root_group }}"
-    mode: "0600"
-    content: "{{ certbot_credentials_content }}"
-  when: certbot_credentials_content | length > 0
-
-- name: Ensure hooks directories exist
-  ansible.builtin.file:
-    path: "{{ __path }}"
-    state: directory
-    owner: root
-    group: "{{ __root_group }}"
-    mode: "0750"
-  vars:
-    __path: "/etc/letsencrypt/renewal-hooks/{{ item.type }}"
-  loop: "{{ certbot_renew_hooks }}"
-  loop_control:
-    label: "{{ __path }}"
-  tags: ["hooks"]
-
-- name: Copy renew hooks
-  ansible.builtin.copy:
-    content: "{{ item.content }}"
-    dest: "/etc/letsencrypt/renewal-hooks/{{ item.type }}/{{ item.name }}"
-    owner: root
-    group: "{{ __root_group }}"
-    mode: "0750"
-  loop: "{{ certbot_renew_hooks }}"
-  loop_control:
-    label: "{{ item.type }} - {{ item.name }}"
-  tags: ["hooks"]
-
-- name: Get certificates
-  ansible.builtin.command: "{{ certbot_generate_command }} -d '{{ item }}'"
-  register: output
-  changed_when:
-    - output.rc == 0
-    - "'Certificate not yet due for renewal; no action taken.' not in output.stdout"
-  loop: "{{ certbot_domains }}"
-  tags: ["fetch"]
+- name: Include removal tasks
+  ansible.builtin.include_tasks: remove.yml
+  when:
+    - certbot_state == 'absent'
+  tags: ["remove"]
