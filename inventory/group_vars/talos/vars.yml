@@ -2,6 +2,9 @@
 
 host_num: "{{ groups['talos'] | ansible.utils.index_of('eq', inventory_hostname) }}"
 
+prometheus_blackbox_icmp_targets: []
+prometheus_node_targets: []
+
 talos_version: "1.5.5"
 kube_version: "1.28.4"
 calico_node_as: "{{ 65201 + (groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
