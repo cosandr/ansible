@@ -15,7 +15,6 @@ server {
 
     ssl_certificate /etc/lego/certificates/{{ domain }}.crt;
     ssl_certificate_key /etc/lego/certificates/{{ domain }}.key;
-    ssl_dhparam {{ nginx_dhparam }};
 
     client_max_body_size 0;
     access_log {{ nginx_sites_logs }}/access-registry.{{ domain }}.log {{ nginx_access_log_options }};

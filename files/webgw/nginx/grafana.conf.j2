@@ -15,7 +15,6 @@ server {
 
     ssl_certificate /etc/lego/certificates/{{ domain }}.crt;
     ssl_certificate_key /etc/lego/certificates/{{ domain }}.key;
-    ssl_dhparam {{ nginx_dhparam }};
 
     access_log {{ nginx_sites_logs }}/access-grafana.{{ domain }}.log {{ nginx_access_log_options }};
     error_log {{ nginx_sites_logs }}/error-grafana.{{ domain }}.log {{ nginx_error_log_options }};

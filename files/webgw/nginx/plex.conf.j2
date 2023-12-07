@@ -15,7 +15,6 @@ server {
 
     ssl_certificate /etc/lego/certificates/{{ domain }}.crt;
     ssl_certificate_key /etc/lego/certificates/{{ domain }}.key;
-    ssl_dhparam {{ nginx_dhparam }};
 
     access_log {{ nginx_sites_logs }}/access-plex.{{ domain }}.log {{ nginx_access_log_options }};
     error_log {{ nginx_sites_logs }}/error-plex.{{ domain }}.log {{ nginx_error_log_options }};
@@ -23,11 +22,6 @@ server {
     client_max_body_size 500M;
     send_timeout 100m;
 
-    ssl_session_cache builtin:1000 shared:SSL:10m;
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers 'TLS-CHACHA20-POLY1305-SHA256:TLS-AES-256-GCM-SHA384:TLS-AES-128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
-    ssl_stapling on;
-    ssl_stapling_verify on;
     # For LetsEncrypt/Certbot, you can get your chain like this: https://esham.io/2016/01/ocsp-stapling
     ssl_trusted_certificate /etc/lego/certificates/{{ domain }}.issuer.crt;
 

@@ -15,13 +15,11 @@ server {
 
     ssl_certificate /etc/lego/certificates/{{ domain }}.crt;
     ssl_certificate_key /etc/lego/certificates/{{ domain }}.key;
-    ssl_dhparam {{ nginx_dhparam }};
 
     access_log {{ nginx_sites_logs }}/access-ha.{{ domain }}.log {{ nginx_access_log_options }};
     error_log {{ nginx_sites_logs }}/error-ha.{{ domain }}.log {{ nginx_error_log_options }};
 
     add_header Strict-Transport-Security "max-age=31536000; includeSubdomains";
-    ssl_protocols TLSv1.2;
     ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4";
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
