@@ -59,7 +59,7 @@
           check_mode: false
           changed_when: false
           ansible.builtin.command:
-            cmd: "gpg -e -r {{ hostvars['webgw01'].certbot_email }} --armor"
+            cmd: "gpg -e -r {{ my_email_alt }} --armor"
             stdin: "{{ __config.stdout[0] }}"
           register: __enc_config
 

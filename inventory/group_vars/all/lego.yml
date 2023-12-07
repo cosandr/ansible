@@ -1,0 +1,10 @@
+---
+
+lego_rfc2136_nameserver: "{{ hostvars['webgw01'].wireguard_ip }}"
+lego_domain_keys: []
+lego_domains: >-
+  {%- set tmp = [] -%}
+  {%- for key in lego_domain_keys -%}
+  {{- tmp.append(lookup('template', repo_base_dir + '/files/lego_rfc2136.yml.j2', template_vars={'key': key}) | from_yaml) -}}
+  {%- endfor -%}
+  {{ tmp }}

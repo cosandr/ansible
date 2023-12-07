@@ -102,11 +102,11 @@
       when: motion_is_rpi | default(false)
       tags: ["motion"]
 
-    - role: certbot
+    - role: lego
+      tags: ["lego"]
       when:
-        - certbot_domains is defined
-        - certbot_domains | length > 0
-      tags: ["certbot"]
+        - lego_domains is defined
+        - lego_domains | length > 0
 
     - role: postfix
       when:

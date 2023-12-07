@@ -19,8 +19,8 @@
           ansible.builtin.slurp:
             path: "{{ item }}"
           loop:
-            - "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
-            - "/etc/letsencrypt/live/{{ domain }}/privkey.pem"
+            - "/etc/lego/certificates/{{ domain }}.crt"
+            - "/etc/lego/certificates/{{ domain }}.key"
           register: __certs
           tags: ["rgw-ingress"]
 

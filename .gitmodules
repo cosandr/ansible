@@ -79,3 +79,6 @@
 [submodule "ansible_collections/andrei/utils"]
 	path = ansible_collections/andrei/utils
 	url = git@github.com:cosandr/ansible-collection-utils.git
+[submodule "roles/lego"]
+	path = roles/lego
+	url = git@github.com:cosandr/ansible-role-lego.git

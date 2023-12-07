@@ -1,6 +1,0 @@
----
-
-certbot_extra_pkgs: ["certbot-dns-cloudflare"]
-certbot_domains_hetzner: []
-certbot_domains_cloudflare:
-  - "{{ domains['ti'] }},*.{{ domains['ti'] }}"

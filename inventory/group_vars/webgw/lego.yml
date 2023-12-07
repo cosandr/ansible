@@ -1,0 +1,10 @@
+---
+
+lego_domain_keys: "{{ domains.keys() }}"
+__group_lego_renew_hooks:
+  - name: sudo-restart-nginx
+    content: |
+      #!/bin/sh
+      systemctl restart nginx
+
+lego_renew_hooks: "{{ (__group_lego_renew_hooks | default([])) + (__host_lego_renew_hooks | default([])) }}"

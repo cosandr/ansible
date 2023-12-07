@@ -7,8 +7,15 @@ ansible_become: true
 
 sys_timezone: "Etc/UTC"
 
+lego_rfc2136_nameserver: "127.0.0.1"
+rfc2136_aaaa_record: "{{ vault_rfc2136_aaaa_record }}"
+
 extra_host_ipv6_addresses:
-  - "{{ acmedns_aaaa_record }}"
+  - "{{ rfc2136_aaaa_record }}"
+
+fail2ban_extra_conf: |
+  [named-refused]
+  enabled = true
 
 networkd_config:
   eth0: |

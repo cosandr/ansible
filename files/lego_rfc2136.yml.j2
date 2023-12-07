@@ -1,0 +1,14 @@
+{% if names is not defined %}
+name:
+  - "{{ domains[key] }}"
+  - "*.{{ domains[key] }}"
+{% else %}
+name: {{ names | to_json }}
+{% endif %}
+email: "{{ email | default(my_email_alt) }}"
+dns: rfc2136
+env:
+  RFC2136_NAMESERVER: "{{ lego_rfc2136_nameserver }}"
+  RFC2136_TSIG_KEY: {{ tsig_key | default('ansible_' + key) }}
+  RFC2136_TSIG_ALGORITHM: hmac-sha256.
+  RFC2136_TSIG_SECRET: "{{ tsig_secret | default(rfc2136_keys[key]) }}"

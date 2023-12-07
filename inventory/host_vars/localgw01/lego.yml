@@ -1,0 +1,11 @@
+---
+
+__host_lego_renew_hooks:
+  - name: push-certs
+    content: |
+      #!/bin/sh
+
+      /usr/local/bin/pg-cert-push \
+          --name "$LEGO_CERT_DOMAIN" \
+          --public-key "$LEGO_CERT_PATH" \
+          --private-key "$LEGO_CERT_KEY_PATH"

@@ -13,6 +13,11 @@ my_groups:
   - docker
   - wheel
 my_email: "{{ vault_my_email }}"
+my_email_alt: "{{ vault_my_email_alt }}"
+
+rfc2136_keys: "{{ vault_rfc2136_keys }}"
+rfc2136_domain: "{{ vault_rfc2136_domain }}"
+rfc2136_domain_map: "{{ vault_rfc2136_domain_map }}"
 
 locale_gen:
   - "en_US.UTF-8"

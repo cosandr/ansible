@@ -130,28 +130,12 @@
       when: ssh_dest_hosts | default([])
       tags: ["auto-ssh"]
 
-    - role: certbot
-      vars:
-        certbot_domains: "{{ certbot_domains_hetzner }}"
-        certbot_credentials_path: "{{ certbot_credentials_path_hetzner }}"
-        certbot_credentials_content: "{{ certbot_credentials_content_hetzner }}"
-        certbot_generate_command: "{{ certbot_generate_command_hetzner }}"
-      when:
-        - certbot_domains_hetzner is defined
-        - certbot_domains_hetzner | length > 0
-      tags: ["certbot", "hetzner"]
 
-    - role: certbot
-      vars:
-        certbot_install: "{{ __certbot_installed is not defined }}"
-        certbot_domains: "{{ certbot_domains_cloudflare }}"
-        certbot_credentials_path: "{{ certbot_credentials_path_cloudflare }}"
-        certbot_credentials_content: "{{ certbot_credentials_content_cloudflare }}"
-        certbot_generate_command: "{{ certbot_generate_command_cloudflare }}"
+    - role: lego
+      tags: ["lego"]
       when:
-        - certbot_domains_cloudflare is defined
-        - certbot_domains_cloudflare | length > 0
-      tags: ["certbot", "cloudflare"]
+        - lego_domains is defined
+        - lego_domains | length > 0
 
     - role: nginx_pre
       tags: ["nginx"]

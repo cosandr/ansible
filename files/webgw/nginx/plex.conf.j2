@@ -13,8 +13,8 @@ server {
     listen [::]:443 ssl http2;
     server_name plex.{{ domain }};
 
-    ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+    ssl_certificate /etc/lego/certificates/{{ domain }}.crt;
+    ssl_certificate_key /etc/lego/certificates/{{ domain }}.key;
     ssl_dhparam {{ nginx_dhparam }};
 
     access_log {{ nginx_sites_logs }}/access-plex.{{ domain }}.log {{ nginx_access_log_options }};
@@ -29,7 +29,7 @@ server {
     ssl_stapling on;
     ssl_stapling_verify on;
     # For LetsEncrypt/Certbot, you can get your chain like this: https://esham.io/2016/01/ocsp-stapling
-    ssl_trusted_certificate /etc/letsencrypt/live/{{ domain }}/chain.pem;
+    ssl_trusted_certificate /etc/lego/certificates/{{ domain }}.issuer.crt;
 
     add_header Strict-Transport-Security max-age=15768000;
     add_header Referrer-Policy strict-origin-when-cross-origin;
