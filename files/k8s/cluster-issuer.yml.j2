@@ -1,19 +1,32 @@
+{% set staging = item.staging | default(false) %}
+{% set suffix = staging | ternary('staging', 'live') %}
+---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
-  name: letsencrypt-staging
+  name: {{ item.key }}-{{ suffix }}
 spec:
   acme:
-    server: https://acme-staging-v02.api.letsencrypt.org/directory
-    email: "{{ cert_manager_hetzner_email }}"
+{% if staging %}
+    server: "https://acme-staging-v02.api.letsencrypt.org/directory"
+{% else %}
+    server: "https://acme-v02.api.letsencrypt.org/directory"
+{% endif %}
+    email: "{{ my_email_alt }}"
     privateKeySecretRef:
-      name: letsencrypt-staging
+      name: {{ item.key }}-{{ suffix }}
     solvers:
-      - dns01:
-          webhook:
-            groupName: "{{ cert_manager_group_name }}"
-            solverName: hetzner
-            config:
-              secretName: hetzner-secret
-              zoneName: {{ domains['hb'] }}
-              apiUrl: https://dns.hetzner.com/api/v1
+      - selector:
+          dnsZones:
+{% for zone in item.zones | default([domains[item.key]]) %}
+            - "{{ zone }}"
+{% endfor %}
+        dns01:
+          cnameStrategy: Follow
+          rfc2136:
+            nameserver: "{{ lego_rfc2136_nameserver }}"
+            tsigKeyName: "ansible_{{ item.key }}"
+            tsigAlgorithm: "HMACSHA256"
+            tsigSecretSecretRef:
+              name: tsig-secret
+              key: {{ item.key }}-key

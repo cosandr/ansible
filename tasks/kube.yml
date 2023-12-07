@@ -133,8 +133,6 @@
 
 - name: Cert-manager tasks
   tags: ["cert-manager"]
-  # TODO: Implement RFC-2136
-  when: false
   block:
     - name: Deploy cert-manager chart
       kubernetes.core.helm:
@@ -148,32 +146,27 @@
           installCRDs: true
       tags: ["helm"]
 
-    - name: Deploy cert-manager-hetzner chart
-      kubernetes.core.helm:
-        name: cert-manager-webhook-hetzner
-        chart_ref: cert-manager-webhook-hetzner/cert-manager-webhook-hetzner
-        chart_version: "1.x"
-        release_namespace: cert-manager
-        create_namespace: false
-        update_repo_cache: true
-        release_values:
-          groupName: "{{ cert_manager_group_name }}"
-      tags: ["helm"]
-
-    - name: Create hetzner secret
+    - name: Create TSIG secret
       kubernetes.core.k8s:
         state: present
         resource_definition:
           apiVersion: v1
           kind: Secret
           metadata:
-            name: hetzner-secret
+            name: tsig-secret
             namespace: cert-manager
           type: Opaque
           data:
-            api-key: "{{ cert_manager_hetzner_secret | b64encode }}"
+            hb-key: "{{ rfc2136_keys['hb'] | b64encode }}"
+      tags: ["secret"]
 
-    - name: Create hetzner cluster issuer
+    - name: Create cluster issuers
       kubernetes.core.k8s:
         state: present
         resource_definition: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/cluster-issuer.yml.j2') | from_yaml }}"
+      # TODO: Maybe move to common kubespray + Talos inventory
+      loop:
+        - key: hb
+          staging: true
+        - key: hb
+      tags: ["issuer"]

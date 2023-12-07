@@ -1,5 +1,0 @@
----
-
-cert_manager_group_name: "acme.{{ domains['hb'] }}"
-cert_manager_hetzner_email: "{{ vault_cert_manager_hetzner_email }}"
-cert_manager_hetzner_secret: "{{ vault_cert_manager_hetzner_secret }}"
