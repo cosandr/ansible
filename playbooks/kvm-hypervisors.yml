@@ -25,6 +25,9 @@
     - role: cpupower
       tags: ["cpupower"]
 
+    - role: intel_gvt
+      tags: ["gvt"]
+
     - role: libvirt
       tags: ["libvirt"]
 

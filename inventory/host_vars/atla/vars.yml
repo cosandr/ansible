@@ -3,3 +3,7 @@
 # Disable while TPM2 is broken in kernel
 cryptenroll_crypttab_config: false
 luks_root_disk_password: ""
+
+# Uses SR-IOV instead
+# https://wiki.archlinux.org/title/QEMU/Guest_graphics_acceleration#SR-IOV
+intel_gvt_enabled: false

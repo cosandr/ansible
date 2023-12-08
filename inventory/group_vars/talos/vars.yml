@@ -25,12 +25,18 @@ kube_api_server: "talos.{{ domains['hb'] }}"
 talos_kubectl_context: "admin@{{ kube_api_server }}"
 kube_ingress_domain: "{{ kube_api_server }}"
 
-__node_labels_common:
-  cluster-type: "talos"
-  cpu-tier: "{{ hostvars[vm_host].cpu_tier }}"
-  vm-host: "{{ vm_host }}"
+node_labels: >-
+  {%- set tmp = {
+    "cluster-type": "talos",
+    "cpu-tier": hostvars[vm_host].cpu_tier | string,
+    "vm-host": vm_host
+  } -%}
+  {%- if inventory_hostname not in groups['talos_cp'] -%}
+  {{- tmp.update({"node-role.kubernetes.io/worker": ""}) -}}
+  {%- endif -%}
+  {%- if vm_mdev_uuids -%}
+  {{- tmp.update({"intel.feature.node.kubernetes.io/gpu": "true"}) -}}
+  {%- endif -%}
+  {{ tmp }}
 
-__node_labels_worker:
-  "node-role.kubernetes.io/worker": ""
-
-node_labels: "{{ __node_labels_common | combine(__node_labels_worker) if inventory_hostname not in groups['talos_cp'] else __node_labels_common }}"
+vm_mdev_uuids: "{{ hostvars[vm_host].intel_gvt_enabled | ternary(['talos' | to_uuid], []) }}"

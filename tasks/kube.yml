@@ -1,6 +1,6 @@
 ---
 
-- name: Set subnet fact
+- name: Set kube_name fact
   ansible.builtin.set_fact:
     kube_name: "{{ ('talos' in group_names) | ternary('talos', 'kube') }}"
   tags: ["always"]
@@ -170,3 +170,97 @@
           staging: true
         - key: hb
       tags: ["issuer"]
+
+# https://intel.github.io/intel-device-plugins-for-kubernetes/INSTALL.html
+- name: Intel GPU tasks
+  tags: ["gpu"]
+  when: ansible_play_hosts | map('extract', hostvars, 'vm_mdev_uuids') | flatten
+  block:
+    - name: Add NFD Helm repo
+      kubernetes.core.helm_repository:
+        name: nfd
+        repo_url: "https://kubernetes-sigs.github.io/node-feature-discovery/charts"
+
+    - name: Install NFD
+      kubernetes.core.helm:
+        name: nfd
+        chart_ref: nfd/node-feature-discovery
+        chart_version: "~0.14"
+        release_namespace: node-feature-discovery
+        create_namespace: true
+        update_repo_cache: true
+        release_values:
+          master:
+            extraLabelNs:
+              - gpu.intel.com
+            resourceLabels:
+              - gpu.intel.com/millicores
+              - gpu.intel.com/memory.max
+              - gpu.intel.com/tiles
+      tags: ["nfd"]
+
+    # Can't use operator until it allows tolerations
+    # https://github.com/intel/intel-device-plugins-for-kubernetes/issues/1617
+    - name: Create inteldeviceplugins-system namespace
+      kubernetes.core.k8s:
+        state: present
+        resource_definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: inteldeviceplugins-system
+            labels:
+              pod-security.kubernetes.io/enforce: privileged
+              pod-security.kubernetes.io/audit: privileged
+              pod-security.kubernetes.io/warn: privileged
+      tags: ["gpu-plugin"]
+
+    - name: Get latest release
+      ansible.builtin.uri:
+        url: "https://api.github.com/repos/intel/intel-device-plugins-for-kubernetes/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      check_mode: false
+      register: _latest_release
+      tags: ["gpu-plugin"]
+
+    - name: Clone repo
+      ansible.builtin.git:
+        repo: https://github.com/intel/intel-device-plugins-for-kubernetes.git
+        version: "{{ _latest_release.json.tag_name }}"
+        dest: "/tmp/intel-device-plugins-for-kubernetes"
+        depth: 1
+      tags: ["gpu-plugin"]
+
+    - name: Install NodeFeatureRules
+      kubernetes.core.k8s:
+        state: present
+        resource_definition: "{{ lookup('kubernetes.core.kustomize', dir='/tmp/intel-device-plugins-for-kubernetes/deployments/nfd/overlays/node-feature-rules') }}"
+      tags: ["nfd", "gpu-plugin"]
+
+    - name: Install Intel GPU plugin
+      kubernetes.core.k8s:
+        state: present
+        namespace: inteldeviceplugins-system
+        resource_definition: "{{ lookup('kubernetes.core.kustomize', dir='/tmp/intel-device-plugins-for-kubernetes/deployments/gpu_plugin/overlays/nfd_labeled_nodes') }}"
+      tags: ["gpu-plugin"]
+
+    - name: Patch daemonset to tolerate control plane
+      kubernetes.core.k8s:
+        api_version: apps/v1
+        kind: DaemonSet
+        name: intel-gpu-plugin
+        namespace: inteldeviceplugins-system
+        state: patched
+        resource_definition:
+          spec:
+            template:
+              spec:
+                tolerations:
+                  - operator: "Exists"
+                    key: node-role.kubernetes.io/control-plane
+                    effect: NoSchedule
+      tags: ["gpu-plugin"]

@@ -28,6 +28,7 @@ vm_cpu_features: []
 #     policy: disable
 vm_seclabel: "system_u:system_r:svirt_t:s0:c{{ all_net[host_net].vlan }},c{{ ansible_host | andrei.utils.host_num_in_net }}"
 vm_qemu_args: []
+vm_mdev_uuids: []
 
 vm_data_disks: []
 # vm_data_disks: ["200G", "150G"]
@@ -79,6 +80,7 @@ vm_default_definition:
   os_id: "{{ vm_os_id }}"
   volumes: "{{ [vm_root_disk] + vm_extra_disks }}"
   interfaces: "{{ vm_nics }}"
+  mdev_uuids: "{{ vm_mdev_uuids }}"
   cpu_mode: "{{ vm_cpu_mode }}"
   cpu_model_name: "{{ vm_cpu_model_name }}"
   cpu_features: "{{ vm_cpu_features }}"

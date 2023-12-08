@@ -23,3 +23,6 @@ grub_config:
 
 ssh_conf_hosts: false
 ceph_mon: false
+
+# AMD CPU
+intel_gvt_enabled: false
