@@ -27,6 +27,7 @@ base_pacman_packages:
   - btrfs-progs
   - deluge-gtk
   - docker
+  - docker-buildx
   - docker-compose
   - downgrade
   - efibootmgr
