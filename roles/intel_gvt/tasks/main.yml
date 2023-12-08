@@ -1,0 +1,15 @@
+---
+
+- name: Configure Intel GVT-g kernel modules
+  community.general.modprobe:
+    name: "{{ item }}"
+    state: "{{ intel_gvt_state }}"
+    persistent: "{{ intel_gvt_state }}"
+  loop:
+    - kvmgt
+    - vfio-iommu-type1
+    - mdev
+
+- name: Include install/remove tasks
+  ansible.builtin.include_tasks:
+    file: "{{ intel_gvt_state }}.yml"

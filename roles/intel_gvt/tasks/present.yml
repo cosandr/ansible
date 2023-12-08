@@ -1,0 +1,48 @@
+---
+
+- name: Install management script
+  ansible.builtin.template:
+    src: "manage-gvt-vgpus.sh.j2"
+    dest: /usr/local/bin/manage-gvt-vgpus
+    owner: root
+    group: root
+    mode: "0755"
+  notify: Restart manage-gvt-vgpus
+
+- name: Install systemd service
+  ansible.builtin.template:
+    src: "manage-gvt-vgpus.service.j2"
+    dest: /etc/systemd/system/manage-gvt-vgpus.service
+    owner: root
+    group: root
+    mode: "0755"
+  notify: Reload systemd
+
+- name: Get vGPUs which aren't defined anymore
+  ansible.builtin.find:
+    depth: 1
+    file_type: directory
+    paths:
+      - "/sys/bus/pci/devices/{{ intel_gvt_pci }}"
+    patterns:
+      - "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    excludes: "{{ intel_gvt_vgpus | map(attribute='name') | map('to_uuid') }}"
+    use_regex: true
+  register: __old_vgpus
+
+- name: Remove old vGPUs
+  ansible.builtin.shell:
+    cmd: "echo 1 > {{ item.path }}/remove"
+    removes: "{{ item.path }}"
+  loop: "{{ __old_vgpus.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start service
+  ansible.builtin.systemd:
+    name: "manage-gvt-vgpus.service"
+    state: started
+    enabled: true

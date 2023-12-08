@@ -1,0 +1,85 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if [[ $EUID -ne 0 ]]; then
+    echo "Must run as root" >&2
+    exit 1
+fi
+
+GVT_PCI="{{ intel_gvt_pci }}"
+GVT_PCI_PATH="/sys/bus/pci/devices/$GVT_PCI"
+
+if [[ ! -d "$GVT_PCI_PATH/mdev_supported_types" ]]; then
+    echo "$GVT_PCI_PATH/mdev_supported_types not found, ensure Intel GVT-g is properly configured." >&2
+    exit 1
+fi
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $0 create|remove"
+    exit 1
+fi
+
+declare -A GVT_MAP=(
+{% for vgpu in intel_gvt_vgpus %}
+    ["{{ vgpu.name | to_uuid }}"]="{{ vgpu.type }}"
+{% endfor %}
+)
+
+create_vgpu() {
+    local uuid="$1"
+    local type="$2"
+    local path="$GVT_PCI_PATH/mdev_supported_types/$type/create"
+    if [[ -d "$GVT_PCI_PATH/$uuid" ]]; then
+        echo "$uuid already created"
+        return 0
+    fi
+    if [[ ! -f "$path" ]]; then
+        echo "$path not found, check type." >&2
+        return 1
+    fi
+    echo "$uuid" > "$path"
+    # shellcheck disable=SC2320
+    return $?
+}
+
+remove_vgpu() {
+    local uuid="$1"
+    local path="$GVT_PCI_PATH/$uuid/remove"
+    if [[ -f "$path" ]]; then
+        echo 1 > "$path"
+        # shellcheck disable=SC2320
+        return $?
+    else
+        echo "$uuid already absent."
+        return 0
+    fi
+}
+
+# Keep going if one vGPU failed to create/destroy
+set +e
+
+global_exit=0
+
+for uuid in "${!GVT_MAP[@]}"; do
+    case $1 in
+        create)
+            create_vgpu "$uuid" "${GVT_MAP[$uuid]}"
+            tmp_exit=$?
+            global_exit=$(( tmp_exit > global_exit ? tmp_exit : global_exit ))
+            [[ $tmp_exit -eq 0 ]] && echo "$uuid created"
+            ;;
+        remove)
+            remove_vgpu "$uuid"
+            tmp_exit=$?
+            global_exit=$(( tmp_exit > global_exit ? tmp_exit : global_exit ))
+            [[ $tmp_exit -eq 0 ]] && echo "$uuid removed"
+            ;;
+        *)
+            echo "Unknown command $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+exit $global_exit

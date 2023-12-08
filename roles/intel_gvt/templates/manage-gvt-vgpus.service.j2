@@ -1,0 +1,12 @@
+[Unit]
+Description=Manage Intel GVT-g vGPUs
+Before={{ intel_gvt_service_before | join(' ') }}
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/local/bin/manage-gvt-vgpus create
+ExecStop=/usr/local/bin/manage-gvt-vgpus remove
+
+[Install]
+WantedBy=multi-user.target

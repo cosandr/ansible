@@ -1,0 +1,20 @@
+---
+
+- name: Disable and stop service
+  ansible.builtin.systemd:
+    name: "manage-gvt-vgpus.service"
+    state: stopped
+    enabled: false
+  register: __svc
+  failed_when:
+    - __svc.failed
+    - "'Could not find the requested service' not in __svc.msg"
+
+- name: Remove files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/local/bin/manage-gvt-vgpus
+    - /etc/systemd/system/manage-gvt-vgpus.service
+  notify: Reload systemd
