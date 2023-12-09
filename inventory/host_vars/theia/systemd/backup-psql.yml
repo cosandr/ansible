@@ -1,0 +1,78 @@
+---
+
+__sd_backup_psql:
+  name: backup-psql
+  service:
+    content: |
+      [Unit]
+      Description=Logical PostgreSQL backup
+      After=network-online.target mnt-tank.mount
+      Requires=network-online.target mnt-tank.mount
+
+      [Service]
+      Type=oneshot
+      ExecStart={{ systemd_script_install_path }}/backup-psql
+
+      [Install]
+      WantedBy=multi-user.target
+
+  # Daily at 03:00
+  timer:
+    enabled: true
+    state: started
+    content: |
+      [Unit]
+      Description=Scheduled PostgreSQL backup
+
+      [Timer]
+      Persistent=yes
+      OnCalendar=*-*-* 03:00:00
+
+      [Install]
+      WantedBy=timers.target
+
+  scripts:
+    - dest: "{{ systemd_script_install_path }}/backup-psql"
+      mode: "0750"
+      content: |
+        #!/bin/bash
+
+        DIR=/mnt/tank/backup/pgsql
+        KEEP=3
+        PERMS=640
+        PERMS_USER=root
+        PERMS_GROUP={{ my_user }}
+        TMPDIR=/tmp/psqlbackup
+
+        DATESTAMP="$(date +%Y%m%d_%H%M)"
+        FILENAME="${DATESTAMP}.gz"
+
+        mkdir -p "${DIR}" "${TMPDIR}"
+
+        cleanup() {
+            rm -rf "${TMPDIR}"
+        }
+
+        trap cleanup EXIT
+
+        set -e
+
+        env PGHOST="{{ hostvars['pg01'].ansible_host }}" \
+            PGUSER="postgres" \
+            PGPASSWORD="{{ hostvars['pg01'].vault_postgresql_passwords.postgres }}" \
+            pg_dumpall -c | gzip > "${TMPDIR}/${FILENAME}"
+
+        # remove all backups except the $KEEP latests
+        BACKUPS=$(find "${DIR}" -name "*.gz" | wc -l | sed 's/\ //g')
+        while [ "$BACKUPS" -ge "$KEEP" ]
+        do
+          ls -tr1 "${DIR}"/*.gz | head -n 1 | xargs rm -f
+          BACKUPS=$(( BACKUPS - 1))
+        done
+
+        install -o "$PERMS_USER" -g "$PERMS_GROUP" -m "$PERMS" "${TMPDIR}/${FILENAME}" "${DIR}/"
+
+        echo "Successfully dumped PG data."
+
+        # Restore
+        # gunzip -c filename.gz | psql -U postgres

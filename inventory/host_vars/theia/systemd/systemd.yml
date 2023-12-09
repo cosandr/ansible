@@ -2,3 +2,4 @@
 
 systemd_units:
   - "{{ __sd_backup_gdrive }}"
+  - "{{ __sd_backup_psql }}"

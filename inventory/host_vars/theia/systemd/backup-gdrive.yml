@@ -50,11 +50,7 @@ __sd_backup_gdrive:
         rclone sync -v /mnt/tank/archive/savegames gcrypt:savegames
         rclone sync -v --exclude 'Camera/**' nextcloud: gcrypt:Nextcloud
 
-        # Find latest pgbackrest backup
-        latest_pg_full="$(find /mnt/tank/backup/pgbackrest/backup/main -maxdepth 1 -type d -name '*F' -exec basename {} \; | sort -rn | head -n1)"
-        rclone sync -v --include "$latest_pg_full*/**" /mnt/tank/backup/pgbackrest/backup/main gsecret:pgbackrest
-
-        # Find latest {{ hostvars['docker01'].vm_host }} backup
+        # Find latest docker01 backup
         latest_docker="$(find /mnt/tank/backup/btrbk/{{ hostvars['docker01'].vm_host }} -maxdepth 1 -type d -name 'libvirt*' | sort -rn | head -n1)"
         if ! grep -q /tmp/docker01-data /proc/mounts && [ -f "$latest_docker"/docker01-data01.raw ]; then
           trap 'umount /tmp/docker01-data' EXIT
