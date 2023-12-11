@@ -6,7 +6,7 @@
   become: false
   gather_facts: false
   vars:
-    network_files: "{{ (repo_base_dir + '/files/inventory/network*') | fileglob | sort }}"
+    network_files: "{{ (repo_base_dir + '/files/inventory/*-net-*') | fileglob | sort }}"
     network_dest: "{{ repo_base_dir }}/inventory/group_vars/all/network.yml"
     hosts_dest: "{{ repo_base_dir }}/inventory/hosts"
   tasks:
