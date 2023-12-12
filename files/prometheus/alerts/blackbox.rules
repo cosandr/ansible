@@ -2,7 +2,7 @@ groups:
 - name: Blackbox Exporter
   rules:
   - alert: BlackboxProbeFailed
-    expr: probe_success == 0
+    expr: probe_success{ignore_down!="true"} == 0
     for: 2m
     labels:
       severity: critical
@@ -11,7 +11,7 @@ groups:
       description: "Probe failed\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
   - alert: BlackboxSlowProbe
-    expr: avg_over_time(probe_duration_seconds[1m]) > 2
+    expr: avg_over_time(probe_duration_seconds{ignore_down!="true"}[1m]) > 2
     for: 2m
     labels:
       severity: warning
@@ -20,7 +20,7 @@ groups:
       description: "Blackbox probe took more than 1s to complete\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
   - alert: BlackboxProbeHttpFailure
-    expr: probe_http_status_code <= 199 OR probe_http_status_code >= 400
+    expr: probe_http_status_code{ignore_down!="true"} <= 199 OR probe_http_status_code{ignore_down!="true"} >= 400
     for: 2m
     labels:
       severity: critical
@@ -29,7 +29,7 @@ groups:
       description: "HTTP status code is not 200-399\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
   - alert: BlackboxSslCertificateWillExpireSoon
-    expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 20
+    expr: probe_ssl_earliest_cert_expiry{ignore_down!="true"} - time() < 86400 * 20
     for: 2m
     labels:
       severity: warning
@@ -38,7 +38,7 @@ groups:
       description: "SSL certificate expires in 20 days\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
   - alert: BlackboxSslCertificateWillExpireSoon
-    expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 3
+    expr: probe_ssl_earliest_cert_expiry{ignore_down!="true"} - time() < 86400 * 3
     for: 2m
     labels:
       severity: critical
@@ -47,7 +47,7 @@ groups:
       description: "SSL certificate expires in 3 days\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
   - alert: BlackboxSslCertificateExpired
-    expr: probe_ssl_earliest_cert_expiry - time() <= 0
+    expr: probe_ssl_earliest_cert_expiry{ignore_down!="true"} - time() <= 0
     for: 2m
     labels:
       severity: critical
@@ -56,7 +56,7 @@ groups:
       description: "SSL certificate has expired already\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
   - alert: BlackboxProbeSlowHttp
-    expr: avg_over_time(probe_http_duration_seconds[1m]) > 2
+    expr: avg_over_time(probe_http_duration_seconds{ignore_down!="true"}[1m]) > 2
     for: 2m
     labels:
       severity: warning
@@ -65,7 +65,7 @@ groups:
       description: "HTTP request took more than 1s\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
   - alert: BlackboxProbeSlowPing
-    expr: avg_over_time(probe_icmp_duration_seconds[1m]) > 2
+    expr: avg_over_time(probe_icmp_duration_seconds{ignore_down!="true"}[1m]) > 2
     for: 2m
     labels:
       severity: warning

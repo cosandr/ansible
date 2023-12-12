@@ -2,12 +2,20 @@ groups:
 - name: Prometheus self-monitoring
   rules:
   - alert: InstanceDown
-    expr: up{instance!="desktop",instance!="laptop",job!="mph"} == 0
+    expr: up{ignore_down!="true"} == 0
     for: 10m
     labels:
       severity: critical
     annotations:
       summary: Job {{ $labels.job }} on {{ $labels.instance }} down
+
+  - alert: LocalgwDown
+    expr: count(up{instance=~"localgw\\d+"} == 1) == 0
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: All local gateways are down
 
   - alert: PrometheusJobMissing
     expr: absent(up{job="prometheus"})
