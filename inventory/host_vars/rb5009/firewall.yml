@@ -47,6 +47,8 @@ __mt_firewall_subnet_lists:
   - "{{ __kube_cidr_map.kube | andrei.utils.items2dictlist('address', list='kube', comment='kube') }}"
   - "{{ __kube_cidr_map.talos | andrei.utils.items2dictlist('address', list='talos', comment='talos') }}"
   - "{{ __kube_cidr_map.values() | flatten | andrei.utils.items2dictlist('address', list='all_kube', comment='all_kube') }}"
+  - "{{ vips.vm | dict2items | selectattr('key', 'match', 'localgw\\d+') | map(attribute='value') | flatten
+    | andrei.utils.items2dictlist('address', list='allow-www', comment='vm-localgw-vips') }}"
 
 __mt_firewall_address_lists_manual:
   - address: "{{ wireguard_endpoint.split(':', 1)[0] }}"

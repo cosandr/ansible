@@ -5,8 +5,8 @@ firewalld_zones:
     interfaces: "{{ host_nic_names }}"
 
   - name: internal
-    sources: "{{ wireguard_interface is defined | ternary([], node_exporter_allow_ips) }}"
-    interfaces: "{{ wireguard_interface is defined | ternary([wireguard_interface], []) }}"
+    sources: "{{ wireguard_interface | default(false) | ternary([], node_exporter_allow_ips) }}"
+    interfaces: "{{ wireguard_interface | default(false) | ternary([wireguard_interface], []) }}"
 
 firewalld_services: >-
   {%- set tmp = [] -%}
@@ -32,6 +32,12 @@ __firewalld_services_2:
 
   - name: https
     zone: public
+
+  - name: http
+    zone: internal
+
+  - name: https
+    zone: internal
 
 __firewall_rules_2:
   - port: 22

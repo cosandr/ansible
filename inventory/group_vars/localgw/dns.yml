@@ -1,25 +1,48 @@
 ---
 
-mt_dns_entries:
-  - name: "{{ inventory_hostname }}.{{ domain }}"
-    address: "{{ ansible_host }}"
+# TODO: andrei.utils.mt_get_dns_entries doesn't handle DNS RR
+# Skip adding type A since API doesn't return it so it always shows as changed
+mt_dns_entries: >-
+  {%- set tmp = [{
+    "name": inventory_hostname + "." + all_net[host_net].domain,
+    "address": ansible_host,
+  }] -%}
+  {%- if host_num | int == 0 -%}
+  {{- tmp.extend(__mt_dns_entries_once) -}}
+  {%- endif -%}
+  {%- if inventory_hostname in keepalived_priorities -%}
+  {%- for vip in vips[host_net][inventory_hostname] -%}
+  {%- set tmp2 = {
+    "name": localgw_dns_name,
+    "address": vip,
+    "ttl": "5m",
+  } -%}
+  {%- if vip is ansible.utils.ipv6 -%}
+  {{- tmp2.update({"type": "AAAA"}) -}}
+  {%- endif -%}
+  {{- tmp.append(tmp2) -}}
+  {%- endfor -%}
+  {%- endif -%}
+  {{ tmp }}
+
+__mt_dns_entries_once:
   - name: "grafana.{{ domain }}"
-    cname: "{{ inventory_hostname }}.{{ domain }}"
+    cname: "{{ localgw_dns_name }}"
     ttl: 5m
     type: CNAME
   - name: "syncthing.{{ domain }}"
-    cname: "{{ inventory_hostname }}.{{ domain }}"
+    cname: "{{ localgw_dns_name }}"
     ttl: 5m
     type: CNAME
   - name: "cloud.{{ domains['dv'] }}"
-    cname: "{{ inventory_hostname }}.{{ domain }}"
+    cname: "{{ localgw_dns_name }}"
     ttl: 5m
     type: CNAME
   - name: "gitlab.{{ domains['dv'] }}"
-    cname: "{{ inventory_hostname }}.{{ domain }}"
+    cname: "{{ localgw_dns_name }}"
     ttl: 5m
     type: CNAME
   - name: "plex.{{ domains['dv'] }}"
-    cname: "{{ inventory_hostname }}.{{ domain }}"
+    cname: "{{ localgw_dns_name }}"
     ttl: 5m
     type: CNAME

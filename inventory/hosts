@@ -7,7 +7,6 @@ k8s04        ansible_host="10.0.10.67"
 k8s05        ansible_host="10.0.10.68"
 k8s06        ansible_host="10.0.10.69"
 k8s07        ansible_host="10.0.10.70"
-localgw01    ansible_host="10.0.10.80"
 pg01         ansible_host="10.0.10.84"
 pgbak01      ansible_host="10.0.10.88"
 gitlab01     ansible_host="10.0.10.90"
@@ -25,6 +24,13 @@ talos04      ansible_host="10.0.10.115"
 talos05      ansible_host="10.0.10.116"
 talos06      ansible_host="10.0.10.117"
 talos07      ansible_host="10.0.10.118"
+localgw01    ansible_host="10.0.10.128"
+localgw02    ansible_host="10.0.10.129"
+localgw03    ansible_host="10.0.10.130"
+localgw04    ansible_host="10.0.10.131"
+localgw05    ansible_host="10.0.10.132"
+localgw06    ansible_host="10.0.10.133"
+localgw07    ansible_host="10.0.10.134"
 desktop      ansible_host="10.0.50.64"
 laptop       ansible_host="10.0.50.65"   wireguard_ip="10.4.20.65"
 m1bp         ansible_host="10.0.50.66"   wireguard_ip="10.4.20.66"
@@ -97,7 +103,6 @@ syno    ansible_user=andrei host_net=mgmt host_num=0
 [servers:children]
 kvm_hv
 libvirt
-localgw
 rom
 rpi
 webgw
@@ -108,14 +113,12 @@ ansible_group_priority=1
 [kvm_hv:vars]
 ansible_group_priority=2
 
-[libvirt]
-localgw01
-
 [libvirt:children]
 db
 gitlab
 gitrun
 k8s_cluster
+localgw
 loki
 minio
 nextcloud
@@ -193,20 +196,21 @@ loki01 host_num=0
 host_subnet=loki
 
 [localgw]
-localgw01 host_num=0
-romgw01
+localgw[01:07]
 
 [localgw:vars]
 host_subnet=localgw
 
 [webgw]
 webgw01 host_wg_num=0
+romgw01
 
 [webgw:children]
 localgw
 
 [webgw:vars]
 host_wg_subnet=webgw
+ansible_group_priority=3
 
 [nextcloud]
 nextcloud01 host_num=0

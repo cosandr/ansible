@@ -12,13 +12,13 @@ __subnet_overrides:
 {% set __subnet_map = {
   "switches": 28,
   "hosts": 28,
-  "_r1": 27,
+  "_r10": 27,
   "trusted": 28,
   "webgw": 30,
-  "_r2": 30,
-  "_r3": 29,
+  "_r20": 30,
+  "_r30": 29,
   "rom": 28,
-  "_r4": 28,
+  "_r40": 28,
   "clients": 26,
 } %}
   mt: {{ all_net.mt | andrei.utils.subnets_from_map(__subnet_map, v6_size=80) }}
@@ -26,7 +26,7 @@ __subnet_overrides:
 __subnet_extensions:
 {% set __subnet_map = {
   "k8s_cluster": 28,
-  "localgw": 30,
+  "_r10": 30,
   "pg": 30,
   "pgbackrest": 31,
   "gitlab": 31,
@@ -36,11 +36,13 @@ __subnet_extensions:
   "nextcloud": 31,
   "docker": 31,
   "prom": 31,
-  "_r1": 31,
+  "_r20": 31,
   "talos": 28,
-  "_r2": 26,
-  "_r3": 27,
-  "_r4": 28,
+  "localgw": 28,
+  "_r30": 28,
+  "_r40": 27,
+  "_r50": 27,
+  "_r60": 28,
   "clients": 28,
 } %}
   vm: {{ all_net.vm | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80) }}
@@ -48,14 +50,14 @@ __subnet_extensions:
 {% set __subnet_map = {
   "trusted": 28,
   "noinet": 28,
-  "_r1": 27,
+  "_r10": 27,
   "clients": 25,
 } %}
   general: {{ all_net.general | andrei.utils.subnets_from_map(__subnet_map, v4_start=48, v6_prefix_skip=3, v6_size=80) }}
 
 {% set __subnet_map = {
   "ipmi": 27,
-  "_r1": 27,
+  "_r10": 27,
   "clients": 25,
 } %}
   mgmt: {{ all_net.mgmt | andrei.utils.subnets_from_map(__subnet_map, v4_start=32, v6_prefix_skip=3, v6_size=80) }}

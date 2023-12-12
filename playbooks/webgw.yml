@@ -122,6 +122,20 @@
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
       tags: ["always"]
+
+    - name: Copy master check script
+      ansible.builtin.template:
+        src: "{{ repo_base_dir }}/files/webgw/check_is_master.sh.j2"
+        dest: /usr/local/bin/check-is-master
+        owner: root
+        group: root
+        # setuid bit to allow all users to run it
+        mode: "04755"
+      when:
+        - lego_pre_script is defined
+        - keepalived_instances is defined
+        - keepalived_instances | length > 0
+      tags: ["lego", "pg_cert"]
   roles:
     - role: fail2ban
       tags: ["fail2ban"]
@@ -130,12 +144,17 @@
       when: ssh_dest_hosts | default([])
       tags: ["auto-ssh"]
 
-
     - role: lego
       tags: ["lego"]
       when:
         - lego_domains is defined
         - lego_domains | length > 0
+
+    - role: keepalived
+      tags: ["keepalived"]
+      when:
+        - keepalived_instances is defined
+        - keepalived_instances | length > 0
 
     - role: nginx_pre
       tags: ["nginx"]

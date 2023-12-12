@@ -1,0 +1,14 @@
+module keepalived_nginx_status 1.0;
+
+require {
+	type httpd_unit_file_t;
+	type systemd_systemctl_exec_t;
+	type keepalived_t;
+	class file { execute execute_no_trans getattr map open read setattr };
+	class service status;
+}
+
+#============= keepalived_t ==============
+allow keepalived_t httpd_unit_file_t:service status;
+allow keepalived_t systemd_systemctl_exec_t:file { execute execute_no_trans getattr open read setattr };
+allow keepalived_t systemd_systemctl_exec_t:file map;

@@ -1,0 +1,29 @@
+---
+
+pg_cert_installed: true
+pg_cert_pg_user: "certs_pusher"
+pg_cert_pg_password: "{{ hostvars['pg01'].vault_postgresql_passwords.certs_pusher }}"
+
+pg_cert_default_owner: lego
+pg_cert_default_group: "lego"
+
+pg_cert_pull_pre_script: |
+  if /usr/local/bin/check-is-master; then
+    echo "Master node, skip fetching certs"
+    exit 0
+  fi
+
+pg_cert_pull: >-
+  {%- set tmp = [] -%}
+  {%- for k in lego_domain_keys -%}
+  {{- tmp.append({
+    "name": domains[k],
+    "cert_path": "/etc/lego/certificates/" + domains[k] + ".crt",
+    "key_path": "/etc/lego/certificates/" + domains[k] + ".key",
+    "chain_path": "/etc/lego/certificates/" + domains[k] + ".issuer.crt",
+    "public_mode": "0600",
+    "private_mode": "0600",
+    "chain_mode": "0600",
+  }) -}}
+  {%- endfor -%}
+  {{ tmp }}

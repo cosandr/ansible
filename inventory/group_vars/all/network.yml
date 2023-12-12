@@ -85,8 +85,6 @@ subnets:
       - 10.0.10.32/27
     k8s_cluster:
       - 10.0.10.64/28
-    localgw:
-      - 10.0.10.80/30
     pg:
       - 10.0.10.84/30
     pgbackrest:
@@ -107,6 +105,8 @@ subnets:
       - 10.0.10.108/31
     talos:
       - 10.0.10.112/28
+    localgw:
+      - 10.0.10.128/28
     clients:
       - 10.0.10.240/28
   general:
@@ -185,6 +185,12 @@ vips:
       - 10.0.10.35
     talos_cp:
       - 10.0.10.36
+    localgw01:
+      - 10.0.10.37
+    localgw02:
+      - 10.0.10.38
+    localgw03:
+      - 10.0.10.39
   general:
     ceph_nfs:
       - 10.0.50.33
@@ -212,6 +218,12 @@ vips_with_prefix:
       - 10.0.10.35/24
     talos_cp:
       - 10.0.10.36/24
+    localgw01:
+      - 10.0.10.37/24
+    localgw02:
+      - 10.0.10.38/24
+    localgw03:
+      - 10.0.10.39/24
   general:
     ceph_nfs:
       - 10.0.50.33/24

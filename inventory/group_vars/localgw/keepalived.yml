@@ -1,0 +1,59 @@
+---
+
+host_num: "{{ groups['localgw'] | ansible.utils.index_of('eq', inventory_hostname) }}"
+
+# Could probably simplify but it's relatively readable like this
+keepalived_priorities: >-
+  {%- set tmp = {} -%}
+  {%- set num = host_num | int -%}
+  {%- set vip_idx = num % 3 -%}
+  {%- if vip_idx == 0 -%}
+  {{- tmp.update({
+    'localgw01': 200 - ((num - vip_idx) / 3) | int * 10,
+    'localgw02': 100 - num * 10,
+    'localgw03': 100 - num * 10,
+  }) -}}
+  {%- elif vip_idx == 1 -%}
+  {{- tmp.update({
+    'localgw01': 100 - num * 10,
+    'localgw02': 200 - ((num - vip_idx) / 3) | int * 10,
+    'localgw03': 100 - num * 10,
+  }) -}}
+  {%- elif vip_idx == 2 -%}
+  {{- tmp.update({
+    'localgw01': 100 - num * 10,
+    'localgw02': 100 - num * 10,
+    'localgw03': 200 - ((num - vip_idx) / 3) | int * 10,
+  }) -}}
+  {%- endif -%}
+  {{ tmp }}
+
+keepalived_global_defs:
+  - enable_script_security
+
+keepalived_scripts:
+  check_nginx:
+    check_script: '/usr/bin/systemctl is-active -q nginx'
+    user: root
+
+keepalived_selinux_compile_rules:
+  - "{{ repo_base_dir }}/files/webgw/keepalived_nginx_status"
+
+keepalived_instances: >-
+  {%- set tmp = {} -%}
+  {%- for name, priority in keepalived_priorities.items() -%}
+  {{- tmp.update({
+    name: {
+      "interface": host_nic_names[0],
+      "state": (priority == 200) | ternary('MASTER', 'BACKUP'),
+      "virtual_router_id": 60 + loop.index,
+      "priority": priority,
+      "unicast_src_ip": ansible_host,
+      "unicast_peers": groups['localgw'] | difference([inventory_hostname]) | map('extract', hostvars, 'ansible_host'),
+      "authentication_password": vault_keepalived_authentication_password,
+      "vips": vips_with_prefix[host_net][name] | map('regex_replace', '$', ' dev ' + host_nic_names[0]),
+      "track_scripts": ["check_nginx"]
+    }
+  }) -}}
+  {%- endfor -%}
+  {{ tmp }}

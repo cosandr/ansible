@@ -1,0 +1,13 @@
+#!/bin/bash
+
+vips=(
+{% for item in vips_with_prefix[host_net]['localgw01'] %}
+"{{ item }}"
+{% endfor %}
+)
+for vip in "${vips[@]}"; do
+    if ip address show "{{ host_nic_names[0] }}" | grep -qF "$vip"; then
+        exit 0
+    fi
+done
+exit 1
