@@ -5,14 +5,45 @@ prometheus_config_flags_extra:
   "storage.tsdb.min-block-duration": "2h"
   "storage.tsdb.max-block-duration": "2h"
 
+__prom_blackbox_http_targets: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_http_targets | default([]) -%}
+  {{- tmp.append(hostvars[h].prometheus_blackbox_http_targets) -}}
+  {%- endfor -%}
+  {{ tmp | flatten | unique | sort }}
+
+__prom_blackbox_tls_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_tls_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_blackbox_tls_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__prom_blackbox_starttls_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_starttls_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_blackbox_starttls_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
 __extra_prometheus_scrape_configs:
-  - job_name: 'blackbox_tls_connect4'
-    scrape_interval: 30m
+  - job_name: 'blackbox_http4'
+    scrape_interval: 1m
     metrics_path: '/probe'
     params:
-      module: [tls_connect_ipv4]
+      module: [http_2xx_ipv4]
     static_configs:
-      - targets: "{{ __prom_blackbox_tls_targets }}"
+      - targets: "{{ __prom_blackbox_http_targets }}"
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -20,25 +51,36 @@ __extra_prometheus_scrape_configs:
         target_label: instance
       - target_label: __address__
         replacement: "localhost:{{ blackbox_exporter_port }}"
-      - source_labels: [instance]
+
+  - job_name: 'blackbox_tls_connect4'
+    scrape_interval: 30m
+    metrics_path: '/probe'
+    params:
+      module: [tls_connect_ipv4]
+    static_configs: "{{ __prom_blackbox_tls_configs }}"
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
         target_label: __host_ip
+        regex: '([^:]+):\d+'
+      - target_label: __address__
+        replacement: "localhost:{{ blackbox_exporter_port }}"
 
   - job_name: 'blackbox_starttls4'
     scrape_interval: 30m
     metrics_path: '/probe'
     params:
       module: [smtp_starttls_ipv4]
-    static_configs:
-      - targets: "{{ __prom_blackbox_starttls_targets }}"
+    static_configs: "{{ __prom_blackbox_starttls_configs }}"
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
       - source_labels: [__param_target]
-        target_label: instance
+        target_label: __host_ip
+        regex: '([^:]+):\d+'
       - target_label: __address__
         replacement: "localhost:{{ blackbox_exporter_port }}"
-      - source_labels: [instance]
-        target_label: __host_ip
 
   - job_name: "federate"
     scrape_interval: 15s
@@ -116,21 +158,6 @@ __extra_prometheus_scrape_configs:
         regex: '.*:19194'
         target_label: thanos_svc
         replacement: "query"
-
-  - job_name: 'blackbox_http4'
-    scrape_interval: 1m
-    metrics_path: '/probe'
-    params:
-      module: [http_2xx_ipv4]
-    static_configs:
-      - targets: "{{ __prom_blackbox_http_targets }}"
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
-      - target_label: __address__
-        replacement: "localhost:{{ blackbox_exporter_port }}"
 
   - job_name: "ipmi"
     metrics_path: /ipmi
