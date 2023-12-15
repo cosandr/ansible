@@ -175,6 +175,13 @@
             chdir: "{{ tmp_dir }}"
             cmd: "talosctl -n {{ ansible_host }} bootstrap"
 
+        # Need these pods on first setup to configure LVM
+        - name: Enable admin pods
+          ansible.builtin.set_fact:
+            enable_admin_pods: true
+            admin_pods_force_enabled: true
+          when: not enable_admin_pods | bool
+
     - name: Check if node is configured
       check_mode: false
       changed_when: false
@@ -376,6 +383,14 @@
       vars:
         tpl_file: "{{ repo_base_dir }}/files/talos/calico-felix.yml.j2"
 
+    - name: Create admin daemonset
+      kubernetes.core.k8s:
+        template: "{{ repo_base_dir }}/files/talos/admin-daemonset.yml.j2"
+        state: present
+        # true blocks for ever if DS has 0 desired pods
+        wait: "{{ enable_admin_pods | bool }}"
+      tags: ["admin"]
+
   handlers:
     - name: Restart calico-node  # noqa no-changed-when
       ansible.builtin.command:
@@ -428,6 +443,42 @@
           metadata:
             labels: "{{ node_labels }}"
       tags: ["node", "labels"]
+
+    - name: Get admin pod on self
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: kube-system
+        label_selectors:
+          - app.kubernetes.io/name=admin
+          - app.kubernetes.io/managed-by=ansible
+        field_selectors:
+          - "spec.nodeName={{ inventory_hostname }}"
+      register: __admin_pod
+      tags: ["lvm"]
+
+    - name: Create LVG
+      community.general.lvg:
+        vg: "localpv"
+        pvs: "/dev/disk/by-id/virtio-data01"
+        pesize: "32"
+        state: present
+      vars:
+        ansible_connection: kubernetes.core.kubectl
+        ansible_kubectl_context: "{{ talos_kubectl_context }}"
+        ansible_kubectl_namespace: "{{ __admin_pod.resources[0].metadata.namespace }}"
+        ansible_kubectl_pod: "{{ __admin_pod.resources[0].metadata.name }}"
+      when: __admin_pod.resources
+      tags: ["lvm"]
+
+    - name: Disable admin daemonset
+      run_once: true
+      kubernetes.core.k8s:
+        template: "{{ repo_base_dir }}/files/talos/admin-daemonset.yml.j2"
+        state: present
+      vars:
+        enable_admin_pods: false
+      when: admin_pods_force_enabled | default(false)
+      tags: ["admin", "lvm"]
 
 - name: Setup Kubernetes
   hosts: talos_cp[0]

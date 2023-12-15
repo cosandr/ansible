@@ -46,17 +46,40 @@
     label: "{{ item.name }}"
   tags: ["helm", "repos"]
 
+- name: Create OpenEBS namespace
+  kubernetes.core.k8s:
+    state: present
+    resource_definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: openebs
+        labels:
+          pod-security.kubernetes.io/enforce: privileged
+          pod-security.kubernetes.io/audit: privileged
+          pod-security.kubernetes.io/warn: privileged
+  tags: ["lvm"]
+
 - name: Install OpenEBS LVM CSI driver
   kubernetes.core.helm:
     name: lvm-localpv
     chart_ref: openebs-lvmlocalpv/lvm-localpv
     chart_version: "~1.2"
     release_namespace: openebs
-    create_namespace: true
+    create_namespace: false
     update_repo_cache: true
     wait: true
-  # TODO: Implement for Talos
-  when: "'k8s_cluster' in group_names"
+    release_values:
+      lvmController:
+        tolerations:
+          - key: "node-role.kubernetes.io/control-plane"
+            effect: "NoSchedule"
+            operator: "Exists"
+      lvmNode:
+        tolerations:
+          - key: "node-role.kubernetes.io/control-plane"
+            effect: "NoSchedule"
+            operator: "Exists"
   tags: ["lvm"]
 
 - name: Create LVM StorageClass
@@ -68,6 +91,8 @@
       metadata:
         name: openebs-lvmpv
       allowVolumeExpansion: true
+      # Fixes PV getting created on unschedulable node
+      volumeBindingMode: WaitForFirstConsumer
       provisioner: local.csi.openebs.io
       parameters:
         storage: "lvm"
@@ -76,7 +101,6 @@
       mountOptions:
         - "defaults"
         - "noatime"
-  when: "'k8s_cluster' in group_names"
   tags: ["lvm"]
 
 - name: Create monitoring namespace

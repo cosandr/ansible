@@ -1,0 +1,55 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: admin
+  namespace: kube-system
+  labels:
+    app.kubernetes.io/name: admin
+    app.kubernetes.io/managed-by: ansible
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: admin
+      app.kubernetes.io/managed-by: ansible
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: admin
+        app.kubernetes.io/managed-by: ansible
+    spec:
+      hostNetwork: true
+      hostPID: true
+      volumes:
+      - name: dev
+        hostPath:
+          path: /dev
+      nodeSelector:
+{% if enable_admin_pods | bool %}
+        kubernetes.io/os: linux
+{% else %}
+        kubernetes.io/os: disabled
+{% endif %}
+      priorityClassName: system-node-critical
+      tolerations:
+      - key: "node-role.kubernetes.io/control-plane"
+        effect: "NoSchedule"
+        operator: "Exists"
+      containers:
+      - name: admin
+        image: {{ gitlab_registry_basename }}/global/containers/admin:latest
+        args: ["/bin/sh", "-ec", "--", "trap : TERM INT; sleep infinity & wait"]
+        terminationGracePeriodSeconds: 2
+        securityContext:
+          privileged: true
+        resources:
+          limits:
+            cpu: 2
+            memory: 1Gi
+          requests:
+            cpu: 10m
+            memory: 16Mi
+        volumeMounts:
+        - name: dev
+          mountPath: /dev
