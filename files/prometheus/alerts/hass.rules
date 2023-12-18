@@ -23,7 +23,7 @@ groups:
     labels:
       severity: warning
     annotations:
-      summary: Sensor "{{ $labels.friendly_name }}" appears to be stuck
+      summary: Power sensor "{{ $labels.friendly_name }}" appears to be stuck
 
   - alert: HassTemperatureSensorStuck
     expr: |
@@ -38,4 +38,12 @@ groups:
     labels:
       severity: warning
     annotations:
-      summary: Sensor "{{ $labels.friendly_name }}" appears to be stuck
+      summary: Temperature sensor "{{ $labels.friendly_name }}" appears to be stuck
+
+  - alert: HassTemperatureSensorDown
+    expr: hass_entity_available{entity=~"sensor\\..+_temperature$"} == 0
+    for: 15m
+    labels:
+      severity: warning
+    annotations:
+      summary: Temperature sensor "{{ $labels.friendly_name }}" is down
