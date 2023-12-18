@@ -25,17 +25,17 @@ internal_net: {{ internal_net | combine(__internal_net_late_merge, recursive=tru
 vips:
   # Consider using list and ansible.utils.reduce_on_network instead?
   vm:
-    ceph_nfs: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
-    ceph_rgw: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(2, wantlist=true) }}
-    kube_cp: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(3, wantlist=true) }}
-    talos_cp: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
-    localgw01: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(5, wantlist=true) }}
-    localgw02: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(6, wantlist=true) }}
-    localgw03: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(7, wantlist=true) }}
+    localgw01: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
+    localgw02: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(2, wantlist=true) }}
+    localgw03: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(3, wantlist=true) }}
+    ceph_nfs: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
+    ceph_rgw: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(5, wantlist=true) }}
+    talos_cp: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(6, wantlist=true) }}
+    kube_cp: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(7, wantlist=true) }}
   general:
-    ceph_nfs: {{ subnets.general.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
+    ceph_nfs: {{ subnets.general.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
   san:
-    ceph_nfs: {{ subnets.san.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
+    ceph_nfs: {{ subnets.san.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
   kube:
     nginx: {{ subnets.kube.lb | andrei.utils.ipaddr_concat(1, wantlist=true) }}
     prom: {{ subnets.kube.lb | andrei.utils.ipaddr_concat(2, wantlist=true) }}
