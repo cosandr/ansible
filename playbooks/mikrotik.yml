@@ -49,11 +49,13 @@
       tags: ["backup"]
       block:
         - name: Get config content
+          no_log: true
           community.routeros.command:
             commands: /export show-sensitive
           register: __config
 
         - name: GPG encrypt config
+          no_log: true
           become: false
           delegate_to: localhost
           check_mode: false
