@@ -19,11 +19,11 @@ __firewalld_services_1:
 __firewall_rules_1:
   - port: 8384
     zone: public
-    sources: "{{ proxy_hosts }}"
+    sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
 
   - port: "{{ nginx_ports['www'] }}"
     zone: public
-    sources: "{{ proxy_hosts }}"
+    sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
 
 mt_firewall_address_lists:
   - address: "{{ host_ips.vm }}"
