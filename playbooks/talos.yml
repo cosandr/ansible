@@ -459,7 +459,7 @@
     - name: Create LVG
       community.general.lvg:
         vg: "localpv"
-        pvs: "/dev/disk/by-id/virtio-data01"
+        pvs: "/dev/disk/by-id/virtio-raw01"
         pesize: "32"
         state: present
       vars:

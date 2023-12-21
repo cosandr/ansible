@@ -8,15 +8,8 @@ vm_customize: false
 vm_autostart: false
 
 # Used by OpenEBS LVM provisioner
-vm_extra_disks:
-  - type: block
-    device: disk
-    format: raw
-    dev: "/dev/{{ 'vg02' if vm_host == 'theia' else 'vg01' }}/k8s"
-    serial: "raw01"
-    driver_options:
-      discard: "unmap"
-      cache: "none"
+vm_data_disks:
+  - "25G"
 
 vm_qemu_args:
   - "-fw_cfg"

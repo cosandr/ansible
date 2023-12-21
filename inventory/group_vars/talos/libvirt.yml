@@ -7,13 +7,12 @@ vm_customize: false
 vm_autostart: false
 
 vm_extra_disks:
-  # TODO: Consider changing to LVM passthrough
-  - name: "{{ inventory_hostname }}-data01.{{ vm_disk_format }}"
-    format: "{{ vm_disk_format }}"
-    device: "disk"
-    capacity: "25G"
-    serial: "data01"
-    pool: "{{ vm_disk_pool }}"
+  # Used by OpenEBS LVM provisioner
+  - type: block
+    device: disk
+    format: raw
+    dev: "/dev/{{ 'vg02' if vm_host == 'theia' else 'vg01' }}/k8s"
+    serial: "raw01"
     target: "vdb"
     driver_options:
       discard: "unmap"
