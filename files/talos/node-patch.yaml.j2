@@ -1,12 +1,13 @@
 machine:
-  certSANs:
-    - "{{ inventory_hostname }}.{{ domain }}"
+  certSANs: {{ __mt_dns_entries_common | map(attribute='name') | to_json }}
   network:
     hostname: "{{ inventory_hostname }}"
     interfaces:
       - deviceSelector:
           hardwareAddr: "{{ vm_default_mac }}"
         dhcp: true
+{% if 'talos_cp' in group_names %}
         vip:
-          ip: "{{ vips.vm.talos_cp | ansible.utils.ipv4 | first }}"
+          ip: "{{ vips.talos.control_plane | ansible.utils.ipv4 | first }}"
+{% endif %}
   nodeLabels: {{ node_labels | to_json }}

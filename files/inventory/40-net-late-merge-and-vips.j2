@@ -3,6 +3,14 @@
     "dhcp_range": subnets.vm.clients | ansible.utils.ipv4 | last | default(""),
     "domain": "vm.{{ domains['hb'] }}",
   },
+  "kube": {
+    "dhcp_range": subnets.kube.clients | ansible.utils.ipv4 | last | default(""),
+    "domain": "kube.{{ domains['hb'] }}",
+  },
+  "talos": {
+    "dhcp_range": subnets.talos.clients | ansible.utils.ipv4 | last | default(""),
+    "domain": "talos.{{ domains['hb'] }}",
+  },
   "general": {
     "dhcp_range": subnets.general.clients | ansible.utils.ipv4 | last | default(""),
     "domain": "gen.{{ domains['hb'] }}",
@@ -30,15 +38,15 @@ vips:
     localgw03: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(3, wantlist=true) }}
     ceph_nfs: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
     ceph_rgw: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(5, wantlist=true) }}
-    talos_cp: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(6, wantlist=true) }}
-    kube_cp: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(7, wantlist=true) }}
   general:
     ceph_nfs: {{ subnets.general.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
   san:
     ceph_nfs: {{ subnets.san.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
   kube:
+    control_plane: {{ subnets.kube.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
     nginx: {{ subnets.kube.lb | andrei.utils.ipaddr_concat(1, wantlist=true) }}
     prom: {{ subnets.kube.lb | andrei.utils.ipaddr_concat(2, wantlist=true) }}
   talos:
+    control_plane: {{ subnets.talos.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
     nginx: {{ subnets.talos.lb | andrei.utils.ipaddr_concat(1, wantlist=true) }}
     prom: {{ subnets.talos.lb | andrei.utils.ipaddr_concat(2, wantlist=true) }}

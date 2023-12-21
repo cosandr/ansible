@@ -10,12 +10,12 @@ installation:
 {% else %}
     linuxDataplane: Iptables
 {% endif %}
-{% if all_net.talos.cidr is defined %}
+{% if all_net.talos.cidr_internal is defined %}
     nodeAddressAutodetectionV4:
       firstFound: false
       interface: "enx.+"
 {% endif %}
-{% if all_net.talos.cidr6 is defined %}
+{% if all_net.talos.cidr6_internal is defined %}
     nodeAddressAutodetectionV6:
       firstFound: false
       interface: "enx.+"

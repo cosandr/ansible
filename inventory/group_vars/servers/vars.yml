@@ -18,7 +18,7 @@ ssh_authorized_keys:
   - "{{ hostvars['desktop'].ssh_keys.andrei }}"
   - "{{ hostvars['laptop'].ssh_keys.andrei }}"
 
-domain: "{{ all_net.vm.domain }}"
+domain: "{{ all_net[host_net].domain | default(domains['hb']) }}"
 
 btrfs_scrub_email: "{{ smartd_email }}"
 btrfs_scrub_from_email: "{{ smartd_from_address }}"

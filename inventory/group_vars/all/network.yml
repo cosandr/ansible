@@ -37,6 +37,24 @@ home_net:
       - NOSEC
     dhcp_range: 10.0.10.240/28
     domain: vm.{{ domains['hb'] }}
+  kube:
+    cidr: 10.0.27.0/24
+    cidr_internal: 172.27.0.0/16
+    vlan: 27
+    mt_lists:
+      - LAN
+      - NOSEC
+    dhcp_range: 10.0.27.240/28
+    domain: kube.{{ domains['hb'] }}
+  talos:
+    cidr: 10.0.28.0/24
+    cidr_internal: 172.28.0.0/16
+    vlan: 28
+    mt_lists:
+      - LAN
+      - NOSEC
+    dhcp_range: 10.0.28.240/28
+    domain: talos.{{ domains['hb'] }}
   general:
     cidr: 10.0.50.0/24
     vlan: 50
@@ -66,10 +84,6 @@ internal_net:
       - NOWAN
       - NOROUTE
     domain: san.{{ domains['hb'] }}
-  kube:
-    cidr: 172.27.0.0/16
-  talos:
-    cidr: 172.28.0.0/16
 
 wg_net:
   mt:
@@ -103,12 +117,50 @@ subnets:
       - 10.0.10.106/31
     prom:
       - 10.0.10.108/31
-    talos:
-      - 10.0.10.112/28
-    k8s_cluster:
-      - 10.0.10.128/28
     clients:
       - 10.0.10.240/28
+  kube:
+    switches:
+      - 10.0.27.0/28
+    hosts:
+      - 10.0.27.16/28
+    vips:
+      - 10.0.27.32/27
+    control_plane:
+      - 10.0.27.64/28
+    worker:
+      - 10.0.27.80/28
+    clients:
+      - 10.0.27.240/28
+    svc:
+      - 172.27.0.0/18
+    pod:
+      - 172.27.64.0/18
+    lb:
+      - 172.27.128.0/26
+    mon:
+      - 172.27.128.64/26
+  talos:
+    switches:
+      - 10.0.28.0/28
+    hosts:
+      - 10.0.28.16/28
+    vips:
+      - 10.0.28.32/27
+    control_plane:
+      - 10.0.28.64/28
+    worker:
+      - 10.0.28.80/28
+    clients:
+      - 10.0.28.240/28
+    svc:
+      - 172.28.0.0/18
+    pod:
+      - 172.28.64.0/18
+    lb:
+      - 172.28.128.0/26
+    mon:
+      - 172.28.128.64/26
   general:
     switches:
       - 10.0.50.0/28
@@ -143,24 +195,6 @@ subnets:
     clients:
       - 10.0.2.64/26
       - 10.0.2.128/25
-  talos:
-    svc:
-      - 172.28.0.0/18
-    pod:
-      - 172.28.64.0/18
-    lb:
-      - 172.28.128.0/26
-    mon:
-      - 172.28.128.64/26
-  kube:
-    svc:
-      - 172.27.0.0/18
-    pod:
-      - 172.27.64.0/18
-    lb:
-      - 172.27.128.0/26
-    mon:
-      - 172.27.128.64/26
   mt:
     switches:
       - 10.4.20.0/28
@@ -187,10 +221,6 @@ vips:
       - 10.0.10.36
     ceph_rgw:
       - 10.0.10.37
-    talos_cp:
-      - 10.0.10.38
-    kube_cp:
-      - 10.0.10.39
   general:
     ceph_nfs:
       - 10.0.50.36
@@ -198,11 +228,15 @@ vips:
     ceph_nfs:
       - 10.0.2.36
   kube:
+    control_plane:
+      - 10.0.27.33
     nginx:
       - 172.27.128.1
     prom:
       - 172.27.128.2
   talos:
+    control_plane:
+      - 10.0.28.33
     nginx:
       - 172.28.128.1
     prom:
@@ -220,10 +254,6 @@ vips_with_prefix:
       - 10.0.10.36/24
     ceph_rgw:
       - 10.0.10.37/24
-    talos_cp:
-      - 10.0.10.38/24
-    kube_cp:
-      - 10.0.10.39/24
   general:
     ceph_nfs:
       - 10.0.50.36/24
@@ -231,11 +261,15 @@ vips_with_prefix:
     ceph_nfs:
       - 10.0.2.36/24
   kube:
+    control_plane:
+      - 10.0.27.33/24
     nginx:
       - 172.27.128.1/16
     prom:
       - 172.27.128.2/16
   talos:
+    control_plane:
+      - 10.0.28.33/24
     nginx:
       - 172.28.128.1/16
     prom:

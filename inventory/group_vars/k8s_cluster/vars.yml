@@ -16,3 +16,6 @@ firewall_frontend: "none"
 firewall_install: false
 promtail_installed: false
 nfs_idmapping_configure: false
+
+kube_api_server: "{{ domain }}"
+kube_ingress_domain: "{{ domain }}"

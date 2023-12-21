@@ -28,7 +28,7 @@ mt_firewall_nat: "{{ vault_mt_firewall_nat }}"
 __kube_cidr_map: >-
   {%- set tmp = {} -%}
   {%- for name, config in all_net.items() if name in ['kube', 'talos'] -%}
-  {{- tmp.update({name: ([config.get('cidr')] + [config.get('cidr6')]) | select }) -}}
+  {{- tmp.update({name: ([config.get('cidr_internal')] + [config.get('cidr6_internal')]) | select }) -}}
   {%- endfor -%}
   {{ tmp }}
 

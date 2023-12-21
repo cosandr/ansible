@@ -8,6 +8,28 @@ home_net:
 {% endif %}
     vlan: 10
     mt_lists: [LAN, NOSEC]
+  kube:
+{% if 'cidr' in supernets %}
+    cidr: "{{ supernets.cidr | ansible.utils.ipsubnet(24, 27) }}"
+{% endif %}
+{% if 'cidr6' in supernets %}
+    cidr6: "{{ supernets.cidr6 | ansible.utils.ipsubnet(64, 27) }}"
+{% endif %}
+    cidr_internal: "172.27.0.0/16"
+    # cidr6_internal: "fd00:172:27::/56"
+    vlan: 27
+    mt_lists: [LAN, NOSEC]
+  talos:
+{% if 'cidr' in supernets %}
+    cidr: "{{ supernets.cidr | ansible.utils.ipsubnet(24, 28) }}"
+{% endif %}
+{% if 'cidr6' in supernets %}
+    cidr6: "{{ supernets.cidr6 | ansible.utils.ipsubnet(64, 28) }}"
+{% endif %}
+    cidr_internal: "172.28.0.0/16"
+    # cidr6_internal: "fd00:172:28::/56"
+    vlan: 28
+    mt_lists: [LAN, NOSEC]
   general:
 {% if 'cidr' in supernets %}
     cidr: "{{ supernets.cidr | ansible.utils.ipsubnet(24, 50) }}"
@@ -39,12 +61,6 @@ internal_net:
     vlan: 2
     mtu: 9000
     mt_lists: [LAN, SEC, NOWAN, NOROUTE]
-  kube:
-    cidr: "172.27.0.0/16"
-    # cidr6: "fd00:172:27::/56"
-  talos:
-    cidr: "172.28.0.0/16"
-    # cidr6: "fd00:172:28::/56"
 
 wg_net:
   mt:

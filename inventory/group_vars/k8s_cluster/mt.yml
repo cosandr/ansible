@@ -1,4 +1,17 @@
 ---
 
 mt_bgp_peers:
-  - as: 5009
+  - as: 65027
+
+# Only add VIP once
+mt_dns_entries: "{{ __mt_dns_entries_common + __mt_dns_entries_vip if inventory_hostname == groups['k8s_cluster'][0] else __mt_dns_entries_common }}"
+__mt_dns_entries_common:
+  - name: "{{ inventory_hostname }}.{{ domain }}"
+    address: "{{ ansible_host }}"
+
+__mt_dns_entries_vip:
+  - name: "{{ kube_api_server }}"
+    address: "{{ vips.kube.control_plane | ansible.utils.ipv4 | first }}"
+  - regexp: ".*\\.{{ kube_ingress_domain | regex_escape() }}$"
+    address: "{{ vips.kube.nginx | ansible.utils.ipv4 | first }}"
+    ttl: 5m

@@ -1,1 +1,1 @@
-subnets: {{ home_net | combine(internal_net) | andrei.utils.default_subnet(no_clients='vm', skip_nets='kube') | combine(__subnet_overrides) | combine(__subnet_extensions, recursive=true) | andrei.utils.sort_subnets }}
+subnets: {{ home_net | combine(internal_net) | andrei.utils.default_subnet(no_clients='vm,talos,kube') | combine(__subnet_overrides) | combine(__subnet_extensions, recursive=true) | andrei.utils.sort_subnets }}

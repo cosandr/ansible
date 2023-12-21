@@ -17,20 +17,20 @@ minio01      ansible_host="10.0.10.100"
 nextcloud01  ansible_host="10.0.10.104"
 docker01     ansible_host="10.0.10.106"
 prom01       ansible_host="10.0.10.108"
-talos01      ansible_host="10.0.10.112"
-talos02      ansible_host="10.0.10.113"
-talos03      ansible_host="10.0.10.114"
-talos04      ansible_host="10.0.10.115"
-talos05      ansible_host="10.0.10.116"
-talos06      ansible_host="10.0.10.117"
-talos07      ansible_host="10.0.10.118"
-k8s01        ansible_host="10.0.10.128"
-k8s02        ansible_host="10.0.10.129"
-k8s03        ansible_host="10.0.10.130"
-k8s04        ansible_host="10.0.10.131"
-k8s05        ansible_host="10.0.10.132"
-k8s06        ansible_host="10.0.10.133"
-k8s07        ansible_host="10.0.10.134"
+k8s01        ansible_host="10.0.27.64"
+k8s02        ansible_host="10.0.27.81"
+k8s03        ansible_host="10.0.27.82"
+k8s04        ansible_host="10.0.27.83"
+k8s05        ansible_host="10.0.27.84"
+k8s06        ansible_host="10.0.27.85"
+k8s07        ansible_host="10.0.27.86"
+talos01      ansible_host="10.0.28.64"
+talos02      ansible_host="10.0.28.65"
+talos03      ansible_host="10.0.28.66"
+talos04      ansible_host="10.0.28.83"
+talos05      ansible_host="10.0.28.84"
+talos06      ansible_host="10.0.28.85"
+talos07      ansible_host="10.0.28.86"
 desktop      ansible_host="10.0.50.64"
 laptop       ansible_host="10.0.50.65"   wireguard_ip="10.4.20.65"
 m1bp         ansible_host="10.0.50.66"   wireguard_ip="10.4.20.66"
@@ -248,13 +248,19 @@ talos_cp
 talos_worker
 
 [talos:vars]
-host_subnet=talos
+host_net=talos
 
 [talos_cp]
 talos[01:03]
 
+[talos_cp:vars]
+host_subnet=control_plane
+
 [talos_worker]
 talos[04:07]
+
+[talos_worker:vars]
+host_subnet=worker
 
 # kubespray
 [k8s_cluster]
@@ -267,16 +273,22 @@ k8s06 host_num=5
 k8s07 host_num=6 vm_mem=4096
 
 [k8s_cluster:vars]
-host_subnet=k8s_cluster
+host_net=kube
 
 [kube_control_plane]
 k8s[01:03]
+
+[kube_control_plane:vars]
+host_subnet=control_plane
 
 [etcd]
 k8s[01:03]
 
 [kube_node]
 k8s[02:07]
+
+[kube_node:vars]
+host_subnet=worker
 
 [unmanaged_hosts]
 ax56u        host_num=5

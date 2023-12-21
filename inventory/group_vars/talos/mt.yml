@@ -15,7 +15,7 @@ __mt_dns_entries_common:
 
 __mt_dns_entries_vip:
   - name: "{{ kube_api_server }}"
-    address: "{{ vips.vm.talos_cp | ansible.utils.ipv4 | first }}"
+    address: "{{ vips.talos.control_plane | ansible.utils.ipv4 | first }}"
   - regexp: ".*\\.{{ kube_ingress_domain | regex_escape() }}$"
     address: "{{ vips.talos.nginx | ansible.utils.ipv4 | first }}"
     ttl: 5m

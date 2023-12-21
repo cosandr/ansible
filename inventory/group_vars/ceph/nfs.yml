@@ -25,6 +25,6 @@ ceph_nfs_exports:
     access_type: "NONE"
     clients:
       - access_type: "RW"
-        addresses: "{{ subnets.vm.kube }}"
+        addresses: "{{ subnets.kube.control_plane + subnets.kube.worker }}"
 
 __ceph_nfs_client_addresses: "{{ ceph_nfs_exports | map(attribute='clients') | flatten | map(attribute='addresses') | flatten | unique }}"

@@ -6,7 +6,10 @@
 {% for name, addrs in nets.items() %}
 {% set tmp3 = [] %}
 {% for addr in addrs %}
-{{- tmp3.append(addr + "/" + ((addr | ansible.utils.ipv4) | ternary(all_net[net_name].cidr, all_net[net_name].cidr6) | ansible.utils.ipaddr('prefix') | string)) -}}
+# Probably a nicer way of doing this without hardcoding the key names
+{% for cidr in all_net | json_query('[*.cidr, *.cidr6, *.cidr_internal, *.cidr6_internal]') | flatten if addr is ansible.utils.in_network cidr %}
+{{- tmp3.append(addr + "/" + cidr | ansible.utils.ipaddr('prefix') | string) -}}
+{% endfor %}
 {% endfor %}
 {{- tmp2.update({name: tmp3}) -}}
 {% endfor %}

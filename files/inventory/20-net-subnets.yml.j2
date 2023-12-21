@@ -1,15 +1,6 @@
 {% set all_net = home_net | combine(internal_net, wg_net) %}
 __subnet_overrides:
 {% set __subnet_map = {
-  "svc": 18,
-  "pod": 18,
-  "lb": 26,
-  "mon": 26,
-} %}
-  kube: {{ all_net.kube | andrei.utils.subnets_from_map(__subnet_map, v6_size=64) }}
-  talos: {{ all_net.talos | andrei.utils.subnets_from_map(__subnet_map, v6_size=64) }}
-
-{% set __subnet_map = {
   "switches": 28,
   "hosts": 28,
   "_r10": 27,
@@ -37,15 +28,34 @@ __subnet_extensions:
   "docker": 31,
   "prom": 31,
   "_r20": 31,
-  "talos": 28,
-  "k8s_cluster": 28,
-  "_r30": 28,
+  "_r25": 28,
+  "_r30": 26,
   "_r40": 27,
-  "_r50": 27,
-  "_r60": 28,
+  "_r50": 28,
   "clients": -28,
 } %}
   vm: {{ all_net.vm | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80) }}
+
+{% set __subnet_map_kube_internal = {
+  "svc": 18,
+  "pod": 18,
+  "lb": 26,
+  "mon": 26,
+} %}
+{% set __subnet_map = {
+  "control_plane": 28,
+  "worker": 28,
+  "_r10": 27,
+  "_r20": 26,
+  "_r30": 27,
+  "_r40": 28,
+  "clients": -28,
+} %}
+  kube: {{ all_net.kube | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80)
+    | combine(all_net.kube | andrei.utils.subnets_from_map(__subnet_map_kube_internal, v4_name="cidr_internal", v6_name="cidr6_internal", v6_size=64)) }}
+
+  talos: {{ all_net.talos | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80)
+    | combine(all_net.talos | andrei.utils.subnets_from_map(__subnet_map_kube_internal, v4_name="cidr_internal", v6_name="cidr6_internal", v6_size=64)) }}
 
 {% set __subnet_map = {
   "trusted": 28,

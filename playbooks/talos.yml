@@ -95,7 +95,7 @@
             --force
             {% endif %}
             --kubernetes-version {{ kube_version }}
-            --additional-sans="{{ vips.vm.talos_cp | join(',') }}"
+            --additional-sans="{{ vips.talos.control_plane | join(',') }}"
             --with-docs=false
             --with-examples=false
             --with-secrets secrets.yaml
@@ -113,11 +113,9 @@
 
     - name: Copy host patches
       ansible.builtin.template:
-        src: "{{ repo_base_dir }}/files/talos/{{ patch_file }}"
+        src: "{{ repo_base_dir }}/files/talos/node-patch.yaml.j2"
         dest: "{{ tmp_dir }}/{{ inventory_hostname }}-patch.yaml"
         mode: "0640"
-      vars:
-        patch_file: "{{ ('talos_cp' in group_names) | ternary('cp-patch.yaml.j2', 'worker-patch.yaml.j2') }}"
       tags: ["host"]
 
     - name: Generate host configs

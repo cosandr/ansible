@@ -8,7 +8,7 @@ kube_vip_controlplane_enabled: true
 kube_vip_services_enabled: false
 apiserver_loadbalancer_domain_name: "{{ __mt_dns_entries_vip[0].name }}"
 
-kube_vip_address: "{{ vips[host_net].kube_cp | first }}"
+kube_vip_address: "{{ vips[host_net].control_plane | first }}"
 loadbalancer_apiserver:
   address: "{{ kube_vip_address }}"
   port: 6443
