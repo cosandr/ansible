@@ -1,5 +1,0 @@
----
-
-host_ips_host:
-  vm: "{{ subnets.vm[host_subnet] | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"
-  general: "{{ subnets.general[host_subnet] | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"

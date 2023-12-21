@@ -51,13 +51,13 @@ vm_default_mac: "{{ '52:54:{:02x}'.format(all_net[host_net].vlan) | community.ge
 vm_default_nic:
   type: bridge
   source:
-    dev: 'VM'
+    dev: "{{ host_net | upper }}"
   mac: "{{ vm_default_mac }}"
   address: "{{ ansible_host }}"
-  domain: "{{ all_net.vm.domain }}"
-  gateway: "{{ hostvars['rb5009'].host_ips.vm }}"
+  domain: "{{ all_net[host_net].domain }}"
+  gateway: "{{ hostvars['rb5009'].host_ips[host_net] }}"
   dns_servers:
-    - "{{ hostvars['rb5009'].host_ips.vm }}"
+    - "{{ hostvars['rb5009'].host_ips[host_net] }}"
     - 1.1.1.1
     - 8.8.8.8
 
@@ -94,9 +94,9 @@ vm_default_definition:
 libvirt_vms: ["{{ vm_default_definition }}"]
 
 resolved_config:
-  DNS: "{{ all_net[vm_default_nic.source.dev | lower].cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
-  FallbackDNS: "1.1.1.1 8.8.8.8"
-  Domains: "{{ domains['hb'] }} vm.{{ domains['hb'] }}"
+  DNS: "{{ vm_default_nic.dns_servers | first }}"
+  FallbackDNS: "{{ vm_default_nic.dns_servers[1:] | join(' ') }}"
+  Domains: "{{ domains['hb'] }} {{ all_net[host_net].domain }}"
 
 host_nic_names: >-
   {%- set tmp = [] -%}
