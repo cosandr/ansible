@@ -5,3 +5,5 @@ nginx_exporter_web_listen_address: "{{ ansible_host }}:{{ nginx_exporter_port }}
 prometheus_ignore_down: true
 # Workaround very bizare bug where wireguard_interface ends up defined as "wg0"
 wireguard_interface: false
+
+swapfile_size: 1G
