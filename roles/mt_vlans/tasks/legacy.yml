@@ -40,10 +40,13 @@
   loop: "{{ __sw_vlan_ingress_config.to_add }}"
   loop_control:
     label: "{{ item['new-customer-vid'] }}"
+  # Bug in community.routeros
+  when: not ansible_check_mode
 
 - name: Delete old ingress translations  # noqa args[module]
   community.routeros.api:
     path: interface ethernet switch ingress-vlan-translation
+    timeout: 20
     remove: "{{ item['.id'] }}"
   loop: "{{ __sw_vlan_ingress_config.to_remove }}"
   loop_control:
@@ -52,6 +55,7 @@
 - name: Update ingress translations  # noqa args[module]
   community.routeros.api_find_and_modify:
     path: interface ethernet switch ingress-vlan-translation
+    timeout: 20
     find:
       ".id": "{{ item['.id'] }}"
     values: "{{ item }}"
@@ -88,15 +92,16 @@
 
 - name: Add missing egress tags  # noqa args[module]
   # api module complains about missing =switch= parameter
-  community.routeros.api:
-    path: interface ethernet switch egress-vlan-tag
-    timeout: 20
-    add: >-
-      vlan-id={{ item['vlan-id'] }}
-      tagged-ports={{ item['tagged-ports'] }}
+  community.routeros.command:
+    commands: >-
+      /interface ethernet switch egress-vlan-tag add
+        vlan-id={{ item['vlan-id'] }}
+        tagged-ports={{ item['tagged-ports'] }}
   loop: "{{ __sw_vlan_egress_config.to_add }}"
   loop_control:
     label: "{{ item['vlan-id'] }}"
+  # Bug in community.routeros
+  when: not ansible_check_mode
 
 - name: Delete old egress tags  # noqa args[module]
   community.routeros.api:
@@ -148,15 +153,16 @@
 
 - name: Add missing switch VLANs  # noqa args[module]
   # api module complains about missing =switch= parameter
-  community.routeros.api:
-    path: interface ethernet switch vlan
-    timeout: 20
-    add: >-
-      vlan-id={{ item['vlan-id'] }}
-      ports={{ item['ports'] }}
+  community.routeros.command:
+    commands: >-
+      /interface ethernet switch vlan add
+        vlan-id={{ item['vlan-id'] }}
+        ports={{ item['ports'] }}
   loop: "{{ __sw_vlan_config.to_add }}"
   loop_control:
     label: "{{ item['vlan-id'] }}"
+  # Bug in community.routeros
+  when: not ansible_check_mode
 
 - name: Delete old switch VLANs   # noqa args[module]
   community.routeros.api:

@@ -36,19 +36,19 @@ def main():
 
     # Configure access ports
     for cfg in access_ports:
-        vlan = cfg['vlan']
+        vlan = cfg["vlan"]
         if vlan not in new_data:
             module.fail_json("Cannot find VLAN '{}'".format(vlan))
         vid = vid_map.get(vlan)
         if not vid:
             module.fail_json("Cannot find VID for '{}'".format(vlan))
-        new_data[vlan]["untagged"] = ','.join(cfg['ports'])
+        new_data[vlan]["untagged"] = ",".join(cfg["ports"])
 
     # Configure trunk ports
     if trunk_ports:
         for name, cfg in new_data.items():
             # Ensure bridge is part of tagged VLANs
-            cfg['tagged'] = ','.join([bridge_name] + trunk_ports)
+            cfg["tagged"] = ",".join([bridge_name] + trunk_ports)
 
     ## Expected output:
     # new_data = [
@@ -68,6 +68,7 @@ def main():
     result = dict(changed=False, new_data=list(new_data.values()))
 
     module.exit_json(**result)
+
 
 if __name__ == "__main__":
     main()

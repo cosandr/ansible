@@ -2,7 +2,11 @@
 
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.mt_utils import make_add_update_remove, make_vid_map, sort_trunks
+from ansible.module_utils.mt_utils import (
+    make_add_update_remove,
+    make_vid_map,
+    sort_trunks,
+)
 
 
 def main():
@@ -11,7 +15,7 @@ def main():
         networks=dict(type="dict", required=True),
         trunk_ports=dict(type="list", elements="str", default=[]),
         access_ports=dict(type="list", elements="dict", default=[]),
-        switch_cpu=dict(type="str", default='switch1-cpu'),
+        switch_cpu=dict(type="str", default="switch1-cpu"),
     )
 
     module = AnsibleModule(
@@ -31,10 +35,10 @@ def main():
 
     # Add access ports
     for cfg in access_ports:
-        vlan = cfg['vlan']
+        vlan = cfg["vlan"]
         if vlan not in vlan_ports:
             module.fail_json("Cannot find VLAN '{}'".format(vlan))
-        vlan_ports[vlan] = cfg['ports']
+        vlan_ports[vlan] = cfg["ports"]
 
     # Add trunk ports
     if trunk_ports:
@@ -47,12 +51,12 @@ def main():
             continue
         new_data.append(
             {
-                "ports": ','.join(sort_trunks(ports, switch_cpu)),
+                "ports": ",".join(sort_trunks(ports, switch_cpu)),
                 "vlan-id": vid_map[vlan],
             }
         )
 
-    to_add, to_update, to_remove = make_add_update_remove(existing, new_data, 'vlan-id')
+    to_add, to_update, to_remove = make_add_update_remove(existing, new_data, "vlan-id")
 
     ## Expected output:
     # new_data = [
@@ -63,9 +67,12 @@ def main():
     #     },
     # ]
 
-    result = dict(changed=False, to_add=to_add, to_update=to_update, to_remove=to_remove)
+    result = dict(
+        changed=False, to_add=to_add, to_update=to_update, to_remove=to_remove
+    )
 
     module.exit_json(**result)
+
 
 if __name__ == "__main__":
     main()

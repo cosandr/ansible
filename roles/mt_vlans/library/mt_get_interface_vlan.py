@@ -19,20 +19,20 @@ def main():
 
     new_data = []
     for net_name, net_config in networks.items():
-        if 'vlan' not in net_config:
+        if "vlan" not in net_config:
             continue
         comment = []
-        if 'cidr' in net_config:
-            comment.append(net_config['cidr'])
-        if 'cidr6' in net_config:
-            comment.append(net_config['cidr6'])
-        comment = '; '.join(comment)
+        if "cidr" in net_config:
+            comment.append(net_config["cidr"])
+        if "cidr6" in net_config:
+            comment.append(net_config["cidr6"])
+        comment = "; ".join(comment)
         new_data.append(
             {
                 "interface": bridge_name,
                 "name": net_name.upper(),
-                "vlan-id": net_config['vlan'],
-                "mtu": net_config.get('mtu', 1500),
+                "vlan-id": net_config["vlan"],
+                "mtu": net_config.get("mtu", 1500),
                 "comment": comment or None,
             }
         )
@@ -49,6 +49,7 @@ def main():
     result = dict(changed=False, new_data=new_data)
 
     module.exit_json(**result)
+
 
 if __name__ == "__main__":
     main()

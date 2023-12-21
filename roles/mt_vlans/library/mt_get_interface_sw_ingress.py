@@ -25,18 +25,22 @@ def main():
 
     # Configure access ports
     for cfg in access_ports:
-        vlan = cfg['vlan']
+        vlan = cfg["vlan"]
         vid = vid_map.get(vlan)
         if not vid:
             module.fail_json("Cannot find VLAN or its VID '{}'".format(vlan))
 
-        new_data.append({
-            "customer-vid": 0,
-            "new-customer-vid": vid,
-            "ports": ','.join(cfg['ports']),
-        })
+        new_data.append(
+            {
+                "customer-vid": 0,
+                "new-customer-vid": vid,
+                "ports": ",".join(cfg["ports"]),
+            }
+        )
 
-    to_add, to_update, to_remove = make_add_update_remove(existing, new_data, 'new-customer-vid')
+    to_add, to_update, to_remove = make_add_update_remove(
+        existing, new_data, "new-customer-vid"
+    )
 
     ## Expected output:
     # [
@@ -48,9 +52,12 @@ def main():
     #     },
     # ]
 
-    result = dict(changed=False, to_add=to_add, to_update=to_update, to_remove=to_remove)
+    result = dict(
+        changed=False, to_add=to_add, to_update=to_update, to_remove=to_remove
+    )
 
     module.exit_json(**result)
+
 
 if __name__ == "__main__":
     main()

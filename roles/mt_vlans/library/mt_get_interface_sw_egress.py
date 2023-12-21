@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
-import re
-
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.mt_utils import make_add_update_remove, make_vid_map, sort_trunks
+from ansible.module_utils.mt_utils import (
+    make_add_update_remove,
+    make_vid_map,
+    sort_trunks,
+)
 
 
 def main():
@@ -11,7 +13,7 @@ def main():
         existing=dict(type="list", elements="dict", required=True),
         networks=dict(type="dict", required=True),
         trunk_ports=dict(type="list", elements="str", default=[]),
-        switch_cpu=dict(type="str", default='switch1-cpu'),
+        switch_cpu=dict(type="str", default="switch1-cpu"),
     )
 
     module = AnsibleModule(
@@ -30,12 +32,14 @@ def main():
     # Add trunk ports
     if trunk_ports:
         for vid in vid_map.values():
-            new_data.append({
-                "tagged-ports": ','.join(sort_trunks(trunk_ports, switch_cpu)),
-                "vlan-id": vid,
-            })
+            new_data.append(
+                {
+                    "tagged-ports": ",".join(sort_trunks(trunk_ports, switch_cpu)),
+                    "vlan-id": vid,
+                }
+            )
 
-    to_add, to_update, to_remove = make_add_update_remove(existing, new_data, 'vlan-id')
+    to_add, to_update, to_remove = make_add_update_remove(existing, new_data, "vlan-id")
 
     ## Expected output:
     # [
@@ -46,9 +50,12 @@ def main():
     #     },
     # ]
 
-    result = dict(changed=False, to_add=to_add, to_update=to_update, to_remove=to_remove)
+    result = dict(
+        changed=False, to_add=to_add, to_update=to_update, to_remove=to_remove
+    )
 
     module.exit_json(**result)
+
 
 if __name__ == "__main__":
     main()

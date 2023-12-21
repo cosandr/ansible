@@ -36,14 +36,14 @@ def main():
             "bridge": bridge_name,
             "interface": p,
         }
-        for k,v in port_params.items():
+        for k, v in port_params.items():
             new_data[p][k] = v
     # Configure access ports
     for cfg in access_ports:
-        vid = vid_map.get(cfg['vlan'])
+        vid = vid_map.get(cfg["vlan"])
         if not vid:
-            module.fail_json("Cannot find VID for '{}'".format(cfg['vlan']))
-        for p in cfg['ports']:
+            module.fail_json("Cannot find VID for '{}'".format(cfg["vlan"]))
+        for p in cfg["ports"]:
             if p not in new_data:
                 module.fail_json("'{}' is not a bridge port".format(p))
             new_data[p]["pvid"] = vid
@@ -71,6 +71,7 @@ def main():
     result = dict(changed=False, new_data=list(new_data.values()))
 
     module.exit_json(**result)
+
 
 if __name__ == "__main__":
     main()
