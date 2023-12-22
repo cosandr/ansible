@@ -1,6 +1,6 @@
 ---
 
-host_num: "{{ groups['talos'] | ansible.utils.index_of('eq', inventory_hostname) }}"
+host_num: "{{ groups[(host_subnet == 'control_plane') | ternary('talos_cp', 'talos_worker')] | ansible.utils.index_of('eq', inventory_hostname) }}"
 
 prometheus_blackbox_icmp_targets: []
 prometheus_node_targets: []
@@ -31,7 +31,7 @@ node_labels: >-
     "cpu-tier": hostvars[vm_host].cpu_tier | string,
     "vm-host": vm_host
   } -%}
-  {%- if inventory_hostname not in groups['talos_cp'] -%}
+  {%- if 'talos_worker' in group_names -%}
   {{- tmp.update({"node-role.kubernetes.io/worker": ""}) -}}
   {%- endif -%}
   {%- if vm_mdev_uuids -%}

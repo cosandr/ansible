@@ -18,19 +18,19 @@ nextcloud01  ansible_host="10.0.10.104"
 docker01     ansible_host="10.0.10.106"
 prom01       ansible_host="10.0.10.108"
 k8s01        ansible_host="10.0.27.64"
-k8s02        ansible_host="10.0.27.81"
-k8s03        ansible_host="10.0.27.82"
-k8s04        ansible_host="10.0.27.83"
-k8s05        ansible_host="10.0.27.84"
-k8s06        ansible_host="10.0.27.85"
-k8s07        ansible_host="10.0.27.86"
+k8s02        ansible_host="10.0.27.65"
+k8s03        ansible_host="10.0.27.66"
+k8s04        ansible_host="10.0.27.80"
+k8s05        ansible_host="10.0.27.81"
+k8s06        ansible_host="10.0.27.82"
+k8s07        ansible_host="10.0.27.83"
 talos01      ansible_host="10.0.28.64"
 talos02      ansible_host="10.0.28.65"
 talos03      ansible_host="10.0.28.66"
-talos04      ansible_host="10.0.28.83"
-talos05      ansible_host="10.0.28.84"
-talos06      ansible_host="10.0.28.85"
-talos07      ansible_host="10.0.28.86"
+talos04      ansible_host="10.0.28.80"
+talos05      ansible_host="10.0.28.81"
+talos06      ansible_host="10.0.28.82"
+talos07      ansible_host="10.0.28.83"
 desktop      ansible_host="10.0.50.64"
 laptop       ansible_host="10.0.50.65"   wireguard_ip="10.4.20.65"
 m1bp         ansible_host="10.0.50.66"   wireguard_ip="10.4.20.66"
@@ -267,10 +267,10 @@ host_subnet=worker
 k8s01 host_num=0 etcd_member_name=etcd01 vm_mem=4096
 k8s02 host_num=1 etcd_member_name=etcd02
 k8s03 host_num=2 etcd_member_name=etcd03
-k8s04 host_num=3
-k8s05 host_num=4
-k8s06 host_num=5
-k8s07 host_num=6 vm_mem=4096
+k8s04 host_num=0
+k8s05 host_num=1
+k8s06 host_num=2
+k8s07 host_num=3 vm_mem=4096
 
 [k8s_cluster:vars]
 host_net=kube
@@ -285,7 +285,7 @@ host_subnet=control_plane
 k8s[01:03]
 
 [kube_node]
-k8s[02:07]
+k8s[04:07]
 
 [kube_node:vars]
 host_subnet=worker
