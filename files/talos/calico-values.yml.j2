@@ -1,8 +1,9 @@
+# Disable CSI
+kubeletVolumePluginPath: None
+
 installation:
   cni:
     type: Calico
-  # Disable CSI
-  kubeletVolumePluginPath: None
   calicoNetwork:
     bgp: Enabled
 {% if calico_ebpf_enabled %}

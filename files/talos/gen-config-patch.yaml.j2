@@ -11,6 +11,16 @@ cluster:
       # Prometheus pod needs to be able to connect
       metrics-bind-address: "0.0.0.0:10249"
 
+  # Needed for Prometheus, possibly fixeable?
+  # https://github.com/prometheus-operator/kube-prometheus/issues/1517
+  # https://github.com/prometheus-operator/prometheus-operator/issues/1859
+  controllerManager:
+    extraArgs:
+      bind-address: "0.0.0.0"
+  scheduler:
+    extraArgs:
+      bind-address: "0.0.0.0"
+
 machine:
   install:
     image: "{{ talos_image }}"

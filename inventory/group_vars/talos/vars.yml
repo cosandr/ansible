@@ -7,6 +7,7 @@ prometheus_node_targets: []
 
 talos_version: "1.6.0"
 kube_version: "1.28.5"
+calico_version: "~3.27"
 calico_node_as: "{{ 65201 + (groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
 calico_node_status: false
 # https://github.com/projectcalico/calico/issues/7892

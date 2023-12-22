@@ -173,19 +173,13 @@
             chdir: "{{ tmp_dir }}"
             cmd: "talosctl -n {{ ansible_host }} bootstrap"
 
-        # Need these pods on first setup to configure LVM
-        - name: Enable admin pods
-          ansible.builtin.set_fact:
-            enable_admin_pods: true
-            admin_pods_force_enabled: true
-          when: not enable_admin_pods | bool
-
     - name: Check if node is configured
       check_mode: false
       changed_when: false
       failed_when:
         - __disks_check.rc != 0
-        - "'bad certificate' not in __disks_check.stderr"
+        - "'bad certificate' not in __disks_check.stderr"  # talosctl <= 1.5
+        - "'certificate required' not in __disks_check.stderr"  # talosctl >= 1.6
       ansible.builtin.command:
         chdir: "{{ tmp_dir }}"
         cmd: "talosctl -n {{ ansible_host }} disks --insecure"
@@ -356,10 +350,11 @@
       kubernetes.core.helm:
         name: calico
         chart_ref: projectcalico/tigera-operator
-        chart_version: "<3.30"
+        chart_version: "{{ calico_version }}"
         release_namespace: tigera-operator
         update_repo_cache: true
         release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/talos/calico-values.yml.j2') | from_yaml }}"
+      register: __calico_helm
       tags: ["calico"]
 
     - name: Apply BGP config
@@ -381,6 +376,23 @@
       vars:
         tpl_file: "{{ repo_base_dir }}/files/talos/calico-felix.yml.j2"
 
+    - name: Check if admin nodes should be force enabled
+      when: not enable_admin_pods | bool
+      block:
+        - name: Get OpenEBS release status
+          kubernetes.core.helm_info:
+            release_name: lvm-localpv
+            release_namespace: openebs
+            release_state:
+              - deployed
+          register: __ebs_release
+
+        - name: Enable admin pods
+          ansible.builtin.set_fact:
+            enable_admin_pods: true
+            admin_pods_force_enabled: true
+          when: __ebs_release.status is not defined
+
     - name: Create admin daemonset
       kubernetes.core.k8s:
         template: "{{ repo_base_dir }}/files/talos/admin-daemonset.yml.j2"
@@ -393,6 +405,8 @@
     - name: Restart calico-node  # noqa no-changed-when
       ansible.builtin.command:
         cmd: "kubectl rollout restart daemonset --context {{ talos_kubectl_context }} -n calico-system calico-node"
+      # Don't try to restart if chart was just deployed
+      when: __calico_helm.status.status != 'DEPLOYED' or __calico_helm.status.revision | int > 1
 
 - name: Setup Kubernetes from all nodes
   hosts: talos

@@ -124,7 +124,7 @@
   kubernetes.core.helm:
     name: prometheus
     chart_ref: prometheus-community/kube-prometheus-stack
-    chart_version: "48.x"
+    chart_version: "55.x"
     release_namespace: monitoring
     create_namespace: false
     update_repo_cache: true
@@ -205,13 +205,26 @@
         name: nfd
         repo_url: "https://kubernetes-sigs.github.io/node-feature-discovery/charts"
 
+    - name: Create node-feature-discovery namespace
+      kubernetes.core.k8s:
+        state: present
+        resource_definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: node-feature-discovery
+            labels:
+              pod-security.kubernetes.io/enforce: privileged
+              pod-security.kubernetes.io/audit: privileged
+              pod-security.kubernetes.io/warn: privileged
+      tags: ["nfd"]
+
     - name: Install NFD
       kubernetes.core.helm:
         name: nfd
         chart_ref: nfd/node-feature-discovery
         chart_version: "~0.14"
         release_namespace: node-feature-discovery
-        create_namespace: true
         update_repo_cache: true
         release_values:
           master:

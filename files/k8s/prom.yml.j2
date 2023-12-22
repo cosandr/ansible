@@ -1,3 +1,4 @@
+{% set kube_proxy_enabled = (talos_kubeproxy_enabled | default(true)) or (not calico_bpf_enabled | default(false)) %}
 ---
 
 alertmanager:
@@ -39,3 +40,23 @@ prometheus-node-exporter:
       readOnly: true
       mountPropagation: None
 {% endif %}
+{% if 'talos' in group_names %}
+kubeControllerManager:
+  service:
+    selector:
+      k8s-app: kube-controller-manager
+
+kubeScheduler:
+  service:
+    selector:
+      k8s-app: kube-scheduler
+{% endif %}
+
+kubeProxy:
+  enabled: {{ kube_proxy_enabled }}
+
+defaultRules:
+  disabled:
+    Watchdog: true
+  rules:
+    kubeProxy: {{ kube_proxy_enabled }}
