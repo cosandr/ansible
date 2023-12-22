@@ -8,14 +8,8 @@ ansible_python_interpreter: "/opt/bin/python"
 firewall_enabled: false
 # Monitoring running inside kubernetes
 node_exporter_installed: false
-# Skip for now
-prometheus_blackbox_icmp_targets: []
-prometheus_node_targets: []
 
 firewall_frontend: "none"
 firewall_install: false
 promtail_installed: false
 nfs_idmapping_configure: false
-
-kube_api_server: "{{ domain }}"
-kube_ingress_domain: "{{ domain }}"

@@ -243,6 +243,13 @@ romgw01 ansible_host=10.1.0.91 host_wg_subnet=rom host_wg_num=2
 [rom:vars]
 ansible_group_priority=10
 
+[kube_common:children]
+talos
+k8s_cluster
+
+[kube_common:vars]
+ansible_group_priority=2
+
 [talos:children]
 talos_cp
 talos_worker

@@ -54,17 +54,14 @@
       kind: Namespace
       metadata:
         name: openebs
-        labels:
-          pod-security.kubernetes.io/enforce: privileged
-          pod-security.kubernetes.io/audit: privileged
-          pod-security.kubernetes.io/warn: privileged
+        labels: "{{ pss_privileged_labels }}"
   tags: ["lvm"]
 
 - name: Install OpenEBS LVM CSI driver
   kubernetes.core.helm:
     name: lvm-localpv
     chart_ref: openebs-lvmlocalpv/lvm-localpv
-    chart_version: "~1.2"
+    chart_version: "{{ openebs_lvm_version }}"
     release_namespace: openebs
     create_namespace: false
     update_repo_cache: true
@@ -111,10 +108,7 @@
       kind: Namespace
       metadata:
         name: monitoring
-        labels:
-          pod-security.kubernetes.io/enforce: privileged
-          pod-security.kubernetes.io/audit: privileged
-          pod-security.kubernetes.io/warn: privileged
+        labels: "{{ pss_privileged_labels }}"
         annotations:
           cni.projectcalico.org/ipv4pools: '["monitoring"]'
   tags: ["helm", "prometheus"]
@@ -124,7 +118,7 @@
   kubernetes.core.helm:
     name: prometheus
     chart_ref: prometheus-community/kube-prometheus-stack
-    chart_version: "55.x"
+    chart_version: "{{ prometheus_version }}"
     release_namespace: monitoring
     create_namespace: false
     update_repo_cache: true
@@ -136,7 +130,7 @@
   kubernetes.core.helm:
     name: ingress-nginx
     chart_ref: ingress-nginx/ingress-nginx
-    chart_version: "4.x"
+    chart_version: "{{ ingress_nginx_version }}"
     release_namespace: ingress-nginx
     create_namespace: true
     update_repo_cache: true
@@ -148,7 +142,7 @@
   kubernetes.core.helm:
     name: promtail
     chart_ref: grafana/promtail
-    chart_version: "6.x"
+    chart_version: "{{ promtail_version }}"
     release_namespace: monitoring
     create_namespace: false
     update_repo_cache: true
@@ -162,7 +156,7 @@
       kubernetes.core.helm:
         name: cert-manager
         chart_ref: jetstack/cert-manager
-        chart_version: "1.x"
+        chart_version: "{{ certmanager_version }}"
         release_namespace: cert-manager
         create_namespace: true
         update_repo_cache: true
@@ -188,11 +182,7 @@
       kubernetes.core.k8s:
         state: present
         resource_definition: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/cluster-issuer.yml.j2') | from_yaml }}"
-      # TODO: Maybe move to common kubespray + Talos inventory
-      loop:
-        - key: hb
-          staging: true
-        - key: hb
+      loop: "{{ certmanager_cluster_issuers }}"
       tags: ["issuer"]
 
 # https://intel.github.io/intel-device-plugins-for-kubernetes/INSTALL.html
@@ -213,17 +203,14 @@
           kind: Namespace
           metadata:
             name: node-feature-discovery
-            labels:
-              pod-security.kubernetes.io/enforce: privileged
-              pod-security.kubernetes.io/audit: privileged
-              pod-security.kubernetes.io/warn: privileged
+            labels: "{{ pss_privileged_labels }}"
       tags: ["nfd"]
 
     - name: Install NFD
       kubernetes.core.helm:
         name: nfd
         chart_ref: nfd/node-feature-discovery
-        chart_version: "~0.14"
+        chart_version: "{{ nfd_version }}"
         release_namespace: node-feature-discovery
         update_repo_cache: true
         release_values:
@@ -246,10 +233,7 @@
           kind: Namespace
           metadata:
             name: inteldeviceplugins-system
-            labels:
-              pod-security.kubernetes.io/enforce: privileged
-              pod-security.kubernetes.io/audit: privileged
-              pod-security.kubernetes.io/warn: privileged
+            labels: "{{ pss_privileged_labels }}"
       tags: ["gpu-plugin"]
 
     - name: Get latest release

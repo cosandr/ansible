@@ -2,12 +2,12 @@
 
 host_num: "{{ groups[(host_subnet == 'control_plane') | ternary('talos_cp', 'talos_worker')] | ansible.utils.index_of('eq', inventory_hostname) }}"
 
-prometheus_blackbox_icmp_targets: []
-prometheus_node_targets: []
-
 talos_version: "1.6.0"
 kube_version: "1.28.5"
 calico_version: "~3.27"
+metrics_server_version: "3.x"
+metallb_version: "<0.14"
+
 calico_node_as: "{{ 65201 + (groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
 calico_node_status: false
 # https://github.com/projectcalico/calico/issues/7892
@@ -22,23 +22,7 @@ talos_kubeproxy_mode: ipvs
 talos_schematic: ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515
 talos_image: "factory.talos.dev/installer/{{ talos_schematic }}:v{{ talos_version }}"
 
-kube_api_server: "{{ domain }}"
-kube_ingress_domain: "{{ domain }}"
 talos_kubectl_context: "admin@{{ kube_api_server }}"
-
-node_labels: >-
-  {%- set tmp = {
-    "cluster-type": "talos",
-    "cpu-tier": hostvars[vm_host].cpu_tier | string,
-    "vm-host": vm_host
-  } -%}
-  {%- if 'talos_worker' in group_names -%}
-  {{- tmp.update({"node-role.kubernetes.io/worker": ""}) -}}
-  {%- endif -%}
-  {%- if vm_mdev_uuids -%}
-  {{- tmp.update({"intel.feature.node.kubernetes.io/gpu": "true"}) -}}
-  {%- endif -%}
-  {{ tmp }}
 
 vm_mdev_uuids: "{{ hostvars[vm_host].intel_gvt_enabled | ternary(['talos' | to_uuid], []) }}"
 # Keep disabled for security, I guess

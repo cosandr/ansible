@@ -14,16 +14,6 @@ kube_service_addresses: "{{ subnets.kube.svc | ansible.utils.ipv4 | first }}"
 kube_pods_subnet: "{{ subnets.kube.pod | ansible.utils.ipv4 | first }}"
 kube_network_node_prefix: "{{ all_net[host_net].cidr | ansible.utils.ipaddr('prefix') }}"
 
-__node_labels_common:
-  cluster-type: "kubespray"
-  cpu-tier: "{{ hostvars[vm_host].cpu_tier }}"
-  vm-host: "{{ vm_host }}"
-
-__node_labels_worker:
-  "node-role.kubernetes.io/worker": ""
-
-node_labels: "{{ __node_labels_common | combine(__node_labels_worker) if inventory_hostname not in groups['kube_control_plane'] else __node_labels_common }}"
-
 cluster_name: "k8s.{{ domains['hb'] }}"
 dns_domain: "cluster.local"
 upstream_dns_servers: "{{ vm_default_nic.dns_servers[:2] }}"

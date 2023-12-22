@@ -1,0 +1,47 @@
+---
+
+certmanager_version: "1.x"
+ingress_nginx_version: "4.x"
+nfd_version: "~0.14"
+openebs_lvm_version: "~1.2"
+prometheus_version: "55.x"
+promtail_version: "6.x"
+
+node_labels: >-
+  {%- set tmp = {
+    "cluster-type": ('talos' in group_names) | ternary('talos', 'kubespray'),
+    "cpu-tier": hostvars[vm_host].cpu_tier | string,
+    "vm-host": vm_host
+  } -%}
+  {%- if host_subnet == 'worker' -%}
+  {{- tmp.update({"node-role.kubernetes.io/worker": ""}) -}}
+  {%- endif -%}
+  {%- if vm_mdev_uuids -%}
+  {{- tmp.update({"intel.feature.node.kubernetes.io/gpu": "true"}) -}}
+  {%- endif -%}
+  {{ tmp }}
+
+alertmanager_template_files: >-
+  {%- set tmp = {} -%}
+  {%- for f in (repo_base_dir + '/files/alertmanager/*.tmpl') | fileglob | sort -%}
+  {{- tmp.update({f | basename: lookup('file', f)}) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+# Skip for now
+prometheus_blackbox_icmp_targets: []
+prometheus_node_targets: []
+
+kube_proxy_enabled: "{{ (talos_kubeproxy_enabled | default(true)) or (not calico_bpf_enabled | default(false)) }}"
+kube_api_server: "{{ domain }}"
+kube_ingress_domain: "{{ domain }}"
+
+certmanager_cluster_issuers:
+  - key: hb
+    staging: true
+  - key: hb
+
+pss_privileged_labels:
+  pod-security.kubernetes.io/enforce: privileged
+  pod-security.kubernetes.io/audit: privileged
+  pod-security.kubernetes.io/warn: privileged

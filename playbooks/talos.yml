@@ -326,10 +326,7 @@
           kind: Namespace
           metadata:
             name: tigera-operator
-            labels:
-              pod-security.kubernetes.io/enforce: privileged
-              pod-security.kubernetes.io/audit: privileged
-              pod-security.kubernetes.io/warn: privileged
+            labels: "{{ pss_privileged_labels }}"
       tags: ["calico"]
 
     - name: "Ensure operator config map is {{ cm_state }}"
@@ -512,7 +509,7 @@
       kubernetes.core.helm:
         name: metrics-server
         chart_ref: metrics-server/metrics-server
-        chart_version: "3.x"
+        chart_version: "{{ metrics_server_version }}"
         release_namespace: kube-system
         update_repo_cache: true
       tags: ["metrics-server"]
@@ -525,10 +522,7 @@
           kind: Namespace
           metadata:
             name: metallb-system
-            labels:
-              pod-security.kubernetes.io/enforce: privileged
-              pod-security.kubernetes.io/audit: privileged
-              pod-security.kubernetes.io/warn: privileged
+            labels: "{{ pss_privileged_labels }}"
       tags: ["metallb"]
 
     - name: Add MetalLB Helm repo
@@ -541,7 +535,7 @@
       kubernetes.core.helm:
         name: metallb
         chart_ref: metallb/metallb
-        chart_version: "<0.14"
+        chart_version: "{{ metallb_version }}"
         release_namespace: metallb-system
         update_repo_cache: true
         release_values:

@@ -1,8 +1,39 @@
-{% set kube_proxy_enabled = (talos_kubeproxy_enabled | default(true)) or (not calico_bpf_enabled | default(false)) %}
 ---
 
 alertmanager:
-  enabled: false
+  enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    hosts:
+      - "am.{{ kube_ingress_domain }}"
+    paths:
+      - /
+    pathType: ImplementationSpecific
+
+  alertmanagerSpec:
+    externalUrl: "http://am.{{ kube_ingress_domain }}"
+
+  templateFiles: {{ alertmanager_template_files | to_json }}
+
+  config:
+    route:
+      repeat_interval: 168h
+{% if vault_alertmanager_discord_webhook_url is defined %}
+      receiver: discord
+{% else %}
+      receiver: 'null'
+{% endif %}
+    receivers:
+      - name: 'null'
+{% if vault_alertmanager_discord_webhook_url is defined %}
+      - name: discord
+        discord_configs:
+          - send_resolved: true
+            webhook_url: "{{ vault_alertmanager_discord_webhook_url }}"
+            title: '{% raw %}{{ template "discord.andrei.title" . }}{% endraw %}'
+            message: '{% raw %}{{ template "discord.andrei.message" . }}{% endraw %}'
+{% endif %}
 grafana:
   enabled: false
 prometheus:
