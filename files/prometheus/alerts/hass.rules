@@ -47,3 +47,11 @@ groups:
       severity: warning
     annotations:
       summary: Temperature sensor "{{ $labels.friendly_name }}" is down
+
+  - alert: HassBoilerOff
+    expr: max_over_time(hass_switch_state{entity="switch.boiler"}[12h]) == 0
+    for: 30m
+    labels:
+      severity: warning
+    annotations:
+      summary: Boiler has not turned on for more than 12 hours
