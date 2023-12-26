@@ -1,5 +1,6 @@
 ---
 
+# MacOS needs to mount with -o resvport or share needs insecure option
 nfs_shares:
   # Backup shares
   - path: /mnt/tank/backup/pgsql
@@ -12,9 +13,12 @@ nfs_shares:
     options: "rw,no_root_squash"
     sources: "{{ subnets.vm.pgbackrest }}"
   # All dataset shares
+  - path: /home/andrei
+    options: "rw,root_squash"
+    sources: "{{ firewall_trusted_sources }}"
   - path: /mnt/tank
     options: "rw,no_root_squash"
-    sources: "{{ subnets.general.trusted }}"
+    sources: "{{ firewall_trusted_sources }}"
   - path: /mnt/tank/media/motion
     options: "rw,no_root_squash"
     sources: "{{ [hostvars['drepi'].ansible_host] }}"

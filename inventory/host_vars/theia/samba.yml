@@ -1,8 +1,6 @@
 ---
 
-samba_hosts_allow:
-  - 127.0.0.1
-  - "{{ home_net.general.cidr }}"
+samba_hosts_allow: "{{ ['127.0.0.1'] + firewall_trusted_sources }}"
 
 samba_interfaces:
   - lo
@@ -35,10 +33,11 @@ samba_shares:
     "follow symlinks": true
     "wide links": true
 
-  ceph:
-    comment: "CephFS"
-    path: "/mnt/ceph"
-    writable: true
+  # TODO: Enable when Ceph is back up (or fix native SMB exports)
+  # ceph:
+  #   comment: "CephFS"
+  #   path: "/mnt/ceph"
+  #   writable: true
     ## VFS doesn't work
     ## fsp_get_io_fd: fsp [.] is a path referencing fsp
     # path: "/"
