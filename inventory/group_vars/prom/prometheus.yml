@@ -169,10 +169,10 @@ __extra_prometheus_scrape_configs:
           __param_target: "{{ hostvars['theia'].host_ips.ipmi }}"
           __param_module: "theia"
 
-  - job_name: "mikrotik"
+  - job_name: "mktxp"
     scrape_interval: 5m
     static_configs:
-      - targets: ["localhost:{{ mikrotik_exporter_port }}"]
+      - targets: ["localhost:{{ mktxp_port }}"]
 
   - job_name: "postfix"
     scrape_interval: 1m

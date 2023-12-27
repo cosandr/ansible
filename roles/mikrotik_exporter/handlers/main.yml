@@ -1,6 +1,0 @@
----
-
-- name: restart mikrotik exporter
-  systemd:
-    name: mikrotik-exporter.service
-    state: restarted

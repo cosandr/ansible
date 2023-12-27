@@ -1,0 +1,52 @@
+{{ ansible_managed | comment }}
+# https://github.com/akpw/mktxp/blob/main/mktxp/cli/config/mktxp.conf
+{% for name, config in mktxp_config.items() %}
+[{{ name }}]
+    enabled = {{ config.enabled | default(true) }}
+
+    hostname = {{ config.hostname }}
+    port = {{ config.port | default(8729) }}
+
+    username = {{ config.username }}
+    password = {{ config.password }}
+
+    use_ssl = {{ config.use_ssl | default(true) }}
+    no_ssl_certificate = {{ config.no_ssl_certificate | default(false) }}
+    ssl_certificate_verify = {{ config.ssl_certificate_verify | default(true) }}
+
+    installed_packages = {{ config.installed_packages | default(false) }}
+    dhcp = {{ config.dhcp | default(false) }}
+    dhcp_lease = {{ config.dhcp_lease | default(false) }}
+
+    connections = {{ config.connections | default(false) }}
+    connection_stats = {{ config.connection_stats | default(false) }}
+
+    pool = {{ config.pool | default(true) }}
+    interface = {{ config.interface | default(true) }}
+
+    firewall = {{ config.firewall | default(false) }}
+    ipv6_firewall = {{ config.ipv6_firewall | default(false) }}
+    ipv6_neighbor = {{ config.ipv6_neighbor | default(false) }}
+
+    poe = {{ config.poe | default(false) }}
+    monitor = {{ config.monitor | default(true) }}
+    netwatch = {{ config.netwatch | default(false) }}
+    public_ip = {{ config.public_ip | default(false) }}
+    route = {{ config.route | default(false) }}
+    wireless = {{ config.wireless | default(false) }}
+    wireless_clients = {{ config.wireless_clients | default(false) }}
+    capsman = {{ config.capsman | default(false) }}
+    capsman_clients = {{ config.capsman_clients | default(false) }}
+
+    kid_control_devices = {{ config.kid_control_devices | default(false) }}
+
+    user = {{ config.user | default(false) }}
+    queue = {{ config.queue | default(false) }}
+
+    remote_dhcp_entry = {{ config.remote_dhcp_entry | default('None') }}
+
+    use_comments_over_names = {{ config.use_comments_over_names | default(false) }}
+
+    check_for_updates = {{ config.check_for_updates | default(false) }}
+
+{% endfor %}

@@ -1,0 +1,55 @@
+---
+
+- name: Include old setup removal tasks
+  ansible.builtin.include_tasks:
+    file: old-remove.yml
+    apply:
+      tags: ["old-remove"]
+  tags: ["old-remove"]
+
+- name: Include installation tasks
+  ansible.builtin.include_tasks:
+    file: install.yml
+    apply:
+      tags: ["install"]
+  tags: ["install"]
+
+- name: Copy system config
+  ansible.builtin.template:
+    src: "_mktxp.conf.j2"
+    dest: "{{ mktxp_config_dir }}/_mktxp.conf"
+    owner: "root"
+    group: "{{ mktxp_group }}"
+    mode: "0640"
+  notify: Restart mktxp
+  tags: ["configure"]
+
+- name: Copy main config
+  ansible.builtin.template:
+    src: "mktxp.conf.j2"
+    dest: "{{ mktxp_config_dir }}/mktxp.conf"
+    owner: root
+    group: "{{ mktxp_group }}"
+    mode: "0640"
+  notify: Restart mktxp
+  tags: ["configure"]
+
+- name: Copy systemd service
+  ansible.builtin.template:
+    src: "mktxp.service.j2"
+    dest: /etc/systemd/system/mktxp.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart mktxp
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start service
+  ansible.builtin.systemd:
+    name: mktxp.service
+    state: started
+    enabled: true

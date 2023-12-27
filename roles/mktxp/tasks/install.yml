@@ -1,0 +1,49 @@
+---
+
+- name: Create mktxp system group
+  ansible.builtin.group:
+    name: "{{ mktxp_group }}"
+    system: true
+    state: present
+  when: mktxp_group != "root"
+
+- name: Create mktxp system user
+  ansible.builtin.user:
+    name: "{{ mktxp_user }}"
+    system: true
+    shell: "/usr/sbin/nologin"
+    group: "{{ mktxp_group }}"
+    createhome: true
+    home: "{{ mktxp_home }}"
+  when: mktxp_user != "root"
+
+- name: Ensure mktxp dirs exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ mktxp_user }}"
+    group: "{{ mktxp_group }}"
+    mode: "0750"
+  loop:
+    - "{{ mktxp_home }}"
+    - "{{ mktxp_config_dir }}"
+
+- name: Setup venv  # noqa package-latest
+  become: true
+  become_user: "{{ mktxp_user }}"
+  ansible.builtin.pip:
+    name:
+      - pip
+      - setuptools
+      - wheel
+    state: latest
+    virtualenv: "{{ mktxp_home }}"
+    virtualenv_command: "python3 -m venv"
+
+- name: Install mktxp
+  become: true
+  become_user: "{{ mktxp_user }}"
+  ansible.builtin.pip:
+    name: "{{ (mktxp_version == 'latest') | ternary('mktxp', 'mktxp' + mktxp_version) }}"
+    state: "{{ (mktxp_version == 'latest') | ternary('latest', 'present') }}"
+    virtualenv: "{{ mktxp_home }}"

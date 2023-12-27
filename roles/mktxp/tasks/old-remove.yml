@@ -1,0 +1,21 @@
+---
+
+- name: Disable and stop old service
+  ansible.builtin.systemd:
+    name: "mikrotik-exporter.service"
+    state: stopped
+    enabled: false
+  register: __svc
+  failed_when:
+    - __svc.failed
+    - "'Could not find the requested service' not in __svc.msg"
+
+- name: Remove old files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /usr/local/bin/mikrotik-exporter
+    - /etc/mikrotik-exporter.yml
+    - /etc/systemd/system/mikrotik-exporter.service
+  notify: Reload systemd

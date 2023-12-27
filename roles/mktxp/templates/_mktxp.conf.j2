@@ -1,0 +1,20 @@
+{{ ansible_managed | comment }}
+# https://github.com/akpw/mktxp/blob/main/mktxp/cli/config/_mktxp.conf
+[MKTXP]
+    port = {{ mktxp_port }}
+    socket_timeout = {{ mktxp_system_config.socket_timeout | default(30) }}
+
+    initial_delay_on_failure = {{ mktxp_system_config.initial_delay_on_failure | default(120) }}
+    max_delay_on_failure = {{ mktxp_system_config.max_delay_on_failure | default(900) }}
+    delay_inc_div = {{ mktxp_system_config.delay_inc_div | default(5) }}
+
+    bandwidth = {{ mktxp_system_config.bandwidth | default(true) }}
+    bandwidth_test_interval = {{ mktxp_system_config.bandwidth_test_interval | default(420) }}
+    minimal_collect_interval = {{ mktxp_system_config.minimal_collect_interval | default(5) }}
+
+    verbose_mode = {{ mktxp_system_config.verbose_mode | default(false) }}
+
+    fetch_routers_in_parallel = {{ mktxp_system_config.fetch_routers_in_parallel | default(true) }}
+    max_worker_threads = {{ mktxp_system_config.max_worker_threads | default(5) }}
+    max_scrape_duration = {{ mktxp_system_config.max_scrape_duration | default(30) }}
+    total_max_scrape_duration = {{ mktxp_system_config.total_max_scrape_duration | default(60) }}

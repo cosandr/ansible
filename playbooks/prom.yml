@@ -72,12 +72,22 @@
         name: thanos
       tags: ["bucket"]
 
+    - name: Copy Mikrotik CA
+      ansible.builtin.copy:
+        src: "{{ repo_base_dir }}/files/mikrotik/ca.crt"
+        dest: /etc/pki/ca-trust/source/anchors/mt-ca.crt
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Update CA trust
+      tags: ["mktxp"]
+
   roles:
     - role: ipmi_exporter
       tags: ["ipmi_exporter"]
 
-    - role: mikrotik_exporter
-      tags: ["mikrotik_exporter"]
+    - role: mktxp
+      tags: ["mktxp"]
 
     - role: grafana
       tags: ["grafana"]
@@ -93,3 +103,6 @@
       ansible.builtin.service:
         name: rsyslog
         state: restarted
+
+    - name: Update CA trust  # noqa no-changed-when
+      ansible.builtin.command: /usr/bin/update-ca-trust

@@ -1,24 +1,22 @@
 ---
 
-mikrotik_exporter_listen_address: ":9436"
-mikrotik_exporter_port: "{{ mikrotik_exporter_listen_address.split(':')[1] }}"
-mikrotik_exporter_config:
-  devices: >-
-    {%- set tmp = [] -%}
-    {%- for h in groups['mikrotik'] if hostvars[h].mt_users | default([]) | selectattr('name', 'eq', 'prometheus') -%}
-    {{- tmp.append({
-      "name": h,
-      "user": "prometheus",
-      "address": hostvars[h].host_ips.get(host_net) | default(hostvars[h].ansible_host, true),
+mktxp_port: 49090
+mktxp_config: >-
+  {%- set tmp = {} -%}
+  {%- for h in groups['mikrotik'] if hostvars[h].mt_users | default([]) | selectattr('name', 'eq', 'prometheus') -%}
+  {{- tmp.update({
+    h: {
+      "hostname": hostvars[h].ansible_host,
+      "username": "prometheus",
       "password": lookup('community.general.passwordstore', 'network/mt_prom_pass'),
-    }) -}}
-    {%- endfor -%}
-    {{ tmp }}
-
-  features:
-    dhcp: true
-    routes: true
-    optics: true
-    health: true
-    firmware: true
-    monitor: true
+      "use_ssl": true,
+      "dhcp": hostvars[h].mt_dhcp_servers is defined,
+      "dhcp_lease": hostvars[h].mt_dhcp_servers is defined,
+      "connection_stats": hostvars[h].mt_firewall_rules is defined,
+      "firewall": hostvars[h].mt_firewall_rules is defined,
+      "ipv6_firewall": hostvars[h].mt_firewall_rules_ipv6 is defined,
+      "route": hostvars[h].mt_firewall_rules is defined,
+    }
+  }) -}}
+  {%- endfor -%}
+  {{ tmp }}

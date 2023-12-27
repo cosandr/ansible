@@ -1,0 +1,19 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Mikrotik exporter
+After=network-online.target
+
+[Service]
+User={{ mktxp_user }}
+Group={{ mktxp_group }}
+ExecStart={{ mktxp_home }}/bin/mktxp --cfg-dir {{ mktxp_config_dir }} export
+PrivateDevices=true
+PrivateTmp=true
+ProtectHome=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+
+[Install]
+WantedBy=default.target
