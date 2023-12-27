@@ -3,3 +3,7 @@
 mt_dns_entries:
   - name: "{{ inventory_hostname }}.{{ domains['hb'] }}"
     address: "{{ ansible_host }}"
+
+mt_dhcp_leases:
+  - address: "{{ ansible_host }}"
+    mac_address: "{{ vault_mac_address }}"

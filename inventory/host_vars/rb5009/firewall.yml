@@ -25,6 +25,31 @@ mt_interface_list: >-
 mt_firewall_rules: "{{ lookup('template', repo_base_dir + '/files/mikrotik/firewall_vault.yml.j2', template_vars={'ipv4': true}) | from_yaml }}"
 mt_firewall_nat: "{{ vault_mt_firewall_nat }}"
 
+__mt_firewall_raw_auto: >-
+  {%- set tmp = [] -%}
+  {%- for name in groups['all'] if hostvars[name].ansible_host is defined and
+    hostvars[name].host_subnet | default('') == 'trusted' and
+    hostvars[name].vault_mac_address is defined -%}
+  {{- tmp.append({
+    'action': 'accept',
+    'chain': 'prerouting',
+    'comment': 'Allow ' + name,
+    'src-address': hostvars[name].ansible_host,
+    'src-mac-address': hostvars[name].vault_mac_address,
+  }) -}}
+  {%- endfor -%}
+  {%- for addr in subnets.general.trusted | ansible.utils.ipv4 -%}
+  {{- tmp.append({
+    'action': 'drop',
+    'chain': 'prerouting',
+    'comment': 'Drop others in trusted subnet',
+    'src-address': addr,
+  }) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_firewall_raw: "{{ __mt_firewall_raw_auto }}"
+
 __kube_cidr_map: >-
   {%- set tmp = {} -%}
   {%- for name, config in all_net.items() if name in ['kube', 'talos'] -%}
@@ -168,4 +193,27 @@ mt_firewall_address_lists_ipv6: "{{ __mt_firewall_address_lists_ipv6_manual + __
 
 mt_firewall_rules_ipv6: "{{ lookup('template', repo_base_dir + '/files/mikrotik/firewall_vault.yml.j2', template_vars={'ipv4': false}) | from_yaml }}"
 
-mt_firewall_raw_ipv6: "{{ vault_mt_firewall_raw_ipv6 }}"
+__mt_firewall_raw_ipv6_auto: >-
+  {%- set tmp = [] -%}
+  {%- for name in groups['all'] if hostvars[name].ansible_host6 is defined and
+    hostvars[name].host_subnet | default('') == 'trusted' and
+    hostvars[name].vault_mac_address is defined -%}
+  {{- tmp.append({
+    'action': 'accept',
+    'chain': 'prerouting',
+    'comment': 'Allow ' + name,
+    'src-address': hostvars[name].ansible_host6,
+    'src-mac-address': hostvars[name].vault_mac_address,
+  }) -}}
+  {%- endfor -%}
+  {%- for addr in subnets.general.trusted | ansible.utils.ipv6 -%}
+  {{- tmp.append({
+    'action': 'drop',
+    'chain': 'prerouting',
+    'comment': 'Drop others in trusted subnet',
+    'src-address': addr,
+  }) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+mt_firewall_raw_ipv6: "{{ __mt_firewall_raw_ipv6_auto + vault_mt_firewall_raw_ipv6 }}"
