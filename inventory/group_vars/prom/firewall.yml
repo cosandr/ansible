@@ -1,33 +1,18 @@
 ---
 
-webgw_zone: '0-webgw'
-__am_fw_sources: "{{ subnets.vm.prom + subnets.mt.webgw }}"
-
 firewalld_zones:
   - name: public
     interfaces: "{{ host_nic_names }}"
 
-  - name: internal
-    sources: "{{ home_net | json_query('*.cidr') }}"
+  - name: cluster
+    sources: "{{ subnets.vm.prom + subnets.mt.webgw }}"
 
-  # Only add Wireguard IPs, others are already included in home_net
-  - name: internal
-    sources: "{{ firewall_trusted_sources | ansible.utils.ipaddr(wg_net.mt.cidr) }}"
-
-  - name: "0-webgw"
-    sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
+  - name: trusted
+    sources: "{{ firewall_trusted_sources }}"
 
 firewalld_services:
   - name: cockpit
     zone: public
-    state: absent
-
-  - name: cockpit
-    zone: internal
-    state: absent
-
-  - name: samba-client
-    zone: internal
     state: absent
 
   - name: samba-client
@@ -35,41 +20,32 @@ firewalld_services:
     state: absent
 
 firewall_rules:
+  # Reverse proxies
   - port: "{{ grafana_port }}"
-    zone: "0-webgw"
+    sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
+  # Group ports
   - port: "{{ node_exporter_port }}"
-    zone: public
-    sources: "{{ __am_fw_sources }}"
+    zone: cluster
   - port: "{{ alertmanager_port }}"
-    zone: internal
+    zone: cluster
   - port: "{{ prometheus_port }}"
-    zone: internal
+    zone: cluster
   - port: "{{ ipmi_exporter_port }}"
-    zone: internal
+    zone: cluster
   - port: "{{ pushgateway_port }}"
-    zone: internal
-  - port: "{{ mikrotik_exporter_port }}"
-    zone: internal
-  - port: "{{ promtail_syslog_port }}"
-    zone: internal
-  - port: 514
-    protocol: tcp
-    zone: internal
-  - port: 514
-    protocol: udp
-    zone: internal
-  # Alertmanager cluster
-  - port: "{{ alertmanager_port }}"
-    zone: "{{ webgw_zone }}"
-    sources: "{{ __am_fw_sources }}"
-  - port: "{{ prometheus_port }}"
-    zone: "{{ webgw_zone }}"
-    sources: "{{ __am_fw_sources }}"
+    zone: cluster
+  - port: "{{ mktxp_port }}"
+    zone: cluster
   - port: "{{ alertmanager_peer_port }}"
     protocol: tcp
-    zone: "{{ webgw_zone }}"
-    sources: "{{ __am_fw_sources }}"
+    zone: cluster
   - port: "{{ alertmanager_peer_port }}"
     protocol: udp
-    zone: "{{ webgw_zone }}"
-    sources: "{{ __am_fw_sources }}"
+    zone: cluster
+  # rsyslog from MGMT
+  - port: 514
+    protocol: tcp
+    sources: "{{ all_net.mgmt | json_query('[cidr, cidr6]') | flatten }}"
+  - port: 514
+    protocol: udp
+    sources: "{{ all_net.mgmt | json_query('[cidr, cidr6]') | flatten }}"
