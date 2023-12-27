@@ -25,6 +25,7 @@ mt_logging_actions: >-
     "remote-port": 514,
     "target": "remote",
     "src-address": host_ips.mgmt,
+    "bsd-syslog": true,
   }) -}}
   {%- endfor -%}
   {{ tmp }}
@@ -39,7 +40,7 @@ __mt_logging_manual:
 __mt_logging_auto: >-
   {%- set tmp = [] -%}
   {%- for h in groups['prom'] -%}
-  {%- for topic in ['warning', 'error', 'critical'] -%}
+  {%- for topic in ['info', 'warning', 'error', 'critical'] -%}
   {{- tmp.append({
     "action": h,
     "topics": topic,
