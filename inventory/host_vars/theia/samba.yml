@@ -1,6 +1,6 @@
 ---
 
-samba_hosts_allow: "{{ ['127.0.0.1'] + firewall_trusted_sources }}"
+samba_hosts_allow: "{{ ['127.0.0.1'] + [all_net.general.cidr] + subnets.mt.trusted }}"
 
 samba_interfaces:
   - lo
