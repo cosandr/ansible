@@ -6,4 +6,4 @@ vm_mem: 2048
 vm_template: "rocky8_packer.raw"
 vm_os_id: "http://rockylinux.org/rocky/8"
 
-vm_root_size: "50G"
+vm_root_size: "100G"
