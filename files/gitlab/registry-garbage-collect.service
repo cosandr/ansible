@@ -1,6 +1,7 @@
 [Unit]
 Description=Gitlab garbage collection
+Documentation=https://docs.gitlab.com/ee/administration/packages/container_registry.html#container-registry-garbage-collection
 After=gitlab-runsvdir.service
 
 [Service]
-ExecStart=/usr/bin/gitlab-ctl registry-garbage-collect
+ExecStart=/usr/bin/gitlab-ctl registry-garbage-collect -m
