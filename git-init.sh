@@ -28,10 +28,11 @@ declare -A remote_map=(
 )
 
 for dir in "${!remote_map[@]}"; do
-    if git -C "$dir" remote -v | grep -q upstream; then
+    if git -C "$dir" remote show | grep -q upstream; then
         echo "$dir already has upstream defined"
         continue
     fi
     git -C "$dir" remote add upstream "${remote_map[$dir]}"
     git -C "$dir" remote set-url upstream --push DISABLED
+    echo "$dir added ${remote_map[$dir]} as upstream"
 done

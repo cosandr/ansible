@@ -240,7 +240,7 @@
 
     - name: Include VLAN role
       ansible.builtin.include_role:
-        name: mt_vlans
+        name: andrei.utils.mt_vlans
         apply:
           tags: ["interfaces", "vlan"]
       vars:
