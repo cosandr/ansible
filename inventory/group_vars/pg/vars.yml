@@ -12,15 +12,14 @@ provisioned_disks:
 
 node_exporter_config_firewall: false
 
-postgresql_version: 14
 postgresql_daemon: "postgresql-{{ postgresql_version }}"
 postgresql_bin_path: "/usr/pgsql-{{ postgresql_version }}/bin"
 postgresql_data_dir: "/var/lib/pgsql/{{ postgresql_version }}/data"
 postgresql_config_path: "/var/lib/pgsql/{{ postgresql_version }}/data"
 postgresql_packages:
-  - postgresql14
-  - postgresql14-server
-  - postgresql14-contrib
+  - postgresql16
+  - postgresql16-server
+  - postgresql16-contrib
 postgresql_log_timezone: "Europe/Oslo"
 
 postgresql_global_config_options:

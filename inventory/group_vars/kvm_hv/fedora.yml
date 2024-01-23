@@ -36,7 +36,7 @@ __group_dnf_packages:
   - pciutils
   - pkgconf
   - policycoreutils-python-utils
-  - postgresql
+  - postgresql16
   - powertop
   - python3-dnf-plugin-versionlock
   - python3-lxml  # virt ansible modules
