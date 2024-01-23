@@ -31,8 +31,10 @@ __postfix_relay_domains:
   - "{{ postfix_relay_domains | map(attribute='name') | list }}"
 
 __postfix_networks:
-  - "{{ wg_net.mt.cidr }}"
-  - "{{ home_net | json_query('*.cidr') }}"
+  - "{{ all_net.mt.cidr }}"
+  - "{{ all_net.vm.cidr }}"
+  - "{{ all_net.general.cidr }}"
+  - "{{ all_net.mgmt.cidr }}"
 
 postfix_networks: "{{ __postfix_networks | flatten }}"
 

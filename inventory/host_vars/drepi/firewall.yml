@@ -1,21 +1,17 @@
 ---
 
-__smtp_sources:
-  - "{{ wg_net.mt.cidr }}"
-  - "{{ home_net | json_query('*.cidr') }}"
-
 firewall_rules:
   - port: 22
     source: "{{ home_net.general.cidr }}"
 
   - port: 25
-    sources: "{{ __smtp_sources | flatten }}"
+    sources: "{{ __postfix_networks | flatten }}"
 
   - port: 465
-    sources: "{{ __smtp_sources | flatten }}"
+    sources: "{{ __postfix_networks | flatten }}"
 
   - port: 587
-    sources: "{{ __smtp_sources | flatten }}"
+    sources: "{{ __postfix_networks | flatten }}"
 
   - port: 8081
     source: "{{ home_net.general.cidr }}"
