@@ -9,7 +9,6 @@ borg_backups:
     passphrase: "{{ borg_libvirt_passphrase }}"
     paths:
       - "/var/lib/prometheus"
-      - "/var/lib/thanos"
     create_args:
       - "--one-file-system"
     prune_args:

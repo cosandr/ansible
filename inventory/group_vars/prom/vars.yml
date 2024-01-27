@@ -10,15 +10,6 @@ provisioned_disks:
         shrink: false
         size: "100%FREE"
 
-  - dev: "/dev/disk/by-id/virtio-data02"
-    vg: thanos
-    vols:
-      - name: vol01
-        path: "/var/lib/thanos"
-        opts: 'defaults,noatime'
-        shrink: false
-        size: "100%FREE"
-
 prometheus_blackbox_icmp_targets:
   - "{{ wireguard_ip | default(ansible_host) }}"
   - "google.com"

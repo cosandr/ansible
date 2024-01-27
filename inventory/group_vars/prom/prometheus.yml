@@ -1,10 +1,5 @@
 ---
 
-prometheus_config_flags_extra:
-  # Compaction must be disabled for Thanos to work
-  "storage.tsdb.min-block-duration": "2h"
-  "storage.tsdb.max-block-duration": "2h"
-
 __prom_blackbox_http_targets: >-
   {%- set tmp = [] -%}
   {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_http_targets | default([]) -%}
@@ -125,39 +120,6 @@ __extra_prometheus_scrape_configs:
       - targets: ["ha.{{ domains['ti'] }}:443"]
         labels:
           instance: "ha.{{ domains['ti'] }}"
-
-  - job_name: 'thanos'
-    static_configs:
-      - targets:
-          - "localhost:19191"
-          - "localhost:19192"
-          - "localhost:19193"
-          - "localhost:19194"
-    relabel_configs:
-      - source_labels: [__address__]
-        regex: '.*:(\d+)'
-        target_label: instance
-        replacement: "{{ inventory_hostname }}:${1}"
-
-      - source_labels: [__address__]
-        regex: '.*:19191'
-        target_label: thanos_svc
-        replacement: "sidecar"
-
-      - source_labels: [__address__]
-        regex: '.*:19192'
-        target_label: thanos_svc
-        replacement: "store"
-
-      - source_labels: [__address__]
-        regex: '.*:19193'
-        target_label: thanos_svc
-        replacement: "compact"
-
-      - source_labels: [__address__]
-        regex: '.*:19194'
-        target_label: thanos_svc
-        replacement: "query"
 
   - job_name: "ipmi"
     metrics_path: /ipmi

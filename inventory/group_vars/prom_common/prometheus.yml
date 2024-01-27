@@ -9,7 +9,7 @@ __prom_node_ips: >-
 
 prometheus_version: latest
 prometheus_port: 9090
-prometheus_storage_retention: "365d"
+prometheus_storage_retention: "5y"
 prometheus_web_listen_address: "{{ wireguard_ip | default('0.0.0.0') }}:{{ prometheus_port }}"
 prometheus_web_external_url: "http://{{ wireguard_ip | default(ansible_host) }}:{{ prometheus_port }}"
 prometheus_global:

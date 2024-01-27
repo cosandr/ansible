@@ -62,16 +62,6 @@
             - ansible_os_family == 'RedHat'
             - ansible_selinux.status == "enabled"
 
-    # Must manually create user, create thanos policy and assign it to user
-    - name: Create Thanos bucket
-      delegate_to: localhost
-      amazon.aws.s3_bucket:
-        access_key: "{{ hostvars['minio01'].s3_admin_access_key }}"
-        secret_key: "{{ hostvars['minio01'].s3_admin_secret_key }}"
-        s3_url: "{{ s3_url }}"
-        name: thanos
-      tags: ["bucket"]
-
     - name: Copy Mikrotik CA
       ansible.builtin.copy:
         src: "{{ repo_base_dir }}/files/mikrotik/ca.crt"
@@ -94,9 +84,6 @@
 
     - role: cloudalchemy.pushgateway
       tags: ["pushgateway"]
-
-    - role: thanos
-      tags: ["thanos"]
 
   handlers:
     - name: Restart rsyslog
