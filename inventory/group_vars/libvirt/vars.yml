@@ -29,6 +29,7 @@ vm_cpu_features: []
 vm_seclabel: "system_u:system_r:svirt_t:s0:c{{ all_net[host_net].vlan }},c{{ ansible_host | andrei.utils.host_num_in_net }}"
 vm_qemu_args: []
 vm_mdev_uuids: []
+vm_virtiofs_mounts: []
 
 vm_data_disks: []
 # vm_data_disks: ["200G", "150G"]
@@ -90,6 +91,7 @@ vm_default_definition:
     model: "selinux"
   seclabel_label: "{{ vm_seclabel }}"
   qemu_commandline_args: "{{ vm_qemu_args }}"
+  virtiofs_mounts: "{{ vm_virtiofs_mounts }}"
 
 libvirt_vms: ["{{ vm_default_definition }}"]
 
