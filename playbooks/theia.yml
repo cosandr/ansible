@@ -73,6 +73,9 @@
     - role: nginx
       tags: ["nginx"]
 
+    - role: syncthing
+      tags: ["syncthing"]
+
   handlers:
     - name: Restore tank SELinux context  # noqa no-changed-when - handler
       ansible.builtin.command: restorecon -r /mnt/tank

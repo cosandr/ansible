@@ -2,14 +2,5 @@
 
 __nginx_upstreams_2: []
 __nginx_upstreams_1:
-  - name: syncthing
-    servers: ["{{ hostvars['theia'].host_ips.vm }}:8384"]
-
   - name: motion
     servers: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].motion_port }}"]
-
-__nginx_vhosts_2:
-  - filename: syncthing.conf
-    server_name: syncthing
-    upstream_name: syncthing
-    template: "{{ repo_base_dir }}/files/webgw/nginx/syncthing.conf.j2"

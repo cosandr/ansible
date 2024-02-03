@@ -1,0 +1,68 @@
+---
+
+- name: Install syncthing
+  ansible.builtin.dnf:
+    name: syncthing
+    state: present
+  tags: ["install"]
+
+- name: Get syncthing system config
+  become: true
+  become_user: "{{ syncthing_user }}"
+  check_mode: false
+  changed_when: false
+  ansible.builtin.command:
+    cmd: "syncthing cli show system"
+  register: __conf_sys
+  tags: ["config"]
+
+- name: Get syncthing options config
+  become: true
+  become_user: "{{ syncthing_user }}"
+  check_mode: false
+  changed_when: false
+  ansible.builtin.command:
+    cmd: "syncthing cli config options dump-json"
+  register: __conf_options
+  tags: ["config"]
+
+- name: Set config facts
+  ansible.builtin.set_fact:
+    syncthing_current_conf_sys: "{{ __conf_sys.stdout | from_json }}"
+    syncthing_current_conf_options: "{{ __conf_options.stdout | from_json }}"
+  tags: ["config"]
+
+- name: Configure GUI listen address  # noqa no-changed-when
+  become: true
+  become_user: "{{ syncthing_user }}"
+  ansible.builtin.command:
+    cmd: "syncthing cli config gui raw-address set {{ syncthing_gui_listen_address }}"
+  when: syncthing_current_conf_sys.guiAddressUsed != syncthing_gui_listen_address
+  tags: ["config"]
+
+- name: Configure options  # noqa no-changed-when
+  become: true
+  become_user: "{{ syncthing_user }}"
+  ansible.builtin.command:
+    cmd: "syncthing cli config options {{ item.property }} set {{ item.want }}"
+  when: syncthing_current_conf_options[item.json_name] != item.want
+  loop:
+    - property: natenabled
+      json_name: "natEnabled"
+      want: "{{ syncthing_nat_traversal }}"
+    - property: global-ann-enabled
+      json_name: "globalAnnounceEnabled"
+      want: "{{ syncthing_global_discovery }}"
+    - property: local-ann-enabled
+      json_name: "localAnnounceEnabled"
+      want: "{{ syncthing_local_discovery }}"
+    - property: relays-enabled
+      json_name: "relaysEnabled"
+      want: "{{ syncthing_relaying }}"
+  tags: ["config"]
+
+- name: Enable and start syncthing
+  ansible.builtin.systemd:
+    name: "syncthing@{{ syncthing_user }}"
+    state: started
+    enabled: true

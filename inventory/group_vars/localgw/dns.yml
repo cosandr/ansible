@@ -30,10 +30,6 @@ __mt_dns_entries_once:
     cname: "{{ localgw_dns_name }}"
     ttl: 5m
     type: CNAME
-  - name: "syncthing.{{ domain }}"
-    cname: "{{ localgw_dns_name }}"
-    ttl: 5m
-    type: CNAME
   - name: "cloud.{{ domains['dv'] }}"
     cname: "{{ localgw_dns_name }}"
     ttl: 5m

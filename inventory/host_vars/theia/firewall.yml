@@ -16,11 +16,14 @@ __firewalld_services_1:
     sources: "{{ firewall_trusted_sources }}"
     zone: public
 
-__firewall_rules_1:
-  - port: 8384
+  - name: syncthing
     zone: public
-    sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
 
+  - name: syncthing-gui
+    zone: public
+    sources: "{{ firewall_trusted_sources }}"
+
+__firewall_rules_1:
   - port: "{{ nginx_ports['www'] }}"
     zone: public
     sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"

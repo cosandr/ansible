@@ -1,0 +1,8 @@
+---
+
+syncthing_user: "{{ my_user | default('syncthing') }}"
+syncthing_gui_listen_address: "0.0.0.0:8384"
+syncthing_nat_traversal: false
+syncthing_global_discovery: false
+syncthing_local_discovery: true
+syncthing_relaying: false
