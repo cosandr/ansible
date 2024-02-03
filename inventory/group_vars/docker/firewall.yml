@@ -1,5 +1,0 @@
----
-
-firewalld_services:
-  - name: nfs3
-    sources: "{{ nfs_shares | map(attribute='sources') | flatten }}"

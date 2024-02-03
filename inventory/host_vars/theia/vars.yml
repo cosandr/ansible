@@ -8,6 +8,12 @@ cpupower_stop_governor: conservative
 web_root: "/var/www"
 pip_wheel_dir: "{{ web_root }}/pip"
 
+btrfs_subvols:
+  - "@snapshots"
+  - "@/var/lib/libvirt/images"
+  - "@home/{{ my_user }}"
+  - "@/mnt/containers"
+
 btrfs_scrub_targets:
   - /
   - /mnt/tank

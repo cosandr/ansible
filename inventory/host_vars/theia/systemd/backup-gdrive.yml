@@ -49,18 +49,6 @@ __sd_backup_gdrive:
 
         rclone sync -v /mnt/tank/archive/savegames gcrypt:savegames
         rclone sync -v --exclude 'Camera/**' nextcloud: gcrypt:Nextcloud
-
-        # Find latest docker01 backup
-        latest_docker="$(find /mnt/tank/backup/btrbk/{{ hostvars['docker01'].vm_host }} -maxdepth 1 -type d -name 'libvirt*' | sort -rn | head -n1)"
-        if ! grep -q /tmp/docker01-data /proc/mounts && [ -f "$latest_docker"/docker01-data01.raw ]; then
-          trap 'umount /tmp/docker01-data' EXIT
-          mkdir -p /tmp/docker01-data
-          mount -o ro,noload,noatime "$latest_docker"/docker01-data01.raw /tmp/docker01-data
-          tmp_exit=$?
-          global_exit=$(( tmp_exit > global_exit ? tmp_exit : global_exit ))
-        fi
-        if [ -d /tmp/docker01-data/syncthing/data ]; then
-          rclone sync -v /tmp/docker01-data/syncthing/data gsecret:syncthing
-        fi
+        rclone sync -v /mnt/containers/syncthing/data gsecret:syncthing
 
         exit $global_exit

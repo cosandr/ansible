@@ -11,6 +11,19 @@
       tags: ["systemd"]
 
   post_tasks:
+    - name: Setup Docker service overrides
+      ansible.builtin.copy:
+        content: |
+          [Unit]
+          After=mnt-containers.mount mnt-media.mount mnt-downloads.mount mnt-yes.mount
+          Requires=mnt-containers.mount mnt-media.mount mnt-downloads.mount mnt-yes.mount
+        dest: "/etc/systemd/system/docker.service.d/override.conf"
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload systemd
+      tags: ["docker"]
+
     - name: Create my user
       ansible.builtin.user:
         name: "{{ my_user }}"
@@ -31,21 +44,19 @@
         exclusive: true
       tags: ["user", "ssh"]
 
-    - name: Mount media shares
+    - name: Mount host shares
       ansible.posix.mount:
-        src: "{{ hostvars['theia'].host_ips.vm }}:{{ item.src }}"
-        path: "{{ item.dest }}"
+        src: "{{ item }}"
+        path: "/mnt/{{ item }}"
         opts: "defaults,noatime"
         state: mounted
-        fstype: nfs
+        fstype: virtiofs
       loop:
-        - src: "/mnt/tank/media"
-          dest: "/mnt/media"
-        - src: "/mnt/tank/yes"
-          dest: "/mnt/yes"
-        - src: "/mnt/tank/downloads"
-          dest: "/mnt/downloads"
-      tags: ["nfs"]
+        - "containers"
+        - "media"
+        - "yes"
+        - "downloads"
+      tags: ["mounts"]
 
     - name: Install python3-docker
       ansible.builtin.dnf:
@@ -62,3 +73,8 @@
       loop_control:
         label: "{{ item.url }} [{{ item.username }}]"
       tags: ["registry"]
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true

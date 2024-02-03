@@ -16,19 +16,12 @@ nfs_shares:
   - path: /home/andrei
     options: "rw,root_squash"
     sources: "{{ firewall_trusted_sources }}"
+  - path: /mnt/containers
+    options: "rw,no_root_squash"
+    sources: "{{ firewall_trusted_sources }}"
   - path: /mnt/tank
     options: "rw,no_root_squash"
     sources: "{{ firewall_trusted_sources }}"
   - path: /mnt/tank/media/motion
     options: "rw,no_root_squash"
     sources: "{{ [hostvars['drepi'].ansible_host] }}"
-  # Docker shares
-  - path: /mnt/tank/media
-    options: "rw,no_root_squash"
-    sources: "{{ subnets.vm.docker }}"
-  - path: /mnt/tank/yes
-    options: "ro,no_root_squash"
-    sources: "{{ subnets.vm.docker }}"
-  - path: /mnt/tank/downloads
-    options: "rw,no_root_squash"
-    sources: "{{ subnets.vm.docker }}"
