@@ -99,6 +99,23 @@ __extra_prometheus_scrape_configs:
       - targets: ["localhost:{{ pushgateway_port }}"]
         labels: "{{ prometheus_node_labels }}"
 
+  - job_name: "syncthing"
+    authorization:
+      credentials: "{{ vault_syncthing_token }}"
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+      - targets: ["{{ hostvars['theia'].syncthing_gui_listen_address }}"]
+        labels: "{{ hostvars['theia'].prometheus_node_labels }}"
+
+  - job_name: "syncthing_ti"
+    authorization:
+      credentials: "{{ vault_syncthing_ti_token }}"
+    static_configs:
+      - targets: ["{{ hostvars['romsto'].ansible_host }}:8384"]
+        labels: "{{ hostvars['romsto'].prometheus_node_labels }}"
+
   - job_name: "hass"
     scrape_interval: 30s
     metrics_path: /api/prometheus
@@ -114,7 +131,7 @@ __extra_prometheus_scrape_configs:
     scrape_interval: 30s
     metrics_path: /api/prometheus
     authorization:
-      credentials: "{{ vault_ha_ta_token }}"
+      credentials: "{{ vault_ha_ti_token }}"
     scheme: https
     static_configs:
       - targets: ["ha.{{ domains['ti'] }}:443"]

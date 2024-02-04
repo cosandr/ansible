@@ -21,7 +21,7 @@ __firewalld_services_1:
 
   - name: syncthing-gui
     zone: public
-    sources: "{{ firewall_trusted_sources }}"
+    sources: "{{ firewall_trusted_sources + node_exporter_allow_ips }}"
 
 __firewall_rules_1:
   - port: "{{ nginx_ports['www'] }}"
