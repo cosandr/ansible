@@ -5,12 +5,3 @@ vm_mem: 16384
 vm_disk_pool: default
 
 vm_root_size: "50G"
-vm_virtiofs_mounts:
-  - source: "/mnt/containers"
-    target: "containers"
-  - source: "/mnt/tank/media"
-    target: "media"
-  - source: "/mnt/tank/yes"
-    target: "yes"
-  - source: "/mnt/tank/downloads"
-    target: "downloads"

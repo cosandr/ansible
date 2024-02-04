@@ -44,19 +44,23 @@
         exclusive: true
       tags: ["user", "ssh"]
 
-    - name: Mount host shares
+    - name: Mount NFS shares
       ansible.posix.mount:
-        src: "{{ item }}"
-        path: "/mnt/{{ item }}"
+        src: "{{ hostvars['theia'].host_ips.vm }}:{{ item.src }}"
+        path: "{{ item.dest }}"
         opts: "defaults,noatime"
         state: mounted
-        fstype: virtiofs
+        fstype: nfs
       loop:
-        - "containers"
-        - "media"
-        - "yes"
-        - "downloads"
-      tags: ["mounts"]
+        - src: "/mnt/containers"
+          dest: "/mnt/containers"
+        - src: "/mnt/tank/media"
+          dest: "/mnt/media"
+        - src: "/mnt/tank/yes"
+          dest: "/mnt/yes"
+        - src: "/mnt/tank/downloads"
+          dest: "/mnt/downloads"
+      tags: ["nfs"]
 
     - name: Install python3-docker
       ansible.builtin.dnf:
