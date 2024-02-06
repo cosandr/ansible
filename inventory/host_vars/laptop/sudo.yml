@@ -5,3 +5,7 @@ sudoers_files:
     content: "%wheel ALL=(ALL) ALL"
   - dest: "40-wg"
     content: "{{ my_user }} ALL=(root) NOPASSWD: /usr/bin/wg, /usr/bin/wg-quick"
+  - dest: "40-tlp"
+    content: "{{ my_user }} ALL=(root) NOPASSWD: /usr/bin/tlp, /usr/bin/tlp-stat"
+  - dest: "40-intel"
+    content: "{{ my_user }} ALL=(root) NOPASSWD: /usr/bin/intel_gpu_top"
