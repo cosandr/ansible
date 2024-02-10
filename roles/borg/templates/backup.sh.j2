@@ -90,8 +90,10 @@ borg create \
     ::'{{ archive_name }}-{now}' \
     ${backup_paths[*]}
 
-backup_exit=$?
+tmp_exit=$?
+global_exit=$(( tmp_exit > global_exit ? tmp_exit : global_exit ))
 
+{% if conf.prune_enabled | default(true) %}
 echo "Pruning repository"
 
 borg prune \
@@ -99,19 +101,26 @@ borg prune \
     {{ a }} \
 {% endfor %}
     --glob-archives '{{ archive_name }}-*'
-{% raw %}
-prune_exit=$?
 
-# use highest exit code as global exit code
-global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))
+tmp_exit=$?
+global_exit=$(( tmp_exit > global_exit ? tmp_exit : global_exit ))
+{% else %}
+echo "Pruning disabled"
+{% endif %}
+
+{% if conf.compact_enabled | default(not conf.append_only | default(false)) %}
+echo "Compacting repository"
+borg compact
+tmp_exit=$?
+global_exit=$(( tmp_exit > global_exit ? tmp_exit : global_exit ))
+{% endif %}
 
 if [ ${global_exit} -eq 0 ]; then
-    echo "Backup and Prune finished successfully"
+    echo "Finished successfully"
 elif [ ${global_exit} -eq 1 ]; then
-    echo "Backup and/or Prune finished with warnings"
+    echo "Finished with warnings"
 else
-    echo "Backup and/or Prune finished with errors"
+    echo "Finished with errors"
 fi
 
 exit ${global_exit}
-{% endraw %}
