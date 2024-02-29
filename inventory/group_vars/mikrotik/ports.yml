@@ -5,4 +5,11 @@ mt_bridges:
     frame-types: admit-only-vlan-tagged
     vlan-filtering: true
 
-mt_bridge_ports: "{{ mt_trunk_ports + mt_access_ports | map(attribute='ports') | flatten | sort }}"
+mt_bridge_ports: >-
+  {%- set tmp = [] -%}
+  {%- for item in mt_trunk_ports + mt_access_ports -%}
+  {{- tmp.append(item.ports | default(item)) -}}
+  {%- endfor -%}
+  {{ tmp | flatten | sort }}
+
+mt_networks: "{{ all_net }}"

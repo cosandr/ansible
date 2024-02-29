@@ -26,6 +26,7 @@
       loop: "{{ mt_groups | default([]) }}"
       loop_control:
         label: "{{ item.name }}"
+      when: not ansible_check_mode
       tags: ["groups"]
 
     - name: Configure users
@@ -42,6 +43,7 @@
       loop: "{{ mt_users | default([]) }}"
       loop_control:
         label: "{{ item.name }}"
+      when: not ansible_check_mode
       tags: ["users"]
 
     - name: Backup config
@@ -49,6 +51,7 @@
       tags: ["backup"]
       block:
         - name: Get config content
+          check_mode: false
           no_log: true
           community.routeros.command:
             commands: /export show-sensitive
@@ -119,6 +122,7 @@
               - /file remove {{ inventory_hostname }}.p12
               # Show certificates
               - /certificate print
+          when: not ansible_check_mode
           register: output
 
       always:
@@ -134,7 +138,9 @@
           - /ip service set www-ssl certificate={{ inventory_hostname }} tls-version=only-1.2
           - /ip service set api-ssl certificate={{ inventory_hostname }} disabled=no tls-version=only-1.2
       tags: ["tls-setup"]
-      when: "'tls-setup' in ansible_run_tags"
+      when:
+        - not ansible_check_mode
+        - "'tls-setup' in ansible_run_tags"
 
 - name: Configure using API
   hosts: mikrotik
@@ -244,7 +250,6 @@
         apply:
           tags: ["interfaces", "vlan"]
       vars:
-        mt_networks: "{{ all_net }}"
         mt_bridge_name: "{{ mt_bridges[0].name }}"
       tags: ["interfaces", "vlan"]
       when: mt_trunk_ports | default([]) or
