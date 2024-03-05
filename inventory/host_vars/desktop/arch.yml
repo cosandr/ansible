@@ -1,18 +1,11 @@
 ---
 
-sbctl_bundles:
-  - kernel: linux
-    label: "Arch Linux"
-  - kernel: linux-lts
-    label: "Arch Linux LTS"
-
 sbctl_enroll: false
 sbctl_enroll_microsoft: true
-sbctl_ucode: "amd-ucode.img"
 
 esp_src: "UUID=538E-A9BF"
 esp_disk: "/dev/nvme1n1"
-extra_kernel_params: "nmi_watchdog=0 nvidia-drm.modeset=1 systemd.unified_cgroup_hierarchy=0"
+extra_kernel_params: "nmi_watchdog=0 nvidia-drm.modeset=1"
 kernel_params: "root=/dev/mapper/root rootflags=subvol=@ {{ extra_kernel_params }}"
 
 network_manager: "systemd-networkd"
@@ -34,5 +27,13 @@ host_pacman_packages:
 
 host_aur_packages: []
 
-mkinitcpio_uefi_bundle: false
+mkinitcpio_uefi_add: false
+mkinitcpio_kernels:
+  - name: linux
+    label: "Arch Linux"
+    filename: "linux.efi"
+  - name: linux-lts
+    label: "Arch Linux LTS"
+    filename: "linux-lts.efi"
+
 mkinitcpio_modules: "nvidia nvidia_modeset nvidia_uvm nvidia_drm"
