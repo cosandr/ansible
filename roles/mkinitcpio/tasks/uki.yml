@@ -1,0 +1,79 @@
+- name: Ensure ESP path exists
+  ansible.builtin.file:
+    path: "{{ mkinitcpio_uefi_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Write kernel parameters
+  ansible.builtin.copy:
+    content: "{{ kernel_params }}\n"
+    dest: "{{ chroot_path }}/etc/kernel/cmdline"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Rebuild all mkinitcpio presets
+
+- name: Add entries to firmware
+  when: mkinitcpio_uefi_add | bool
+  block:
+    - name: Prepare efibootmgr facts
+      ansible.builtin.set_fact:
+        __mkinitcpio_efibootmgr: "{{ __mkinitcpio_efibootmgr | default([]) + [tmp_dict] }}"
+      vars:
+        filename: "{{ (item.filename is defined) | ternary(item.filename, '{{ mkinitcpio_uefi_prefix }}-{{ item.name }}.efi') }}"
+        tmp_dict:
+          disk: "{{ esp_disk }}"
+          part: "{{ esp_part }}"
+          loader: "{{ mkinitcpio_uefi_path.replace(esp_mount, '', 1) }}/{{ filename }}"
+          label: "{{ item.label | default(ansible_distribution + ' ' + item.name) }}"
+      loop: "{{ mkinitcpio_kernels }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Prepare efibootmgr facts [fallback]
+      ansible.builtin.set_fact:
+        __mkinitcpio_efibootmgr: "{{ __mkinitcpio_efibootmgr | default([]) + [tmp_dict] }}"
+      vars:
+        filename: "{{ (item.fallback_filename is defined) | ternary(item.fallback_filename, '{{ mkinitcpio_uefi_prefix }}-{{ item.name }}-fallback.efi') }}"
+        tmp_dict:
+          disk: "{{ esp_disk }}"
+          part: "{{ esp_part }}"
+          loader: "{{ mkinitcpio_uefi_path.replace(esp_mount, '', 1) }}/{{ filename }}"
+          label: "{{ item.label | default(ansible_distribution + ' ' + item.name + ' fallback') }}"
+      loop: "{{ mkinitcpio_kernels }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: "'fallback' in (item.presets | default(mkinitcpio_kernel_presets))"
+
+    - name: Add entries in EFI
+      ansible.builtin.include_role:
+        name: "efibootmgr"
+      vars:
+        efibootmgr_entries: "{{ __mkinitcpio_efibootmgr }}"
+
+- name: Sign bundles with sbctl
+  when: mkinitcpio_uefi_sbctl_sign | bool
+  tags: ["sbctl"]
+  block:
+    - name: Prepare list of files to sign
+      ansible.builtin.set_fact:
+        __mkinitcpio_sign_files: "{{ __mkinitcpio_sign_files | default([]) + [tmp] }}"
+      vars:
+        filename: "{{ (item.filename is defined) | ternary(item.filename, '{{ mkinitcpio_uefi_prefix }}-{{ item.name }}.efi') }}"
+        tmp: "{{ mkinitcpio_uefi_path }}/{{ filename }}"
+      loop: "{{ mkinitcpio_kernels }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Prepare list of files to sign [fallback]
+      ansible.builtin.set_fact:
+        __mkinitcpio_sign_files: "{{ __mkinitcpio_sign_files | default([]) + [tmp] }}"
+      vars:
+        filename: "{{ (item.fallback_filename is defined) | ternary(item.fallback_filename, '{{ mkinitcpio_uefi_prefix }}-{{ item.name }}-fallback.efi') }}"
+        tmp: "{{ mkinitcpio_uefi_path }}/{{ filename }}"
+      loop: "{{ mkinitcpio_kernels }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: "'fallback' in (item.presets | default(mkinitcpio_kernel_presets))"

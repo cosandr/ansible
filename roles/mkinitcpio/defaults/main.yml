@@ -10,7 +10,7 @@ kernel_params: ""
 mkinitcpio_modules: ""
 mkinitcpio_binaries: ""
 mkinitcpio_files: ""
-mkinitcpio_hooks: "base systemd autodetect keyboard sd-vconsole modconf block sd-encrypt filesystems fsck"
+mkinitcpio_hooks: "base systemd autodetect microcode keyboard sd-vconsole modconf block sd-encrypt filesystems fsck"
 
 mkinitcpio_kernel_presets:
   - default
@@ -25,3 +25,5 @@ mkinitcpio_uefi_add: true
 mkinitcpio_uefi_path: "{{ esp_mount }}/EFI/Linux"
 mkinitcpio_uefi_prefix: "archlinux"
 mkinitcpio_uefi_splash: "/usr/share/systemd/bootctl/splash-arch.bmp"
+mkinitcpio_uefi_default_options: "{% if mkinitcpio_uefi_splash %}--splash {{ mkinitcpio_uefi_splash }}{% endif %}"
+mkinitcpio_uefi_fallback_options: "-S autodetect{% if mkinitcpio_uefi_splash %} --splash {{ mkinitcpio_uefi_splash }}{% endif %}"

@@ -2,21 +2,25 @@
 
 ALL_config="/etc/mkinitcpio.conf"
 ALL_kver="/boot/vmlinuz-{{ item.name }}"
-{% if mkinitcpio_uefi_bundle | bool %}
-ALL_microcode=(/boot/*-ucode.img)
-{% endif %}
 
 PRESETS=({{ item.presets | default(mkinitcpio_kernel_presets) | map("regex_replace","(.+)","\'\\1\'") | join(' ') }})
 
 default_image="/boot/initramfs-{{ item.name }}.img"
 {% if mkinitcpio_uefi_bundle | bool %}
+{% if item.filename is not defined %}
 default_uki="{{ mkinitcpio_uefi_path }}/{{ mkinitcpio_uefi_prefix }}-{{ item.name }}.efi"
+{% else %}
+default_uki="{{ mkinitcpio_uefi_path }}/{{ item.filename }}"
 {% endif %}
-default_options="--splash {{ mkinitcpio_uefi_splash }}"
+{% endif %}
+default_options="{{ item.default_options | default(mkinitcpio_uefi_default_options) }}"
 
-#fallback_config="/etc/mkinitcpio.conf"
 fallback_image="/boot/initramfs-{{ item.name }}-fallback.img"
 {% if mkinitcpio_uefi_bundle | bool %}
+{% if item.fallback_filename is not defined %}
 fallback_uki="{{ mkinitcpio_uefi_path }}/{{ mkinitcpio_uefi_prefix }}-{{ item.name }}-fallback.efi"
+{% else %}
+fallback_uki="{{ mkinitcpio_uefi_path }}/{{ item.fallback_filename }}"
 {% endif %}
-fallback_options="-S autodetect --splash {{ mkinitcpio_uefi_splash }}"
+{% endif %}
+fallback_options="{{ item.fallback_options | default(mkinitcpio_uefi_fallback_options) }}"
