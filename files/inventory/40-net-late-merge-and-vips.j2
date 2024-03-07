@@ -1,29 +1,29 @@
 {% set __home_net_late_merge = {
   "vm": {
-    "dhcp_range": subnets.vm.clients | ansible.utils.ipv4 | last | default(""),
+    "dhcp_range": subnets.vm.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "vm.{{ domains['hb'] }}",
   },
   "kube": {
-    "dhcp_range": subnets.kube.clients | ansible.utils.ipv4 | last | default(""),
+    "dhcp_range": subnets.kube.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "kube.{{ domains['hb'] }}",
   },
   "talos": {
-    "dhcp_range": subnets.talos.clients | ansible.utils.ipv4 | last | default(""),
+    "dhcp_range": subnets.talos.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "talos.{{ domains['hb'] }}",
   },
   "general": {
-    "dhcp_range": subnets.general.clients | ansible.utils.ipv4 | last | default(""),
+    "dhcp_range": subnets.general.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "gen.{{ domains['hb'] }}",
   },
   "public": {
-    "dhcp_range": subnets.public.clients | ansible.utils.ipv4 | last | default(""),
+    "dhcp_range": subnets.public.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "pub.{{ domains['hb'] }}",
   },
 } %}
 
 {% set __internal_net_late_merge = {
   "mgmt": {
-    "dhcp_range": subnets.mgmt.clients | ansible.utils.ipv4 | last | default(""),
+    "dhcp_range": subnets.mgmt.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "man.{{ domains['hb'] }}",
   },
   "san": {
