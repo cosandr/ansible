@@ -29,7 +29,7 @@ __firewalld_zones_2:
   - name: internal
     interfaces: >-
       {%- set tmp = [] -%}
-      {%- for name, config in internal_net.items() if 'vlan' in config -%}
+      {%- for name, config in internal_net.items() if 'vlan' in config and name not in host_exclude_nets -%}
       {{- tmp.append(name | upper) -}}
       {%- endfor -%}
       {{ tmp }}
@@ -37,7 +37,7 @@ __firewalld_zones_2:
   - name: public
     interfaces: >-
       {%- set tmp = [] -%}
-      {%- for name, config in home_net.items() if 'vlan' in config -%}
+      {%- for name, config in home_net.items() if 'vlan' in config and name not in host_exclude_nets -%}
       {{- tmp.append(name | upper) -}}
       {%- endfor -%}
       {{ tmp }}

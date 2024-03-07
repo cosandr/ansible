@@ -7,6 +7,9 @@
 __bond0_primary_iface: "enp1s0"
 __bond0_backup_iface: "eno1"
 
+host_exclude_nets:
+  - public
+
 resolved_config:
   DNS: "{{ all_net.mgmt.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
   FallbackDNS: "1.1.1.1 8.8.8.8"
@@ -19,7 +22,7 @@ host_bridge_config:
 
 __networkd_vlan_netdevs: >-
   {%- set tmp = {} -%}
-  {%- for config in all_net.values() if 'vlan' in config -%}
+  {%- for name, config in all_net.items() if 'vlan' in config and name not in host_exclude_nets -%}
   {{- tmp.update({
     'bond0.' + config.vlan | string: lookup('template', repo_base_dir + '/files/kvm_hv/vlan.netdev.j2', template_vars=config)
     }) -}}
@@ -28,7 +31,7 @@ __networkd_vlan_netdevs: >-
 
 __networkd_bridge_netdevs: >-
   {%- set tmp = {} -%}
-  {%- for name, config in all_net.items() if 'vlan' in config -%}
+  {%- for name, config in all_net.items() if 'vlan' in config and name not in host_exclude_nets -%}
   {{- tmp.update({
       name | upper: lookup('template', repo_base_dir + '/files/kvm_hv/bridge.netdev.j2', template_vars={'name': name, 'config': config})
     }) -}}
@@ -42,7 +45,7 @@ networkd_netdevs: "{{ __networkd_bond_netdevs | combine(__networkd_vlan_netdevs,
 
 __networkd_vlan_configs: >-
   {%- set tmp = {} -%}
-  {%- for name, config in all_net.items() if 'vlan' in config -%}
+  {%- for name, config in all_net.items() if 'vlan' in config and name not in host_exclude_nets -%}
   {{- tmp.update({
       'bond0.' + config.vlan | string: lookup('template', repo_base_dir + '/files/kvm_hv/bond.network.j2', template_vars={'name': name, 'config': config})
     }) -}}
@@ -51,7 +54,7 @@ __networkd_vlan_configs: >-
 
 __networkd_bridge_configs: >-
   {%- set tmp = {} -%}
-  {%- for name, config in all_net.items() if 'vlan' in config -%}
+  {%- for name, config in all_net.items() if 'vlan' in config and name not in host_exclude_nets -%}
   {{- tmp.update({
       name | upper: lookup('template', repo_base_dir + '/files/kvm_hv/bridge.network.j2', template_vars={'name': name, 'config': config})
     }) -}}

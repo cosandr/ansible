@@ -15,6 +15,10 @@
     "dhcp_range": subnets.general.clients | ansible.utils.ipv4 | last | default(""),
     "domain": "gen.{{ domains['hb'] }}",
   },
+  "public": {
+    "dhcp_range": subnets.public.clients | ansible.utils.ipv4 | last | default(""),
+    "domain": "pub.{{ domains['hb'] }}",
+  },
 } %}
 
 {% set __internal_net_late_merge = {

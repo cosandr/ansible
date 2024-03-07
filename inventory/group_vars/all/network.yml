@@ -64,6 +64,15 @@ home_net:
     upnp: true
     dhcp_range: 10.0.50.128/25
     domain: gen.{{ domains['hb'] }}
+  public:
+    cidr: 10.0.55.0/24
+    vlan: 55
+    mt_lists:
+      - LAN
+      - NOSEC
+    upnp: true
+    dhcp_range: 10.0.55.128/25
+    domain: pub.{{ domains['hb'] }}
 
 internal_net:
   mgmt:
@@ -174,6 +183,16 @@ subnets:
       - 10.0.50.80/28
     clients:
       - 10.0.50.128/25
+  public:
+    switches:
+      - 10.0.55.0/28
+    hosts:
+      - 10.0.55.16/28
+    vips:
+      - 10.0.55.32/27
+    clients:
+      - 10.0.55.64/26
+      - 10.0.55.128/25
   mgmt:
     switches:
       - 10.0.100.0/28

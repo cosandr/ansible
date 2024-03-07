@@ -12,4 +12,11 @@ mt_bridge_ports: >-
   {%- endfor -%}
   {{ tmp | flatten | sort }}
 
-mt_networks: "{{ all_net }}"
+host_exclude_nets: []
+
+mt_networks: >-
+  {%- set tmp = {} -%}
+  {%- for name, config in all_net.items() if name not in host_exclude_nets -%}
+  {{- tmp.update({name: config}) -}}
+  {%- endfor -%}
+  {{ tmp }}

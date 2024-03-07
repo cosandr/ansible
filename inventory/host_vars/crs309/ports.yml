@@ -1,5 +1,8 @@
 ---
 
+host_exclude_nets:
+  - public
+
 mt_trunk_ports: [
   sfp-sfpplus1, sfp-sfpplus2, sfp-sfpplus3, sfp-sfpplus4,
   sfp-sfpplus5, sfp-sfpplus6, sfp-sfpplus7, sfp-sfpplus8,

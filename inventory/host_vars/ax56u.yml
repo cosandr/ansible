@@ -1,5 +1,15 @@
 ---
 
+ansible_user: admin
+
 mt_dns_entries:
   - name: "{{ inventory_hostname }}.{{ domains['hb'] }}"
     address: "{{ ansible_host }}"
+
+merlin_tagged_port: eth0
+
+merlin_guest_interfaces:
+  - name: "wl0.1"
+    vlan: PUBLIC
+
+merlin_access_ports: [eth1, eth2, eth3, eth4, eth5, eth6]

@@ -8,14 +8,27 @@ mt_bonds:
     lacp-rate: 1sec
     mtu: 9000
 
-mt_trunk_ports: [sfp-sfpplus1]
+mt_trunk_ports:
+  - vlan: VM
+    ports: [sfp-sfpplus1]
+  - vlan: KUBE
+    ports: [sfp-sfpplus1]
+  - vlan: TALOS
+    ports: [sfp-sfpplus1]
+  - vlan: GENERAL
+    ports: [sfp-sfpplus1, ether6]
+  - vlan: PUBLIC
+    ports: [ether6]
+  - vlan: MGMT
+    ports: [sfp-sfpplus1]
+  - vlan: SAN
+    ports: [sfp-sfpplus1]
 
 mt_access_ports:
   - vlan: GENERAL
     ports:
       - ether1
       - ether5
-      - ether6
       - ether7
 
   - vlan: MGMT

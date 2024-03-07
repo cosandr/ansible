@@ -1,5 +1,8 @@
 ---
 
+host_exclude_nets:
+  - public
+
 mt_vlan_legacy: true
 
 mt_bridge_ports: [

@@ -40,6 +40,16 @@ home_net:
     vlan: 50
     mt_lists: [LAN, NOSEC]
     upnp: true
+  public:
+{% if 'cidr' in supernets %}
+    cidr: "{{ supernets.cidr | ansible.utils.ipsubnet(24, 55) }}"
+{% endif %}
+{% if 'cidr6' in supernets %}
+    cidr6: "{{ supernets.cidr6 | ansible.utils.ipsubnet(64, 55) }}"
+{% endif %}
+    vlan: 55
+    mt_lists: [LAN, NOSEC]
+    upnp: true
 
 internal_net:
   mgmt:
