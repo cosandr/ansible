@@ -41,6 +41,11 @@ alertmanager_route:
         - alertname="ContainerCpuUsage"
         - name=~"plex.*"
 
+    - group_wait: 30m
+      matchers:
+        - alertname="HostSystemdServiceCrashed"
+        - name="wireguard_reresolve-dns.service"
+
 alertmanager_inhibit_rules:
   # Only fire one out of memory alert
   - source_matchers:
