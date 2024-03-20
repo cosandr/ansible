@@ -3,11 +3,12 @@
 chroot_path: ""
 
 networkd_install: "{{ not chroot_path }}"
-resolved_link_stub: true
 networkd_provisioning_synced: true
 networkd_restart: "{{ networkd_immediate }}"
 networkd_immediate: true
 networkd_netdevs: {}
+# bool filter doesn't work as expected for some reason
+networkd_service_enabled: "{{ true if networkd_config else false }}"
 networkd_config:
   wired: |
     [Match]
@@ -22,10 +23,9 @@ networkd_config:
     [Network]
     DHCP=yes
 
-networkd_services:
-  - "systemd-networkd.service"
-  - "systemd-resolved.service"
-
 networkd_links: {}
 
+resolved_link_stub: "{{ not resolv_config | default(false) }}"
 resolved_config: {}
+resolved_service_enabled: "{{ true if resolved_config else false }}"
+resolved_immediate: "{{ networkd_immediate }}"

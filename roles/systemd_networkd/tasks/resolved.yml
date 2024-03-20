@@ -53,3 +53,15 @@
     state: absent
   notify: Restart systemd-resolved
   when: not resolved_config
+
+- name: Configure systemd-resolved service state
+  ansible.builtin.systemd:
+    name: systemd-resolved.service
+    enabled: "{{ resolved_service_enabled }}"
+    state: "{{ ('started' if resolved_service_enabled else 'stopped') if resolved_immediate | bool else omit }}"
+  when: not chroot_path
+
+- name: Configure systemd-resolved service state (chroot)  # noqa no-changed-when
+  ansible.builtin.command: >-
+    arch-chroot {{ chroot_path }} systemctl {{ 'enable' if resolved_service_enabled else 'disable' }} systemd-resolved.service
+  when: chroot_path

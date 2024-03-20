@@ -110,7 +110,6 @@
   notify: Restart systemd-networkd
   when: networkd_provisioning_synced
 
-
 - name: Include resolved configuration
   ansible.builtin.include_tasks:
     file: resolved.yml
@@ -140,16 +139,14 @@
         name: NetworkManager
         enabled: false
 
-- name: "Ensure systemd-networkd services are enabled {{ 'and started' if networkd_immediate | bool else '' }}"
+- name: Configure systemd-networkd service state
   ansible.builtin.systemd:
-    name: "{{ item }}"
-    enabled: true
-    state: "{{ 'started' if networkd_immediate | bool else omit }}"
-  loop: "{{ networkd_services }}"
+    name: systemd-networkd.service
+    enabled: "{{ networkd_service_enabled }}"
+    state: "{{ ('started' if networkd_service_enabled else 'stopped') if networkd_immediate | bool else omit }}"
   when: not chroot_path
 
-- name: Enable systemd-networkd services (chroot)
+- name: Configure systemd-networkd service state (chroot)  # noqa no-changed-when
   ansible.builtin.command: >-
-    arch-chroot {{ chroot_path }} systemctl enable {{ item }}
-  loop: "{{ networkd_services }}"
+    arch-chroot {{ chroot_path }} systemctl {{ 'enable' if networkd_service_enabled else 'disable' }} systemd-networkd.service
   when: chroot_path
