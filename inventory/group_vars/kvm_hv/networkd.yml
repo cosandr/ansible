@@ -10,9 +10,11 @@ __bond0_backup_iface: "eno1"
 host_exclude_nets:
   - public
 
-resolved_config:
-  DNS: "{{ all_net.mgmt.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
-  FallbackDNS: "1.1.1.1 8.8.8.8"
+resolv_config: |
+  nameserver {{ hostvars['rb5009'].host_ips[host_net] }}
+  nameserver 1.1.1.1
+  nameserver 8.8.8.8
+  search {{ domains['hb'] }}{% for net in host_ips.keys() if all_net[net].domain is defined %} {{ all_net[net].domain }}{% endfor %}
 
 host_bridge_config:
   mgmt:

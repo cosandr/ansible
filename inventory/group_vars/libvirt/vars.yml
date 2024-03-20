@@ -95,10 +95,11 @@ vm_default_definition:
 
 libvirt_vms: ["{{ vm_default_definition }}"]
 
-resolved_config:
-  DNS: "{{ vm_default_nic.dns_servers | first }}"
-  FallbackDNS: "{{ vm_default_nic.dns_servers[1:] | join(' ') }}"
-  Domains: "{{ domains['hb'] }} {{ all_net[host_net].domain }}"
+resolv_config: |
+  {% for ns in vm_default_nic.dns_servers %}
+  nameserver {{ ns }}
+  {% endfor %}
+  search {{ domains['hb'] }} {{ all_net[host_net].domain }}
 
 host_nic_names: >-
   {%- set tmp = [] -%}

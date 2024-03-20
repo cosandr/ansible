@@ -1,5 +1,16 @@
 ---
 
+- name: Configure /etc/resolv.conf
+  ansible.builtin.copy:
+    content: "{{ resolv_config }}"
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: "0644"
+    follow: false
+  when: resolv_config | default('')
+  tags: ["resolv"]
+
 - name: Setup systemd-networkd
   ansible.builtin.include_role:
     name: systemd_networkd

@@ -169,6 +169,17 @@
             remote_src: true
             force: false
 
+    - name: Configure /etc/resolv.conf
+      ansible.builtin.copy:
+        content: "{{ resolv_config }}"
+        dest: /etc/resolv.conf
+        owner: root
+        group: root
+        mode: "0644"
+        follow: false
+      when: resolv_config | default('')
+      tags: ["resolv"]
+
   handlers:
     - name: Dracut regenerate  # noqa no-changed-when
       become: true

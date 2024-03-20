@@ -1,6 +1,7 @@
 ---
 
-resolved_config:
-  DNS: "{{ all_net.general.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}"
-  FallbackDNS: "1.1.1.1 8.8.8.8"
-  Domains: "{{ domains['hb'] }} vm.{{ domains['hb'] }}"
+resolv_config: |
+  nameserver {{ hostvars['rb5009'].host_ips[host_net] }}
+  nameserver 1.1.1.1
+  nameserver 8.8.8.8
+  search {{ domains['hb'] }}{% for conf in all_net.values() if conf.domain is defined %} {{ conf.domain }}{% endfor %}
