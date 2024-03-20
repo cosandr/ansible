@@ -2,7 +2,7 @@
 Name=bond0
 
 [Network]
-{% for vid in all_net | dict2items | map(attribute='value') | selectattr('vlan', 'defined') | map(attribute='vlan') | sort %}
+{% for vid in all_net | dict2items | rejectattr('key', 'in', host_exclude_nets) | map(attribute='value') | selectattr('vlan', 'defined') | map(attribute='vlan') | sort %}
 VLAN=bond0.{{ vid }}
 {% endfor %}
 LinkLocalAddressing=no
