@@ -4,7 +4,7 @@ pg_cert_installed: true
 pg_cert_pg_user: "certs_pusher"
 pg_cert_pg_password: "{{ hostvars['pg01'].vault_postgresql_passwords.certs_pusher }}"
 
-pg_cert_default_owner: lego
+pg_cert_default_owner: "lego"
 pg_cert_default_group: "lego"
 
 pg_cert_pull_pre_script: |
@@ -27,3 +27,7 @@ pg_cert_pull: >-
   }) -}}
   {%- endfor -%}
   {{ tmp }}
+
+pg_cert_config_owner: "root"
+pg_cert_config_group: "lego"
+pg_cert_config_mode: "0640"
