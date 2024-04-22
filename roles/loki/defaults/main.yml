@@ -23,3 +23,12 @@ loki_alert_rules_files: []
 loki_extra_config: {}
 loki_ruler_config:
   enable_alertmanager_v2: true
+
+loki_schema_configs:
+  - from: 2020-10-24
+    store: boltdb-shipper
+    object_store: filesystem
+    schema: v11
+    index:
+      prefix: index_
+      period: 24h
