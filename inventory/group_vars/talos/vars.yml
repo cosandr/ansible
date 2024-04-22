@@ -30,6 +30,5 @@ talos_image: "factory.talos.dev/installer/{{ talos_schematic }}:v{{ talos_versio
 
 talos_kubectl_context: "admin@{{ kube_api_server }}"
 
-vm_mdev_uuids: "{{ hostvars[vm_host].intel_gvt_enabled | ternary(['talos' | to_uuid], []) }}"
 # Keep disabled for security, I guess
 enable_admin_pods: false

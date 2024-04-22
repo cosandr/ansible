@@ -5,6 +5,10 @@ vm_host: "{{ vm_host_list[groups['talos'] | ansible.utils.index_of('eq', invento
 vm_template: false
 vm_customize: false
 vm_autostart: false
+# Disable for now, seems unstable
+# VM freezes with "gvt: guest page write error", requiring hard host reset
+# Ref. https://github.com/intel/gvt-linux/issues/188
+# vm_mdev_uuids: "{{ hostvars[vm_host].intel_gvt_enabled | ternary(['talos' | to_uuid], []) }}"
 
 vm_extra_disks:
   # Used by OpenEBS LVM provisioner
