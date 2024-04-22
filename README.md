@@ -26,26 +26,6 @@ wg genpsk
 gopass edit -c network/<inventory_hostname>_wg_psk
 ```
 
-## kubespray
-
-Run kube playbook first
-
-```sh
-./playbooks/kube.yml -t system
-```
-
-If IPs were changed or hosts were added/removed, BGP peers must also be updated
-
-```sh
-./playbooks/mikrotik.yml -l rb5009 -t bgp
-```
-
-Run Ansible from the kubespray submodule
-
-```sh
-ansible-playbook -i ../inventory --vault-password-file ../gopass-vault.sh cluster.yml
-```
-
 ## sshjail
 
 ```sh
@@ -118,4 +98,47 @@ Cleanup
 yq -iy 'map(del(.".id"))' /tmp/rb5009.yml
 sed -i -E "/^  (log|disabled): false.*/d;/^  log-prefix: ''/d;/^-.*/i\\ " /tmp/rb5009.yml
 sed -i 's/^ $//g' /tmp/rb5009.yml
+```
+
+## Kubernetes
+
+### Remove Intel GPU stuff
+
+```sh
+kubectl delete ns inteldeviceplugins-system
+kubectl delete ns node-feature-discovery
+kubectl delete nodefeaturerules.nfd.k8s-sigs.io intel-dp-devices
+kubectl delete nodefeaturerules.nfd.k8s-sigs.io intel-gpu-platform-labeling
+kubectl delete crd nodefeatures.nfd.k8s-sigs.io
+kubectl delete crd nodefeaturerules.nfd.k8s-sigs.io
+```
+
+### kubespray
+
+Run kube playbook first
+
+```sh
+./playbooks/kube.yml -t system
+```
+
+If IPs were changed or hosts were added/removed, BGP peers must also be updated
+
+```sh
+./playbooks/mikrotik.yml -l rb5009 -t bgp
+```
+
+Run Ansible from the kubespray submodule
+
+```sh
+ansible-playbook -i ../inventory --vault-password-file ../gopass-vault.sh cluster.yml
+```
+
+### Talos
+
+Setup config
+
+```sh
+./playbooks/talos.yml -t config,host -e force=true
+cd /tmp/talos-config
+export TALOSCONFIG=$(realpath ./talosconfig)
 ```
