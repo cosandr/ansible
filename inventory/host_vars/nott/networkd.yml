@@ -1,3 +1,4 @@
 ---
 
-__bond0_backup_iface: "enp3s0"
+__bond0_primary_iface: "enp2s0f1np1"
+__bond0_backup_iface: "enp87s0"
