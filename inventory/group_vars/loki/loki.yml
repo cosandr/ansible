@@ -12,8 +12,6 @@ loki_extra_config:
     delete_request_cancel_period: 15m
     delete_request_store: filesystem
   limits_config:
-    # TODO: Remove after new schema is in use
-    allow_structured_metadata: false
     deletion_mode: filter-and-delete
     retention_period: 365d
   query_range:
