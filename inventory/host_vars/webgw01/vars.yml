@@ -32,3 +32,11 @@ networkd_config:
 
 host_nic_names:
   - eth0
+
+node_exporter_no_collectors:
+  - mdadm
+  - zfs
+  - xfs
+  - bcache
+  - textfile
+  - arp

@@ -20,3 +20,11 @@ networkd_config:
 
 host_nic_names:
   - enp1s0
+
+node_exporter_no_collectors:
+  - mdadm
+  - zfs
+  - xfs
+  - bcache
+  - textfile
+  - arp
