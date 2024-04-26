@@ -104,9 +104,16 @@ sed -i 's/^ $//g' /tmp/rb5009.yml
 
 ### Remove Intel GPU stuff
 
+https://kubernetes-sigs.github.io/node-feature-discovery/v0.15/deployment/uninstallation.html
+
 ```sh
 kubectl delete ns inteldeviceplugins-system
 kubectl delete ns node-feature-discovery
+
+kubectl apply -k 'https://github.com/kubernetes-sigs/node-feature-discovery/deployment/overlays/prune?ref=v0.15.4'
+kubectl -n node-feature-discovery wait job.batch/nfd-master --for=condition=complete
+kubectl delete -k 'https://github.com/kubernetes-sigs/node-feature-discovery/deployment/overlays/prune?ref=v0.15.4'
+
 kubectl delete nodefeaturerules.nfd.k8s-sigs.io intel-dp-devices
 kubectl delete nodefeaturerules.nfd.k8s-sigs.io intel-gpu-platform-labeling
 kubectl delete crd nodefeatures.nfd.k8s-sigs.io
