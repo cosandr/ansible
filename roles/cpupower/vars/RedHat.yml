@@ -1,0 +1,4 @@
+---
+
+cpupower_package_name: "kernel-tools"
+cpupower_config_file: "/etc/sysconfig/cpupower"

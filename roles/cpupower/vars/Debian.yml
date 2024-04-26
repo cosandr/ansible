@@ -1,0 +1,4 @@
+---
+
+cpupower_package_name: "linux-cpupower"
+cpupower_config_file: "/etc/default/cpupower"

@@ -1,25 +1,46 @@
 ---
 
-- name: Install kernel-tools
-  ansible.builtin.dnf:
-    name: kernel-tools
+- name: Include OS vars
+  ansible.builtin.include_vars:
+    file: "{{ ansible_os_family }}.yml"
+
+- name: Install cpupower
+  ansible.builtin.package:
+    name: "{{ cpupower_package_name }}"
     state: present
-  when: ansible_os_family == 'RedHat'
   tags: ["install"]
 
-- name: Configure cpupower
-  ansible.builtin.lineinfile:
-    path: /etc/sysconfig/cpupower
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-  loop:
-    - regexp: '^CPUPOWER_START_OPTS='
-      line: 'CPUPOWER_START_OPTS="frequency-set -g {{ cpupower_start_governor }}"'
-    - regexp: '^CPUPOWER_STOP_OPTS='
-      line: 'CPUPOWER_STOP_OPTS="frequency-set -g {{ cpupower_stop_governor }}"'
-  loop_control:
-    label: "{{ item.regexp }}"
+# https://src.fedoraproject.org/rpms/kernel-tools/blob/f39/f/cpupower.config
+- name: Copy cpupower config file
+  ansible.builtin.template:
+    src: cpupower.config.j2
+    dest: "{{ cpupower_config_file }}"
+    owner: root
+    group: root
+    mode: "0644"
   notify: Restart cpupower service
+
+# https://bugzilla.redhat.com/show_bug.cgi?id=2263054
+- name: Check if service exists
+  ansible.builtin.stat:
+    path: /usr/lib/systemd/system/cpupower.service
+  register: svc_check
+
+# https://src.fedoraproject.org/rpms/kernel-tools/blob/f39/f/cpupower.service
+- name: Copy cpupower service file
+  ansible.builtin.copy:
+    src: cpupower.service
+    dest: /etc/systemd/system/cpupower.service
+    owner: root
+    group: root
+    mode: "0644"
+  when: not svc_check.stat.exists
+  notify:
+    - Reload systemd
+    - Restart cpupower service
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Enable and start cpupower service
   ansible.builtin.systemd:
