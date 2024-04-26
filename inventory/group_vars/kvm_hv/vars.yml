@@ -27,12 +27,7 @@ __dnf_automatic_excludes_3:
   - "libvirt*"
   - "qemu*"
 
-# https://github.com/intel/gvt-linux/wiki/GVTg_Setup_Guide#53-create-vgpu-kvmgt-only
-intel_gvt_enabled: true
-intel_gvt_pci: "0000:00:02.0"
-intel_gvt_vgpus:
-  - name: talos
-    type: i915-GVTg_V5_4
+intel_gvt_enabled: false
 
 # Remove once all hosts are expected to be up all the time
 prometheus_ignore_down: true

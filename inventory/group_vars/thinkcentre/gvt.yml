@@ -1,0 +1,8 @@
+---
+
+# https://github.com/intel/gvt-linux/wiki/GVTg_Setup_Guide#53-create-vgpu-kvmgt-only
+intel_gvt_enabled: true
+intel_gvt_pci: "0000:00:02.0"
+intel_gvt_vgpus:
+  - name: talos
+    type: i915-GVTg_V5_4

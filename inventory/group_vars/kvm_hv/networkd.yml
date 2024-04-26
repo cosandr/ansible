@@ -4,9 +4,6 @@
 # https://serverfault.com/questions/1106863/bridge-on-a-bonded-interface-with-systemd-networkd
 # https://www.reddit.com/r/linux/comments/30hk8e/creating_a_bridge_for_virtual_machines_using/
 
-__bond0_primary_iface: "enp1s0"
-__bond0_backup_iface: "eno1"
-
 host_exclude_nets:
   - public
 

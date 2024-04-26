@@ -6,7 +6,18 @@ libvirt_vm_engine: "kvm"
 libvirt_vm_default_uuid_deterministic: true
 
 vm_disk_format: "raw"
-vm_host_list: "{{ groups['kvm_hv'] }}"
+# Alternative but can't figure out how to get 1st item from all elements
+# dict(groups['kvm_hv'] | zip(groups['kvm_hv'] | map('extract', hostvars, 'host_num'), strict=true)) | dictsort(false, 'value')
+vm_host_list: >-
+  {%- set tmp = {} -%}
+  {%- for name in groups['kvm_hv'] -%}
+  {{- tmp.update({name: hostvars[name].host_num}) -}}
+  {%- endfor -%}
+  {%- set tmp2 = [] -%}
+  {%- for item in tmp | dictsort(false, 'value') -%}
+  {{- tmp2.append(item[0]) -}}
+  {%- endfor -%}
+  {{ tmp2 }}
 vm_host: "{{ vm_host_list[0] }}"
 vm_cpus: 4
 vm_mem: 4096
