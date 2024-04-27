@@ -1,0 +1,4 @@
+---
+
+__host_ips_3:
+  vpro: "{{ subnets.vpro[host_subnet] | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"

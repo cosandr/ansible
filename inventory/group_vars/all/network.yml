@@ -12,8 +12,14 @@
 # List of IPs with same number in a subnet
 # "{{ subnets | dict2items | map(attribute='value') | map(attribute='vips') | ansible.utils.ipv4 | ipaddr(2) | ipaddr('address') }}"
 
-host_ips_group: "{{ {host_net: ansible_host} }}"
-host_ips: "{{ (host_ips_group | default({})) | combine(host_ips_host | default({})) }}"
+host_ips: >-
+  {%- set tmp = {} -%}
+  {%- for i in range(1, 4) -%}
+  {{- tmp.update(lookup('ansible.builtin.vars', '__host_ips_' + (i | string), default={})) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__host_ips_2: "{{ {host_net: ansible_host} }}"
 host_ips_with_prefix: >-
   {%- set tmp = {} -%}
   {%- for net_name, addr in host_ips.items() if net_name in all_net -%}
@@ -83,6 +89,15 @@ internal_net:
       - SEC
     dhcp_range: 10.0.100.128-10.0.100.254
     domain: man.{{ domains['hb'] }}
+  vpro:
+    cidr: 10.0.108.0/24
+    vlan: 108
+    mt_lists:
+      - LAN
+      - SEC
+      - NOWAN
+    dhcp_range: 10.0.108.128-10.0.108.254
+    domain: vpro.{{ domains['hb'] }}
   san:
     cidr: 10.0.2.0/24
     vlan: 2
@@ -204,6 +219,16 @@ subnets:
       - 10.0.100.64/27
     clients:
       - 10.0.100.128/25
+  vpro:
+    switches:
+      - 10.0.108.0/28
+    hosts:
+      - 10.0.108.16/28
+    vips:
+      - 10.0.108.32/27
+    clients:
+      - 10.0.108.64/26
+      - 10.0.108.128/25
   san:
     switches:
       - 10.0.2.0/28

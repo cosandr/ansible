@@ -26,6 +26,10 @@
     "dhcp_range": subnets.mgmt.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "man.{{ domains['hb'] }}",
   },
+  "vpro": {
+    "dhcp_range": subnets.vpro.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
+    "domain": "vpro.{{ domains['hb'] }}",
+  },
   "san": {
     "domain": "san.{{ domains['hb'] }}",
   },

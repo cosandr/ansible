@@ -3,6 +3,9 @@
 host_exclude_nets:
   - public
 
+trunk_exclude_nets:
+  - vpro
+
 mt_vlan_legacy: true
 
 mt_bridge_ports: [
@@ -12,10 +15,24 @@ mt_bridge_ports: [
   ether17, ether18, ether19, ether20, ether21, ether22, ether23, ether24,
 ]
 
-mt_trunk_ports: [
+__mt_trunk_ports: [
   sfp-sfpplus1, sfpplus2,
   ether12, ether13, ether14, ether15, ether16, ether17, ether18,
 ]
+
+__mt_trunk_ports_auto: >-
+  {%- set tmp = [] -%}
+  {%- for name, config in all_net.items() if 'vlan' in config and name not in host_exclude_nets + trunk_exclude_nets -%}
+  {{- tmp.append({'vlan': name.upper(), 'ports': __mt_trunk_ports}) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+__mt_trunk_ports_manual:
+  - vlan: VPRO
+    ports:
+      - sfp-sfpplus1
+
+mt_trunk_ports: "{{ __mt_trunk_ports_auto + __mt_trunk_ports_manual }}"
 
 mt_access_ports:
   - vlan: GENERAL
@@ -30,3 +47,10 @@ mt_access_ports:
       - ether9
       - ether10
       - ether11
+
+  - vlan: VPRO
+    ports:
+      - ether14  # Gerd
+      - ether15  # Ymir
+      - ether21  # Nari
+      - ether22  # Nott

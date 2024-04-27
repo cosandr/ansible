@@ -108,6 +108,13 @@ nott  host_num=6
 [ms01:vars]
 cpu_tier=1
 
+[vpro]
+gerd
+ymir
+
+[vpro:children]
+ms01
+
 [kvm_hv:vars]
 host_net=mgmt
 host_subnet=hosts

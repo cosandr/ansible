@@ -21,6 +21,8 @@ mt_trunk_ports:
     ports: [ether6]
   - vlan: MGMT
     ports: [sfp-sfpplus1]
+  - vlan: VPRO
+    ports: [sfp-sfpplus1]
   - vlan: SAN
     ports: [sfp-sfpplus1]
 

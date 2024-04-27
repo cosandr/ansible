@@ -1,6 +1,6 @@
 ---
 
-host_ips_group:
+__host_ips_2:
   mgmt: "{{ subnets.mgmt[host_subnet] | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"
   general: "{{ subnets.general[host_subnet] | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"
   san: "{{ subnets.san[host_subnet] | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"

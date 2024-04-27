@@ -2,6 +2,7 @@
 
 host_exclude_nets:
   - public
+  - vpro
 
 mt_trunk_ports: [
   sfp-sfpplus1, sfp-sfpplus2, sfp-sfpplus3, sfp-sfpplus4,

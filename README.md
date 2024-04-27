@@ -45,10 +45,15 @@ wget -O library/iocage.py https://raw.githubusercontent.com/fractalcells/ansible
 
 ```sh
 sudo pacman -S python-botocore python-boto3
-
 ```
 
-3. Add init/shutdown script in UI
+## ansible-pylibssh
+
+On MacOS, install `libssh` with Homebrew then
+
+```sh
+CFLAGS="-I $(brew --prefix)/include -I ext -L $(brew --prefix)/lib -lssh" pip install ansible-pylibssh
+```
 
 ## GCP
 
