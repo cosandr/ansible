@@ -6,7 +6,7 @@
 	url = git@github.com:cosandr/ansible-grafana.git
 [submodule "roles/nginx"]
 	path = roles/nginx
-	url = https://github.com/geerlingguy/ansible-role-nginx.git
+	url = git@github.com:cosandr/ansible-role-nginx.git
 [submodule "roles/unattended-upgrades"]
 	path = roles/unattended-upgrades
 	url = git@github.com:cosandr/ansible-role-unattended-upgrades.git

@@ -20,6 +20,10 @@ nginx_vhosts:
     server_name: default_reject
     template: "{{ repo_base_dir }}/files/webgw/nginx/default_reject.conf.j2"
 
+  - filename: status.conf
+    server_name: status
+    template: "{{ repo_base_dir }}/roles/nginx_exporter/templates/status.conf.j2"
+
   - filename: ha.conf
     server_name: ha
     upstream_name: ha_ta

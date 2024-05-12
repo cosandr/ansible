@@ -21,6 +21,7 @@ declare -A remote_map=(
     ["roles/grafana"]="https://github.com/cloudalchemy/ansible-grafana.git"
     ["roles/libvirt_vm"]="https://github.com/stackhpc/ansible-role-libvirt-vm.git"
     ["roles/postgresql"]="https://github.com/geerlingguy/ansible-role-postgresql.git"
+    ["roles/nginx"]="https://github.com/geerlingguy/ansible-role-nginx.git"
     ["roles/prometheus"]="https://github.com/cloudalchemy/ansible-prometheus.git"
     ["roles/wireguard"]="https://github.com/githubixx/ansible-role-wireguard.git"
     ## DEPRECATED
