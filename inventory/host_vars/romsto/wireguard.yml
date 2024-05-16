@@ -16,7 +16,6 @@ mt_wg_allowed_addresses:
   - "{{ wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') }}"
   - "10.1.0.0/24"
 
-wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
 wireguard_endpoint: "{{ vault_wireguard_endpoint }}"

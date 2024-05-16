@@ -13,12 +13,13 @@ wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
   - "{{ home_net.vm.cidr }}"
 
-wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
 wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
 wireguard_reresolve_dns: true
+wireguard_reresolve_dns_retries: 5
+wireguard_reresolve_dns_retry_delay: 30
 
 wireguard_unmanaged_peers:
   mt:

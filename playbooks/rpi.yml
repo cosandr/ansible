@@ -122,8 +122,8 @@
 
     - role: wireguard
       when:
-        - wireguard_address is defined
-        - wireguard_address | length > 0
+        - wireguard_addresses is defined
+        - wireguard_addresses | length > 0
       tags: ["wireguard"]
 
     - role: socat_proxy

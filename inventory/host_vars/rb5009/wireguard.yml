@@ -2,7 +2,6 @@
 
 wireguard_addresses:
   - "{{ wireguard_ip }}/{{ wg_net[host_wg_net].cidr | ansible.utils.ipaddr('prefix') | string }}"
-wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
 

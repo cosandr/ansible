@@ -12,7 +12,6 @@ wireguard_mt_allowed_ips:
 wireguard_webgw_allowed_ips:
   - "{{ hostvars['webgw01'].wireguard_ip }}/32"
 
-wireguard_address: "{{ wireguard_addresses | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
 wireguard_persistent_keepalive: 300

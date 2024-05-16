@@ -166,5 +166,5 @@
       tags: ["nginx_exporter"]
 
     - role: wireguard
-      when: wireguard_address is defined
+      when: wireguard_addresses is defined
       tags: ["wireguard"]
