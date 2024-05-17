@@ -1,0 +1,13 @@
+---
+
+- name: Restart nut-server
+  ansible.builtin.systemd:
+    name: nut-server.service
+    state: restarted
+  when: nut_server
+
+- name: Restart nut-monitor
+  ansible.builtin.systemd:
+    name: nut-monitor.service
+    state: restarted
+  when: nut_client

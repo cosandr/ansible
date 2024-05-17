@@ -153,3 +153,11 @@
     - ansible_os_family == 'RedHat'
     - selinux_modules | default([])
   tags: ["selinux", "selinux_modules"]
+
+- name: Setup NUT
+  ansible.builtin.include_role:
+    name: nut
+    apply:
+      tags: ["nut"]
+  when: nut_upses | default([]) or nut_monitors | default([])
+  tags: ["nut"]

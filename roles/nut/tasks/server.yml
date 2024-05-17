@@ -1,0 +1,35 @@
+---
+
+- name: Install NUT server
+  ansible.builtin.package:
+    name: nut
+    state: present
+    update_cache: true
+  tags: ["install"]
+
+- name: Configure ups.conf
+  ansible.builtin.template:
+    src: ups.conf.j2
+    dest: "{{ nut_config_dir }}/ups.conf"
+    owner: root
+    group: nut
+    mode: "0640"
+  notify: Restart nut-server
+
+- name: Configure upsd users
+  ansible.builtin.template:
+    src: upsd.users.j2
+    dest: "{{ nut_config_dir }}/upsd.users"
+    owner: root
+    group: nut
+    mode: "0640"
+  notify: Restart nut-server
+
+- name: Configure upsd
+  ansible.builtin.template:
+    src: upsd.conf.j2
+    dest: "{{ nut_config_dir }}/upsd.conf"
+    owner: root
+    group: nut
+    mode: "0640"
+  notify: Restart nut-server

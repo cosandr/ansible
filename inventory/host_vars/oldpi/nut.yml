@@ -1,0 +1,26 @@
+---
+
+# Debian 11's NUT uses master/slave instead of primary/secondary as per current docs
+
+nut_config:
+  MODE: "netserver"
+
+nut_upses:
+  - name: apc
+    driver: usbhid-ups
+    port: auto
+
+nut_monitors:
+  - system: apc@localhost
+    username: admin
+    password: "{{ vault_nut_upsd_passwords.admin }}"
+    type: "master"
+
+nut_upsd_users:
+  - name: "admin"
+    password: "{{ vault_nut_upsd_passwords.admin }}"
+    upsmon: "master"
+
+  - name: "client"
+    password: "{{ vault_nut_upsd_passwords.client }}"
+    upsmon: "slave"

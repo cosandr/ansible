@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+
+# https://networkupstools.org/docs/man/ups.conf.html
+
+{% for k, v in nut_ups_config.items() %}
+{{ k }} = {{ v }}
+{% endfor %}
+
+{% for c in nut_upses %}
+[{{ c.name }}]
+{% for k, v in c.items() if k != "name" %}
+    {{ k }} = {{ v }}
+{% endfor %}
+{% endfor %}

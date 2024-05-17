@@ -1,0 +1,18 @@
+{{ ansible_managed | comment }}
+
+# https://networkupstools.org/docs/man/upsd.users.html
+
+{% for u in nut_upsd_users %}
+[{{ u.name }}]
+  password = {{ u.password }}
+{% if u.upsmon is defined %}
+  upsmon {{ u.upsmon }}
+{% endif %}
+{% if u.actions is defined %}
+  actions = {{ u.actions }}
+{% endif %}
+{% if u.instcmds is defined %}
+  instcmds = {{ u.instcmds }}
+{% endif %}
+
+{% endfor %}

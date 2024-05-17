@@ -1,0 +1,7 @@
+{{ ansible_managed | comment }}
+
+# https://networkupstools.org/docs/man/upsd.conf.html
+
+{% for k, v in nut_upsd_config.items() %}
+{{ k }} {{ v }}
+{% endfor %}

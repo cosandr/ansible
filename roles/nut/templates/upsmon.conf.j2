@@ -1,0 +1,11 @@
+{{ ansible_managed | comment }}
+
+# https://networkupstools.org/docs/man/upsmon.conf.html
+
+{% for k, v in nut_upsmon_config.items() %}
+{{ k }} "{{ v }}"
+{% endfor %}
+
+{% for m in nut_monitors %}
+MONITOR {{ m.system }} {{ m.powervalue | default(1) }} {{ m.username }} {{ m.password }} {{ m.type }}
+{% endfor %}

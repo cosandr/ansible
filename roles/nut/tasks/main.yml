@@ -1,0 +1,107 @@
+---
+
+- name: Include OS vars
+  ansible.builtin.include_vars:
+    file: "{{ ansible_os_family }}.yml"
+  when: nut_config_dir is not defined
+
+- name: Include server tasks
+  ansible.builtin.include_tasks:
+    file: server.yml
+  when: nut_server
+
+- name: Install NUT client
+  ansible.builtin.package:
+    name: nut-client
+    state: present
+    update_cache: true
+  when: not nut_server
+  tags: ["install"]
+
+- name: Remove server files
+  ansible.builtin.file:
+    path: "{{ nut_config_dir }}/{{ item }}"
+    state: absent
+  loop:
+    - ups.conf
+    - upsd.users
+    - upsd.conf
+  when: not nut_server
+
+- name: Configure upsmon.conf
+  ansible.builtin.template:
+    src: upsmon.conf.j2
+    dest: "{{ nut_config_dir }}/upsmon.conf"
+    owner: root
+    group: nut
+    mode: "0640"
+  notify: Restart nut-monitor
+
+- name: Configure nut.conf
+  ansible.builtin.template:
+    src: nut.conf.j2
+    dest: "{{ nut_config_dir }}/nut.conf"
+    owner: root
+    group: nut
+    mode: "0640"
+  notify:
+    - Restart nut-server
+    - Restart nut-monitor
+
+- name: Enable and start nut-server
+  ansible.builtin.systemd:
+    name: nut-server.service
+    state: started
+    enabled: true
+  when: nut_server
+
+- name: Disable and stop nut-server
+  ansible.builtin.systemd:
+    name: nut-server.service
+    state: stopped
+    enabled: false
+  register: __svc
+  failed_when:
+    - __svc.failed
+    - "'Could not find the requested service' not in __svc.msg"
+  when: not nut_server
+
+- name: Enable and start nut-monitor
+  ansible.builtin.systemd:
+    name: nut-monitor.service
+    state: started
+    enabled: true
+  when: nut_client
+
+- name: Disable and stop nut-monitor
+  ansible.builtin.systemd:
+    name: nut-monitor.service
+    state: stopped
+    enabled: false
+  register: __svc
+  failed_when:
+    - __svc.failed
+    - "'Could not find the requested service' not in __svc.msg"
+  when: not nut_client
+
+- name: Check if nut.target exists
+  ansible.builtin.stat:
+    path: "/usr/lib/systemd/system/nut.target"
+  register: nut_target_check
+
+- name: Enable nut.target
+  ansible.builtin.systemd:
+    name: nut.target
+    enabled: true
+  when:
+    - nut_target_check.stat.exists
+    - nut_client or nut_server
+
+- name: Disable nut.target
+  ansible.builtin.systemd:
+    name: nut.target
+    enabled: false
+  when:
+    - nut_target_check.stat.exists
+    - not nut_client
+    - not nut_server

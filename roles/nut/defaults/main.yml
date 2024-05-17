@@ -1,0 +1,32 @@
+---
+
+nut_server: "{{ nut_upsd_config and nut_upses and nut_upsd_users }}"
+nut_client: "{{ nut_config['MODE'] != 'none' }}"
+
+nut_config:
+  MODE: "none"
+
+nut_upsd_config:
+  LISTEN: "0.0.0.0"
+
+nut_monitors: []
+
+nut_upses: []
+nut_ups_config:
+  maxretry: 3
+
+nut_upsd_users:
+  - name: "admin"
+    upsmon: "primary"
+
+nut_upsmon_config:
+  DEADTIME: 15
+  FINALDELAY: 5
+  HOSTSYNC: 15
+  MINSUPPLIES: 1
+  NOCOMMWARNTIME: 300
+  POLLFREQ: 5
+  POLLFREQALERT: 5
+  POWERDOWNFLAG: "/etc/killpower"
+  RBWARNTIME: 43200
+  SHUTDOWNCMD: "/sbin/shutdown -h +0"

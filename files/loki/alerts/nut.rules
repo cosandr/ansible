@@ -1,0 +1,68 @@
+---
+
+groups:
+  - name: NUT Alerts
+    rules:
+      - alert: NutUpsDown
+        expr: sum by (host) (count_over_time({unit="nut-monitor.service"} |~ "Communications with UPS.*lost"[5m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: '{{ $labels.host }} has disconnected from UPS!'
+
+      - alert: NutUpsDownSyslog
+        expr: sum by (host) (count_over_time({program="upsmon"} |~ "Communications with UPS.*lost"[5m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: '{{ $labels.host }} has disconnected from UPS!'
+
+      - alert: NutUpsBattery
+        expr: sum by (host) (count_over_time({unit="nut-monitor.service"} |~ "UPS.*on battery"[5m])) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: '{{ $labels.host }} is running on UPS battery!'
+
+      - alert: NutUpsBatterySyslog
+        expr: sum by (host) (count_over_time({program="upsmon"} |~ "UPS.*on battery"[5m])) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: '{{ $labels.host }} is running on UPS battery!'
+
+      - alert: NutUpsBatteryLow
+        expr: sum by (host) (count_over_time({unit="nut-monitor.service"} |~ "UPS.*battery is low"[5m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: '{{ $labels.host }} UPS battery is low!'
+
+      - alert: NutUpsBatteryLowSyslog
+        expr: sum by (host) (count_over_time({program="upsmon"} |~ "UPS.*battery is low"[5m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: '{{ $labels.host }} UPS battery is low!'
+
+      - alert: NutUpsShutdown
+        expr: sum by (host) (count_over_time({unit="nut-monitor.service"} |~ "UPS.*forced shutdown in progress"[5m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: '{{ $labels.host }} UPS shutdown!'
+
+      - alert: NutUpsShutdownSyslog
+        expr: sum by (host) (count_over_time({program="upsmon"} |~ "UPS.*forced shutdown in progress"[5m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: '{{ $labels.host }} UPS shutdown!'

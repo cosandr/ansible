@@ -15,3 +15,7 @@ firewall_rules:
   - port: 5678
     source: "fe80::/64"
     protocol: "udp"
+
+  # NUT
+  - port: 3493
+    sources: "{{ subnets[host_net].hosts }}"

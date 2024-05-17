@@ -1,0 +1,7 @@
+{{ ansible_managed | comment }}
+
+# https://networkupstools.org/docs/man/nut.conf.html
+
+{% for k, v in nut_config.items() %}
+{{ k }}={{ v }}
+{% endfor %}
