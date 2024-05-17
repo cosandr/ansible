@@ -1,8 +1,0 @@
----
-
-__host_ips_3:
-  vpro: "{{ subnets.vpro[host_subnet] | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"
-
-__mt_dns_entries_host:
-  - name: "{{ inventory_hostname }}.{{ all_net.vpro.domain }}"
-    address: "{{ host_ips.vpro }}"

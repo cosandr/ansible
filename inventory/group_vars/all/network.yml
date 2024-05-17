@@ -89,15 +89,6 @@ internal_net:
       - SEC
     dhcp_range: 10.0.100.128-10.0.100.254
     domain: man.{{ domains['hb'] }}
-  vpro:
-    cidr: 10.0.108.0/24
-    vlan: 108
-    mt_lists:
-      - LAN
-      - SEC
-      - NOWAN
-    dhcp_range: 10.0.108.128-10.0.108.254
-    domain: vpro.{{ domains['hb'] }}
   san:
     cidr: 10.0.2.0/24
     vlan: 2
@@ -219,16 +210,6 @@ subnets:
       - 10.0.100.64/27
     clients:
       - 10.0.100.128/25
-  vpro:
-    switches:
-      - 10.0.108.0/28
-    hosts:
-      - 10.0.108.16/28
-    vips:
-      - 10.0.108.32/27
-    clients:
-      - 10.0.108.64/26
-      - 10.0.108.128/25
   san:
     switches:
       - 10.0.2.0/28

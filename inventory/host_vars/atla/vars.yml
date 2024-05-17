@@ -1,5 +1,0 @@
----
-
-# Disable while TPM2 is broken in kernel
-cryptenroll_crypttab_config: false
-luks_root_disk_password: ""

@@ -6,7 +6,6 @@
 
 host_exclude_nets:
   - public
-  - vpro
 
 resolv_config: |
   nameserver {{ hostvars['rb5009'].host_ips[host_net] }}
