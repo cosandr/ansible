@@ -31,3 +31,4 @@ nut_upsd_users:
 nut_exporter_env:
   NUT_EXPORTER_USERNAME: "exporter"
   NUT_EXPORTER_PASSWORD: "{{ vault_nut_upsd_passwords.exporter }}"
+  NUT_EXPORTER_VARIABLES: "battery.charge,battery.voltage,battery.voltage.nominal,input.voltage,input.voltage.nominal,ups.load,ups.status,battery.runtime"
