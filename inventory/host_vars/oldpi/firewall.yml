@@ -19,3 +19,7 @@ firewall_rules:
   # NUT
   - port: 3493
     sources: "{{ subnets[host_net].hosts }}"
+
+  # NUT exporter
+  - port: 9199
+    sources: "{{ node_exporter_allow_ips }}"

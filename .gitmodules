@@ -82,3 +82,6 @@
 [submodule "roles/lego"]
 	path = roles/lego
 	url = git@github.com:cosandr/ansible-role-lego.git
+[submodule "roles/nut_exporter"]
+	path = roles/nut_exporter
+	url = git@github.com:cosandr/ansible-role-nut_exporter.git

@@ -132,6 +132,10 @@
         - serial_proxies | length > 0
       tags: ["serial"]
 
+    - role: nut_exporter
+      when: nut_exporter_env | default({})
+      tags: ["nut_exporter"]
+
   handlers:
     - name: Reboot
       ansible.builtin.reboot: {}

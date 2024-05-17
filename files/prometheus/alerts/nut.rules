@@ -1,0 +1,26 @@
+groups:
+- name: NUT Exporter
+  rules:
+  - alert: NutHighLoad
+    expr: network_ups_tools_ups_load > 80
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: UPS {{ $labels.ups }} has high load {{ $value }}%
+
+  - alert: NutCriticalLoad
+    expr: network_ups_tools_ups_load > 95
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: UPS {{ $labels.ups }} has critical load {{ $value }}%
+
+  - alert: NutLowBattery
+    expr: network_ups_tools_battery_charge < 30 and on(ups) network_ups_tools_ups_status{flag="OB"} == 1
+    for: 0m
+    labels:
+      severity: critical
+    annotations:
+      summary: UPS {{ $labels.ups }} is low on battery [{{ $value }}%] and discharging

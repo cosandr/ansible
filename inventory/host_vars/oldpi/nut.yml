@@ -24,3 +24,10 @@ nut_upsd_users:
   - name: "client"
     password: "{{ vault_nut_upsd_passwords.client }}"
     upsmon: "slave"
+
+  - name: "exporter"
+    password: "{{ vault_nut_upsd_passwords.exporter }}"
+
+nut_exporter_env:
+  NUT_EXPORTER_USERNAME: "exporter"
+  NUT_EXPORTER_PASSWORD: "{{ vault_nut_upsd_passwords.exporter }}"
