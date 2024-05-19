@@ -15,7 +15,7 @@ vm_extra_disks:
   - type: block
     device: disk
     format: raw
-    dev: "/dev/{{ 'vg02' if vm_host == 'theia' else 'vg01' }}/k8s"
+    dev: "/dev/vg01/k8s"
     serial: "raw01"
     target: "vdb"
     driver_options:
