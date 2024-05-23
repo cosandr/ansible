@@ -65,4 +65,4 @@ __networkd_bond_configs:
   bond0_primary: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/bond0_primary.network.j2') }}"
   bond0_backup: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/bond0_backup.network.j2') }}"
 
-networkd_config: "{{ __networkd_bond_configs | combine(__networkd_vlan_configs, __networkd_bridge_configs) }}"
+networkd_config: "{{ __networkd_bond_configs | combine(__networkd_vlan_configs, __networkd_bridge_configs, __networkd_group_configs | default({})) }}"

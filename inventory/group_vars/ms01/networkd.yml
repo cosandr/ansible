@@ -2,3 +2,16 @@
 
 __bond0_primary_iface: "enp2s0f1np1"
 __bond0_backup_iface: "enp87s0"
+# Force vPro interface to always be up, if it's down it's impossible to connect with AMT
+__networkd_group_configs:
+  vpro: |
+    [Match]
+    Name=enp89s0
+
+    [Link]
+    RequiredForOnline=no
+    ActivationPolicy=always-up
+
+    [Network]
+    LinkLocalAddressing=no
+    IPv6AcceptRA=no
