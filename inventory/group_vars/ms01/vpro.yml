@@ -6,3 +6,5 @@ __host_ips_3:
 __mt_dns_entries_host:
   - name: "{{ inventory_hostname }}.vpro.{{ domains['hb'] }}"
     address: "{{ host_ips.vpro }}"
+
+grub_cmdline_group: "console=tty0 console=ttyS4,115200n8"
