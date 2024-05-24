@@ -19,7 +19,20 @@ chezmoi_overrides:
     NVIDIA_CORE_OFFSET="100"
     NVIDIA_MEM_OFFSET="1500"
     USE_AUTORANDR=0
+
+    export __GL_SYNC_TO_VBLANK=1
+    export __GL_SYNC_DISPLAY_DEVICE=DP-2
+    export VDPAU_NVIDIA_SYNC_DISPLAY_DEVICE=DP-2
+  lock: |
+    idle_hook=xidlehook_lock
+    WAYLAND_LOCKER=swaylock_screenshot
   xorg: |
     DPI=120
     MONITOR_MAP["DP-2"]="--primary --mode 3840x2160 --rate 144"
     MONITOR_MAP["HDMI-0"]="--mode 3840x2160 --rate 60 --above DP-2"
+  waybar.yaml: |
+    monitor_map:
+      desktop_main:
+        - "GIGA-BYTE TECHNOLOGY CO., LTD. Gigabyte M32U 21311B001327"
+      desktop_secondary:
+        - "Samsung Electric Company U24E850 HTHH300363"
