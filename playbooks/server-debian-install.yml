@@ -1,0 +1,470 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+# tail -f /mnt/debootstrap/debootstrap.log
+
+- name: Debian Install
+  hosts: servers
+  gather_facts: false
+  become: true
+  vars:
+    ansible_os_family: Debian
+    ansible_distribution: Debian
+    ansible_distribution_release: "bookworm"
+    chroot_path: "/mnt"
+    wipe_root_disk: false
+    luks_name: "cryptlvm01"
+    esp_label: "{{ ansible_distribution | upper }}-ESP"
+    boot_label: "{{ ansible_distribution | upper }}-BOOT"
+    btrfs_root_label: "{{ ansible_distribution | upper }}-BTRFS"
+    swap_label: "{{ ansible_distribution | upper }}-SWAP"
+    grub_cmdline: "intel_iommu=on nmi_watchdog=0"
+    # root_disk: "/dev/disk/by-id/"
+    debootstrap_exclude:
+      - ifupdown
+    debootstrap_include:
+      - apt-file
+      - bash-completion
+      - binutils
+      - btrfs-progs
+      - cryptsetup
+      - curl
+      - dosfstools
+      - dracut
+      - efibootmgr
+      - gdisk
+      - git
+      - grub-efi-amd64-signed
+      - grub-pc
+      - locales
+      - lvm2
+      - man-db
+      - net-tools
+      - nfs-common
+      - openssh-server
+      - parted
+      - python3-apt
+      - rsync
+      - shim-signed
+      - sudo
+      - systemd-timesyncd
+      - tpm-udev
+      - tpm2-tools
+      - vim
+      - wget
+      - zstd
+    mounts:
+      - path: /
+        subvol: "@"
+      - path: /home
+        subvol: "@home"
+      - path: /var/log
+        subvol: "@var_log"
+      - path: /.snapshots
+        subvol: "@snapshots"
+  pre_tasks:
+    - name: Sanity checks
+      ansible.builtin.assert:
+        that:
+          - ansible_limit | default(false)
+          - root_disk is defined
+          - root_disk.startswith('/dev/disk/by-id')
+          - btrfs_root is defined
+          - btrfs_opts is defined
+          - luks_passphrase is defined
+      tags: ["always"]
+
+    - name: Ensure required utils are present
+      ansible.builtin.apt:
+        name:
+          - arch-install-scripts
+          - btrfs-progs
+          - cryptsetup
+          - debootstrap
+          - dosfstools
+          - efibootmgr
+          - gdisk
+          - lvm2
+          - parted
+          - sudo
+          - tpm2-tools
+        state: present
+        update_cache: true
+      tags: ["utils"]
+
+    - name: Ensure root disk is valid block device
+      ansible.builtin.stat:
+        path: "{{ root_disk }}"
+        follow: true
+      register: root_disk_check
+      failed_when: not root_disk_check.stat.isblk
+      tags: ["always"]
+
+    - name: Wipe root disk
+      ansible.builtin.command: "sgdisk --zap-all {{ root_disk }}"
+      when: wipe_root_disk | bool
+      tags: ["partition"]
+
+    - name: Create ESP
+      community.general.parted:
+        name: ""
+        label: gpt
+        device: "{{ root_disk }}"
+        number: 1
+        state: present
+        fs_type: fat32
+        flags: [boot, esp]
+        part_start: "1MiB"
+        part_end: "257MiB"
+      tags: ["partition"]
+
+    - name: Create /boot
+      community.general.parted:
+        name: ""
+        label: gpt
+        device: "{{ root_disk }}"
+        number: 2
+        state: present
+        fs_type: ext4
+        part_start: "257MiB"
+        part_end: "769MiB"
+      tags: ["partition"]
+
+    - name: Create LUKS partition
+      community.general.parted:
+        name: ""
+        label: gpt
+        device: "{{ root_disk }}"
+        number: 3
+        state: present
+        part_start: "769MiB"
+        part_end: "100%"
+      tags: ["partition"]
+
+    - name: Create LUKS container
+      community.crypto.luks_device:
+        device: "{{ root_disk }}-part3"
+        state: present
+        passphrase: "{{ luks_passphrase }}"
+        type: luks2
+      tags: ["luks"]
+
+    - name: Open LUKS container
+      community.crypto.luks_device:
+        device: "{{ root_disk }}-part3"
+        state: opened
+        passphrase: "{{ luks_passphrase }}"
+        allow_discards: true
+        name: "{{ luks_name }}"
+      tags: ["luks"]
+
+    - name: Create ESP filesystem
+      community.general.filesystem:
+        dev: "{{ root_disk }}-part1"
+        fstype: vfat
+        opts: "-F 32 -n {{ esp_label }}"
+        state: present
+      tags: ["filesystem"]
+
+    - name: Create /boot filesystem
+      community.general.filesystem:
+        dev: "{{ root_disk }}-part2"
+        fstype: ext4
+        opts: "-L {{ boot_label }}"
+        state: present
+      tags: ["filesystem"]
+
+    - name: Create LVG
+      community.general.lvg:
+        vg: "vg01"
+        pvs: "/dev/mapper/{{ luks_name }}"
+        state: present
+      tags: ["lvm"]
+
+    - name: Create LVOLs
+      community.general.lvol:
+        vg: "vg01"
+        lv: "{{ item.name }}"
+        size: "{{ item.size }}"
+        state: present
+        shrink: false
+      loop:
+        - name: k8s
+          size: 150G
+        - name: swap
+          size: 16G
+        - name: root
+          size: "100%FREE"
+      tags: ["lvm"]
+
+    - name: Create BTRFS filesystem
+      community.general.filesystem:
+        dev: /dev/vg01/root
+        fstype: btrfs
+        opts: "-L {{ btrfs_root_label }}"
+        state: present
+      tags: ["filesystem"]
+
+    - name: Create swap filesystem
+      community.general.filesystem:
+        dev: "/dev/vg01/swap"
+        fstype: swap
+        opts: "-L {{ swap_label }}"
+        state: present
+      tags: ["filesystem", "swap"]
+
+    - name: Mount btrfs root
+      ansible.posix.mount:
+        src: "LABEL={{ btrfs_root_label }}"
+        path: "/btrfs_root"
+        opts: "{{ btrfs_opts }}"
+        state: mounted
+        fstype: btrfs
+        fstab: "/tmp/chroot.fstab"
+      tags: ["mount"]
+
+    - name: Create subvolumes
+      community.general.btrfs_subvolume:
+        name: "{{ item }}"
+        filesystem_label: "{{ btrfs_root_label }}"
+        state: present
+      loop: "{{ mounts | map(attribute='subvol') }}"
+      tags: ["subvols"]
+
+    - name: Mount BTRFS subvolumes
+      ansible.posix.mount:
+        src: "LABEL={{ btrfs_root_label }}"
+        path: "{{ chroot_path }}{{ item.path }}"
+        opts: "{{ btrfs_opts }},subvol={{ item.subvol }}"
+        state: mounted
+        fstype: btrfs
+        fstab: "/tmp/chroot.fstab"
+      loop: "{{ mounts }}"
+      tags: ["mount"]
+
+    - name: Mount /boot and ESP
+      ansible.posix.mount:
+        src: "LABEL={{ item.label }}"
+        path: "{{ chroot_path }}{{ item.path }}"
+        state: mounted
+        fstype: "{{ item.fstype }}"
+        fstab: "/tmp/chroot.fstab"
+      loop:
+        - label: "{{ boot_label }}"
+          path: "/boot"
+          fstype: ext4
+        - label: "{{ esp_label }}"
+          path: "/boot/efi"
+          fstype: vfat
+      tags: ["mount"]
+
+    - name: Install base packages
+      ansible.builtin.command: >-
+        debootstrap --arch amd64
+          --exclude={{ debootstrap_exclude | join(',') }}
+          --include={{ debootstrap_include | join(',') }}
+          {{ ansible_distribution_release | lower }} {{ chroot_path }} http://ftp.no.debian.org/debian
+      args:
+        creates: "{{ chroot_path }}/etc/fstab"
+      tags: ["bootstrap"]
+
+    - name: Copy apt sources
+      ansible.builtin.copy:
+        content: |
+          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} main
+          deb-src http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} main
+
+          deb http://security.debian.org/ {{ ansible_distribution_release | lower }}-security main
+          deb-src http://security.debian.org/ {{ ansible_distribution_release | lower }}-security main
+
+          deb http://deb.debian.org/debian {{ ansible_distribution_release | lower }}-backports main
+        dest: "{{ chroot_path }}/etc/apt/sources.list"
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["apt"]
+
+    - name: Install backports kernel and firewalld
+      ansible.builtin.command: "arch-chroot {{ chroot_path }} sh -c 'apt-get update -y && apt-get install -y firewalld linux-image-amd64/{{ ansible_distribution_release | lower }}-backports'"
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+      register: __apt
+      changed_when: "'0 newly installed' not in __apt.stdout"
+      tags: ["apt"]
+
+    - name: Configure fstab # noqa no-tabs
+      ansible.builtin.copy:
+        dest: "{{ chroot_path }}/etc/fstab"
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          # Static information about the filesystems.
+          # See fstab(5) for details.
+
+          # <file system> <dir> <type> <options> <dump> <pass>
+          LABEL={{ esp_label }} 	 /boot/efi 	 vfat 	 defaults,noatime,uid=0,gid=0,umask=077,shortname=winnt  	 0  2
+          LABEL={{ boot_label }} 	 /boot 	 ext4 	 defaults,noatime 	0  0
+          {% for m in mounts %}
+          LABEL={{ btrfs_root_label }} 	 {{ m.path }} 	 btrfs 	 {{ btrfs_opts }},subvol={{ m.subvol }} 	0  0
+          {% endfor %}
+          LABEL={{ swap_label }} 	 none 	 swap 	 defaults 0 0
+      tags: ["fstab"]
+
+    - name: Get LUKS partition UUID
+      changed_when: false
+      check_mode: false
+      ansible.builtin.command: "blkid -s UUID -o value {{ root_disk }}-part3"
+      register: root_blkid
+      tags: ["crypttab", "grub"]
+
+    - name: Write crypttab
+      ansible.builtin.copy:
+        content: |
+          cryptlvm01    UUID={{ root_blkid.stdout }}    -    luks,discard,tpm2-device=auto
+        dest: "{{ chroot_path }}/etc/{{ item }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - crypttab
+        - crypttab.initramfs
+      tags: ["crypttab"]
+
+  tasks:
+    - name: Write vconsole.conf
+      ansible.builtin.copy:
+        dest: "{{ chroot_path }}/etc/vconsole.conf"
+        owner: root
+        group: root
+        mode: "0644"
+        content: "{{ vconsole_conf | default('') }}\n"
+      tags: ["vconsole"]
+
+    - name: Set timezone
+      ansible.builtin.file:
+        src: "/usr/share/zoneinfo/{{ sys_timezone }}"
+        dest: "{{ chroot_path }}/etc/localtime"
+        owner: root
+        group: root
+        state: link
+      tags: ["time"]
+
+    - name: Sync hwclock
+      ansible.builtin.command: "arch-chroot {{ chroot_path }} hwclock --systohc"
+      args:
+        creates: "{{ chroot_path }}/etc/adjtime"
+      tags: ["time"]
+
+    - name: Configure networkd for DHCP
+      ansible.builtin.copy:
+        content: |
+          [Match]
+          Type=ether
+
+          [Network]
+          DHCP=yes
+        dest: "{{ chroot_path }}/etc/systemd/network/dhcp.network"
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["networkd"]
+
+    - name: Enable networkd
+      ansible.builtin.command:
+        cmd: "arch-chroot {{ chroot_path }} systemctl enable systemd-networkd"
+        creates: "{{ chroot_path }}/etc/systemd/system/multi-user.target.wants/systemd-networkd.service"
+      tags: ["networkd"]
+
+    - name: Configure /etc/resolv.conf
+      ansible.builtin.copy:
+        content: |
+          nameserver 1.1.1.1
+          nameserver 8.8.8.8
+        dest: "{{ chroot_path }}/etc/resolv.conf"
+        owner: root
+        group: root
+        mode: "0644"
+        follow: false
+      tags: ["resolv"]
+
+    - name: Configure root SSH keys
+      ansible.posix.authorized_key:
+        user: "root"
+        path: "{{ chroot_path }}/root/.ssh/authorized_keys"
+        key: "{{ ssh_authorized_keys | join('\n') }}"
+        state: present
+        exclusive: true
+      tags: ["ssh"]
+
+  roles:
+    - role: systemd_cryptenroll
+      vars:
+        luks_root_disk: "{{ root_disk }}-part3"
+        luks_root_disk_password: "{{ luks_passphrase }}"
+      tags: ["cryptenroll"]
+
+    - role: locale_conf
+      tags: ["locale"]
+
+    - role: sudo
+      tags: ["sudo"]
+
+    - role: sshd
+      tags: ["sshd"]
+
+    - role: hostname
+      tags: ["hostname"]
+
+  post_tasks:
+    - name: Configure dracut modules
+      ansible.builtin.copy:
+        content: |
+          add_dracutmodules+=" tpm2-tss "
+          hostonly="yes"
+          compress="zstd"
+        dest: "{{ chroot_path }}/etc/dracut.conf.d/90-custom.conf"
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["dracut"]
+
+    - name: Find latest installed kernel
+      ansible.builtin.find:
+        paths: "{{ chroot_path }}/lib/modules"
+        file_type: directory
+        depth: 1
+      register: installed_kernels
+      tags: ["dracut"]
+
+    - name: Regenerate initramfs
+      ansible.builtin.command:
+        # For some reason it doesn't automatically pick it up when running in chroot
+        cmd: >-
+          arch-chroot {{ chroot_path }} dracut -f
+          --include /etc/crypttab.initramfs /etc/crypttab
+          --kver {{ (installed_kernels.files | sort(attribute='ctime'))[-1].path | basename }}
+      tags: ["dracut"]
+
+    - name: Install grub
+      ansible.builtin.command:
+        cmd: >-
+          arch-chroot {{ chroot_path }} grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --uefi-secure-boot --removable
+        creates: "{{ chroot_path }}/boot/efi/EFI/BOOT/grubx64.efi"
+      tags: ["grub"]
+
+    - name: Configure grub
+      ansible.builtin.copy:
+        content: |
+          GRUB_TIMEOUT=2
+          GRUB_CMDLINE_LINUX="{{ grub_cmdline }}"
+        dest: "{{ chroot_path }}/etc/default/grub"
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["grub"]
+
+    - name: Update grub
+      ansible.builtin.command:
+        cmd: "arch-chroot {{ chroot_path }} update-grub"
+      tags: ["grub"]
