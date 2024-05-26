@@ -170,7 +170,7 @@ pacman_i3_packages:
   - python-i3ipc
   - qt5ct
   - redshift
-  - rofi
+  - rofi-wayland
   - scrot
   - thunar
   - thunar-archive-plugin
@@ -211,5 +211,6 @@ pacman_sway_packages:
   - xorg-xwayland
 
 aur_sway_packages:
+  - clipman
   - wdisplays
   - wev
