@@ -28,3 +28,7 @@ gitlab_external_url: "https://gitlab.{{ domains['dv'] }}"
 gitlab_registry_external_url: "https://{{ gitlab_registry_basename }}"
 
 my_user_pass: "{{ vault_my_user_pass }}"
+
+btrfs_root: "/mnt/btrfs_root"
+btrfs_opts: "compress=zstd:3,space_cache=v2"
+root_pass_hash: "{{ lookup('community.general.passwordstore', 'ansible/server_root_hash') }}"

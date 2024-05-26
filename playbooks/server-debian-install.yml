@@ -18,7 +18,14 @@
     boot_label: "{{ ansible_distribution | upper }}-BOOT"
     btrfs_root_label: "{{ ansible_distribution | upper }}-BTRFS"
     swap_label: "{{ ansible_distribution | upper }}-SWAP"
-    grub_cmdline: "intel_iommu=on nmi_watchdog=0"
+    intel_cpu: true
+    grub_cmdline: "{% if intel_cpu | bool %}intel_iommu=on {% endif %}nmi_watchdog=0"
+    luks_passphrase: "changemelater"
+    default_root_size: "100%FREE"
+    default_swap_size: 16
+    default_extra_lvols:
+      - name: k8s
+        size: 150G
     # root_disk: "/dev/disk/by-id/"
     debootstrap_exclude:
       - ifupdown
@@ -141,6 +148,13 @@
         part_end: "100%"
       tags: ["partition"]
 
+    - name: Destroy LUKS container
+      community.crypto.luks_device:
+        device: "{{ root_disk }}-part3"
+        state: absent
+      when: wipe_root_disk | bool
+      tags: ["luks"]
+
     - name: Create LUKS container
       community.crypto.luks_device:
         device: "{{ root_disk }}-part3"
@@ -166,12 +180,36 @@
         state: present
       tags: ["filesystem"]
 
+    - name: Check ESP label
+      changed_when: false
+      check_mode: false
+      ansible.builtin.command: "fatlabel {{ root_disk }}-part1"
+      register: esp_label_check
+      tags: ["filesystem"]
+
+    - name: Set ESP label
+      ansible.builtin.command: "fatlabel {{ root_disk }}-part1 {{ esp_label }}"
+      when: esp_label_check.stdout != esp_label
+      tags: ["filesystem"]
+
     - name: Create /boot filesystem
       community.general.filesystem:
         dev: "{{ root_disk }}-part2"
         fstype: ext4
         opts: "-L {{ boot_label }}"
         state: present
+      tags: ["filesystem"]
+
+    - name: Check /boot label
+      changed_when: false
+      check_mode: false
+      ansible.builtin.command: "e2label {{ root_disk }}-part2"
+      register: boot_label_check
+      tags: ["filesystem"]
+
+    - name: Set /boot label
+      ansible.builtin.command: "e2label {{ root_disk }}-part2 {{ boot_label }}"
+      when: boot_label_check.stdout != boot_label
       tags: ["filesystem"]
 
     - name: Create LVG
@@ -181,20 +219,31 @@
         state: present
       tags: ["lvm"]
 
-    - name: Create LVOLs
+    - name: Create extra LVOLs
       community.general.lvol:
         vg: "vg01"
         lv: "{{ item.name }}"
         size: "{{ item.size }}"
         state: present
         shrink: false
-      loop:
-        - name: k8s
-          size: 150G
-        - name: swap
-          size: 16G
-        - name: root
-          size: "100%FREE"
+      loop: "{{ extra_lvols | default(default_extra_lvols) }}"
+
+    - name: Create swap LVOL
+      community.general.lvol:
+        vg: "vg01"
+        lv: "swap"
+        size: "{{ swap_size | default(default_swap_size) }}G"
+        state: present
+        shrink: false
+      when: swap_size | default(default_swap_size) > 0
+
+    - name: Create root LVOL
+      community.general.lvol:
+        vg: "vg01"
+        lv: "root"
+        size: "{{ root_size | default(default_root_size) }}"
+        state: present
+        shrink: false
       tags: ["lvm"]
 
     - name: Create BTRFS filesystem
@@ -258,6 +307,16 @@
           fstype: vfat
       tags: ["mount"]
 
+    - name: Stop after mounting
+      ansible.builtin.meta: end_host
+      when: stop_after_mount | default(false) | bool
+      tags: ["always"]
+
+    - name: Delete all files
+      ansible.builtin.shell: "rm -rf {{ chroot_path }}/*"
+      when: wipe_root_disk | bool
+      tags: ["wipe"]
+
     - name: Install base packages
       ansible.builtin.command: >-
         debootstrap --arch amd64
@@ -272,10 +331,12 @@
       ansible.builtin.copy:
         content: |
           deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} main
-          deb-src http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} main
 
           deb http://security.debian.org/ {{ ansible_distribution_release | lower }}-security main
-          deb-src http://security.debian.org/ {{ ansible_distribution_release | lower }}-security main
+
+          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} contrib
+
+          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} non-free non-free-firmware
 
           deb http://deb.debian.org/debian {{ ansible_distribution_release | lower }}-backports main
         dest: "{{ chroot_path }}/etc/apt/sources.list"
@@ -284,8 +345,30 @@
         mode: "0644"
       tags: ["apt"]
 
-    - name: Install backports kernel and firewalld
-      ansible.builtin.command: "arch-chroot {{ chroot_path }} sh -c 'apt-get update -y && apt-get install -y firewalld linux-image-amd64/{{ ansible_distribution_release | lower }}-backports'"
+    - name: Install kernel and firewalld
+      ansible.builtin.command:
+        cmd: "arch-chroot {{ chroot_path }} sh -"
+        stdin: |
+          apt-get update -y
+          apt-get install -y firewalld linux-image-amd64{% if deb_backports_kernel | default(true) | bool %}/{{ ansible_distribution_release | lower }}-backports{% endif %}
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+      register: __apt
+      changed_when: "'0 newly installed' not in __apt.stdout"
+      tags: ["apt"]
+
+    - name: Install firmwares
+      ansible.builtin.command:
+        cmd: "arch-chroot {{ chroot_path }} sh -"
+        stdin: >-
+          apt-get install -y --no-install-recommends
+          {% if intel_cpu | bool %}
+          intel-microcode
+          {% else %}
+          amd64-microcode
+          {% endif %}
+          firmware-linux
+          {{ deb_extra_firmwares | default([]) | join(' ') }}
       environment:
         DEBIAN_FRONTEND: noninteractive
       register: __apt
@@ -397,6 +480,14 @@
         exclusive: true
       tags: ["ssh"]
 
+    - name: Set root password
+      ansible.builtin.lineinfile:
+        path: "{{ chroot_path }}/etc/shadow"
+        regexp: '^root:'
+        line: "root:{{ root_pass_hash }}:{{ lookup('pipe', 'date +%s') | int // 86400 }}:0:99999:7:::"
+      when: root_pass_hash | default('')
+      tags: ["root"]
+
   roles:
     - role: systemd_cryptenroll
       vars:
@@ -439,7 +530,8 @@
 
     - name: Regenerate initramfs
       ansible.builtin.command:
-        # For some reason it doesn't automatically pick it up when running in chroot
+        # It doesn't automatically pick up crypttab.initramfs when running in chroot
+        # It defaults to the current live image kernel too
         cmd: >-
           arch-chroot {{ chroot_path }} dracut -f
           --include /etc/crypttab.initramfs /etc/crypttab
@@ -468,3 +560,13 @@
       ansible.builtin.command:
         cmd: "arch-chroot {{ chroot_path }} update-grub"
       tags: ["grub"]
+
+    - name: Print message about changing LUKS pass
+      ansible.builtin.debug:
+        msg: "cryptsetup luksChangeKey {{ root_disk }}-part3"
+      tags: ["luks", "info"]
+
+    - name: Print message about cryptenroll after reboot
+      ansible.builtin.debug:
+        msg: "systemd-cryptenroll {{ root_disk }}-part3 --tpm2-device=auto --tpm2-pcrs=0+7 --wipe-slot=tpm2"
+      tags: ["cryptenroll", "info"]
