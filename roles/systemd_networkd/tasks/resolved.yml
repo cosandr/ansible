@@ -59,6 +59,10 @@
     name: systemd-resolved.service
     enabled: "{{ resolved_service_enabled }}"
     state: "{{ ('started' if resolved_service_enabled else 'stopped') if resolved_immediate | bool else omit }}"
+  register: __svc
+  failed_when:
+    - __svc.failed
+    - "resolved_service_enabled or 'Could not find the requested service' not in __svc.msg"
   when: not chroot_path
 
 - name: Configure systemd-resolved service state (chroot)  # noqa no-changed-when
