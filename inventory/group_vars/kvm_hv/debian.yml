@@ -1,0 +1,17 @@
+---
+
+deb_packages:
+  - build-essential
+  - ca-certificates
+  - lm-sensors
+  - netcat-openbsd
+  - openssl
+  - p7zip-full
+  - postgresql-client
+  - shellcheck
+  - ssh
+
+deb_block_packages:
+  - network-manager
+  - initramfs-tools
+  - initramfs-tools-core

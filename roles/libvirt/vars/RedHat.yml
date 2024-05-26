@@ -1,0 +1,10 @@
+---
+
+default_libvirt_security_driver: "selinux"
+libvirt_pkgs:
+  - guestfs-tools
+  - libvirt
+  - python3-libvirt
+  - qemu-kvm
+  - virt-install
+  - virt-manager

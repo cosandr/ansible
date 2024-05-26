@@ -26,8 +26,8 @@
     state: present
   when:
     - networkd_install | bool
-    # They are part of the systemd package on Arch
-    - ansible_distribution != "Archlinux"
+    # They are part of the systemd package
+    - ansible_distribution not in ["Archlinux", "Debian"]
   tags: ["install"]
 
 - name: Register previously copied configuration files

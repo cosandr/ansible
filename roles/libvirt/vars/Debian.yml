@@ -1,0 +1,10 @@
+---
+
+default_libvirt_security_driver: "apparmor"
+libvirt_pkgs:
+  - guestfs-tools
+  - libvirt-daemon
+  - python3-libvirt
+  - qemu-kvm
+  - virtinst
+  - virt-manager

@@ -1,0 +1,4 @@
+---
+
+root_disk: "/dev/disk/by-id/nvme-MTFDHBA960TDF_20332A42BEA1"
+btrfs_src: "LABEL=DEBIAN-BTRFS"

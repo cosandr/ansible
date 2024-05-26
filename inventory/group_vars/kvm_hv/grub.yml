@@ -4,4 +4,4 @@ grub_config:
   - regexp: '^GRUB_TIMEOUT'
     line: "GRUB_TIMEOUT=2"
   - regexp: '^GRUB_CMDLINE_LINUX'
-    line: GRUB_CMDLINE_LINUX="crashkernel=auto intel_iommu=on nmi_watchdog=0{% if grub_cmdline_group | default('') %} {{ grub_cmdline_group }}{% endif %}"
+    line: GRUB_CMDLINE_LINUX="{% if ansible_os_family == 'RedHat' %}crashkernel=auto {% endif %}intel_iommu=on nmi_watchdog=0{% if grub_cmdline_group | default('') %} {{ grub_cmdline_group }}{% endif %}"

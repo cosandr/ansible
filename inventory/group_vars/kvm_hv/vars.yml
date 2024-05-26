@@ -29,3 +29,49 @@ intel_gvt_enabled: false
 
 # Remove once all hosts are expected to be up all the time
 prometheus_ignore_down: true
+
+common_packages:
+  - bash-completion
+  - binutils
+  - efibootmgr
+  - ethtool
+  - file
+  - findutils
+  - fio
+  - firewalld
+  - gawk
+  - git
+  - gzip
+  - htop
+  - iftop
+  - iotop
+  - iperf3
+  - jq
+  - logrotate
+  - lshw
+  - lsof
+  - make
+  - man-db
+  - mc
+  - mlocate
+  - ncdu
+  - net-tools
+  - patch
+  - pciutils
+  - pkgconf
+  - powertop
+  - python3-lxml  # virt ansible modules
+  - rsync
+  - smartmontools
+  - sudo
+  - sysstat
+  - tcpdump
+  - telnet
+  - tmux
+  - tree
+  - usbutils
+  - vim
+  - vim-ale
+  - wget
+  - which
+  - zsh

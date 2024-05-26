@@ -4,11 +4,40 @@
 - name: Configure KVM hypervisors
   hosts: kvm_hv
   pre_tasks:
-    - name: Install packages
+    - name: Install common packages
+      ansible.builtin.package:
+        name: "{{ common_packages }}"
+        state: present
+      tags: ["pkg"]
+
+    - name: Install DNF packages
       ansible.builtin.dnf:
         name: "{{ dnf_packages }}"
         state: present
-      tags: ["dnf"]
+      when: ansible_os_family == 'RedHat'
+      tags: ["pkg", "dnf"]
+
+    - name: Install APT packages
+      ansible.builtin.apt:
+        name: "{{ deb_packages }}"
+        state: present
+      when: ansible_os_family == 'Debian'
+      tags: ["pkg", "apt"]
+
+    - name: Block some APT packages
+      ansible.builtin.copy:
+        content: |
+          {% for p in deb_block_packages %}
+          Package: {{ p }}
+          Pin: release *
+          Pin-Priority: -1
+
+          {% endfor %}
+        dest: /etc/apt/preferences.d/ansible
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["apt"]
   roles:
     - role: grub
       tags: ["grub"]
@@ -133,6 +162,13 @@
           loop: "{{ btrfs_nocow_paths | default([]) }}"
           tags: ["swap"]
 
+    - name: Create wheel group
+      ansible.builtin.group:
+        name: wheel
+        state: present
+      when: ansible_os_family == 'Debian'
+      tags: ["user"]
+
     - name: Create my user
       ansible.builtin.user:
         name: "{{ my_user }}"
@@ -173,11 +209,14 @@
         state: link
         force: true
       loop: ["crt", "key"]
+      # TODO: Debian, maybe. Or remove it.
+      when: ansible_os_family == 'RedHat'
       tags: ["cockpit"]
 
   handlers:
     - name: Restore user SELinux context
       ansible.builtin.command: "restorecon -r /home/{{ my_user }}"
+      when: ansible_selinux.status == "enabled"
 
 - name: Import Theia playbook
   ansible.builtin.import_playbook: theia.yml

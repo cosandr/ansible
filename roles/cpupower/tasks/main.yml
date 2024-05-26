@@ -28,8 +28,8 @@
 
 # https://src.fedoraproject.org/rpms/kernel-tools/blob/f39/f/cpupower.service
 - name: Copy cpupower service file
-  ansible.builtin.copy:
-    src: cpupower.service
+  ansible.builtin.template:
+    src: cpupower.service.j2
     dest: /etc/systemd/system/cpupower.service
     owner: root
     group: root

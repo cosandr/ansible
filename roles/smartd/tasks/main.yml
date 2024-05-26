@@ -1,5 +1,9 @@
 ---
 
+- name: Include OS vars
+  ansible.builtin.include_vars:
+    file: "{{ ansible_os_family }}.yml"
+
 - name: Install smartmontools
   ansible.builtin.package:
     name: smartmontools
@@ -12,14 +16,14 @@
     dest: /usr/local/bin/smartdnotify
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   when:
     - smartd_email
     - smartd_from_address
 
 - name: Configure smartd email address
   ansible.builtin.lineinfile:
-    path: /etc/smartmontools/smartd.conf
+    path: "{{ smartd_config_path }}"
     regexp: '^DEVICESCAN'
     line: 'DEVICESCAN -H -m {{ smartd_email }} -M exec {{ __exec_custom if smartd_from_address else __exec_stock }} -n standby,10,q'
   vars:

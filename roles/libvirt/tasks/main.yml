@@ -1,16 +1,13 @@
 ---
 
+- name: Include OS vars
+  ansible.builtin.include_vars:
+    file: "{{ ansible_os_family }}.yml"
+
 - name: Install libvirt KVM
-  ansible.builtin.dnf:
-    name:
-      - guestfs-tools
-      - libvirt
-      - python3-libvirt
-      - qemu-kvm
-      - virt-install
-      - virt-manager
+  ansible.builtin.package:
+    name: "{{ libvirt_pkgs }}"
     state: present
-  when: ansible_os_family == 'RedHat'
   tags: ["install"]
 
 # https://libvirt.org/drvqemu.html#selinux-svirt-confinement
@@ -18,7 +15,7 @@
   ansible.builtin.lineinfile:
     path: /etc/libvirt/qemu.conf
     regexp: '^#?security_driver'
-    line: 'security_driver = "{{ libvirt_security_driver }}"'
+    line: 'security_driver = "{{ libvirt_security_driver | default(default_libvirt_security_driver, true) }}"'
   notify: Restart libvirtd
 
 - name: Enable and start libvirtd
