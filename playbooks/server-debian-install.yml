@@ -60,6 +60,16 @@
       - vim
       - wget
       - zstd
+    deb_block_packages:
+      - initramfs-tools
+      - initramfs-tools-core
+      - network-manager
+    post_bootstrap_pkg:
+      - "linux-image-amd64{% if deb_backports_kernel | default(true) | bool %}/{{ ansible_distribution_release | lower }}-backports{% endif %}"
+      - apparmor-utils
+      - auditd
+      - ca-certificates
+      - firewalld
     mounts:
       - path: /
         subvol: "@"
@@ -327,6 +337,22 @@
         creates: "{{ chroot_path }}/etc/fstab"
       tags: ["bootstrap"]
 
+    - name: Block APT packages
+      ansible.builtin.copy:
+        content: |
+          {% for p in deb_block_packages %}
+          Package: {{ p }}
+          Pin: release *
+          Pin-Priority: -1
+
+          {% endfor %}
+        dest: "{{ chroot_path }}/etc/apt/preferences.d/ansible"
+        owner: root
+        group: root
+        mode: "0644"
+      when: deb_block_packages | length > 0
+      tags: ["apt"]
+
     - name: Copy apt sources
       ansible.builtin.copy:
         content: |
@@ -345,12 +371,12 @@
         mode: "0644"
       tags: ["apt"]
 
-    - name: Install kernel and firewalld
+    - name: Install post bootstrap packages
       ansible.builtin.command:
         cmd: "arch-chroot {{ chroot_path }} sh -"
         stdin: |
           apt-get update -y
-          apt-get install -y firewalld linux-image-amd64{% if deb_backports_kernel | default(true) | bool %}/{{ ansible_distribution_release | lower }}-backports{% endif %}
+          apt-get install -y {{ post_bootstrap_pkg | join(' ') }}
       environment:
         DEBIAN_FRONTEND: noninteractive
       register: __apt
