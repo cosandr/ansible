@@ -1,6 +1,8 @@
 ---
 
 deb_packages:
+  - apparmor-utils
+  - auditd
   - build-essential
   - ca-certificates
   - lm-sensors

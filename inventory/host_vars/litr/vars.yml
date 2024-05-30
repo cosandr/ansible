@@ -1,0 +1,35 @@
+---
+
+prometheus_node_targets: []
+root_disk: "/dev/disk/by-id/ata-SAMSUNG_MZ7WD120HAFV-00003_S16KNYAF400837"
+extra_lvols: []
+
+host_nic_names:
+  - eno1
+
+resolv_config: |
+  nameserver {{ hostvars['rb5009'].host_ips[host_net] }}
+  nameserver 1.1.1.1
+  nameserver 8.8.8.8
+
+deb_packages:
+  - apparmor-utils
+  - auditd
+  - ca-certificates
+  - lm-sensors
+  - netcat-openbsd
+  - openssl
+
+deb_block_packages:
+  - network-manager
+  - initramfs-tools
+  - initramfs-tools-core
+
+networkd_config:
+  main: |
+    [Match]
+    Name={{ host_nic_names | join(' ') }}
+
+    [Network]
+    Address={{ ansible_host }}/24
+    Gateway={{ hostvars['rb5009'].host_ips[host_net] }}

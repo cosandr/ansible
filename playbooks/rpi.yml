@@ -126,16 +126,6 @@
         - wireguard_addresses | length > 0
       tags: ["wireguard"]
 
-    - role: socat_proxy
-      when:
-        - "'serial_proxies' in hostvars[inventory_hostname]"
-        - serial_proxies | length > 0
-      tags: ["serial"]
-
-    - role: nut_exporter
-      when: nut_exporter_env | default({})
-      tags: ["nut_exporter"]
-
   handlers:
     - name: Reboot
       ansible.builtin.reboot: {}

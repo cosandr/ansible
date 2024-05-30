@@ -1,0 +1,18 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Configure litr
+  hosts: litr
+  pre_tasks:
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      vars:
+        _sshd_pkg: "openssh-server"
+      tags: ["always"]
+  roles:
+    - role: socat_proxy
+      tags: ["serial"]
+
+    - role: nut_exporter
+      tags: ["nut_exporter"]
