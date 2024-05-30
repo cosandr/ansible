@@ -1,5 +1,52 @@
 ---
 
+- name: Install common packages
+  ansible.builtin.package:
+    name: "{{ common_packages }}"
+    state: present
+  when: common_packages | default([])
+  tags: ["pkg"]
+
+- name: Install packages
+  tags: ["pkg"]
+  when: ansible_os_family is defined
+  block:
+    - name: Install DNF packages
+      ansible.builtin.dnf:
+        name: "{{ dnf_packages }}"
+        state: present
+      when:
+        - dnf_packages | default([])
+        - ansible_os_family == 'RedHat'
+      tags: ["dnf"]
+
+    - name: Block APT packages
+      ansible.builtin.copy:
+        content: |
+          {% for p in deb_block_packages %}
+          Package: {{ p }}
+          Pin: release *
+          Pin-Priority: -1
+
+          {% endfor %}
+        dest: /etc/apt/preferences.d/ansible
+        owner: root
+        group: root
+        mode: "0644"
+      when:
+        - deb_block_packages | default([])
+        - ansible_os_family == 'Debian'
+      tags: ["apt"]
+
+    - name: Install APT packages
+      ansible.builtin.apt:
+        name: "{{ deb_packages }}"
+        state: present
+      when:
+        - deb_packages | default([])
+        - ansible_os_family == 'Debian'
+      tags: ["apt"]
+
 - name: Configure /etc/resolv.conf
   ansible.builtin.copy:
     content: "{{ resolv_config }}"
