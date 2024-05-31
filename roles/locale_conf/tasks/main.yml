@@ -4,7 +4,7 @@
   become: true
   ansible.builtin.replace:
     path: "{{ chroot_path }}/etc/locale.gen"
-    regexp: '^#?({{ item | regex_escape() }}.*)$'
+    regexp: '^#?\s*({{ item | regex_escape() }}.*)$'
     replace: '\1'
   loop: "{{ locale_gen }}"
   notify: Generate locales
