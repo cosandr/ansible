@@ -655,7 +655,7 @@
           andrei.utils.mt_get_dns_entries:
             existing: "{{ __mt_dns.result }}"
             data: "{{ mt_dns_entries }}"
-            exclude_comment_regex: "^dhcp-.*"
+            exclude_comment_regex: "^(dhcp|manual)-.*"
           register: __dns_lists
 
         - name: Add missing entries  # noqa args[module]
