@@ -1,13 +1,5 @@
 ---
 
-# Need to request certificates manually the first time.
-# sudo -u lego env FORCE=1 /usr/local/bin/lego-wrapper run
-# Push certs if needed
-# ansible localgw01 -m shell -a "{% for d in lego_domain_keys %}/usr/local/bin/pg-cert-push --name {{ domains[d] }} --public-key /etc/lego/certificates/{{ domains[d] }}.crt --private-key /etc/lego/certificates/{{ domains[d] }}.key --chain /etc/lego/certificates/{{ domains[d] }}.issuer.crt; {% endfor %}"
-# Pull on other nodes
-# ansible localgw -a '/usr/local/bin/pg-cert-pull-systemd'
-# Restart nginx
-# ansible localgw -a 'systemctl restart nginx'
 lego_pre_script: |
   if [[ ${FORCE:-0} -eq 0 ]] && ! /usr/local/bin/check-is-master; then
     echo "Not master node, skip fetching certs"
