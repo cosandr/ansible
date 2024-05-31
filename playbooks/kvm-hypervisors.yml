@@ -127,6 +127,26 @@
           loop: "{{ btrfs_nocow_paths | default([]) }}"
           tags: ["swap"]
 
+    - name: Define libvirt default pool
+      community.libvirt.virt_pool:
+        name: default
+        command: define
+        xml: "{{ lookup('file', repo_base_dir + '/files/kvm_hv/libvirt-default.xml') }}"
+        state: "present"
+      tags: ["libvirt", "pool"]
+
+    - name: Start libvirt default pool
+      community.libvirt.virt_pool:
+        name: default
+        state: active
+      tags: ["libvirt", "pool"]
+
+    - name: Ensure libvirt default pool is autostarted
+      community.libvirt.virt_pool:
+        name: default
+        autostart: true
+      tags: ["libvirt", "pool"]
+
     - name: Create wheel group
       ansible.builtin.group:
         name: wheel
