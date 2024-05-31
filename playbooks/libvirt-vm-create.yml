@@ -27,6 +27,7 @@
           capacity: "{{ item }}"
           serial: "{{ disk_name }}"
           pool: "{{ vm_disk_pool }}"
+          create_volume: true
           type: file
           driver_options:
             discard: "unmap"

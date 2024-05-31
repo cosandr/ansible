@@ -66,6 +66,7 @@ vm_root_disk:
   clone_image: "{{ vm_template }}"
   serial: "root01"
   pool: "{{ vm_disk_pool }}"
+  create_volume: true
   # https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/1677398
   type: file
   driver_options:
