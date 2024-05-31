@@ -2,6 +2,5 @@
 
 vm_cpus: 6
 vm_mem: 16384
-vm_disk_pool: default
 
 vm_root_size: "50G"

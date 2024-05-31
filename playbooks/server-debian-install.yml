@@ -61,6 +61,7 @@
       - wget
       - zstd
     deb_block_packages:
+      - ifupdown
       - initramfs-tools
       - initramfs-tools-core
       - network-manager
@@ -323,6 +324,7 @@
       tags: ["always"]
 
     - name: Delete all files
+      failed_when: false
       ansible.builtin.shell: "rm -rf {{ chroot_path }}/*"
       when: wipe_root_disk | bool
       tags: ["wipe"]
@@ -546,7 +548,7 @@
         mode: "0644"
       tags: ["dracut"]
 
-    - name: Find latest installed kernel
+    - name: Find installed kernels
       ansible.builtin.find:
         paths: "{{ chroot_path }}/lib/modules"
         file_type: directory
@@ -561,7 +563,8 @@
         cmd: >-
           arch-chroot {{ chroot_path }} dracut -f
           --include /etc/crypttab.initramfs /etc/crypttab
-          --kver {{ (installed_kernels.files | sort(attribute='ctime'))[-1].path | basename }}
+          --kver {{ item }}
+      loop: "{{ installed_kernels.files | map(attribute='path') | map('basename') }}"
       tags: ["dracut"]
 
     - name: Install grub

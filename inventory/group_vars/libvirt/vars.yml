@@ -4,6 +4,7 @@ borg_libvirt_passphrase: "{{ vault_borg_libvirt_passphrase }}"
 fstrim_timer_enabled: true
 libvirt_vm_engine: "kvm"
 libvirt_vm_default_uuid_deterministic: true
+libvirt_volume_default_images_path: "/var/lib/libvirt/images"
 
 vm_disk_format: "raw"
 # Alternative but can't figure out how to get 1st item from all elements
@@ -37,10 +38,21 @@ vm_cpu_features: []
 #   - ssbd
 #   - name: mpx
 #     policy: disable
-vm_seclabel: "system_u:system_r:svirt_t:s0:c{{ all_net[host_net].vlan }},c{{ ansible_host | andrei.utils.host_num_in_net }}"
+vm_seclabel_options_selinux:
+  type: "static"
+  relabel: "yes"
+  model: "selinux"
+vm_seclabel_selinux: "system_u:system_r:svirt_t:s0:c{{ all_net[host_net].vlan }},c{{ ansible_host | andrei.utils.host_num_in_net }}"
+vm_seclabel_options_apparmor:
+  type: "dynamic"
+  model: "apparmor"
+vm_seclabel_apparmor: ""
 vm_qemu_args: []
 vm_mdev_uuids: []
 vm_virtiofs_mounts: []
+
+vm_seclabel: "{{ vm_seclabel_selinux if vm_host == 'theia' else vm_seclabel_apparmor }}"
+vm_seclabel_options: "{{ vm_seclabel_options_selinux if vm_host == 'theia' else vm_seclabel_options_apparmor }}"
 
 vm_data_disks: []
 # vm_data_disks: ["200G", "150G"]
@@ -54,6 +66,8 @@ vm_root_disk:
   clone_image: "{{ vm_template }}"
   serial: "root01"
   pool: "{{ vm_disk_pool }}"
+  # https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/1677398
+  type: file
   driver_options:
     discard: "unmap"
 
@@ -96,10 +110,7 @@ vm_default_definition:
   cpu_mode: "{{ vm_cpu_mode }}"
   cpu_model_name: "{{ vm_cpu_model_name }}"
   cpu_features: "{{ vm_cpu_features }}"
-  seclabel_options:
-    type: "static"
-    relabel: "yes"
-    model: "selinux"
+  seclabel_options: "{{ vm_seclabel_options }}"
   seclabel_label: "{{ vm_seclabel }}"
   qemu_commandline_args: "{{ vm_qemu_args }}"
   virtiofs_mounts: "{{ vm_virtiofs_mounts }}"

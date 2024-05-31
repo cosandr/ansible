@@ -1,12 +1,5 @@
 ---
 
-- name: Install common packages
-  ansible.builtin.package:
-    name: "{{ common_packages }}"
-    state: present
-  when: common_packages | default([])
-  tags: ["pkg"]
-
 - name: Install packages
   tags: ["pkg"]
   when: ansible_os_family is defined
@@ -46,6 +39,13 @@
         - deb_packages | default([])
         - ansible_os_family == 'Debian'
       tags: ["apt"]
+
+- name: Install common packages
+  ansible.builtin.package:
+    name: "{{ common_packages }}"
+    state: present
+  when: common_packages | default([])
+  tags: ["pkg"]
 
 - name: Configure /etc/resolv.conf
   ansible.builtin.copy:

@@ -21,6 +21,7 @@ deb_packages:
   - openssl
 
 deb_block_packages:
+  - ifupdown
   - network-manager
   - initramfs-tools
   - initramfs-tools-core

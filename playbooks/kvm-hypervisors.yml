@@ -161,7 +161,10 @@
         shell: "/usr/bin/zsh"
         home: "/home/{{ my_user }}"
         create_home: false
-        groups: wheel
+        groups:
+          - wheel
+          - video
+          - render
         append: true
         uid: 1000
       tags: ["user"]

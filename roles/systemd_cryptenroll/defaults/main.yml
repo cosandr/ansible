@@ -3,7 +3,7 @@
 luks_root_disk: ""
 luks_root_disk_password: ""
 cryptenroll_crypttab_config: true
-cryptenroll_crypttab_link: true
+cryptenroll_crypttab_link: false
 cryptenroll_force: false
 cryptenroll_tpm_device: "auto"
 cryptenroll_tpm_pcrs: [0, 7]

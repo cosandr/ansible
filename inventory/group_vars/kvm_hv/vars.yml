@@ -59,6 +59,7 @@ common_packages:
   - patch
   - pciutils
   - pkgconf
+  - podman
   - powertop
   - python3-lxml  # virt ansible modules
   - rsync
