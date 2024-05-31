@@ -3,12 +3,12 @@
 host_num: "{{ groups[(host_subnet == 'control_plane') | ternary('talos_cp', 'talos_worker')] | ansible.utils.index_of('eq', inventory_hostname) }}"
 
 # https://github.com/siderolabs/talos/releases
-talos_version: "1.7.0"
+talos_version: "1.7.4"
 # https://kubernetes.io/releases/
-kube_version: "1.29.4"
+kube_version: "1.29.5"
 # https://github.com/projectcalico/calico/releases
 # https://artifacthub.io/packages/helm/projectcalico/tigera-operator
-calico_version: "~3.27"
+calico_version: "~3.28"
 # https://github.com/kubernetes-sigs/metrics-server/releases
 metrics_server_version: "3.x"
 # https://metallb.universe.tf/release-notes/

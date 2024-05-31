@@ -9,7 +9,7 @@ nfd_version: "~0.15"
 # https://github.com/openebs/lvm-localpv/releases
 openebs_lvm_version: "~1.5"
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
-prometheus_version: "58.x"
+prometheus_version: "59.x"
 # https://github.com/grafana/helm-charts/releases
 promtail_version: "6.x"
 
