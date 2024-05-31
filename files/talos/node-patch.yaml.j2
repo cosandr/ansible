@@ -11,3 +11,8 @@ machine:
           ip: "{{ vips.talos.control_plane | ansible.utils.ipv4 | first }}"
 {% endif %}
   nodeLabels: {{ node_labels | to_json }}
+
+{% if 'talos_cp' in group_names %}
+cluster:
+  allowSchedulingOnControlPlanes: {{ talos_schedule_on_control_plane }}
+{% endif %}

@@ -433,6 +433,7 @@
         name: calico-apiserver
         namespace: calico-apiserver
         wait: true
+        wait_timeout: 300
       tags: ["calico", "status"]
 
     - name: "Ensure calico node status are {{ status_state }}"

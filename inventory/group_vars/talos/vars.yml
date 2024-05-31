@@ -19,6 +19,7 @@ calico_node_status: false
 # https://github.com/projectcalico/calico/issues/7892
 calico_ebpf_enabled: false
 
+talos_schedule_on_control_plane: true
 talos_kubeprism_enabled: false
 talos_kubeproxy_enabled: "{{ not calico_ebpf_enabled }}"
 talos_kubeproxy_mode: ipvs
