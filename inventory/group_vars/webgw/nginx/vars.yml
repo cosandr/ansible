@@ -1,5 +1,9 @@
 ---
 
+nginx_provisioning_synced_excludes:
+  - "manual-*.conf"
+  - "private-*.conf"
+
 nginx_extra_conf_options: |
   stream {
     upstream gitlab-ssh {
