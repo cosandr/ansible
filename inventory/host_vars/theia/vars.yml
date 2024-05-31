@@ -20,7 +20,6 @@ btrfs_scrub_targets:
 
 prometheus_node_targets: ["{{ host_ips.vm + ':' + node_exporter_port | string }}"]
 
-cryptenroll_crypttab_config: false
 grub_config:
   - regexp: '^GRUB_TIMEOUT'
     line: "GRUB_TIMEOUT=2"

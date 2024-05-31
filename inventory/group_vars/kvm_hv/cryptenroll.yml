@@ -2,3 +2,5 @@
 
 luks_root_disk: /dev/nvme0n1p3
 luks_root_disk_password: "{{ vault_luks_root_disk_password }}"
+
+cryptenroll_crypttab_config: false
