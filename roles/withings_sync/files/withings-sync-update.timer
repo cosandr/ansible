@@ -1,0 +1,9 @@
+[Unit]
+Description=Update withings-sync every 3 days
+
+[Timer]
+Persistent=yes
+OnCalendar=*-*-1/3 00:00:00
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,77 @@
+---
+
+# Needs Debian 12 or later
+
+- name: Install Python requirements
+  ansible.builtin.apt:
+    name:
+      - python3-packaging
+      - python3.11
+      - python3.11-venv
+    update_cache: true
+    state: present
+  tags: ["install"]
+
+- name: Create withings-sync user
+  ansible.builtin.user:
+    name: withings-sync
+    create_home: true
+    home: /opt/withings-sync
+    state: present
+  tags: ["install"]
+
+- name: Setup venv  # noqa package-latest
+  become: true
+  become_user: withings-sync
+  ansible.builtin.pip:
+    name:
+      - pip
+      - setuptools
+      - wheel
+    state: latest
+    virtualenv: "/opt/withings-sync/venv"
+    virtualenv_command: "python3.11 -m venv"
+  tags: ["install"]
+
+- name: Install withings-sync
+  become: true
+  become_user: withings-sync
+  ansible.builtin.pip:
+    name: withings-sync
+    state: present
+    virtualenv: "/opt/withings-sync/venv"
+  tags: ["install"]
+
+- name: Copy withings config
+  ansible.builtin.template:
+    src: "withings-sync.j2"
+    dest: "/etc/default/withings-sync"
+    owner: root
+    group: withings-sync
+    mode: "0640"
+  tags: ["config"]
+
+- name: Copy withings-sync systemd units
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/system/{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - withings-sync.service
+    - withings-sync.timer
+    - withings-sync-update.service
+    - withings-sync-update.timer
+  notify: Reload systemd
+  tags: ["install"]
+
+- name: Enable and start timers
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - withings-sync.timer
+    - withings-sync-update.timer
+  tags: ["install", "timers"]

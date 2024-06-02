@@ -26,3 +26,13 @@ ansible localgw -a '/usr/local/bin/pg-cert-pull-systemd'
 ansible localgw -a 'systemctl restart nginx'
 ansible localgw -a 'systemctl restart nginx_exporter'
 ```
+
+## withings-sync
+
+Need to sign in manually the first time
+
+```sh
+sudo -u withings-sync -i
+source /etc/default/withings-sync && export GARMIN_USERNAME GARMIN_PASSWORD
+/opt/withings-sync/venv/bin/withings-sync -f 2023-09-26 -v
+```

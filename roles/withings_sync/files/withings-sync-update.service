@@ -1,0 +1,10 @@
+[Unit]
+Description=Update withings-sync
+After=network-online.target
+Requires=network-online.target
+
+[Service]
+Type=simple
+User=withings-sync
+WorkingDirectory=/opt/withings-sync
+ExecStart=/opt/withings-sync/venv/bin/pip install -U withings-sync

@@ -1,0 +1,9 @@
+[Unit]
+Description=Sync Withings to Garmin every 4 hours
+
+[Timer]
+Persistent=yes
+OnCalendar=*-*-* 00/4:15:00
+
+[Install]
+WantedBy=timers.target
