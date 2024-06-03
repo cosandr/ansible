@@ -2,6 +2,8 @@
 
 ansible_port: 22
 
+swapfile_size: 1G
+
 nginx_exporter_web_listen_address: "{{ wireguard_ip }}:{{ nginx_exporter_port }}"
 
 selinux_modules: []
