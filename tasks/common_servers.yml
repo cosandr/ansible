@@ -108,7 +108,7 @@
 
 - name: Configure auto upgrades (Debian)
   ansible.builtin.include_role:
-    name: unattended-upgrades
+    name: hifis.toolkit.unattended_upgrades
     apply:
       tags: ["upgrades", "unattended-upgrades"]
   when: ansible_os_family == 'Debian'

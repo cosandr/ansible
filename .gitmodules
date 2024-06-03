@@ -7,9 +7,6 @@
 [submodule "roles/nginx"]
 	path = roles/nginx
 	url = git@github.com:cosandr/ansible-role-nginx.git
-[submodule "roles/unattended-upgrades"]
-	path = roles/unattended-upgrades
-	url = git@github.com:cosandr/ansible-role-unattended-upgrades.git
 [submodule "roles/wireguard"]
 	path = roles/wireguard
 	url = git@github.com:cosandr/ansible-role-wireguard.git

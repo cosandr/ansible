@@ -10,6 +10,8 @@ collections:
     version: '>=2.4'
   - name: community.routeros
     version: ">=2.10"
+  - name: hifis.toolkit
+    version: '>4.0,<5.0'
 
 roles:
   # https://www.jeffgeerling.com/blog/2023/ansible-galaxy-error-unable-compare-role-versions

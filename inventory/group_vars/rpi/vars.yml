@@ -11,8 +11,10 @@ node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
 node_exporter_collectors:
   - systemd
 
+unattended_package_blacklist: []
 unattended_mail: "{{ my_email }}"
-unattended_mail_only_on_error: true
+unattended_mail_report: "only-on-error"
+unattended_mail_sender: "{{ inventory_hostname }}@{{ domains['hb'] }}"
 unattended_remove_unused_dependencies: true
 unattended_remove_new_unused_dependencies: true
 unattended_automatic_reboot: true

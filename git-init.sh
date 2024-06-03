@@ -24,8 +24,6 @@ declare -A remote_map=(
     ["roles/nginx"]="https://github.com/geerlingguy/ansible-role-nginx.git"
     ["roles/prometheus"]="https://github.com/cloudalchemy/ansible-prometheus.git"
     ["roles/wireguard"]="https://github.com/githubixx/ansible-role-wireguard.git"
-    ## DEPRECATED
-    # ["roles/unattended-upgrades"]="https://github.com/jnv/ansible-role-unattended-upgrades"
 )
 
 for dir in "${!remote_map[@]}"; do

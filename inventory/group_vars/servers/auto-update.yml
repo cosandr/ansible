@@ -17,6 +17,20 @@ __dnf_automatic_excludes_2:
   - "kmod*"
   - "systemd*"
 
+__unattended_package_blacklist_2:
+  - "linux-image*"
+  - "systemd*"
+
+unattended_origins_patterns:
+  - "origin=*"
+
+unattended_package_blacklist: >-
+  {%- set tmp = [] -%}
+  {%- for i in range(1, 5) -%}
+  {{- tmp.extend(lookup('ansible.builtin.vars', '__unattended_package_blacklist_' + (i | string), default=[])) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
 unattended_remove_unused_dependencies: true
 unattended_remove_new_unused_dependencies: true
 unattended_automatic_reboot: false
