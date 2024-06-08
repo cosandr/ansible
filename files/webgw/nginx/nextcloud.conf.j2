@@ -61,10 +61,12 @@ server {
         proxy_max_temp_file_size 2048m;
     }
 
-    location ^~ /.well-known {
-        location = /.well-known/carddav     { return 301 $scheme://$host/remote.php/dav; }
-        location = /.well-known/caldav      { return 301 $scheme://$host/remote.php/dav; }
-        location ^~ /.well-known            { return 301 $scheme://$host/index.php$uri; }
+    # https://help.nextcloud.com/t/frequent-nextcloud-29-hub-8-update-issues/189897#well-known-issue-4
+    location = /.well-known/carddav {
+        return 301 $scheme://$host:$server_port/remote.php/dav/;
+    }
+    location = /.well-known/caldav {
+        return 301 $scheme://$host:$server_port/remote.php/dav/;
     }
 }
 {% endif %}
