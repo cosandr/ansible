@@ -2,6 +2,8 @@
 
 mktxp_port: 49090
 mktxp_listen_address: "127.0.0.1:{{ mktxp_port }}"
+mktxp_system_config:
+  bandwidth: false
 mktxp_config: >-
   {%- set tmp = {} -%}
   {%- for h in groups['mikrotik'] if hostvars[h].mt_users | default([]) | selectattr('name', 'eq', 'prometheus') -%}
