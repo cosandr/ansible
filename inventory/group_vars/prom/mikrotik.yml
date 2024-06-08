@@ -1,6 +1,7 @@
 ---
 
 mktxp_port: 49090
+mktxp_listen_address: "127.0.0.1:{{ mktxp_port }}"
 mktxp_config: >-
   {%- set tmp = {} -%}
   {%- for h in groups['mikrotik'] if hostvars[h].mt_users | default([]) | selectattr('name', 'eq', 'prometheus') -%}
@@ -9,13 +10,13 @@ mktxp_config: >-
       "hostname": hostvars[h].ansible_host,
       "username": "prometheus",
       "password": lookup('community.general.passwordstore', 'network/mt_prom_pass'),
-      "use_ssl": true,
       "dhcp": hostvars[h].mt_dhcp_servers is defined,
       "dhcp_lease": hostvars[h].mt_dhcp_servers is defined,
       "connection_stats": hostvars[h].mt_firewall_rules is defined,
       "firewall": hostvars[h].mt_firewall_rules is defined,
       "ipv6_firewall": hostvars[h].mt_firewall_rules_ipv6 is defined,
       "route": hostvars[h].mt_firewall_rules is defined,
+      "bgp": hostvars[h].mt_bgp_peers is defined,
     }
   }) -}}
   {%- endfor -%}

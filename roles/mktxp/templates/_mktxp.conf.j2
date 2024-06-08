@@ -1,7 +1,7 @@
 {{ ansible_managed | comment }}
 # https://github.com/akpw/mktxp/blob/main/mktxp/cli/config/_mktxp.conf
 [MKTXP]
-    port = {{ mktxp_port }}
+    listen = '{{ mktxp_listen_address }}'
     socket_timeout = {{ mktxp_system_config.socket_timeout | default(30) }}
 
     initial_delay_on_failure = {{ mktxp_system_config.initial_delay_on_failure | default(120) }}
@@ -18,3 +18,5 @@
     max_worker_threads = {{ mktxp_system_config.max_worker_threads | default(5) }}
     max_scrape_duration = {{ mktxp_system_config.max_scrape_duration | default(30) }}
     total_max_scrape_duration = {{ mktxp_system_config.total_max_scrape_duration | default(60) }}
+
+    compact_default_conf_values = {{ mktxp_system_config.compact_default_conf_values | default(false) }}

@@ -1,11 +1,11 @@
 ---
 
-mktxp_version: latest
+mktxp_version: "<1.3"
 
 mktxp_user: mktxp
 mktxp_group: mktxp
 mktxp_home: "/opt/mktxp"
 mktxp_config_dir: "/etc/mktxp"
-mktxp_port: 49090
+mktxp_listen_address: "0.0.0.0:49090"
 mktxp_system_config: {}
 mktxp_config: {}
