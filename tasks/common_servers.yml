@@ -58,6 +58,13 @@
   when: resolv_config | default('')
   tags: ["resolv"]
 
+- name: Setup hostname
+  ansible.builtin.include_role:
+    name: hostname
+    apply:
+      tags: ["hostname"]
+  tags: ["hostname"]
+
 - name: Setup systemd-networkd
   ansible.builtin.include_role:
     name: systemd_networkd
