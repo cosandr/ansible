@@ -1,0 +1,12 @@
+---
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: smartctl_exporter_install_service
+
+- name: Restart smartctl_exporter
+  ansible.builtin.systemd:
+    name: smartctl_exporter.service
+    state: restarted
+  when: smartctl_exporter_install_service

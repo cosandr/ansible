@@ -1,0 +1,48 @@
+---
+
+dependency:
+  name: galaxy
+  options:
+    requirements-file: requirements.yml
+driver:
+  name: podman
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+platforms:
+  - name: alma9-smartctl_exporter
+    image: "ghcr.io/almalinux/9-init"
+    pre_build_image: true
+    tty: false
+    command: "/sbin/init"
+    # https://github.com/ansible/molecule/issues/4140
+    systemd: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    groups: ["el", "el9"]
+
+  - name: debian12-smartctl_exporter
+    image: "docker.io/geerlingguy/docker-debian12-ansible"
+    pre_build_image: true
+    tty: false
+    command: "/sbin/init"
+    systemd: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+    groups: ["debian"]
+provisioner:
+  name: ansible
+  log: true
+  playbooks:
+    prepare: ../resources/playbooks/prepare.yml
+    converge: ../resources/playbooks/converge.yml
+    verify: ../resources/playbooks/verify.yml
+  inventory:
+    group_vars:
+      all:
+        smartctl_exporter_python_version: /usr/bin/python3
+      el9:
+        smartctl_exporter_python_version: /usr/bin/python3.11
+verifier:
+  name: ansible

@@ -1,0 +1,28 @@
+---
+
+galaxy_info:
+  role_name: smartctl_exporter
+  author: Andrei Costescu
+  namespace: cosandr
+  description: Ansible role for setting up smartctl_exporter.
+
+  issue_tracker_url: https://github.com/cosandr/ansible/issues
+
+  license: MIT
+
+  min_ansible_version: "2.16"
+
+  platforms:
+    - name: Debian
+      versions:
+        - "bookworm"
+    - name: EL
+      versions:
+        - "9"
+    - name: Fedora
+      versions:
+        - "all"
+
+  galaxy_tags: []
+
+dependencies: []

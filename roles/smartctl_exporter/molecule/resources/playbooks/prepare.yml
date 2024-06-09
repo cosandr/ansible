@@ -1,0 +1,31 @@
+---
+
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Install requirements
+      ansible.builtin.package:
+        name:
+          - sudo
+          - smartmontools
+        update_cache: true
+        state: present
+
+    - name: Install Python 3.11
+      ansible.builtin.dnf:
+        name: python3.11-pip
+        state: present
+      when: "'el9' in group_names"
+
+    - name: Install python3-packaging
+      ansible.builtin.package:
+        name: python3-packaging
+        state: present
+      when: "'el' in group_names"
+
+    - name: Install python3-venv
+      ansible.builtin.package:
+        name: python3-venv
+        state: present
+      when: "'debian' in group_names"

@@ -140,6 +140,16 @@
     - node_exporter_installed | default(true)
   tags: ["node_exporter"]
 
+- name: Setup smartctl exporter
+  ansible.builtin.include_role:
+    name: smartctl_exporter
+    apply:
+      tags: ["smartctl_exporter"]
+  when:
+    - prometheus_smartctl_targets is defined
+    - prometheus_smartctl_targets | length > 0
+  tags: ["smartctl_exporter"]
+
 - name: Setup NVMe exporter
   ansible.builtin.include_role:
     name: nvme_exporter

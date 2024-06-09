@@ -1,0 +1,30 @@
+---
+
+- name: Include installation tasks
+  ansible.builtin.include_tasks:
+    file: install.yml
+    apply:
+      tags: ["install"]
+  tags: ["install"]
+
+- name: Copy systemd service
+  ansible.builtin.template:
+    src: "smartctl_exporter.service.j2"
+    dest: /etc/systemd/system/smartctl_exporter.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart smartctl_exporter
+  when: smartctl_exporter_install_service
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start service
+  ansible.builtin.systemd:
+    name: smartctl_exporter.service
+    state: started
+    enabled: true
+  when: smartctl_exporter_install_service

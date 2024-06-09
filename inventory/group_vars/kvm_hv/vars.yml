@@ -7,6 +7,7 @@ fstrim_timer_enabled: true
 nvme_exporter_port: 9998
 nvme_exporter_listen_address: "{{ host_ips.vm }}:{{ nvme_exporter_port }}"
 
+prometheus_smartctl_targets: ["{{ smartctl_exporter_address }}:{{ smartctl_exporter_port }}"]
 prometheus_nvme_targets: ["{{ nvme_exporter_listen_address }}"]
 
 btrfs_src: "LABEL=FEDORA-BTRFS"

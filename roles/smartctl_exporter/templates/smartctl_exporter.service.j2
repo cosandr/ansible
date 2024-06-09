@@ -1,0 +1,23 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=Prometheus exporter for smartctl
+Documentation=https://github.com/matusnovak/prometheus-smartctl
+After=network-online.target
+
+[Service]
+Environment=SMARTCTL_REFRESH_INTERVAL={{ smartctl_exporter_refresh_interval }}
+Environment=SMARTCTL_EXPORTER_PORT={{ smartctl_exporter_port }}
+Environment=SMARTCTL_EXPORTER_ADDRESS={{ smartctl_exporter_address }}
+WorkingDirectory={{ smartctl_exporter_home }}
+ExecStart={{ smartctl_exporter_home }}/bin/python {{ smartctl_exporter_home }}/smartprom.py
+ReadOnlyPaths=/dev
+PrivateTmp=true
+ProtectHome=true
+ProtectControlGroups=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+
+[Install]
+WantedBy=default.target

@@ -106,6 +106,18 @@ __prom_blackbox_icmp_configs: >-
   {%- endfor -%}
   {{ tmp }}
 
+__prom_smartctl_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_smartctl_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_smartctl_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
 prometheus_scrape_configs: "{{ (__common_prometheus_scrape_configs | default([])) + (__extra_prometheus_scrape_configs | default([])) }}"
 
 __common_prometheus_scrape_configs:
