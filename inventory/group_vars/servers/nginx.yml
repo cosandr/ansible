@@ -11,6 +11,8 @@ nginx_dhparam: "/etc/nginx/dhparam.pem"
 
 # https://ssl-config.mozilla.org/#server=nginx&version=1.24.0&config=intermediate&openssl=1.1.1k&guideline=5.7
 nginx_extra_http_options: |
+  resolver {{ resolv_config | regex_findall('^nameserver (.+)', '\\1') | join(' ') }};
+
   autoindex off;
   ssl_session_timeout 1d;
   ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions

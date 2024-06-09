@@ -8,6 +8,11 @@ nginx_exporter_web_listen_address: "{{ wireguard_ip }}:{{ nginx_exporter_port }}
 
 selinux_modules: []
 
+resolv_config: |
+  nameserver 10.1.0.1
+  nameserver 1.1.1.1
+  nameserver 8.8.8.8
+
 networkd_config:
   enp1s0: |
     [Match]
@@ -15,9 +20,6 @@ networkd_config:
 
     [Network]
     Address={{ ansible_host }}/24
-    DNS=10.1.0.1
-    DNS=1.1.1.1
-    DNS=8.8.8.8
     Gateway=10.1.0.1
 
 host_nic_names:

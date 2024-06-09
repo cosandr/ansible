@@ -97,14 +97,12 @@
         policy: targeted
         state: enforcing
       register: __selinux_state
-      when: ansible_os_family == 'RedHat'
+      when: ansible_selinux.status == "enabled"
       tags: ["selinux"]
 
     - name: Reboot if required
       ansible.builtin.reboot:
-      when:
-        - __selinux_state is defined
-        - __selinux_state.reboot_required
+      when: __selinux_state.reboot_required | default(false)
       tags: ["selinux"]
 
     - name: Install epel
@@ -137,6 +135,10 @@
         - keepalived_instances | length > 0
       tags: ["lego", "pg_cert"]
   roles:
+    - role: wireguard
+      when: wireguard_addresses is defined
+      tags: ["wireguard"]
+
     - role: fail2ban
       tags: ["fail2ban"]
 
@@ -164,7 +166,3 @@
 
     - role: nginx_exporter
       tags: ["nginx_exporter"]
-
-    - role: wireguard
-      when: wireguard_addresses is defined
-      tags: ["wireguard"]

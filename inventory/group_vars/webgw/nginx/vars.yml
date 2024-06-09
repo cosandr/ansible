@@ -1,5 +1,7 @@
 ---
 
+# Debian uses a plain 'default' file
+nginx_provisioning_synced_patterns: ["*"]
 nginx_provisioning_synced_excludes:
   - "manual-*.conf"
   - "private-*.conf"

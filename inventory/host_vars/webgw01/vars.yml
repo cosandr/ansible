@@ -17,6 +17,10 @@ fail2ban_extra_conf: |
   [named-refused]
   enabled = true
 
+resolv_config: |
+  nameserver 1.1.1.1
+  nameserver 8.8.8.8
+
 networkd_config:
   eth0: |
     [Match]
