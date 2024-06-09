@@ -8,8 +8,6 @@ postgresql_users:
 
   - name: discord_public
 
-  - name: gitea
-
   - name: gitlab
 
   - name: grafana

@@ -7,9 +7,6 @@ postgresql_databases:
   - name: discord_public
     owner: postgres
 
-  - name: gitea
-    owner: gitea
-
   - name: gitlabhq_production
     owner: gitlab
 
