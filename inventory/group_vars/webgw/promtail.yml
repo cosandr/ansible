@@ -59,6 +59,15 @@ __promtail_scrape_configs_2:
                 # 10.1.0.91 - - [12/Jun/2022:19:16:38 +0200] "GET / HTTP/2.0" 500 289 "-" "curl/7.61.1" "-"
                 expression: '(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<timestamp>\w{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4})\] "(?P<method>[A-Z]+) (?P<request>.*?)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>.*?)" "(?P<http_user_agent>.*?)" "(?P<http_x_forwarded_for>.*?)"'
 
+            - drop:
+                source: "http_user_agent"
+                expression: "^gitlab-runner.*"
+
+            - drop:
+                source: "http_user_agent"
+                # Prometheus exporters
+                expression: "(?i).*(prometheus|exporter).*"
+
             - labels:
                 remote_addr: ""
                 method: ""
