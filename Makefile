@@ -1,4 +1,4 @@
-VENV_NAME := $(shell cat .python-version)
+VENV_NAME := "ansible-2.17"
 
 .PHONY: git-hooks inventory
 
