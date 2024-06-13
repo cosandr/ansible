@@ -1,20 +1,17 @@
 ---
 
-- name: reload nginx
-  become: true
-  systemd:
+- name: Reload nginx
+  ansible.builtin.systemd:
     name: nginx
     state: reloaded
 
-- name: restart nginx_exporter
-  become: true
-  systemd:
+- name: Restart nginx_exporter
+  ansible.builtin.systemd:
     daemon_reload: true
     name: nginx_exporter
     state: restarted
 
-- name: reload nginx_exporter
-  become: true
-  systemd:
+- name: Reload nginx_exporter
+  ansible.builtin.systemd:
     name: nginx_exporter
     state: reloaded

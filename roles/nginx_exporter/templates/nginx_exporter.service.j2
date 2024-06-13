@@ -10,9 +10,13 @@ Type=simple
 User=nginx_exporter
 Group=nginx_exporter
 ExecStart={{ _nginx_exporter_binary_install_dir }}/nginx_exporter \
-  -nginx.scrape-uri="{{ nginx_exporter_scrape_uri }}" \
-  -nginx.ssl-verify={{ nginx_exporter_ssl_verify }} \
-  -web.listen-address="{{ nginx_exporter_web_listen_address }}"
+  --nginx.scrape-uri="{{ nginx_exporter_scrape_uri }}" \
+{% if nginx_exporter_ssl_verify %}
+  --nginx.ssl-verify \
+{% else %}
+  --no-nginx.ssl-verify \
+{% endif %}
+  --web.listen-address="{{ nginx_exporter_web_listen_address }}"
 Restart=always
 ExecReload=/bin/kill -HUP $MAINPID
 NoNewPrivileges=true

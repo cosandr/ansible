@@ -1,15 +1,16 @@
 ---
-- include_tasks: install.yml
+- name: Include installation tasks
+  ansible.builtin.include_tasks: install.yml
   when:
     - not nginx_exporter_skip_install
   tags: ["install"]
 
-- include_tasks: configure.yml
+- name: Include configuration tasks
+  ansible.builtin.include_tasks: configure.yml
   tags: ["configure"]
 
-- name: ensure nginx_exporter service is started and enabled
-  become: true
-  systemd:
+- name: Ensure nginx_exporter service is started and enabled
+  ansible.builtin.systemd:
     daemon_reload: true
     name: nginx_exporter
     state: started

@@ -1,21 +1,21 @@
 ---
 
-- name: install nginx config file
-  template:
+- name: Install nginx config file
+  ansible.builtin.template:
     src: status.conf.j2
     dest: "{{ nginx_vhost_path }}/status.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when: nginx_exporter_install_conf | bool
-  notify: reload nginx
+  notify: Reload nginx
 
-- name: create or update systemd service unit
-  template:
+- name: Create or update systemd service unit
+  ansible.builtin.template:
     src: nginx_exporter.service.j2
     dest: /etc/systemd/system/nginx_exporter.service
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   notify:
-    - restart nginx_exporter
+    - Restart nginx_exporter

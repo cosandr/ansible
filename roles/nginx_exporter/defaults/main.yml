@@ -1,5 +1,5 @@
 ---
-nginx_exporter_version: "0.10.0"
+nginx_exporter_version: "latest"
 
 nginx_exporter_no_sysusers: false
 nginx_exporter_skip_install: false
@@ -11,4 +11,4 @@ nginx_vhost_path: /etc/nginx/conf.d
 
 nginx_exporter_web_listen_address: "0.0.0.0:{{ nginx_exporter_port | default('9113') }}"
 nginx_exporter_scrape_uri: "http://127.0.0.1:80/{{ nginx_exporter_scrape_location }}"
-nginx_exporter_ssl_verify: "true"
+nginx_exporter_ssl_verify: true
