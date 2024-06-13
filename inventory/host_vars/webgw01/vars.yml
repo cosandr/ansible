@@ -55,3 +55,7 @@ node_exporter_no_collectors:
   - bcache
   - textfile
   - arp
+
+node_exporter_required_services: "{{ prometheus_required_services }}"
+nginx_exporter_required_services: "{{ prometheus_required_services }}"
+alertmanager_required_services: "{{ prometheus_required_services }}"

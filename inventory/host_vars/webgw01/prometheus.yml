@@ -12,3 +12,6 @@ prometheus_blackbox_icmp_targets:
 prometheus_alert_rules_files:
   - "{{ repo_base_dir }}/files/prometheus/alerts/blackbox.rules"
   - "{{ repo_base_dir }}/files/prometheus/alerts/prometheus.rules"
+
+prometheus_required_services:
+  - "wg-quick@mt.service"
