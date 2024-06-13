@@ -8,10 +8,11 @@ nginx_error_log_options: "warn"
 nginx_error_log: "/var/log/nginx/error.log {{ nginx_error_log_options }}"
 nginx_sites_logs: "/var/log/nginx/sites"
 nginx_dhparam: "/etc/nginx/dhparam.pem"
+nginx_resolvers: "{{ resolv_config | regex_findall('^nameserver (.+)', '\\1') }}"
 
 # https://ssl-config.mozilla.org/#server=nginx&version=1.24.0&config=intermediate&openssl=1.1.1k&guideline=5.7
 nginx_extra_http_options: |
-  resolver {{ resolv_config | regex_findall('^nameserver (.+)', '\\1') | join(' ') }};
+  resolver {{ nginx_resolvers | join(' ') }};
 
   autoindex off;
   ssl_session_timeout 1d;

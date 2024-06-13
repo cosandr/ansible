@@ -17,10 +17,11 @@ fail2ban_extra_conf: |
   [named-refused]
   enabled = true
 
-resolv_config: |
-  nameserver 1.1.1.1
-  nameserver 8.8.8.8
-
+nginx_resolvers:
+  - "1.1.1.1"
+  - "8.8.8.8"
+# Required if using DNS in wireguard configs
+resolved_service_enabled: true
 networkd_config:
   eth0: |
     [Match]
@@ -34,8 +35,18 @@ networkd_config:
     {% endfor %}
     Gateway=fe80::1
 
+  eth1: |
+    [Match]
+    Name=eth1
+
+    [Network]
+    DHCP=ipv4
+    LinkLocalAddressing=no
+    IPv6AcceptRA=no
+
 host_nic_names:
   - eth0
+  - eth1
 
 node_exporter_no_collectors:
   - mdadm

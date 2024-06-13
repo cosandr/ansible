@@ -36,3 +36,28 @@ sudo -u withings-sync -i
 source /etc/default/withings-sync && export GARMIN_USERNAME GARMIN_PASSWORD
 /opt/withings-sync/venv/bin/withings-sync -f 2023-09-26 -v
 ```
+
+## webgw
+
+After deploy, install pre-reqs
+
+```sh
+dnf install -y firewalld vim net-tools
+```
+
+```sh
+./playbooks/webgw.yml -l webgw01 -t user -e ansible_port=22
+./playbooks/webgw.yml -l webgw01 -t sshd
+./playbooks/webgw.yml -l webgw01
+ansible webgw01 -m dnf -a 'name=NetworkManager state=absent'
+ansible webgw01 -m dnf -a 'name=cloud-init state=absent'
+./playbooks/prom.yml -l webgw01
+```
+
+If restoring SSH host keys
+
+```sh
+restorecon -rv /etc/ssh
+chmod 600 /etc/ssh/ssh_host_{ecdsa,ed25519,rsa}_key
+systemctl restart sshd
+```
