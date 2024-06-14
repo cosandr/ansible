@@ -127,14 +127,14 @@ groups:
       summary: "One or more NICs reports packet drops"
     expr: |
       (
-        rate(node_network_receive_drop_total{device!="lo"}[1m]) +
-        rate(node_network_transmit_drop_total{device!="lo"}[1m])
+        rate(node_network_receive_drop_total{device!~"(lo|mt|wg\\d+)"}[1m]) +
+        rate(node_network_transmit_drop_total{device!~"(lo|mt|wg\\d+)"}[1m])
       ) / (
-        rate(node_network_receive_packets_total{device!="lo"}[1m]) +
-        rate(node_network_transmit_packets_total{device!="lo"}[1m])
-      ) >= 0.0050000000000000001 and (
-        rate(node_network_receive_drop_total{device!="lo"}[1m]) +
-        rate(node_network_transmit_drop_total{device!="lo"}[1m])
+        rate(node_network_receive_packets_total{device!~"(lo|mt|wg\\d+)"}[1m]) +
+        rate(node_network_transmit_packets_total{device!~"(lo|mt|wg\\d+)"}[1m])
+      ) >= 0.005 and (
+        rate(node_network_receive_drop_total{device!~"(lo|mt|wg\\d+)"}[1m]) +
+        rate(node_network_transmit_drop_total{device!~"(lo|mt|wg\\d+)"}[1m])
       ) >= 10
     labels:
       severity: "warning"
@@ -145,15 +145,51 @@ groups:
       summary: "One or more NICs reports packet errors"
     expr: |
       (
-        rate(node_network_receive_errs_total{device!="lo"}[1m]) +
-        rate(node_network_transmit_errs_total{device!="lo"}[1m])
+        rate(node_network_receive_errs_total{device!~"(lo|mt|wg\\d+)"}[1m]) +
+        rate(node_network_transmit_errs_total{device!~"(lo|mt|wg\\d+)"}[1m])
       ) / (
-        rate(node_network_receive_packets_total{device!="lo"}[1m]) +
-        rate(node_network_transmit_packets_total{device!="lo"}[1m])
+        rate(node_network_receive_packets_total{device!~"(lo|mt|wg\\d+)"}[1m]) +
+        rate(node_network_transmit_packets_total{device!~"(lo|mt|wg\\d+)"}[1m])
       ) >= 0.0001 or (
-        rate(node_network_receive_errs_total{device!="lo"}[1m]) +
-        rate(node_network_transmit_errs_total{device!="lo"}[1m])
+        rate(node_network_receive_errs_total{device!~"(lo|mt|wg\\d+)"}[1m]) +
+        rate(node_network_transmit_errs_total{device!~"(lo|mt|wg\\d+)"}[1m])
       ) >= 10
+    labels:
+      severity: "warning"
+
+  - alert: "NodeWireguardPacketDrops"
+    annotations:
+      description: "Node {{ $labels.instance }} experiences packet drop > 5% or > 50 packets/s on interface {{ $labels.device }}."
+      summary: "One or more WireGuard interfaces report packet drops"
+    expr: |
+      (
+        rate(node_network_receive_drop_total{device=~"(mt|wg\\d+)"}[2m]) +
+        rate(node_network_transmit_drop_total{device=~"(mt|wg\\d+)"}[2m])
+      ) / (
+        rate(node_network_receive_packets_total{device=~"(mt|wg\\d+)"}[2m]) +
+        rate(node_network_transmit_packets_total{device=~"(mt|wg\\d+)"}[2m])
+      ) >= 0.05 and (
+        rate(node_network_receive_drop_total{device=~"(mt|wg\\d+)"}[2m]) +
+        rate(node_network_transmit_drop_total{device=~"(mt|wg\\d+)"}[2m])
+      ) >= 50
+    labels:
+      severity: "warning"
+
+  - alert: "NodeWireguardPacketErrors"
+    annotations:
+      description: "Node {{ $labels.instance }} experiences packet errors > 5% or > 50 packets/s on interface {{ $labels.device }}."
+      summary: "One or more WireGuard interfaces report packet errors"
+    expr: |
+      (
+        rate(node_network_receive_errs_total{device=~"(mt|wg\\d+)"}[2m]) +
+        rate(node_network_transmit_errs_total{device=~"(mt|wg\\d+)"}[2m])
+      ) / (
+        rate(node_network_receive_packets_total{device=~"(mt|wg\\d+)"}[2m]) +
+        rate(node_network_transmit_packets_total{device=~"(mt|wg\\d+)"}[2m])
+      ) >= 0.05 or (
+        rate(node_network_receive_errs_total{device=~"(mt|wg\\d+)"}[2m]) +
+        rate(node_network_transmit_errs_total{device=~"(mt|wg\\d+)"}[2m])
+      ) >= 50
     labels:
       severity: "warning"
 
