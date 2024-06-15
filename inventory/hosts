@@ -134,7 +134,7 @@ pg
 pgbackrest
 
 [pg]
-pg01 host_num=0
+pg01 host_num=0 vm_host=ymir
 
 [pg:vars]
 host_subnet=pg
@@ -158,14 +158,14 @@ host_wg_num6_offset=false
 host_wg_subnet=switches
 
 [gitlab]
-gitlab01 host_num=0
+gitlab01 host_num=0 vm_host=aegir
 
 [gitlab:vars]
 host_subnet=gitlab
 
 [gitrun]
-gitrun01 host_num=0
-gitrun02 host_num=1
+gitrun01 host_num=0 vm_host=aegir
+gitrun02 host_num=1 vm_host=ymir
 
 [gitrun:vars]
 host_subnet=gitrun
@@ -177,14 +177,14 @@ webgw01
 prom
 
 [prom]
-prom01 host_num=0
+prom01 host_num=0 vm_host=gerd
 
 [prom:vars]
 host_subnet=prom
 ansible_group_priority=10
 
 [loki]
-loki01 host_num=0
+loki01 host_num=0 vm_host=gerd
 
 [loki:vars]
 host_subnet=loki
@@ -207,7 +207,7 @@ host_wg_subnet=webgw
 ansible_group_priority=3
 
 [nextcloud]
-nextcloud01 host_num=0
+nextcloud01 host_num=0 vm_host=ymir
 
 [nextcloud:vars]
 host_subnet=nextcloud
@@ -219,7 +219,7 @@ docker01 host_num=0
 host_subnet=docker
 
 [minio]
-minio01 host_num=0
+minio01 host_num=0 vm_host=aegir
 
 [minio:vars]
 host_subnet=minio
