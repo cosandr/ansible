@@ -10,6 +10,7 @@
         setype: var_t
         state: present
       notify: Restore tank SELinux context
+      when: ansible_selinux.status == "enabled"
       tags: ["selinux"]
 
     - name: Ensure btrbk backup targets exist
@@ -28,37 +29,8 @@
         state: present
         norc: true
         user_install: false
+      when: ansible_os_family == "RedHat"
       tags: ["tmuxinator"]
-
-    # Requires EPEL
-    - name: Install rclone
-      ansible.builtin.dnf:
-        name: rclone
-        state: present
-      tags: ["rclone"]
-
-    - name: Install php-fpm
-      ansible.builtin.dnf:
-        name:
-          - php
-          - php-cli
-          - php-common
-          - php-fpm
-          - php-gd
-          - php-intl
-          - php-mbstring
-          - php-opcache
-          - php-pdo
-          - php-pecl-imagick
-          - php-pecl-zip
-          - php-pgsql
-          - php-process
-          - php-sodium
-          - php-xml
-        state: present
-      tags: ["php"]
-
-    # TODO: Install SELinux modules
 
   roles:
     - role: samba
@@ -79,6 +51,4 @@
   handlers:
     - name: Restore tank SELinux context  # noqa no-changed-when - handler
       ansible.builtin.command: restorecon -r /mnt/tank
-
-    - name: Dracut regenerate  # noqa no-changed-when - handler
-      ansible.builtin.command: dracut -f --regenerate-all
+      when: ansible_selinux.status == "enabled"

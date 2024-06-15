@@ -1,6 +1,11 @@
 ---
 
-deb_packages:
+# 6.7 freezes on boot when first installing on MS01's
+# Don't need backports on Theia
+deb_backports_kernel: false
+
+deb_packages: "{{ __group_deb_packages + (__host_deb_packages | default([])) }}"
+__group_deb_packages:
   - apparmor-utils
   - auditd
   - build-essential
@@ -10,6 +15,7 @@ deb_packages:
   - openssl
   - p7zip-full
   - postgresql-client
+  - python3-venv
   - shellcheck
   - ssh
 

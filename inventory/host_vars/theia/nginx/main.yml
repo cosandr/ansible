@@ -28,6 +28,10 @@ nginx_extra_http_options: |
   types_hash_max_size 1024;
   types_hash_bucket_size 64;
 
+  upstream php-fpm {
+    server unix:/run/php/php-fpm.sock;
+  }
+
 nginx_ssl_cert_main: "/etc/pki/tls/certs/{{ domain }}.crt"
 nginx_ssl_key_main: "/etc/pki/tls/private/{{ domain }}.key"
 nginx_remove_default_vhost: true

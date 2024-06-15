@@ -10,7 +10,7 @@ nvme_exporter_listen_address: "{{ host_ips.vm }}:{{ nvme_exporter_port }}"
 prometheus_smartctl_targets: ["{{ smartctl_exporter_address }}:{{ smartctl_exporter_port }}"]
 prometheus_nvme_targets: ["{{ nvme_exporter_listen_address }}"]
 
-btrfs_src: "LABEL=FEDORA-BTRFS"
+btrfs_src: "LABEL=DEBIAN-BTRFS"
 swapfile_path: ""
 btrfs_nocow_paths:
   - "/var/lib/libvirt/images"
@@ -36,7 +36,8 @@ intel_gvt_enabled: false
 # Remove once all hosts are expected to be up all the time
 prometheus_ignore_down: true
 
-common_packages:
+common_packages: "{{ __group_common_packages + (__host_common_packages | default([])) }}"
+__group_common_packages:
   - bash-completion
   - binutils
   - efibootmgr

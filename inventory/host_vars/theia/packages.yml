@@ -1,0 +1,46 @@
+---
+
+__host_common_packages:
+  - ansible
+  - ansible-lint
+  - autoconf
+  - automake
+  - gcc
+  - gettext
+  - ipmitool
+  - libtool
+  - ntfs-3g
+  - python3-aiohttp
+  - python3-llfuse  # borg mount
+  - python3-netaddr
+  - python3-websockets
+  - rclone
+  - rubygems
+  - sshpass
+  - php
+  - php-cli
+  - php-common
+  - php-fpm
+  - php-gd
+  - php-intl
+  - php-mbstring
+  - php-opcache
+  - php-pdo
+  - php-pgsql
+  - php-xml
+
+__host_dnf_packages:
+  - libxml2-devel
+  - libxslt-devel
+  - php-pecl-imagick
+  - php-pecl-zip
+  - php-process
+  - php-sodium
+
+__host_deb_packages:
+  - libsodium-dev
+  - libxml2-dev
+  - libxslt-dev
+  - php-imagick
+  - php-zip
+  - tmuxinator

@@ -38,21 +38,13 @@ vm_cpu_features: []
 #   - ssbd
 #   - name: mpx
 #     policy: disable
-vm_seclabel_options_selinux:
-  type: "static"
-  relabel: "yes"
-  model: "selinux"
-vm_seclabel_selinux: "system_u:system_r:svirt_t:s0:c{{ all_net[host_net].vlan }},c{{ ansible_host | andrei.utils.host_num_in_net }}"
-vm_seclabel_options_apparmor:
-  type: "dynamic"
-  model: "apparmor"
-vm_seclabel_apparmor: ""
 vm_qemu_args: []
 vm_mdev_uuids: []
 vm_virtiofs_mounts: []
 
-vm_seclabel: "{{ vm_seclabel_selinux if vm_host == 'theia' else vm_seclabel_apparmor }}"
-vm_seclabel_options: "{{ vm_seclabel_options_selinux if vm_host == 'theia' else vm_seclabel_options_apparmor }}"
+vm_seclabel_options:
+  type: "dynamic"
+  model: "apparmor"
 
 vm_data_disks: []
 # vm_data_disks: ["200G", "150G"]
@@ -112,7 +104,6 @@ vm_default_definition:
   cpu_model_name: "{{ vm_cpu_model_name }}"
   cpu_features: "{{ vm_cpu_features }}"
   seclabel_options: "{{ vm_seclabel_options }}"
-  seclabel_label: "{{ vm_seclabel }}"
   qemu_commandline_args: "{{ vm_qemu_args }}"
   virtiofs_mounts: "{{ vm_virtiofs_mounts }}"
 

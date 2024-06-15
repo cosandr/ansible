@@ -1,5 +1,7 @@
 ---
 
+root_disk: "/dev/disk/by-id/nvme-SAMSUNG_MZ1LB1T9HALS-00007_S436NC0R532548"
+
 domain: "{{ domains['hb'] }}"
 
 cpupower_start_governor: schedutil

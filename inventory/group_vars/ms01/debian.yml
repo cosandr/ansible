@@ -1,5 +1,0 @@
----
-
-btrfs_src: "LABEL=DEBIAN-BTRFS"
-# 6.7 freezes on boot when first installing
-deb_backports_kernel: false

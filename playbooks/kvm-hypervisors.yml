@@ -151,6 +151,7 @@
       ansible.builtin.group:
         name: wheel
         state: present
+        system: true
       when: ansible_os_family == 'Debian'
       tags: ["user"]
 
@@ -167,6 +168,15 @@
           - render
         append: true
         uid: 1000
+      tags: ["user"]
+
+    - name: Add my user to adm group
+      ansible.builtin.user:
+        name: "{{ my_user }}"
+        groups:
+          - adm
+        append: true
+      when: ansible_os_family == 'Debian'
       tags: ["user"]
 
     - name: Ensure user home permissions are correct
