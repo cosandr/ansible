@@ -18,8 +18,6 @@
     boot_label: "{{ ansible_distribution | upper }}-BOOT"
     btrfs_root_label: "{{ ansible_distribution | upper }}-BTRFS"
     swap_label: "{{ ansible_distribution | upper }}-SWAP"
-    intel_cpu: true
-    grub_cmdline: "{% if intel_cpu | bool %}intel_iommu=on {% endif %}nmi_watchdog=0"
     luks_passphrase: "changemelater"
     default_root_size: "100%FREE"
     default_swap_size: 16
@@ -110,6 +108,19 @@
         update_cache: true
       tags: ["utils"]
 
+    - name: Check CPU vendor
+      check_mode: false
+      changed_when: false
+      failed_when: false
+      ansible.builtin.command: "grep -q GenuineIntel /proc/cpuinfo"
+      register: __intel_cpu_check
+      tags: ["always"]
+
+    - name: Set intel_cpu fact
+      ansible.builtin.set_fact:
+        intel_cpu: "{{ __intel_cpu_check.rc == 0 }}"
+      tags: ["always"]
+
     - name: Ensure root disk is valid block device
       ansible.builtin.stat:
         path: "{{ root_disk }}"
@@ -118,7 +129,7 @@
       failed_when: not root_disk_check.stat.isblk
       tags: ["always"]
 
-    - name: Wipe root disk
+    - name: Wipe root disk  # noqa no-changed-when
       ansible.builtin.command: "sgdisk --zap-all {{ root_disk }}"
       when: wipe_root_disk | bool
       tags: ["partition"]
@@ -189,6 +200,7 @@
         fstype: vfat
         opts: "-F 32 -n {{ esp_label }}"
         state: present
+        force: "{{ wipe_root_disk | bool }}"
       tags: ["filesystem"]
 
     - name: Check ESP label
@@ -198,7 +210,7 @@
       register: esp_label_check
       tags: ["filesystem"]
 
-    - name: Set ESP label
+    - name: Set ESP label  # noqa no-changed-when
       ansible.builtin.command: "fatlabel {{ root_disk }}-part1 {{ esp_label }}"
       when: esp_label_check.stdout != esp_label
       tags: ["filesystem"]
@@ -209,6 +221,7 @@
         fstype: ext4
         opts: "-L {{ boot_label }}"
         state: present
+        force: "{{ wipe_root_disk | bool }}"
       tags: ["filesystem"]
 
     - name: Check /boot label
@@ -218,7 +231,7 @@
       register: boot_label_check
       tags: ["filesystem"]
 
-    - name: Set /boot label
+    - name: Set /boot label  # noqa no-changed-when
       ansible.builtin.command: "e2label {{ root_disk }}-part2 {{ boot_label }}"
       when: boot_label_check.stdout != boot_label
       tags: ["filesystem"]
@@ -238,6 +251,7 @@
         state: present
         shrink: false
       loop: "{{ extra_lvols | default(default_extra_lvols) }}"
+      tags: ["lvm"]
 
     - name: Create swap LVOL
       community.general.lvol:
@@ -247,6 +261,7 @@
         state: present
         shrink: false
       when: swap_size | default(default_swap_size) > 0
+      tags: ["lvm"]
 
     - name: Create root LVOL
       community.general.lvol:
@@ -265,13 +280,38 @@
         state: present
       tags: ["filesystem"]
 
-    - name: Create swap filesystem
-      community.general.filesystem:
-        dev: "/dev/vg01/swap"
-        fstype: swap
-        opts: "-L {{ swap_label }}"
-        state: present
+    - name: Check BTRFS label
+      changed_when: false
+      check_mode: false
+      ansible.builtin.command: "btrfs filesystem label /dev/vg01/root"
+      register: btrfs_root_label_check
+      tags: ["filesystem"]
+
+    - name: Set BTRFS label  # noqa no-changed-when
+      ansible.builtin.command: "btrfs filesystem label /dev/vg01/root {{ btrfs_root_label }}"
+      when: btrfs_root_label_check.stdout != btrfs_root_label
+      tags: ["filesystem"]
+
+    - name: Swap tasks
       tags: ["filesystem", "swap"]
+      when: swap_size | default(default_swap_size) > 0
+      block:
+        - name: Create swap filesystem
+          community.general.filesystem:
+            dev: "/dev/vg01/swap"
+            fstype: swap
+            opts: "-L {{ swap_label }}"
+            state: present
+
+        - name: Check swap label
+          changed_when: false
+          check_mode: false
+          ansible.builtin.command: "blkid -s LABEL -o value /dev/vg01/swap"
+          register: swap_label_check
+
+        - name: Set swap label  # noqa no-changed-when
+          ansible.builtin.command: "swaplabel -L {{ swap_label }} /dev/vg01/swap"
+          when: swap_label_check.stdout != swap_label
 
     - name: Mount btrfs root
       ansible.posix.mount:
@@ -323,7 +363,7 @@
       when: stop_after_mount | default(false) | bool
       tags: ["always"]
 
-    - name: Delete all files
+    - name: Delete all files  # noqa no-changed-when
       failed_when: false
       ansible.builtin.shell: "rm -rf {{ chroot_path }}/*"
       when: wipe_root_disk | bool
@@ -358,20 +398,18 @@
     - name: Copy apt sources
       ansible.builtin.copy:
         content: |
-          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} main
+          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} main contrib non-free non-free-firmware
 
-          deb http://security.debian.org/ {{ ansible_distribution_release | lower }}-security main
+          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }}-updates main contrib non-free non-free-firmware
 
-          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} contrib
+          deb http://deb.debian.org/debian-security {{ ansible_distribution_release | lower }}-security main contrib non-free non-free-firmware
 
-          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} non-free non-free-firmware
-
-          deb http://deb.debian.org/debian {{ ansible_distribution_release | lower }}-backports main
+          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }}-backports main contrib non-free non-free-firmware
         dest: "{{ chroot_path }}/etc/apt/sources.list"
         owner: root
         group: root
         mode: "0644"
-      tags: ["apt"]
+      tags: ["apt", "sources"]
 
     - name: Install post bootstrap packages
       ansible.builtin.command:
@@ -578,7 +616,7 @@
       ansible.builtin.copy:
         content: |
           GRUB_TIMEOUT=2
-          GRUB_CMDLINE_LINUX="{{ grub_cmdline }}"
+          GRUB_CMDLINE_LINUX="{% if intel_cpu %}intel_iommu=on {% endif %}nmi_watchdog=0"
         dest: "{{ chroot_path }}/etc/default/grub"
         owner: root
         group: root
