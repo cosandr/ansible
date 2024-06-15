@@ -1,5 +1,34 @@
 ---
 
+- name: Debian repo install
+  when: ansible_distribution == 'Debian'
+  block:
+    - name: Copy syncthing GPG key
+      ansible.builtin.copy:
+        src: syncthing-archive-keyring.gpg
+        dest: /etc/apt/keyrings/syncthing-archive-keyring.gpg
+        owner: root
+        group: root
+        mode: "0644"
+      diff: false
+
+    - name: Add syncthing repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/syncthing-archive-keyring.gpg] https://apt.syncthing.net/ syncthing stable"
+        state: present
+        filename: syncthing
+
+    - name: Prefer repo packages
+      ansible.builtin.copy:
+        content: |
+          Package: *
+          Pin: origin apt.syncthing.net
+          Pin-Priority: 900
+        dest: "/etc/apt/preferences.d/99syncthing"
+        owner: root
+        group: root
+        mode: "0644"
+
 - name: Install syncthing
   ansible.builtin.dnf:
     name: syncthing
