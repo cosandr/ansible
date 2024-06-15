@@ -1,19 +1,33 @@
 ---
-- import_tasks: "preflight.yml"
 
-- import_tasks: "install.yml"
-  tags: ["install"]
+- name: Fail if unconfigured
+  ansible.builtin.fail:
+    msg: "Shares must be configured"
   when:
-    - not samba_skip_install
+    - samba_shares is not defined or samba_shares | length == 0
 
-- import_tasks: "add_vfs.yml"
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  tags: ["install"]
+
+- name: Install samba
+  ansible.builtin.package:
+    name: "{{ __samba_packages }}"
+    state: present
+  when: not samba_skip_install
+  tags: ["install"]
+
+- name: Configure VFS
+  ansible.builtin.include_tasks: "add_vfs.yml"
   when: samba_add_vfs
+  tags: ["vfs"]
 
-- import_tasks: "configure.yml"
+- name: Include configuration tasks
+  ansible.builtin.include_tasks: "configure.yml"
   tags: ["configure"]
 
 - name: Configure users
-  ansible.builtin.import_tasks: users.yml
+  ansible.builtin.include_tasks: users.yml
   when: samba_users
   tags: ["users"]
 

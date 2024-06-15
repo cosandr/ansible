@@ -1,9 +1,0 @@
----
-- name: Include OS-specific variables.
-  include_vars: "{{ ansible_os_family }}.yml"
-
-- name: Fail if unconfigured
-  fail:
-    msg: "Shares must be configured"
-  when:
-    - samba_shares is not defined or samba_shares | length == 0

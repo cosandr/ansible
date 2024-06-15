@@ -1,15 +1,15 @@
 ---
 
 - name: Install config file
-  template:
+  ansible.builtin.template:
     src: "templates/smb.conf.j2"
     dest: "/etc/samba/smb.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     validate: "testparm -s %s"
   notify:
-    - restart samba
+    - Restart samba
 
 - name: Configure samba sebooleans
   ansible.posix.seboolean:

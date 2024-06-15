@@ -1,5 +1,6 @@
 ---
-samba_skip_install: no
+
+samba_skip_install: false
 
 samba_workgroup: WORKGROUP
 

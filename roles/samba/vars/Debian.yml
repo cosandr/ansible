@@ -1,0 +1,7 @@
+---
+
+__samba_packages:
+  - cifs-utils
+  - samba
+  - samba-vfs-modules
+  - smbclient
