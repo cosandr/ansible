@@ -1,0 +1,31 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Prepare facts
+  hosts: libvirt
+  gather_facts: false
+  serial: 1
+  tasks:
+    - name: Add self allocation to host's vars
+      delegate_to: "{{ vm_host }}"
+      delegate_facts: true
+      ansible.builtin.set_fact:
+        vm_total_cpu: "{{ hostvars[vm_host].vm_total_cpu | default([]) + [(vm_cpus | int)] }}"
+        vm_total_mem: "{{ hostvars[vm_host].vm_total_mem | default([]) + [(vm_mem | int)] }}"
+        vm_total_disk: "{{ hostvars[vm_host].vm_total_disk | default([]) + [([vm_root_size] + vm_data_disks) | map('regex_search', '(\\d+)G', '\\1') | flatten | map('int') | sum] }}"
+
+- name: Show results
+  hosts: kvm_hv
+  gather_facts: false
+  tasks:
+    - name: Show total CPU allocation
+      ansible.builtin.debug:
+        msg: "{{ vm_total_cpu | sum }}"
+
+    - name: Show total RAM allocation
+      ansible.builtin.debug:
+        msg: "{{ vm_total_mem | sum }}"
+
+    - name: Show total disk allocation
+      ansible.builtin.debug:
+        msg: "{{ vm_total_disk | sum }}"
