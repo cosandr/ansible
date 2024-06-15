@@ -110,7 +110,7 @@ echo "Pruning disabled"
 
 {% if conf.compact_enabled | default(not conf.append_only | default(false)) %}
 echo "Compacting repository"
-borg compact
+borg compact --info
 tmp_exit=$?
 global_exit=$(( tmp_exit > global_exit ? tmp_exit : global_exit ))
 {% endif %}

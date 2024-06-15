@@ -54,7 +54,7 @@ borg_backups:
     create_args:
       - "--exclude '**/.snapshots'"
     # Manually add to Task Scheduler
-    # /usr/local/bin/borg compact /volume1/backup/borg/theia/tank > /volume1/backup/borg/compact-$(date +%Y%m%d).log
+    # /usr/local/bin/borg compact --info /volume1/backup/borg/theia/tank
     append_only: true
     prune_args:
       - "--keep-weekly 2"
