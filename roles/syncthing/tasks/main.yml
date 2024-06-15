@@ -30,7 +30,7 @@
         mode: "0644"
 
 - name: Install syncthing
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     name: syncthing
     state: present
   tags: ["install"]
