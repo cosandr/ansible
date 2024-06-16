@@ -11,11 +11,9 @@ borg_remote_repo: "ssh://{{ borg_ssh_check }}/."
 borg_backups:
   - name: "docker"
     paths:
-      - "/mnt/disks/datassd01/docker"
+      - "/mnt/disks/datassd01/containers"
     pre_run: |
       export BORG_UNKNOWN_UNENCRYPTED_REPO_ACCESS_IS_OK=yes
-    create_args:
-      - "--exclude '/mnt/disks/datassd01/docker/docker.img'"
     prune_args:
       - "--keep-weekly 3"
       - "--keep-monthly 1"
