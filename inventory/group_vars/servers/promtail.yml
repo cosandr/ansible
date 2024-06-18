@@ -6,14 +6,70 @@ promtail_clients:
       host: "{{ inventory_hostname }}"
 
 __promtail_scrape_config_map:
+  audit:
+    job_name: audit
+    static_configs:
+      - labels:
+          job: audit
+          __path__: /var/log/audit/audit.log
+    pipeline_stages:
+      - regex:
+          # type=BPF msg=audit(1718695502.035:530): prog-id=69 op=LOAD
+          expression: '^type=(?P<audit_type>[^ ]+) msg=audit\((?P<timestamp>\d+\.\d+):(?P<audit_id>\d+)\): (?P<message>.*)$'
+
+      - timestamp:
+          source: timestamp
+          format: Unix
+
+      - labels:
+          audit_type: ""
+
+      - output:
+          source: message
+
+  unattended_upgrades:
+    job_name: unattended-upgrades
+    static_configs:
+      - labels:
+          job: unattended-upgrades
+          unattended_type: main
+          __path__: /var/log/unattended-upgrades/unattended-upgrades.log
+
+      - labels:
+          job: unattended-upgrades
+          __path__: /var/log/unattended-upgrades/unattended-upgrades-*.log
+    pipeline_stages:
+      - match:
+          selector: '{unattended_type="main"}'
+          stages:
+            - regex:
+                # 2024-05-31 21:56:14,682 INFO Starting unattended upgrades script
+                expression: '^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) (?P<level>[^ ]+) (?P<message>.*)$'
+
+            - timestamp:
+                source: timestamp
+                format: "2006-01-02 15:04:05,000"
+                location: "{{ sys_timezone }}"
+
+            - labels:
+                level: ""
+
+            - labeldrop:
+                - unattended_type
+
+            - output:
+                source: message
+
   system:
     job_name: system
     static_configs:
-      - targets:
-          - localhost
-        labels:
+      - labels:
           job: varlogs
-          __path__: /var/log/*log
+          __path__: /var/log/*.log
+
+      - labels:
+          job: mail
+          __path__: /var/log/maillog
 
   journal:
     job_name: journal
@@ -39,8 +95,10 @@ __promtail_scrape_config_map:
           job: docker
 
 __promtail_scrape_configs_3:
-  - "{{ __promtail_scrape_config_map['system'] }}"
+  - "{{ __promtail_scrape_config_map['audit'] }}"
   - "{{ __promtail_scrape_config_map['journal'] }}"
+  - "{{ __promtail_scrape_config_map['system'] }}"
+  - "{{ __promtail_scrape_config_map['unattended_upgrades'] }}"
 
 promtail_scrape_configs: >-
   {%- set tmp = [] -%}
