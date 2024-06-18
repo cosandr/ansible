@@ -4,6 +4,10 @@ domain: "{{ domains['hb'] }}"
 
 fstrim_timer_enabled: true
 
+# schedutil is best for amd_pstate while powersave is for intel_pstate
+cpupower_start_governor: "{{ 'schedutil' if inventory_hostname == 'theia' else 'powersave' }}"
+cpupower_stop_governor: "{{ cpupower_start_governor }}"
+
 nvme_exporter_port: 9998
 nvme_exporter_listen_address: "{{ host_ips.vm }}:{{ nvme_exporter_port }}"
 
