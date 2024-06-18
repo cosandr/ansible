@@ -33,9 +33,6 @@ unattended_mail_sender: "{{ inventory_hostname }}@{{ domains['hb'] }}"
 
 intel_gvt_enabled: false
 
-# Remove once all hosts are expected to be up all the time
-prometheus_ignore_down: true
-
 common_packages: "{{ __group_common_packages + (__host_common_packages | default([])) }}"
 __group_common_packages:
   - bash-completion

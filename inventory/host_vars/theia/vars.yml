@@ -31,6 +31,4 @@ grub_config:
 ssh_conf_hosts: false
 ceph_mon: false
 
-prometheus_ignore_down: false
-
 syncthing_gui_listen_address: "{{ host_ips.general }}:8384"
