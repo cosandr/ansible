@@ -5,6 +5,7 @@ fstrim_timer_enabled: true
 libvirt_vm_engine: "kvm"
 libvirt_vm_default_uuid_deterministic: true
 libvirt_volume_default_images_path: "/var/lib/libvirt/images"
+postfix_main_config: []
 
 vm_disk_format: "raw"
 # Alternative but can't figure out how to get 1st item from all elements

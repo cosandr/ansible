@@ -225,3 +225,11 @@
       tags: ["nut"]
   when: nut_upses | default([]) or nut_monitors | default([])
   tags: ["nut"]
+
+- name: Setup postfix
+  ansible.builtin.include_role:
+    name: postfix
+    apply:
+      tags: ["postfix"]
+  when: postfix_main_config | default([]) | length > 0
+  tags: ["postfix"]

@@ -28,9 +28,6 @@
     - role: cockpit
       tags: ["cockpit"]
 
-    - role: postfix
-      tags: ["postfix"]
-
     - role: smartd
       tags: ["smartd"]
 

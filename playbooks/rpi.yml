@@ -108,16 +108,8 @@
         - lego_domains is defined
         - lego_domains | length > 0
 
-    - role: postfix
-      when:
-        - postfix_main_config is defined
-        - postfix_main_config | length > 0
-      tags: ["postfix"]
-
     - role: postfix_exporter
-      when:
-        - postfix_main_config is defined
-        - postfix_main_config | length > 0
+      when: postfix_exporter_listen_address | default(false)
       tags: ["postfix_exporter"]
 
     - role: wireguard
