@@ -27,9 +27,6 @@ __dnf_automatic_excludes_3:
   - "qemu*"
 
 __unattended_package_blacklist_3: "{{ __dnf_automatic_excludes_3 }}"
-unattended_mail: "{{ my_email }}"
-unattended_mail_report: "only-on-error"
-unattended_mail_sender: "{{ inventory_hostname }}@{{ domains['hb'] }}"
 
 intel_gvt_enabled: false
 
