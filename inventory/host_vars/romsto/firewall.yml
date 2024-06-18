@@ -3,5 +3,3 @@
 mt_firewall_address_lists:
   - address: "{{ wireguard_ip }}"
     list: allow-backup
-  - address: "{{ wireguard_ip }}"
-    list: allow-smtp

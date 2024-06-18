@@ -11,6 +11,7 @@ wireguard_dns_list:
 
 wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
+  - "{{ hostvars['drepi'].ansible_host }}/32"
   - "{{ home_net.vm.cidr }}"
 
 wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"

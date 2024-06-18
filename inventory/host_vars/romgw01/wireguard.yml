@@ -8,6 +8,7 @@ wireguard_addresses:
 wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
   - "{{ hostvars['loki01'].ansible_host }}/32"
+  - "{{ hostvars['drepi'].ansible_host }}/32"
 
 wireguard_webgw_allowed_ips:
   - "{{ hostvars['webgw01'].wireguard_ip }}/32"
