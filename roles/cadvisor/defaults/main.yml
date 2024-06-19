@@ -1,9 +1,10 @@
 ---
-cadvisor_version: 0.36.0
+
+cadvisor_version: latest
 
 cadvisor_skip_install: false
-cadvisor_docker_only: true
-cadvisor_listen_ip: 127.0.0.1
-cadvisor_port: 8081
+cadvisor_listen_ip: 0.0.0.0
+cadvisor_port: 8080
 
-cadvisor_required_services: ["docker.service"]
+cadvisor_required_services: []
+cadvisor_config: {}

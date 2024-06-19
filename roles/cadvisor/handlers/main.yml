@@ -1,13 +1,7 @@
 ---
-- name: restart cadvisor
-  become: true
-  systemd:
+
+- name: Restart cadvisor
+  ansible.builtin.systemd:
     daemon_reload: true
     name: cadvisor
     state: restarted
-
-- name: reload cadvisor
-  become: true
-  systemd:
-    name: cadvisor
-    state: reloaded

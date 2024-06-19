@@ -1,46 +1,48 @@
 ---
-- block:
+
+- name: Get latest release
+  when: cadvisor_version == "latest"
+  block:
     - name: Get latest release
-      uri:
+      become: false
+      delegate_to: localhost
+      run_once: true
+      ansible.builtin.uri:
         url: "https://api.github.com/repos/google/cadvisor/releases/latest"
         method: GET
         return_content: true
         status_code: 200
         body_format: json
-        validate_certs: false
-        user: "{{ lookup('env', 'GH_USER') | default(omit) }}"
-        password: "{{ lookup('env', 'GH_TOKEN') | default(omit) }}"
-      no_log: "{{ not lookup('env', 'ANSIBLE_DEBUG') | bool }}"
+        validate_certs: true
       register: _latest_release
-      until: _latest_release.status == 200
+      until:
+        - _latest_release.status is defined
+        - _latest_release.status == 200
       retries: 5
       check_mode: false
 
     - name: "Set cadvisor version to {{ _latest_release.json.tag_name[1:] }}"
-      set_fact:
+      ansible.builtin.set_fact:
         cadvisor_version: "{{ _latest_release.json.tag_name[1:] }}"
-  when:
-    - cadvisor_version == "latest"
 
-- name: download cadvisor binary to local folder
+- name: Download cadvisor binary to local folder
   become: false
-  get_url:
-    url: "https://github.com/google/cadvisor/releases/download/v{{ cadvisor_version }}/cadvisor"
-    dest: "/tmp/ansible_cadvisor_{{ cadvisor_version }}"
+  ansible.builtin.get_url:
+    url: "https://github.com/google/cadvisor/releases/download/v{{ cadvisor_version }}/cadvisor-v{{ cadvisor_version }}-linux-{{ go_arch }}"
+    dest: "/tmp/cadvisor-{{ go_arch }}"
+    mode: "0644"
   register: _download_binary
   until: _download_binary is succeeded
   retries: 5
   delay: 2
-  run_once: true
   delegate_to: localhost
   check_mode: false
 
-- name: propagate official cadvisor binary
-  copy:
-    src: "/tmp/ansible_cadvisor_{{ cadvisor_version }}"
+- name: Propagate official cadvisor binary
+  ansible.builtin.copy:
+    src: "/tmp/cadvisor-{{ go_arch }}"
     dest: "{{ _cadvisor_binary_install_dir }}/cadvisor"
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
-  notify:
-    - restart cadvisor
+  notify: Restart cadvisor

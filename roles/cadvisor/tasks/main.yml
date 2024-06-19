@@ -1,14 +1,23 @@
 ---
-- include_tasks: install.yml
+
+- name: Include installation tasks
+  ansible.builtin.include_tasks: install.yml
   when:
     - not cadvisor_skip_install
   tags: ["install"]
 
-- include_tasks: configure.yml
+- name: Create or update systemd service unit
+  ansible.builtin.template:
+    src: cadvisor.service.j2
+    dest: /etc/systemd/system/cadvisor.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart cadvisor
   tags: ["configure"]
 
-- name: ensure cadvisor service is started and enabled
-  systemd:
+- name: Ensure cadvisor service is started and enabled
+  ansible.builtin.systemd:
     daemon_reload: true
     name: cadvisor
     state: started

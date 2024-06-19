@@ -9,11 +9,12 @@ After=network-online.target {{ cadvisor_required_services | join(' ') }}
 Type=simple
 User=root
 ExecStart={{ _cadvisor_binary_install_dir }}/cadvisor \
-  --docker="unix:///run/docker.sock" \
-  --logtostderr=true \
-  --docker_only={{ cadvisor_docker_only }} \
-  --listen_ip={{ cadvisor_listen_ip }} \
-  --port={{ cadvisor_port }}
+{% for k, v in cadvisor_config.items() %}
+  -{{ k }}={{ v }} \
+{% endfor %}
+  -logtostderr=true \
+  -listen_ip={{ cadvisor_listen_ip }} \
+  -port={{ cadvisor_port }}
 Restart=always
 ExecReload=/bin/kill -HUP $MAINPID
 NoNewPrivileges=true
