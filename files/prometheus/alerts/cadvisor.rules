@@ -3,7 +3,7 @@ groups:
   rules:
   # This rule can be very noisy in dynamic infra with legitimate container start/stop/deployment.
   - alert: ContainerKilled
-    expr: time() - container_last_seen > 60
+    expr: time() - container_last_seen{name!=""} > 60
     for: 10m
     labels:
       severity: warning
@@ -12,7 +12,7 @@ groups:
 
   # This rule can be very noisy in dynamic infra with legitimate container start/stop/deployment.
   - alert: ContainerAbsent
-    expr: absent(container_last_seen)
+    expr: absent(container_last_seen{name!=""})
     for: 5m
     labels:
       severity: warning
@@ -40,7 +40,7 @@ groups:
       description: "Container Memory usage is above 80%\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
 
   - alert: ContainerHighThrottleRate
-    expr: rate(container_cpu_cfs_throttled_seconds_total[3m]) > 1
+    expr: rate(container_cpu_cfs_throttled_seconds_total{name!=""}[3m]) > 1
     for: 2m
     labels:
       severity: warning
