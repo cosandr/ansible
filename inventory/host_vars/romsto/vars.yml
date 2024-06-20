@@ -24,6 +24,8 @@ prometheus_node_labels:
 prometheus_nextcloud_targets:
   - "{{ wireguard_ip }}:9205"
 
+prometheus_cadvisor_targets: ["{{ ansible_host }}:{{ cadvisor_port }}"]
+
 user_scripts_path: "/boot/config/plugins/user.scripts/scripts"
 data_disk:
   dev: "/dev/disk/by-label/datassd01"

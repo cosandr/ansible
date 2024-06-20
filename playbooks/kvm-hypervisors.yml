@@ -36,6 +36,9 @@
 
     - role: chezmoi
       tags: ["chezmoi"]
+
+    - role: cadvisor
+      tags: ["cadvisor"]
   tasks:
     - name: Include common tasks
       ansible.builtin.include_tasks:

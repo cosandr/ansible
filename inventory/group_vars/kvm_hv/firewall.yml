@@ -78,3 +78,7 @@ __firewall_rules_2:
   - port: "{{ smartctl_exporter_port }}"
     zone: public
     sources: "{{ node_exporter_allow_ips }}"
+
+  - port: "{{ cadvisor_port }}"
+    zone: public
+    sources: "{{ node_exporter_allow_ips }}"

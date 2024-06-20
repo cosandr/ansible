@@ -31,6 +31,18 @@ __prom_blackbox_starttls_configs: >-
   {%- endfor -%}
   {{ tmp }}
 
+__prom_cadvisor_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_cadvisor_targets | default([]) -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_cadvisor_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
 __extra_prometheus_scrape_configs:
   - job_name: 'blackbox_http4'
     scrape_interval: 1m
@@ -173,9 +185,7 @@ __extra_prometheus_scrape_configs:
         labels: "{{ hostvars['drepi'].prometheus_node_labels }}"
 
   - job_name: "cadvisor"
-    static_configs:
-      - targets: ["{{ hostvars['romsto'].ansible_host }}:{{ hostvars['romsto'].cadvisor_port }}"]
-        labels: "{{ hostvars['romsto'].prometheus_node_labels }}"
+    static_configs: "{{ __prom_cadvisor_configs }}"
 
   - job_name: "aquaero"
     scrape_interval: 30s

@@ -6,11 +6,11 @@ nginx_upstreams_file: "/mnt/user/docker/nginx/conf.d/upstreams.conf"
 nginx_prom_conf_dir: "/mnt/user/docker/nginx/conf.d/prom.conf.d"
 nginx_upstreams:
   node_exporter: "127.0.0.1:9100"
-  cadvisor: "127.0.0.1:9101"
+  cadvisor: "127.0.0.1:{{ cadvisor_port }}"
   syncthing: "127.0.0.1:8384"
   transmission: "127.0.0.1:9091"
   aria2: "127.0.0.1:6800"
-  nextcloud: "127.0.0.1:25683"
+  nextcloud: "127.0.0.1:{{ nextcloud_port }}"
   smartctl: "127.0.0.1:9102"
 nginx_site_configs:
   cadvisor: |
