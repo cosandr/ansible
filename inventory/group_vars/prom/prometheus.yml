@@ -112,6 +112,7 @@ __extra_prometheus_scrape_configs:
         labels: "{{ prometheus_node_labels }}"
 
   - job_name: "smartctl"
+    scrape_interval: 5m
     static_configs: "{{ __prom_smartctl_configs }}"
 
   - job_name: "syncthing"
