@@ -1,26 +1,5 @@
 ---
 
-- name: Check Python version
-  ansible.builtin.command: "{{ smartctl_exporter_python_version }} -V"
-  check_mode: false
-  changed_when: false
-  register: __py_ver
-
-- name: Ensure it's new enough
-  ansible.builtin.assert:
-    that: __py_ver.stdout.split(' ')[-1] is version('3.11', '>=')
-
-- name: Setup venv  # noqa package-latest
-  become: true
-  ansible.builtin.pip:
-    name:
-      - pip
-      - setuptools
-      - wheel
-    state: latest
-    virtualenv: "{{ smartctl_exporter_home }}"
-    virtualenv_command: "{{ smartctl_exporter_python_version }} -m venv"
-
 - name: Fetch latest release
   when: smartctl_exporter_version == "latest"
   block:
@@ -29,7 +8,7 @@
       delegate_to: localhost
       run_once: true
       ansible.builtin.uri:
-        url: "https://api.github.com/repos/matusnovak/prometheus-smartctl/releases/latest"
+        url: "https://api.github.com/repos/prometheus-community/smartctl_exporter/releases/latest"
         method: GET
         return_content: true
         status_code: 200
@@ -46,60 +25,41 @@
       ansible.builtin.set_fact:
         smartctl_exporter_version: "{{ _latest_release.json.tag_name[1:] }}"
 
-- name: Download smartmon.py to localhost
+- name: Get checksum list
+  ansible.builtin.set_fact:
+    __smartctl_exporter_checksums: "{{ lookup('url', 'https://github.com/prometheus-community/smartctl_exporter/releases/download/v' + smartctl_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
+  run_once: true
+  check_mode: false
   delegate_to: localhost
+
+- name: Download smartctl_exporter archive
   become: false
   ansible.builtin.get_url:
-    url: "https://raw.githubusercontent.com/matusnovak/prometheus-smartctl/v{{ smartctl_exporter_version }}/smartprom.py"
-    dest: "/tmp/smartctl_exporter_{{ smartctl_exporter_version }}.py"
+    url: "https://github.com/prometheus-community/smartctl_exporter/releases/download/v{{ smartctl_exporter_version }}/{{ smartctl_exporter_filename }}.tar.gz"
+    dest: "/tmp/{{ smartctl_exporter_filename }}.tar.gz"
+    checksum: "sha256:{{ (__smartctl_exporter_checksums | select('search', smartctl_exporter_filename + '.tar.gz') | first).split()[0] }}"
     mode: "0644"
-
-- name: Download megaraid.py to localhost
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
   delegate_to: localhost
-  become: false
-  ansible.builtin.get_url:
-    url: "https://raw.githubusercontent.com/matusnovak/prometheus-smartctl/v{{ smartctl_exporter_version }}/megaraid.py"
-    dest: "/tmp/smartctl_exporter_megaraid_{{ smartctl_exporter_version }}.py"
-    mode: "0644"
+  check_mode: false
 
-- name: Download smartmon requirements to localhost
+- name: Unpack smartctl_exporter binaries
+  become: false
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ smartctl_exporter_filename }}.tar.gz"
+    dest: "/tmp"
+    creates: "/tmp/{{ smartctl_exporter_filename }}/smartctl_exporter"
   delegate_to: localhost
-  become: false
-  ansible.builtin.get_url:
-    url: "https://raw.githubusercontent.com/matusnovak/prometheus-smartctl/v{{ smartctl_exporter_version }}/requirements.txt"
-    dest: "/tmp/smartctl_exporter_{{ smartctl_exporter_version }}.requirements"
-    mode: "0644"
+  check_mode: false
 
-- name: Copy smartmon.py
-  become: true
+- name: Copy binary to target host
   ansible.builtin.copy:
-    src: "/tmp/smartctl_exporter_{{ smartctl_exporter_version }}.py"
-    dest: "{{ smartctl_exporter_home }}/smartprom.py"
-    owner: root
-    group: root
+    src: "/tmp/{{ smartctl_exporter_filename }}/smartctl_exporter"
+    dest: "/usr/local/bin/smartctl_exporter"
     mode: "0755"
-  notify: Restart smartctl_exporter
-
-- name: Copy megaraid.py
-  become: true
-  ansible.builtin.copy:
-    src: "/tmp/smartctl_exporter_megaraid_{{ smartctl_exporter_version }}.py"
-    dest: "{{ smartctl_exporter_home }}/megaraid.py"
     owner: root
     group: root
-    mode: "0644"
   notify: Restart smartctl_exporter
-
-- name: Copy requirements
-  become: true
-  ansible.builtin.copy:
-    src: "/tmp/smartctl_exporter_{{ smartctl_exporter_version }}.requirements"
-    dest: "{{ smartctl_exporter_home }}/requirements.txt"
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Install requirements
-  ansible.builtin.pip:
-    requirements: "{{ smartctl_exporter_home }}/requirements.txt"
-    virtualenv: "{{ smartctl_exporter_home }}"

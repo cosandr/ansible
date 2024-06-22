@@ -2,15 +2,15 @@
 
 [Unit]
 Description=Prometheus exporter for smartctl
-Documentation=https://github.com/matusnovak/prometheus-smartctl
+Documentation=https://github.com/prometheus-community/smartctl_exporter
 After=network-online.target
 
 [Service]
-Environment=SMARTCTL_REFRESH_INTERVAL={{ smartctl_exporter_refresh_interval }}
-Environment=SMARTCTL_EXPORTER_PORT={{ smartctl_exporter_port }}
-Environment=SMARTCTL_EXPORTER_ADDRESS={{ smartctl_exporter_address }}
-WorkingDirectory={{ smartctl_exporter_home }}
-ExecStart={{ smartctl_exporter_home }}/bin/python {{ smartctl_exporter_home }}/smartprom.py
+ExecStart=/usr/local/bin/smartctl_exporter \
+{% for k, v in smartctl_exporter_config.items() %}
+  --{{ k }}={{ v }} \
+{% endfor %}
+  --web.listen-address={{ smartctl_exporter_listen_address }}
 ReadOnlyPaths=/dev
 PrivateTmp=true
 ProtectHome=true

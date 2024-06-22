@@ -38,11 +38,5 @@ provisioner:
     prepare: ../resources/playbooks/prepare.yml
     converge: ../resources/playbooks/converge.yml
     verify: ../resources/playbooks/verify.yml
-  inventory:
-    group_vars:
-      all:
-        smartctl_exporter_python_version: /usr/bin/python3
-      el9:
-        smartctl_exporter_python_version: /usr/bin/python3.11
 verifier:
   name: ansible

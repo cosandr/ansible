@@ -1,5 +1,11 @@
 ---
 
+- name: Remove old exporter
+  ansible.builtin.file:
+    path: "{{ smartctl_exporter_home }}"
+    state: absent
+  tags: ["remove"]
+
 - name: Include installation tasks
   ansible.builtin.include_tasks:
     file: install.yml

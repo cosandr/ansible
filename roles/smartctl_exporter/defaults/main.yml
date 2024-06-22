@@ -1,10 +1,9 @@
 ---
 
 smartctl_exporter_version: "latest"
-
-smartctl_exporter_home: "/opt/smartctl_exporter"
-smartctl_exporter_address: "0.0.0.0"
-smartctl_exporter_port: 9902
-smartctl_exporter_refresh_interval: 60
 smartctl_exporter_install_service: true
-smartctl_exporter_python_version: "python3"
+smartctl_exporter_config: {}
+smartctl_exporter_listen_address: ":9633"
+
+# From old Python version
+smartctl_exporter_home: "/opt/smartctl_exporter"

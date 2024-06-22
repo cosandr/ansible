@@ -1,0 +1,12 @@
+---
+
+go_arch_map:
+  i386: '386'
+  x86_64: 'amd64'
+  aarch64: 'arm64'
+  armv7l: 'armv7'
+  armv6l: 'armv6'
+  armv5l: 'armv5'
+
+go_arch: "{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}"
+smartctl_exporter_filename: "smartctl_exporter-{{ smartctl_exporter_version }}.linux-{{ go_arch }}"

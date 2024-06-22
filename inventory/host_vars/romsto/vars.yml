@@ -16,7 +16,7 @@ prometheus_blackbox_http_targets:
 prometheus_blackbox_icmp_targets:
   - "{{ ansible_host }}"
   - "{{ wireguard_ip }}"
-prometheus_smartctl_targets: ["{{ smartctl_exporter_address }}:{{ smartctl_exporter_port }}"]
+prometheus_smartctl_targets: ["{{ smartctl_exporter_listen_address }}"]
 prometheus_node_targets: ["{{ ansible_host + ':' + node_exporter_port | string }}"]
 prometheus_node_labels:
   instance: "RomeoTV"

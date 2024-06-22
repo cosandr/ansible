@@ -33,5 +33,5 @@ btrfs_root: "/mnt/btrfs_root"
 btrfs_opts: "compress=zstd:3,space_cache=v2"
 root_pass_hash: "{{ lookup('community.general.passwordstore', 'ansible/server_root_hash') }}"
 
-smartctl_exporter_address: "{{ host_ips.vm | default(ansible_host) }}"
-smartctl_exporter_port: 9902
+smartctl_exporter_port: 9633
+smartctl_exporter_listen_address: "{{ host_ips.vm | default(ansible_host) }}:{{ smartctl_exporter_port }}"
