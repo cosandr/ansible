@@ -6,3 +6,5 @@ domain: "{{ domains['hb'] }}"
 node_exporter_installed: false
 # TODO
 promtail_scrape_configs: []
+
+prometheus_smartctl_targets: ["{{ smartctl_exporter_listen_address }}"]
