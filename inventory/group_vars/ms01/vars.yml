@@ -8,3 +8,6 @@ __mt_dns_entries_host:
     address: "{{ host_ips.vpro }}"
 
 grub_cmdline_group: "console=tty0 console=ttyS4,115200n8"
+
+# Remove once all hosts are expected to be up all the time
+prometheus_ignore_down: true
