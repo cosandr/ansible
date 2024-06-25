@@ -26,6 +26,12 @@ grafana_datasources:
     access: "proxy"
     url: "http://localhost:{{ prometheus_port }}/"
     basicAuth: false
+    jsonData:
+      defaultEditor: "code"
+      httpMethod: "POST"
+      prometheusType: "Prometheus"
+      prometheusVersion: "2.50.1"
+      timeInterval: "{{ hostvars['prom01'].prometheus_global.scrape_interval }}"
 grafana_dashboards: []
 
 grafana_log:
