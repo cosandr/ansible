@@ -28,6 +28,10 @@ grafana_datasources:
     basicAuth: false
 grafana_dashboards: []
 
+grafana_log:
+  config:
+    filters: "context:warn"  # Disable access logs
+
 grafana_plugins:
   - grafana-piechart-panel
   - vonage-status-panel
