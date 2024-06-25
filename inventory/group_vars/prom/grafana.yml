@@ -7,7 +7,6 @@ grafana_url: "https://{{ grafana_domain }}/"
 grafana_instance: "localhost"
 grafana_address: "0.0.0.0"
 grafana_port: 3000
-grafana_dashboards_dir: "{{ repo_base_dir }}/files/grafana/dashboards"
 
 grafana_security:
   admin_user: "{{ grafana_admin_user }}"
