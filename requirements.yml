@@ -34,4 +34,4 @@ roles:
   - name: cosandr.nextcloud
     src: https://github.com/cosandr/ansible-role-nextcloud.git
     scm: git
-    version: v1.5.0
+    version: v1.6.0
