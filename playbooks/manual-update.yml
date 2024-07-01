@@ -14,11 +14,10 @@
       register: __dnf_result
       when: ansible_os_family == 'RedHat'
 
-    - name: Upgrade with apt # noqa package-latest
+    - name: Upgrade with apt
       ansible.builtin.apt:
-        name: '*'
-        state: latest
         update_cache: true
+        upgrade: dist
       register: __apt_result
       when: ansible_os_family == 'Debian'
 
