@@ -58,6 +58,20 @@
   when: resolv_config | default('')
   tags: ["resolv"]
 
+- name: Install Rocky security repo
+  ansible.builtin.dnf:
+    name: rocky-release-security
+    state: present
+  when: ansible_distribution == "Rocky"
+  tags: ["rocky"]
+
+- name: Install Rocky security repo GPG key
+  ansible.builtin.rpm_key:
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-SIG-Security
+    state: present
+  when: ansible_distribution == "Rocky"
+  tags: ["rocky"]
+
 - name: Setup hostname
   ansible.builtin.include_role:
     name: hostname
