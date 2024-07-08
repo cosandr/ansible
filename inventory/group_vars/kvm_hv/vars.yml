@@ -85,3 +85,5 @@ __group_common_packages:
   - wget
   - which
   - zsh
+
+wol_address: "{{ lookup('community.general.passwordstore', 'wol/' + inventory_hostname) }}"

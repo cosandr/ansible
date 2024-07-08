@@ -8,3 +8,6 @@ node_exporter_installed: false
 promtail_scrape_configs: []
 
 prometheus_smartctl_targets: ["{{ smartctl_exporter_listen_address }}"]
+
+wol_host: "rb5009"
+wol_address: "{{ lookup('community.general.passwordstore', 'wol/' + inventory_hostname) }}"

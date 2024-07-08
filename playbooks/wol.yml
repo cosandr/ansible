@@ -1,0 +1,23 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Send WOL magic packet
+  hosts: all
+  become: false
+  gather_facts: false
+  tasks:
+    - name: Send WOL packet
+      delegate_to: "{{ __host }}"
+      community.routeros.api:
+        hostname: "{{ hostvars[__host].ansible_host }}"
+        username: "{{ hostvars[__host].api_username }}"
+        password: "{{ hostvars[__host].api_password }}"
+        tls: true
+        validate_certs: true
+        validate_cert_hostname: true
+        ca_path: "{{ hostvars[__host].ca_publickey_path }}"
+        path: "tool"
+        cmd: "wol interface={{ wol_interface | default(host_net | upper) }} mac={{ wol_address }}"
+      vars:
+        __host: "{{ wol_host | default('crs226') }}"
+      when: wol_address is defined

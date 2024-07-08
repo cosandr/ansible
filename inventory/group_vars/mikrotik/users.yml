@@ -3,7 +3,7 @@
 mt_groups:
   - name: "{{ api_username }}"
     args:
-      - "policy=api,read,write,sensitive"
+      - "policy=api,read,write,sensitive,test"
   - name: "prometheus"
     args:
       - "policy=api,read,winbox"
