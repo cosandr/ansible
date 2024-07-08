@@ -32,6 +32,61 @@
       when: ansible_os_family == "RedHat"
       tags: ["tmuxinator"]
 
+    - name: Setup syno auto shutdown
+      tags: ["borg", "syno"]
+      vars:
+        borg_user: "{{ hostvars['syno'].borg_user }}"
+        borg_group: "{{ hostvars['syno'].borg_group }}"
+      block:
+        - name: Generate control SSH key
+          community.crypto.openssh_keypair:
+            path: "/root/.ssh/id_ed25519.syno"
+            type: ed25519
+            comment: "root@{{ inventory_hostname }}"
+          register: __ssh_key
+
+        - name: Copy SSH key to syno
+          delegate_to: syno
+          become: true
+          ansible.posix.authorized_key:
+            user: "{{ borg_user }}"
+            comment: "{{ __ssh_key.comment }}"
+            key: "{{ __ssh_key.public_key }}"
+            key_options: 'command="/bin/bash /volume1/backup/theia-entrypoint.sh",restrict'
+
+        # Synology doesn't have visudo
+        - name: Copy temporary sudoers file
+          delegate_to: localhost
+          ansible.builtin.copy:
+            content: |
+              {{ borg_user }} ALL= NOPASSWD: /usr/sbin/poweroff
+            dest: /tmp/syno-borg-nopasswd
+            mode: "0644"
+            validate: 'visudo -cf %s'
+          tags: ["sudo"]
+
+        - name: Copy sudoers config to syno
+          delegate_to: syno
+          become: true
+          ansible.builtin.copy:
+            src: /tmp/syno-borg-nopasswd
+            dest: /etc/sudoers.d/10-borg-poweroff
+            owner: root
+            group: root
+            mode: "0640"
+          tags: ["sudo"]
+
+        - name: Copy theia-entrypoint
+          delegate_to: syno
+          become: true
+          ansible.builtin.template:
+            src: "{{ repo_base_dir }}/files/borg/theia-entrypoint.sh.j2"
+            dest: /volume1/backup/theia-entrypoint.sh
+            owner: "{{ borg_user }}"
+            group: "{{ borg_group }}"
+            mode: "0755"
+          tags: ["script"]
+
   roles:
     - role: samba
       tags: ["samba"]

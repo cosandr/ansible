@@ -46,9 +46,15 @@ borg_backups:
     target_host: "syno"
     archive_name: "tank"
     archive_path: "tank"
+    pre_ssh_check: "{{ lookup('template', repo_base_dir + '/files/borg/pre_ssh_check_syno.sh.j2') }}"
     pre_run: |
       {{ lookup('template', repo_base_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
-    post_run: "{{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}"
+    post_run: |
+      {{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}
+      if ! ssh -q -o "BatchMode=yes" -i "$synoctl_key" "$syno_ssh_cmd" poweroff; then
+        echo "Failed to poweroff synology"
+        exit 1
+      fi
     paths:
       - "."
     create_args:

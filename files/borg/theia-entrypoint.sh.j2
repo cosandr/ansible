@@ -1,0 +1,75 @@
+#!/bin/bash
+
+set -euo pipefail
+
+cmd="${1:-$SSH_ORIGINAL_COMMAND}"
+last_run_file="/volume1/backup/last_compact"
+repo_dir="{{ hostvars['syno'].borg_pool }}/theia/tank"
+compact_thresh=3888000 # 45*24*3600
+
+print_help() {
+cat <<-END
+Usage $0: COMMAND
+
+Commands:
+poweroff  Poweroff $(hostname)
+help      Show this message
+
+Config:
+last_run_file: $last_run_file
+compact_thresh: $compact_thresh
+END
+}
+
+if [[ -z $cmd ]]; then
+    print_help
+    exit 1
+fi
+
+borg_is_running() {
+    if [[ -f "$repo_dir/lock.roster" ]] || [[ -d "$repo_dir/lock.exclusive" ]]; then
+        return 0
+    fi
+
+    if ! /usr/local/bin/pgrep borg >/dev/null; then
+        return 0
+    fi
+
+    return 1
+}
+
+maybe_compact() {
+    local last_run_ts=0
+    [[ -f "$last_run_file" ]] && last_run_ts=$(<"$last_run_file")
+
+    if [[ $(date +%s) -ge $(( last_run_ts + compact_thresh )) ]]; then
+        {{ hostvars['syno'].borg_serve_bin }} compact --info "$repo_dir"
+        date +%s > "$last_run_file"
+    else
+        echo "Compaction not required yet"
+    fi
+}
+
+case "$cmd" in
+    help)
+        print_help
+        exit 0
+        ;;
+    poweroff)
+        if borg_is_running; then
+            echo "Borg is running, refusing shutdown"
+            exit 100
+        fi
+        maybe_compact
+        echo "Powering off"
+        sudo /usr/sbin/poweroff
+        ;;
+    ping)
+        echo pong
+        exit 0
+        ;;
+    *)
+        echo "Unknown command $cmd"
+        exit 1
+        ;;
+esac

@@ -7,6 +7,7 @@ node_exporter_installed: false
 # TODO
 promtail_scrape_configs: []
 
+prometheus_ignore_down: true
 prometheus_smartctl_targets: ["{{ smartctl_exporter_listen_address }}"]
 
 wol_host: "rb5009"

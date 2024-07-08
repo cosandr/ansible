@@ -31,6 +31,9 @@ export BORG_REPO="{{ borg_pool }}/{{ borg_repo_name }}/{{ archive_path }}"
 {% if conf.remote_path is defined %}
 export BORG_REMOTE_PATH="{{ conf.remote_path }}"
 {% endif %}
+{% if conf.pre_ssh_check is defined %}
+{{ conf.pre_ssh_check }}
+{% endif %}
 {% if ssh_check %}
 if ! ssh -q -o "BatchMode=yes" {{ ssh_check }} exit &>/dev/null
 then
