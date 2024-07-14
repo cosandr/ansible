@@ -19,6 +19,8 @@ calico_node_status: false
 # https://github.com/projectcalico/calico/issues/7892
 calico_ebpf_enabled: false
 
+# Disabled for now, enable when using vm_pci_devices
+# intel_gpu_operator_installed: true
 talos_schedule_on_control_plane: true
 talos_kubeprism_enabled: false
 talos_kubeproxy_enabled: "{{ not calico_ebpf_enabled }}"
