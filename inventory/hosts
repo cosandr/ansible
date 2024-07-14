@@ -42,7 +42,6 @@ rb5009       ansible_host="10.0.100.1"   wireguard_ip="10.4.20.1"
 crs226       ansible_host="10.0.100.2"
 crs309       ansible_host="10.0.100.3"
 theia        ansible_host="10.0.100.16"
-aegir        ansible_host="10.0.100.17"
 gerd         ansible_host="10.0.100.18"
 ymir         ansible_host="10.0.100.19"
 syno         ansible_host="10.0.100.128"
@@ -80,7 +79,7 @@ theia cpu_tier=2 host_num=0
 ms01
 
 [ms01]
-aegir  host_num=1
+; aegir  host_num=1
 gerd   host_num=2
 ymir   host_num=3
 
@@ -190,7 +189,9 @@ loki01 host_num=0
 host_subnet=loki
 
 [localgw]
-localgw[01:04]
+localgw01 vm_host=theia
+localgw03 vm_host=gerd
+localgw04 vm_host=ymir
 
 [localgw:vars]
 host_subnet=localgw
@@ -252,13 +253,15 @@ talos_worker
 host_net=talos
 
 [talos_cp]
-talos[01:03]
+talos01 vm_host=theia
+talos02 vm_host=theia
+talos03 vm_host=gerd
 
 [talos_cp:vars]
 host_subnet=control_plane
 
 [talos_worker]
-talos04
+talos04 vm_host=ymir
 
 [talos_worker:vars]
 host_subnet=worker
