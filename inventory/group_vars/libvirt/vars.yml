@@ -42,6 +42,7 @@ vm_cpu_features: []
 vm_qemu_args: []
 vm_mdev_uuids: []
 vm_virtiofs_mounts: []
+vm_pci_devices: []
 
 vm_seclabel_options:
   type: "dynamic"
@@ -101,6 +102,7 @@ vm_default_definition:
   volumes: "{{ [vm_root_disk] + vm_extra_disks }}"
   interfaces: "{{ vm_nics }}"
   mdev_uuids: "{{ vm_mdev_uuids }}"
+  pci_devices: "{{ vm_pci_devices }}"
   cpu_mode: "{{ vm_cpu_mode }}"
   cpu_model_name: "{{ vm_cpu_model_name }}"
   cpu_features: "{{ vm_cpu_features }}"
