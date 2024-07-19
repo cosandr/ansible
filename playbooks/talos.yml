@@ -453,6 +453,55 @@
         update_repo_cache: true
       tags: ["metrics-server"]
 
+    - name: Add fluxcd-community Helm repo
+      kubernetes.core.helm_repository:
+        name: "fluxcd-community"
+        repo_url: "https://fluxcd-community.github.io/helm-charts"
+      tags: ["flux"]
+
+    - name: Create Flux namespace
+      kubernetes.core.k8s:
+        state: present
+        resource_definition:
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: flux-system
+            labels: "{{ pss_privileged_labels }}"
+      tags: ["flux"]
+
+    - name: Deploy Flux chart
+      kubernetes.core.helm:
+        name: flux2
+        chart_ref: fluxcd-community/flux2
+        chart_version: "{{ flux_version }}"
+        release_namespace: flux-system
+        create_namespace: false
+        update_repo_cache: true
+      tags: ["flux"]
+
+    - name: Get GitLab host keys
+      check_mode: false
+      changed_when: false
+      ansible.builtin.command:
+        cmd: "ssh-keyscan -q gitlab.{{ domains['dv'] }}"
+      register: __gitlab_host_keys
+      tags: ["flux"]
+
+    - name: Set gitlab_host_keys fact
+      ansible.builtin.set_fact:
+        gitlab_host_keys: "{{ __gitlab_host_keys.stdout_lines | sort | join('\n') }}"
+      tags: ["flux"]
+
+    - name: Create Flux bootstrap resources
+      kubernetes.core.k8s:
+        state: present
+        resource_definition: "{{ lookup('template', '{{ repo_base_dir }}/files/talos/{{ item }}') | from_yaml_all }}"
+      loop:
+        - flux-gitlab-secret_vault.yml
+        - flux-gitlab.yml.j2
+      tags: ["flux"]
+
     - name: Include config tasks
       ansible.builtin.include_tasks:
         file: ../tasks/kube.yml

@@ -10,6 +10,9 @@ kube_version: "1.29.6"
 cilium_version: "1.15.x"
 # https://github.com/kubernetes-sigs/metrics-server/releases
 metrics_server_version: "3.x"
+# https://github.com/fluxcd/flux2/releases
+# https://github.com/fluxcd-community/helm-charts/releases
+flux_version: "~2.13"
 
 # Disabled for now, enable when using vm_pci_devices
 # intel_gpu_operator_installed: true

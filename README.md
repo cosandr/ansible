@@ -154,3 +154,25 @@ Setup config
 cd /tmp/talos-config
 export TALOSCONFIG=$(realpath ./talosconfig)
 ```
+
+### Flux
+
+https://fluxcd.io/flux/components/source/gitrepositories/#writing-a-gitrepository-spec
+
+Generate new SSH key, save password in `pass` at `k8s/flux-gitlab-ssh`
+
+```sh
+gopass edit -c k8s/flux-gitlab-ssh
+ssh-keygen -C "flux@talos" -N "$(gopass show -o k8s/flux-gitlab-ssh)" -t ed25519 -f /tmp/flux-ssh
+```
+
+Decrypt [flux-gitlab-secret_vault.yml](./files/talos/flux-gitlab-secret_vault.yml) and add the contents of `/tmp/flux-ssh`
+in the `identity` field.
+
+Add the contents of `/tmp/flux-ssh.pub` to GitLab in Settings/Repository/Deploy Keys (`/flux/talos/-/settings/repository`), ensure write access is enabled.
+
+Remove key from disk
+
+```
+rm -fv /tmp/flux-ssh /tmp/flux-ssh.pub
+```
