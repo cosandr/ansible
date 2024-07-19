@@ -1,0 +1,64 @@
+# https://docs.cilium.io/en/stable/helm-reference/
+
+rollOutCiliumPods: true
+
+# https://docs.cilium.io/en/stable/network/bgp-control-plane/
+bgpControlPlane:
+  enabled: true
+
+# https://docs.cilium.io/en/stable/network/kubernetes/ipam-multi-pool/#enable-multi-pool-ipam-mode
+autoDirectNodeRoutes: true
+endpointRoutes:
+  enabled: true
+ipam:
+  mode: multi-pool
+  operator:
+    autoCreateCiliumPodIPPools:
+      default:
+{% if subnets.talos.pod | ansible.utils.ipv4 %}
+        ipv4:
+          cidrs: {{ subnets.talos.pod | ansible.utils.ipv4 | to_json }}
+          maskSize: 24
+{% endif %}
+{% if subnets.talos.pod | ansible.utils.ipv6 %}
+        ipv6:
+          cidrs: {{ subnets.talos.pod | ansible.utils.ipv6 | to_json }}
+          maskSize: 80
+{% endif %}
+kubeProxyReplacement: true
+enableIPv4Masquerade: false
+ipv4:
+  enabled: {{ all_net.talos.cidr is defined }}
+ipv4NativeRoutingCIDR: "{{ all_net.talos.cidr | default('') }}"
+enableIPv6Masquerade: false
+ipv6:
+  enabled: {{ all_net.talos.cidr6 is defined }}
+ipv6NativeRoutingCIDR: "{{ all_net.talos.cidr6 | default('') }}"
+routingMode: native
+
+# Talos specific
+# https://www.talos.dev/v1.7/kubernetes-guides/network/deploying-cilium/
+k8sServiceHost: localhost
+k8sServicePort: 7445
+cgroup:
+  autoMount:
+    enabled: false
+  hostRoot: /sys/fs/cgroup
+securityContext:
+  capabilities:
+    ciliumAgent:
+      - CHOWN
+      - KILL
+      - NET_ADMIN
+      - NET_RAW
+      - IPC_LOCK
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    cleanCiliumState:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_RESOURCE

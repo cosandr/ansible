@@ -12,7 +12,26 @@
     state: present
   tags: ["helm", "plugins"]
 
-- name: Apply Calico IPPools
+- name: Create Cilium monitoring pool
+  kubernetes.core.k8s:
+    state: present
+    resource_definition:
+      apiVersion: cilium.io/v2alpha1
+      kind: CiliumPodIPPool
+      metadata:
+        name: monitoring
+      spec:
+        ipv4:
+          cidrs: "{{ subnets[kube_name].mon | ansible.utils.ipv4 }}"
+          # Add 2 to CIDR, i.e. /26 -> /28
+          # Needs to be increased if there's more than 4 nodes in cluster.
+          # maskSize: "{{ subnets[kube_name].mon | first | ansible.utils.ipaddr('prefix') + 2 }}"
+          # spec.ipv4.maskSize in body must be of type integer
+          maskSize: 28
+  when: cilium_version is defined
+  tags: ["cilium", "pool"]
+
+- name: Create Calico monitoring pool
   kubernetes.core.k8s:
     state: present
     resource_definition:
@@ -23,6 +42,7 @@
       spec:
         cidr: "{{ subnets[kube_name].mon | ansible.utils.ipv4 | first }}"
         allowedUses: ["Workload"]
+  when: cilium_version is not defined
   tags: ["calico", "pool"]
 
 - name: Add helm repos
@@ -109,8 +129,12 @@
       metadata:
         name: monitoring
         labels: "{{ pss_privileged_labels }}"
-        annotations:
-          cni.projectcalico.org/ipv4pools: '["monitoring"]'
+        annotations: "{{ __cilium_pool if cilium_version is defined else __calico_pool }}"
+  vars:
+    __calico_pool:
+      cni.projectcalico.org/ipv4pools: '["monitoring"]'
+    __cilium_pool:
+      ipam.cilium.io/ip-pool: monitoring
   tags: ["helm", "prometheus"]
 
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack

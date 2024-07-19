@@ -1,0 +1,23 @@
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumBGPPeeringPolicy
+metadata:
+  name: rb5009
+spec:
+  virtualRouters:
+    - localASN: 64528
+      exportPodCIDR: true
+      neighbors:
+        - peerAddress: "{{ (hostvars['rb5009'].mt_routing_ids | selectattr('name', 'eq', host_net) | first).id }}/32"
+          peerASN: {{ mt_bgp_peers[0].as }}
+          gracefulRestart:
+            enabled: true
+            restartTimeSeconds: 120
+      # Announce all services
+      serviceSelector:
+        matchExpressions:
+          - {key: somekey, operator: NotIn, values: ['never-used-value']}
+      # Announce all pod IPs
+      podIPPoolSelector:
+        matchExpressions:
+          - {key: somekey, operator: NotIn, values: ['never-used-value']}

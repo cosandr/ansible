@@ -1,0 +1,11 @@
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: "cilium-lb"
+spec:
+  allowFirstLastIPs: "No"
+  blocks:
+{% for cidr in subnets.talos.lb %}
+  - cidr: "{{ cidr }}"
+{% endfor %}

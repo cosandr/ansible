@@ -318,60 +318,33 @@
         state: present
       tags: ["certs", "cert-approver"]
 
-    - name: Create tigera-operator namespace
-      kubernetes.core.k8s:
-        state: present
-        resource_definition:
-          apiVersion: v1
-          kind: Namespace
-          metadata:
-            name: tigera-operator
-            labels: "{{ pss_privileged_labels }}"
-      tags: ["calico"]
-
-    - name: "Ensure operator config map is {{ cm_state }}"
-      kubernetes.core.k8s:
-        src: "{{ repo_base_dir }}/files/talos/calico-services-configmap.yml"
-        state: "{{ cm_state }}"
-      vars:
-        cm_state: "{{ calico_ebpf_enabled | ternary('present', 'absent') }}"
-      tags: ["calico"]
-
-    - name: Add Calico Helm repo
+    - name: Add Cilium Helm repo
       kubernetes.core.helm_repository:
-        name: "projectcalico"
-        repo_url: "https://docs.tigera.io/calico/charts"
-      tags: ["calico"]
+        name: "cilium"
+        repo_url: "https://helm.cilium.io/"
+      tags: ["cilium"]
 
-    - name: Deploy Calico chart
+    - name: Deploy Cilium chart
       kubernetes.core.helm:
-        name: calico
-        chart_ref: projectcalico/tigera-operator
-        chart_version: "{{ calico_version }}"
-        release_namespace: tigera-operator
+        name: cilium
+        chart_ref: cilium/cilium
+        chart_version: "{{ cilium_version }}"
+        release_namespace: kube-system
         update_repo_cache: true
-        release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/talos/calico-values.yml.j2') | from_yaml }}"
-      register: __calico_helm
-      tags: ["calico"]
+        release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/talos/cilium-values.yml.j2') | from_yaml }}"
+      tags: ["cilium"]
 
-    - name: Apply BGP config
-      ansible.builtin.include_tasks:
-        file: ../tasks/kube_or_calicoctl.yml
-        apply:
-          tags: ["calico", "bgp"]
-          notify: Restart calico-node
-      tags: ["calico", "bgp"]
-      vars:
-        tpl_file: "{{ repo_base_dir }}/files/talos/calico-bgp.yml.j2"
+    - name: Apply Cilium BGP config
+      kubernetes.core.k8s:
+        template: "{{ repo_base_dir }}/files/talos/cilium-bgp.yml.j2"
+        state: present
+      tags: ["cilium"]
 
-    - name: Apply Felix config
-      ansible.builtin.include_tasks:
-        file: ../tasks/kube_or_calicoctl.yml
-        apply:
-          tags: ["calico", "felix"]
-      tags: ["calico", "felix"]
-      vars:
-        tpl_file: "{{ repo_base_dir }}/files/talos/calico-felix.yml.j2"
+    - name: Apply Cilium LB config
+      kubernetes.core.k8s:
+        template: "{{ repo_base_dir }}/files/talos/cilium-lb-pool.yml.j2"
+        state: present
+      tags: ["cilium"]
 
     - name: Check if admin nodes should be force enabled
       when: not enable_admin_pods | bool
@@ -398,13 +371,6 @@
         wait: "{{ enable_admin_pods | bool }}"
       tags: ["admin"]
 
-  handlers:
-    - name: Restart calico-node  # noqa no-changed-when
-      ansible.builtin.command:
-        cmd: "kubectl rollout restart daemonset --context {{ talos_kubectl_context }} -n calico-system calico-node"
-      # Don't try to restart if chart was just deployed
-      when: __calico_helm.status.status != 'DEPLOYED' or __calico_helm.status.revision | int > 1
-
 - name: Setup Kubernetes from all nodes
   hosts: talos
   become: false
@@ -416,34 +382,6 @@
     ansible_connection: local
   tags: ["system"]
   tasks:
-    - name: Apply Node config
-      ansible.builtin.include_tasks:
-        file: ../tasks/kube_or_calicoctl.yml
-        apply:
-          tags: ["calico", "bgp"]
-      tags: ["calico", "bgp"]
-      vars:
-        tpl_file: "{{ repo_base_dir }}/files/talos/calico-node.yml.j2"
-
-    - name: Wait until Calico API server is up
-      run_once: true
-      kubernetes.core.k8s_info:
-        api_version: apps/v1
-        kind: Deployment
-        name: calico-apiserver
-        namespace: calico-apiserver
-        wait: true
-        wait_timeout: 300
-      tags: ["calico", "status"]
-
-    - name: "Ensure calico node status are {{ status_state }}"
-      kubernetes.core.k8s:
-        state: "{{ status_state }}"
-        template: "{{ repo_base_dir }}/files/talos/calico-node-status.yml.j2"
-      vars:
-        status_state: "{{ calico_node_status | bool | ternary('present', 'absent') }}"
-      tags: ["calico", "status"]
-
     - name: Apply node labels
       kubernetes.core.k8s:
         kind: Node
@@ -514,52 +452,6 @@
         release_namespace: kube-system
         update_repo_cache: true
       tags: ["metrics-server"]
-
-    - name: Create MetalLB namespace
-      kubernetes.core.k8s:
-        state: present
-        resource_definition:
-          apiVersion: v1
-          kind: Namespace
-          metadata:
-            name: metallb-system
-            labels: "{{ pss_privileged_labels }}"
-      tags: ["metallb"]
-
-    - name: Add MetalLB Helm repo
-      kubernetes.core.helm_repository:
-        name: "metallb"
-        repo_url: "https://metallb.github.io/metallb"
-      tags: ["metallb"]
-
-    - name: Deploy MetalLB chart
-      kubernetes.core.helm:
-        name: metallb
-        chart_ref: metallb/metallb
-        chart_version: "{{ metallb_version }}"
-        release_namespace: metallb-system
-        update_repo_cache: true
-        release_values:
-          speaker:
-            enabled: false
-      tags: ["metallb"]
-
-    - name: Wait for metallb-controller
-      kubernetes.core.k8s_info:
-        kind: Pod
-        namespace: metallb-system
-        field_selectors:
-          - status.phase=Running
-        label_selectors:
-          - app.kubernetes.io/name=metallb
-        wait: true
-      tags: ["metallb"]
-
-    - name: Create MetalLB IP pool
-      kubernetes.core.k8s:
-        template: "{{ repo_base_dir }}/files/talos/metallb-pool.yml.j2"
-        state: present
-      tags: ["metallb"]
 
     - name: Include config tasks
       ansible.builtin.include_tasks:

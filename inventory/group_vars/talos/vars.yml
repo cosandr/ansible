@@ -6,24 +6,17 @@ host_num: "{{ groups[(host_subnet == 'control_plane') | ternary('talos_cp', 'tal
 talos_version: "1.7.5"
 # https://kubernetes.io/releases/
 kube_version: "1.29.6"
-# https://github.com/projectcalico/calico/releases
-# https://artifacthub.io/packages/helm/projectcalico/tigera-operator
-calico_version: "~3.28"
+# https://github.com/cilium/cilium/releases
+cilium_version: "1.15.x"
 # https://github.com/kubernetes-sigs/metrics-server/releases
 metrics_server_version: "3.x"
-# https://metallb.universe.tf/release-notes/
-metallb_version: "<0.15"
-
-calico_node_as: "{{ 65201 + (groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
-calico_node_status: false
-# https://github.com/projectcalico/calico/issues/7892
-calico_ebpf_enabled: false
 
 # Disabled for now, enable when using vm_pci_devices
 # intel_gpu_operator_installed: true
 talos_schedule_on_control_plane: true
-talos_kubeprism_enabled: false
-talos_kubeproxy_enabled: "{{ not calico_ebpf_enabled }}"
+talos_kubeprism_enabled: true
+talos_kubeproxy_enabled: false
+kube_proxy_enabled: false
 talos_kubeproxy_mode: ipvs
 
 # https://www.talos.dev/v1.7/talos-guides/install/boot-assets/#image-factory
