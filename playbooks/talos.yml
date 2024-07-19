@@ -312,12 +312,6 @@
       tags: ["certs"]
 
   tasks:
-    - name: Deploy cert-approver
-      kubernetes.core.k8s:
-        src: "https://raw.githubusercontent.com/alex1989hu/kubelet-serving-cert-approver/main/deploy/standalone-install.yaml"
-        state: present
-      tags: ["certs", "cert-approver"]
-
     - name: Add Cilium Helm repo
       kubernetes.core.helm_repository:
         name: "cilium"
