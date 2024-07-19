@@ -15,4 +15,20 @@ machine:
 {% if 'talos_cp' in group_names %}
 cluster:
   allowSchedulingOnControlPlanes: {{ talos_schedule_on_control_plane }}
+  # https://www.talos.dev/v1.7/reference/configuration/v1alpha1/config/#Config.cluster.apiServer
+  apiServer:
+    admissionControl:
+      - name: PodSecurity
+        configuration:
+         defaults:
+          audit: baseline
+          audit-version: latest
+          enforce: baseline
+          enforce-version: latest
+          warn: baseline
+          warn-version: latest
+         exemptions:
+          namespaces:
+            # Adds to defaults (kube-system)
+            - cilium-test
 {% endif %}
