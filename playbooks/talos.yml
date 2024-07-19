@@ -438,21 +438,6 @@
   vars:
     ansible_connection: local
   tasks:
-    - name: Add metrics-server Helm repo
-      kubernetes.core.helm_repository:
-        name: "metrics-server"
-        repo_url: "https://kubernetes-sigs.github.io/metrics-server/"
-      tags: ["metrics-server"]
-
-    - name: Deploy metrics-server chart
-      kubernetes.core.helm:
-        name: metrics-server
-        chart_ref: metrics-server/metrics-server
-        chart_version: "{{ metrics_server_version }}"
-        release_namespace: kube-system
-        update_repo_cache: true
-      tags: ["metrics-server"]
-
     - name: Add fluxcd-community Helm repo
       kubernetes.core.helm_repository:
         name: "fluxcd-community"

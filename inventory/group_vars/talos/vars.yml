@@ -8,8 +8,6 @@ talos_version: "1.7.5"
 kube_version: "1.29.6"
 # https://github.com/cilium/cilium/releases
 cilium_version: "1.15.x"
-# https://github.com/kubernetes-sigs/metrics-server/releases
-metrics_server_version: "3.x"
 # https://github.com/fluxcd/flux2/releases
 # https://github.com/fluxcd-community/helm-charts/releases
 flux_version: "~2.13"
