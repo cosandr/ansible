@@ -75,6 +75,7 @@
       metadata:
         name: openebs
         labels: "{{ pss_privileged_labels }}"
+  when: "'talos' not in group_names"
   tags: ["lvm"]
 
 - name: Install OpenEBS LVM CSI driver
@@ -97,6 +98,7 @@
           - key: "node-role.kubernetes.io/control-plane"
             effect: "NoSchedule"
             operator: "Exists"
+  when: "'talos' not in group_names"
   tags: ["lvm"]
 
 - name: Create LVM StorageClass
@@ -118,6 +120,7 @@
       mountOptions:
         - "defaults"
         - "noatime"
+  when: "'talos' not in group_names"
   tags: ["lvm"]
 
 - name: Create monitoring namespace
