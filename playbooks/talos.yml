@@ -415,7 +415,9 @@
         ansible_kubectl_context: "{{ talos_kubectl_context }}"
         ansible_kubectl_namespace: "{{ __admin_pod.resources[0].metadata.namespace }}"
         ansible_kubectl_pod: "{{ __admin_pod.resources[0].metadata.name }}"
-      when: __admin_pod.resources
+      when:
+        - __admin_pod.resources
+        - vm_extra_disks | selectattr('serial', 'defined') | selectattr('serial', 'eq', 'raw01')
       tags: ["lvm"]
 
     - name: Disable admin daemonset
