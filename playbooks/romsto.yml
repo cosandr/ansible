@@ -21,27 +21,42 @@
           mount -o {{ ssd_mount_opts }} {{ data_disk.dev }} {{ data_disk.path }}
       tags: ["go", "datassd"]
 
-    - name: Setup extra SSD scrub
-      ansible.builtin.copy:
-        dest: /etc/cron.weekly/datassd-scrub.sh
+    - name: Ensure data-ssd scrub user script dir exists
+      ansible.builtin.file:
+        path: "{{ user_scripts_path }}/scrub-datassd"
+        state: directory
         owner: root
         group: root
-        mode: "0755"
+        mode: "0700"
+      tags: ["datassd", "userscripts"]
+
+    # Manually add weekly schedule
+    - name: Setup extra SSD scrub
+      ansible.builtin.copy:
+        dest: "{{ user_scripts_path }}/scrub-datassd/script"
+        owner: root
+        group: root
+        mode: "0600"
         content: |
           #!/bin/bash
 
+          #name=scrub-datassd
+          #description=Scrub datassd
+          #arrayStarted=true
+          #noParity=true
+
           /sbin/btrfs scrub start {{ persistent_disk.path }} &> /dev/null
           /sbin/btrfs scrub start {{ data_disk.path }} &> /dev/null
-      tags: ["datassd"]
+      tags: ["datassd", "userscripts"]
 
-    - name: Ensure user script dir exists
+    - name: Ensure data-ssd mount user script dir exists
       ansible.builtin.file:
         path: "{{ user_scripts_path }}/0-mount-datassd"
         state: directory
         owner: root
         group: root
         mode: "0700"
-      tags: ["datassd"]
+      tags: ["datassd", "userscripts"]
 
     - name: Ensure data SSD is mounted on array start
       ansible.builtin.copy:
@@ -61,7 +76,7 @@
             mkdir -p {{ data_disk.path }}
             mount -o {{ ssd_mount_opts }} {{ data_disk.dev }} {{ data_disk.path }}
           fi
-      tags: ["datassd"]
+      tags: ["datassd", "userscripts"]
 
     - name: Configure mlocate
       tags: ["mlocate"]
@@ -95,6 +110,71 @@
               [ -d /var/lib/mlocate ] && rm -rf /var/lib/mlocate
               ln -s {{ persistent_disk.path }}/mlocate /var/lib/
           tags: ["go"]
+
+    - name: Ensure user script dir exists
+      ansible.builtin.file:
+        path: "{{ user_scripts_path }}/ensure-25gbe"
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+      tags: ["25gbe", "userscripts"]
+
+    # Manually schedule to every 5 minutes
+    - name: Ensure data SSD is mounted on array start
+      ansible.builtin.copy:
+        dest: "{{ user_scripts_path }}/ensure-25gbe/script"
+        owner: root
+        group: root
+        mode: "0600"
+        content: |
+          #!/bin/bash
+
+          #name=ensure-25gbe
+          #description=Ensure 2.5GbE has IP address
+          #arrayStarted=true
+          #noParity=true
+
+          MAC_ADDRESS="{{ vault_25gbe_mac }}"
+          IP_ADDRESS="10.25.0.6/24"
+          IFNAME=""
+
+          # Find device name
+          for f in /sys/class/net/eth*/address; do
+              if [[ $(<"$f") = "$MAC_ADDRESS" ]]; then
+                  IFNAME="$(basename "$(dirname "$f")")"
+                  break
+              fi
+          done
+
+          if [[ -z $IFNAME ]]; then
+              echo "Could not determine interface name"
+              exit 1
+          fi
+
+          ifstatus="$(ip addr show dev "$IFNAME")"
+
+          if [[ $ifstatus != *"$IP_ADDRESS"* ]]; then
+              echo "Adding $IP_ADDRESS to $IFNAME"
+              ip addr add "$IP_ADDRESS" dev "$IFNAME"
+          else
+              echo "$IP_ADDRESS already set on $IFNAME"
+          fi
+
+          if [[ $ifstatus != *"mtu 9000"* ]]; then
+              echo "Setting $IFNAME MTU to 9000"
+              ip link set mtu 9000 "$IFNAME"
+          else
+              echo "MTU already set on $IFNAME"
+          fi
+
+          if [[ $ifstatus == *"state DOWN"* ]]; then
+              echo "Setting $IFNAME up"
+              ip link set "$IFNAME" up
+          else
+              echo "$IFNAME already up"
+          fi
+      tags: ["datassd", "userscripts"]
 
   roles:
     - role: nginx_site
