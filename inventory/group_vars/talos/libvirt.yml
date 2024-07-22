@@ -8,6 +8,7 @@ vm_autostart: false
 
 # Disabled for now, test manually
 # vm_pci_devices: "{{ (vm_host in groups['ms01']) | ternary(__igpu_vm_pci_devices, []) }}"
+vm_pci_devices: "{{ (vm_host == 'ymir') | ternary(__igpu_vm_pci_devices, []) }}"
 __igpu_vm_pci_devices:
   - address:
       domain: "0x0000"
