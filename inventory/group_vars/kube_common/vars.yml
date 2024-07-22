@@ -5,8 +5,6 @@ certmanager_version: "1.x"
 # https://github.com/kubernetes/ingress-nginx/releases
 # https://github.com/kubernetes/ingress-nginx/issues/11588
 ingress_nginx_version: "4.10.x"
-# https://github.com/kubernetes-sigs/node-feature-discovery/releases
-nfd_version: "~0.16"
 # https://github.com/openebs/lvm-localpv/releases
 openebs_lvm_version: "~1.6"
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
