@@ -16,6 +16,7 @@ base_pacman_packages:
   - alsa-utils
   - ansible
   - ansible-lint
+  - argocd
   - autoconf
   - automake
   - base
@@ -25,6 +26,7 @@ base_pacman_packages:
   - bluez
   - bluez-utils
   - btrfs-progs
+  - cilium-cli
   - deluge-gtk
   - docker
   - docker-buildx
@@ -40,6 +42,7 @@ base_pacman_packages:
   - firefox-i18n-nb-no
   - firewalld
   - flex
+  - fluxcd
   - freerdp
   - fzf
   - gawk
@@ -63,6 +66,8 @@ base_pacman_packages:
   - kernel-modules-hook
   - kitty
   - kubectl
+  - kubectx
+  - kubeseal
   - libpulse
   - libtool
   - libva-utils
@@ -131,6 +136,7 @@ base_pacman_packages:
   - wget
   - which
   - yamllint
+  - zed
   - zsh
   - zsh-completions
 
