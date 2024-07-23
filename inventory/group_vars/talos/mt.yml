@@ -3,3 +3,6 @@
 mt_dhcp_leases:
   - address: "{{ ansible_host }}"
     mac_address: "{{ vm_default_mac }}"
+  - address: "{{ host_ips.san }}"
+    mac_address: "{{ vm_mac_san }}"
+    server: "dhcp-san"

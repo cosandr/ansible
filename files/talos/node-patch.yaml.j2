@@ -10,6 +10,12 @@ machine:
         vip:
           ip: "{{ vips.talos.control_plane | ansible.utils.ipv4 | first }}"
 {% endif %}
+      - deviceSelector:
+          hardwareAddr: "{{ vm_mac_san }}"
+        dhcp: true
+        mtu: {{ all_net.san.mtu }}
+        routes:
+          - network: "{{ all_net.san.cidr }}"
   nodeLabels: {{ node_labels | to_json }}
 
 {% if 'talos_cp' in group_names %}

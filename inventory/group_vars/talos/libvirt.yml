@@ -5,6 +5,13 @@ vm_host: "{{ vm_host_list[groups['talos'] | ansible.utils.index_of('eq', invento
 vm_template: false
 vm_customize: false
 vm_autostart: false
+vm_mac_san: "{{ '52:54:{:02x}'.format(all_net.san.vlan) | community.general.random_mac(seed=inventory_hostname) }}"
+vm_nics:
+  - "{{ vm_default_nic }}"
+  - type: bridge
+    source:
+      dev: "SAN"
+    mac: "{{ vm_mac_san }}"
 
 # Disabled for now, test manually
 # vm_pci_devices: "{{ (vm_host in groups['ms01']) | ternary(__igpu_vm_pci_devices, []) }}"

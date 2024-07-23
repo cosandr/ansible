@@ -2,6 +2,9 @@
 
 host_num: "{{ groups[(host_subnet == 'control_plane') | ternary('talos_cp', 'talos_worker')] | ansible.utils.index_of('eq', inventory_hostname) }}"
 
+__host_ips_2:
+  san: "{{ subnets.san.talos | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
+
 # https://github.com/siderolabs/talos/releases
 talos_version: "1.7.5"
 # https://kubernetes.io/releases/
