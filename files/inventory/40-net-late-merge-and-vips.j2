@@ -27,6 +27,7 @@
     "domain": "man.{{ domains['hb'] }}",
   },
   "san": {
+    "dhcp_range": subnets.san.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "san.{{ domains['hb'] }}",
   },
 } %}

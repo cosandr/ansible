@@ -2,7 +2,7 @@
 
 host_ips: >-
   {%- set tmp = {} -%}
-  {%- for name, config in all_net.items() if 'vlan' in config and 'NOROUTE' not in config.get('mt_lists', []) -%}
+  {%- for name, config in all_net.items() if 'vlan' in config and ('NOROUTE' not in config.get('mt_lists', []) or 'dhcp_range' in config) -%}
   {{- tmp.update({name: config.cidr | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address')}) -}}
   {%- endfor -%}
   {{ tmp }}

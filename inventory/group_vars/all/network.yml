@@ -98,6 +98,7 @@ internal_net:
       - SEC
       - NOWAN
       - NOROUTE
+    dhcp_range: 10.0.2.128-10.0.2.254
     domain: san.{{ domains['hb'] }}
 
 wg_net:
@@ -217,8 +218,9 @@ subnets:
       - 10.0.2.16/28
     vips:
       - 10.0.2.32/27
+    talos:
+      - 10.0.2.96/27
     clients:
-      - 10.0.2.64/26
       - 10.0.2.128/25
   mt:
     switches:

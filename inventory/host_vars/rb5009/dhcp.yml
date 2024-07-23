@@ -34,14 +34,23 @@ mt_dhcp_servers: >-
 mt_dhcp_networks: >-
   {%- set tmp = [] -%}
   {%- for name, config in all_net.items() if 'dhcp_range' in config -%}
-  {{- tmp.append(
-    {
+  {%- set tmp_dict = {
       'address': config.cidr,
-      'dns-server': [host_ips[name], '1.1.1.1', '8.8.8.8'] | join(','),
       'domain': config.domain | default(name + '.' + domains['hb']),
-      'gateway': host_ips[name],
     }
-  ) -}}
+  -%}
+  {%- if 'NOROUTE' not in config.get('mt_lists', []) and name in host_ips -%}
+  {{- tmp_dict.update({
+    'gateway': host_ips[name],
+    'dns-server': [host_ips[name], '1.1.1.1', '8.8.8.8'] | join(','),
+  }) -}}
+  {%- endif -%}
+  {%- if 'NOROUTE' in config.get('mt_lists', []) and name in host_ips -%}
+  {{- tmp_dict.update({
+    'dns-server': host_ips[name],
+  }) -}}
+  {%- endif -%}
+  {{- tmp.append(tmp_dict) -}}
   {%- endfor -%}
   {{ tmp }}
 
