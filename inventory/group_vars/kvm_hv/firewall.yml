@@ -23,13 +23,18 @@ firewall_rules: >-
   {%- endfor -%}
   {{ tmp }}
 
+# Need to manually remove it
+# ansible kvm_hv -a 'firewall-cmd --permanent --zone=internal --remove-interface=SAN'
+internal_exclude_nets:
+  - san
+
 __firewall_ssh_public: "absent"
 __firewall_cockpit_zone: "internal"
 __firewalld_zones_2:
   - name: internal
     interfaces: >-
       {%- set tmp = [] -%}
-      {%- for name, config in internal_net.items() if 'vlan' in config and name not in host_exclude_nets -%}
+      {%- for name, config in internal_net.items() if 'vlan' in config and name not in host_exclude_nets and name not in internal_exclude_nets -%}
       {{- tmp.append(name | upper) -}}
       {%- endfor -%}
       {{ tmp }}
@@ -41,6 +46,9 @@ __firewalld_zones_2:
       {{- tmp.append(name | upper) -}}
       {%- endfor -%}
       {{ tmp }}
+
+  - name: san
+    interfaces: ["SAN"]
 
 __firewalld_services_2:
   - name: cockpit
@@ -65,6 +73,13 @@ __firewalld_services_2:
   - name: cockpit
     zone: "{{ __firewall_cockpit_zone }}"
     sources: "{{ firewall_trusted_sources }}"
+
+  - name: nfs3
+    zone: san
+
+  - name: ssh
+    zone: san
+    sources: "{{ subnets.san.hosts }}"
 
 __firewall_rules_2:
   - port: "{{ nvme_exporter_port }}"
