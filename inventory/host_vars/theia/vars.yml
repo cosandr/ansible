@@ -12,6 +12,7 @@ btrfs_subvols:
   - "@/var/lib/libvirt/images"
   - "@home/{{ my_user }}"
   - "@/mnt/containers"
+  - "@/mnt/kube"
 
 btrfs_scrub_targets:
   - /
