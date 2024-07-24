@@ -8,7 +8,6 @@ metadata:
     app.kubernetes.io/name: admin
     app.kubernetes.io/managed-by: ansible
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: admin
@@ -32,6 +31,7 @@ spec:
         kubernetes.io/os: disabled
 {% endif %}
       priorityClassName: system-node-critical
+      terminationGracePeriodSeconds: 2
       tolerations:
       - key: "node-role.kubernetes.io/control-plane"
         effect: "NoSchedule"
@@ -40,7 +40,6 @@ spec:
       - name: admin
         image: {{ gitlab_registry_basename }}/global/containers/admin:latest
         args: ["/bin/sh", "-ec", "--", "trap : TERM INT; sleep infinity & wait"]
-        terminationGracePeriodSeconds: 2
         securityContext:
           privileged: true
         resources:

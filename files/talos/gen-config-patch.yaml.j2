@@ -28,6 +28,9 @@ machine:
   network:
     nameservers: {{ vm_default_nic.dns_servers[:2] | to_json }}
   kubelet:
+    nodeIP:
+      validSubnets:
+        - "{{ all_net[host_net].cidr }}"
     extraArgs:
       rotate-server-certificates: true
   features:

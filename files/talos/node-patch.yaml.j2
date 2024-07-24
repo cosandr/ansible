@@ -5,17 +5,22 @@ machine:
     interfaces:
       - deviceSelector:
           hardwareAddr: "{{ vm_default_mac }}"
-        dhcp: true
+        addresses:
+          - "{{ host_ips_with_prefix[host_net] }}"
+        mtu: {{ all_net[host_net].mtu | default(1500) }}
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "{{ hostvars['rb5009'].host_ips[host_net] }}"
+            metric: 1024
 {% if 'talos_cp' in group_names %}
         vip:
           ip: "{{ vips.talos.control_plane | ansible.utils.ipv4 | first }}"
 {% endif %}
       - deviceSelector:
           hardwareAddr: "{{ vm_mac_san }}"
-        dhcp: true
+        addresses:
+          - "{{ host_ips_with_prefix.san }}"
         mtu: {{ all_net.san.mtu }}
-        routes:
-          - network: "{{ all_net.san.cidr }}"
   nodeLabels: {{ node_labels | to_json }}
 
 {% if 'talos_cp' in group_names %}

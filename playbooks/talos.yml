@@ -328,6 +328,19 @@
         release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/talos/cilium-values.yml.j2') | from_yaml }}"
       tags: ["cilium"]
 
+    - name: Wait until Cilium Operator is ready
+      kubernetes.core.k8s_info:
+        context: "{{ talos_kubectl_context }}"
+        kind: Deployment
+        name: "cilium-operator"
+        namespace: kube-system
+        wait: true
+      register: __cilium_operator
+      until: __cilium_operator is succeeded
+      retries: 120
+      delay: 1
+      tags: ["cilium"]
+
     - name: Apply Cilium BGP config
       kubernetes.core.k8s:
         template: "{{ repo_base_dir }}/files/talos/cilium-bgp.yml.j2"
