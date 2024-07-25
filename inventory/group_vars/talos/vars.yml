@@ -24,8 +24,8 @@ kube_proxy_enabled: false
 talos_kubeproxy_mode: ipvs
 
 # https://www.talos.dev/v1.7/talos-guides/install/boot-assets/#image-factory
-# Contains qemu-guest-agent
-talos_schematic: ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515
+# Contains qemu-guest-agent and i915-ucode
+talos_schematic: 90015c0ada3ddd8b55e25342d736bbb1ef7c8e213883ec2ad1110cb44944503f
 talos_image: "factory.talos.dev/installer/{{ talos_schematic }}:v{{ talos_version }}"
 
 talos_kubectl_context: "admin@{{ kube_api_server }}"
