@@ -1,8 +1,10 @@
 # https://docs.cilium.io/en/stable/helm-reference/
 
+# upgradeCompatibility: "1.15"
+
 rollOutCiliumPods: true
 
-# https://docs.cilium.io/en/stable/network/bgp-control-plane/
+# https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane/#bgp-control-plane
 bgpControlPlane:
   enabled: true
 
@@ -38,6 +40,15 @@ ipv6:
   enabled: {{ all_net.talos.cidr6 is defined }}
 ipv6NativeRoutingCIDR: "{{ all_net.talos.cidr6 | default('') }}"
 routingMode: native
+loadBalancer:
+  mode: dsr
+
+ {# ingressController:
+   enabled: true
+   loadbalancerMode: shared
+   service:
+     externalTrafficPolicy: Cluster  # Local isn't being advertised (and doesn't preserve client IPs anyway)
+     loadBalancerIP: "{{ vips.talos.cilium_ingress | ansible.utils.ipv4 | first }}" #}
 
 # Talos specific
 # https://www.talos.dev/v1.7/kubernetes-guides/network/deploying-cilium/

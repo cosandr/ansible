@@ -10,7 +10,7 @@ talos_version: "1.7.5"
 # https://kubernetes.io/releases/
 kube_version: "1.29.7"
 # https://github.com/cilium/cilium/releases
-cilium_version: "1.15.x"
+cilium_version: "1.16.x"
 # https://github.com/fluxcd/flux2/releases
 # https://github.com/fluxcd-community/helm-charts/releases
 flux_version: "~2.13"
