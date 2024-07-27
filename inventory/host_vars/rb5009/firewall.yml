@@ -52,7 +52,7 @@ mt_firewall_raw: "{{ __mt_firewall_raw_auto }}"
 
 __kube_cidr_map: >-
   {%- set tmp = {} -%}
-  {%- for name, config in all_net.items() if name in ['kube', 'talos'] -%}
+  {%- for name, config in all_net.items() if name in ['talos'] -%}
   {{- tmp.update({name: ([config.get('cidr_internal')] + [config.get('cidr6_internal')]) | select }) -}}
   {%- endfor -%}
   {{ tmp }}
@@ -71,9 +71,7 @@ __mt_firewall_subnet_lists:
   - "{{ subnets.vm.nextcloud | andrei.utils.items2dictlist('address', list='www', comment='vm-nextcloud') }}"
   - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='allow-lan', comment='vm-prom') }}"
   - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='www', comment='vm-prom') }}"
-  - "{{ __kube_cidr_map.kube | andrei.utils.items2dictlist('address', list='kube', comment='kube') }}"
   - "{{ __kube_cidr_map.talos | andrei.utils.items2dictlist('address', list='talos', comment='talos') }}"
-  - "{{ __kube_cidr_map.values() | flatten | andrei.utils.items2dictlist('address', list='all_kube', comment='all_kube') }}"
   - "{{ vips.vm | dict2items | selectattr('key', 'match', 'localgw\\d+') | map(attribute='value') | flatten
     | andrei.utils.items2dictlist('address', list='allow-www', comment='vm-localgw-vips') }}"
 

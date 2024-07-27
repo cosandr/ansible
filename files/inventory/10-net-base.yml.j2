@@ -8,17 +8,6 @@ home_net:
 {% endif %}
     vlan: 10
     mt_lists: [LAN, NOSEC]
-  kube:
-{% if 'cidr' in supernets %}
-    cidr: "{{ supernets.cidr | ansible.utils.ipsubnet(24, 27) }}"
-{% endif %}
-{% if 'cidr6' in supernets %}
-    cidr6: "{{ supernets.cidr6 | ansible.utils.ipsubnet(64, 27) }}"
-{% endif %}
-    cidr_internal: "172.27.0.0/16"
-    # cidr6_internal: "fd00:172:27::/56"
-    vlan: 27
-    mt_lists: [LAN, NOSEC]
   talos:
 {% if 'cidr' in supernets %}
     cidr: "{{ supernets.cidr | ansible.utils.ipsubnet(24, 28) }}"

@@ -1,0 +1,27 @@
+---
+
+# https://cert-manager.io/docs/releases/
+certmanager_version: "1.x"
+# https://github.com/openebs/lvm-localpv/releases
+openebs_lvm_version: "~1.6"
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+prometheus_version: "61.x"
+# https://github.com/grafana/helm-charts/releases
+promtail_version: "6.x"
+# https://github.com/cilium/cilium/releases
+cilium_version: "1.16.x"
+# https://github.com/fluxcd/flux2/releases
+# https://github.com/fluxcd-community/helm-charts/releases
+flux_version: "~2.13"
+
+alertmanager_template_files: >-
+  {%- set tmp = {} -%}
+  {%- for f in (repo_base_dir + '/files/alertmanager/*.tmpl') | fileglob | sort -%}
+  {{- tmp.update({f | basename: lookup('file', f)}) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
+certmanager_cluster_issuers:
+  - key: hb
+    staging: true
+  - key: hb

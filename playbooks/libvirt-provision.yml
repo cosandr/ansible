@@ -2,7 +2,7 @@
 ---
 
 - name: Run common tasks
-  hosts: libvirt,!k8s_cluster,!talos
+  hosts: libvirt,!talos
   gather_facts: true
   pre_tasks:
     - name: Include common tasks

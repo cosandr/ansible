@@ -1,9 +1,6 @@
 ---
 
 mt_routing_ids:
-  - id: "{{ host_ips.kube }}"
-    name: kube
-    select-from-vrf: main
   - id: "{{ host_ips.talos }}"
     name: talos
     select-from-vrf: main

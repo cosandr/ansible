@@ -2,7 +2,7 @@
 ---
 
 - name: Upgrade OS with dnf or apt
-  hosts: servers, !romsto, !syno, !k8s_cluster, !talos
+  hosts: servers, !romsto, !syno, !talos
   gather_facts: true
   become: true
   tasks:

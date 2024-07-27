@@ -51,9 +51,6 @@ __subnet_extensions:
   "_r40": 28,
   "clients": -28,
 } %}
-  kube: {{ all_net.kube | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80)
-    | combine(all_net.kube | andrei.utils.subnets_from_map(__subnet_map_kube_internal, v4_name="cidr_internal", v6_name="cidr6_internal", v6_size=64)) }}
-
   talos: {{ all_net.talos | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80)
     | combine(all_net.talos | andrei.utils.subnets_from_map(__subnet_map_kube_internal, v4_name="cidr_internal", v6_name="cidr6_internal", v6_size=64)) }}
 

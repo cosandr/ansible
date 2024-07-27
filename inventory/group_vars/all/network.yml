@@ -43,15 +43,6 @@ home_net:
       - NOSEC
     dhcp_range: 10.0.10.240-10.0.10.254
     domain: vm.{{ domains['hb'] }}
-  kube:
-    cidr: 10.0.27.0/24
-    cidr_internal: 172.27.0.0/16
-    vlan: 27
-    mt_lists:
-      - LAN
-      - NOSEC
-    dhcp_range: 10.0.27.240-10.0.27.254
-    domain: kube.{{ domains['hb'] }}
   talos:
     cidr: 10.0.28.0/24
     cidr_internal: 172.28.0.0/16
@@ -135,27 +126,6 @@ subnets:
       - 10.0.10.108/31
     clients:
       - 10.0.10.240/28
-  kube:
-    switches:
-      - 10.0.27.0/28
-    hosts:
-      - 10.0.27.16/28
-    vips:
-      - 10.0.27.32/27
-    control_plane:
-      - 10.0.27.64/28
-    worker:
-      - 10.0.27.80/28
-    clients:
-      - 10.0.27.240/28
-    svc:
-      - 172.27.0.0/18
-    pod:
-      - 172.27.64.0/18
-    lb:
-      - 172.27.128.0/26
-    mon:
-      - 172.27.128.64/26
   talos:
     switches:
       - 10.0.28.0/28
@@ -254,13 +224,6 @@ vips:
   san:
     ceph_nfs:
       - 10.0.2.36
-  kube:
-    control_plane:
-      - 10.0.27.33
-    nginx:
-      - 172.27.128.1
-    prom:
-      - 172.27.128.2
   talos:
     control_plane:
       - 10.0.28.33
@@ -283,13 +246,6 @@ vips_with_prefix:
   san:
     ceph_nfs:
       - 10.0.2.36/24
-  kube:
-    control_plane:
-      - 10.0.27.33/24
-    nginx:
-      - 172.27.128.1/16
-    prom:
-      - 172.27.128.2/16
   talos:
     control_plane:
       - 10.0.28.33/24

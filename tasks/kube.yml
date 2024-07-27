@@ -1,10 +1,5 @@
 ---
 
-- name: Set kube_name fact
-  ansible.builtin.set_fact:
-    kube_name: "{{ ('talos' in group_names) | ternary('talos', 'kube') }}"
-  tags: ["always"]
-
 - name: Install Helm diff plugin
   delegate_to: localhost
   kubernetes.core.helm_plugin:
@@ -22,10 +17,10 @@
         name: monitoring
       spec:
         ipv4:
-          cidrs: "{{ subnets[kube_name].mon | ansible.utils.ipv4 }}"
+          cidrs: "{{ subnets.talos.mon | ansible.utils.ipv4 }}"
           # Add 2 to CIDR, i.e. /26 -> /28
           # Needs to be increased if there's more than 4 nodes in cluster.
-          # maskSize: "{{ subnets[kube_name].mon | first | ansible.utils.ipaddr('prefix') + 2 }}"
+          # maskSize: "{{ subnets.talos.mon | first | ansible.utils.ipaddr('prefix') + 2 }}"
           # spec.ipv4.maskSize in body must be of type integer
           maskSize: 28
   when: cilium_version is defined
@@ -40,7 +35,7 @@
       metadata:
         name: monitoring
       spec:
-        cidr: "{{ subnets[kube_name].mon | ansible.utils.ipv4 | first }}"
+        cidr: "{{ subnets.talos.mon | ansible.utils.ipv4 | first }}"
         allowedUses: ["Workload"]
   when: cilium_version is not defined
   tags: ["calico", "pool"]

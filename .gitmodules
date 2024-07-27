@@ -22,9 +22,6 @@
 [submodule "roles/thanos"]
 	path = roles/thanos
 	url = git@github.com:cosandr/ansible-role-thanos.git
-[submodule "kubespray"]
-	path = kubespray
-	url = https://github.com/kubernetes-sigs/kubespray.git
 [submodule "roles/blackbox_exporter"]
 	path = roles/blackbox_exporter
 	url = git@github.com:cosandr/ansible-blackbox-exporter.git

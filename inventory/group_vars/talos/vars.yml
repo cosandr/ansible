@@ -9,19 +9,14 @@ __host_ips_3:
 talos_version: "1.7.5"
 # https://kubernetes.io/releases/
 kube_version: "1.29.7"
-# https://github.com/cilium/cilium/releases
-cilium_version: "1.16.x"
-# https://github.com/fluxcd/flux2/releases
-# https://github.com/fluxcd-community/helm-charts/releases
-flux_version: "~2.13"
 
-# Disabled for now, enable when using vm_pci_devices
-# intel_gpu_operator_installed: true
 talos_schedule_on_control_plane: true
 talos_kubeprism_enabled: true
 talos_kubeproxy_enabled: false
-kube_proxy_enabled: false
 talos_kubeproxy_mode: ipvs
+kube_proxy_enabled: false
+kube_api_server: "{{ domain }}"
+kube_ingress_domain: "{{ domain }}"
 
 # https://www.talos.dev/v1.7/talos-guides/install/boot-assets/#image-factory
 # Contains qemu-guest-agent and i915-ucode
@@ -32,3 +27,26 @@ talos_kubectl_context: "admin@{{ kube_api_server }}"
 
 # Keep disabled for security, I guess
 enable_admin_pods: false
+
+node_labels: >-
+  {%- set tmp = {
+    "cluster-type": 'talos',
+    "cpu-tier": hostvars[vm_host].cpu_tier | string,
+    "vm-host": vm_host
+  } -%}
+  {%- if host_subnet == 'worker' -%}
+  {{- tmp.update({"node-role.kubernetes.io/worker": ""}) -}}
+  {%- endif -%}
+  {%- if vm_pci_devices -%}
+  {{- tmp.update({"intel.feature.node.kubernetes.io/gpu": "true"}) -}}
+  {%- endif -%}
+  {{ tmp }}
+
+# Skip for now
+prometheus_blackbox_icmp_targets: []
+prometheus_node_targets: []
+
+pss_privileged_labels:
+  pod-security.kubernetes.io/enforce: privileged
+  pod-security.kubernetes.io/audit: privileged
+  pod-security.kubernetes.io/warn: privileged

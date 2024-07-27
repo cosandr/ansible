@@ -3,10 +3,6 @@
     "dhcp_range": subnets.vm.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "vm.{{ domains['hb'] }}",
   },
-  "kube": {
-    "dhcp_range": subnets.kube.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
-    "domain": "kube.{{ domains['hb'] }}",
-  },
   "talos": {
     "dhcp_range": subnets.talos.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "talos.{{ domains['hb'] }}",
@@ -47,9 +43,5 @@ vips:
     ceph_nfs: {{ subnets.general.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
   san:
     ceph_nfs: {{ subnets.san.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
-  kube:
-    control_plane: {{ subnets.kube.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
-    nginx: {{ subnets.kube.lb | andrei.utils.ipaddr_concat(1, wantlist=true) }}
-    prom: {{ subnets.kube.lb | andrei.utils.ipaddr_concat(2, wantlist=true) }}
   talos:
     control_plane: {{ subnets.talos.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}

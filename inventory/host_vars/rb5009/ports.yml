@@ -11,8 +11,6 @@ mt_bonds:
 mt_trunk_ports:
   - vlan: VM
     ports: [sfp-sfpplus1]
-  - vlan: KUBE
-    ports: [sfp-sfpplus1]
   - vlan: TALOS
     ports: [sfp-sfpplus1]
   - vlan: GENERAL

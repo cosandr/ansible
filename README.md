@@ -125,26 +125,6 @@ kubectl delete crd nodefeatures.nfd.k8s-sigs.io
 kubectl delete crd nodefeaturerules.nfd.k8s-sigs.io
 ```
 
-### kubespray
-
-Run kube playbook first
-
-```sh
-./playbooks/kube.yml -t system
-```
-
-If IPs were changed or hosts were added/removed, BGP peers must also be updated
-
-```sh
-./playbooks/mikrotik.yml -l rb5009 -t bgp
-```
-
-Run Ansible from the kubespray submodule
-
-```sh
-ansible-playbook -i ../inventory --vault-password-file ../gopass-vault.sh cluster.yml
-```
-
 ### Talos
 
 Setup config

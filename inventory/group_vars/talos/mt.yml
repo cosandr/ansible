@@ -3,3 +3,16 @@
 mt_dhcp_leases:
   - address: "{{ ansible_host }}"
     mac_address: "{{ vm_default_mac }}"
+
+mt_bgp_peers:
+  - as: "{{ 65000 + all_net[host_net].vlan }}"
+
+# Only add VIP once
+mt_dns_entries: "{{ (host_subnet == 'control_plane' and host_num == '0') | ternary(__mt_dns_entries_common + __mt_dns_entries_vip, __mt_dns_entries_common) }}"
+__mt_dns_entries_common:
+  - name: "{{ inventory_hostname }}.{{ domain }}"
+    address: "{{ ansible_host }}"
+
+__mt_dns_entries_vip:
+  - name: "{{ kube_api_server }}"
+    address: "{{ vips[host_net].control_plane | ansible.utils.ipv4 | first }}"
