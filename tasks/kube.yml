@@ -52,8 +52,6 @@
   loop:
     - name: prometheus-community
       repo_url: "https://prometheus-community.github.io/helm-charts"
-    - name: ingress-nginx
-      repo_url: "https://kubernetes.github.io/ingress-nginx"
     - name: grafana
       repo_url: "https://grafana.github.io/helm-charts"
     - name: jetstack
@@ -151,18 +149,6 @@
     update_repo_cache: true
     release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/prom.yml.j2') | from_yaml }}"
   tags: ["helm", "prometheus"]
-
-# https://github.com/kubernetes/ingress-nginx/tree/main/charts/ingress-nginx
-- name: Deploy ingress-nginx chart
-  kubernetes.core.helm:
-    name: ingress-nginx
-    chart_ref: ingress-nginx/ingress-nginx
-    chart_version: "{{ ingress_nginx_version }}"
-    release_namespace: ingress-nginx
-    create_namespace: true
-    update_repo_cache: true
-    release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/ingress-nginx.yml.j2') | from_yaml }}"
-  tags: ["helm", "nginx"]
 
 # https://github.com/grafana/helm-charts/tree/main/charts/promtail
 - name: Deploy Promtail chart

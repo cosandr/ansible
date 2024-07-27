@@ -53,5 +53,3 @@ vips:
     prom: {{ subnets.kube.lb | andrei.utils.ipaddr_concat(2, wantlist=true) }}
   talos:
     control_plane: {{ subnets.talos.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
-    nginx: {{ subnets.talos.lb | andrei.utils.ipaddr_concat(1, wantlist=true) }}
-    prom: {{ subnets.talos.lb | andrei.utils.ipaddr_concat(2, wantlist=true) }}

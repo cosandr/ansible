@@ -264,10 +264,6 @@ vips:
   talos:
     control_plane:
       - 10.0.28.33
-    nginx:
-      - 172.28.128.1
-    prom:
-      - 172.28.128.2
 
 vips_with_prefix:
   vm:
@@ -297,8 +293,4 @@ vips_with_prefix:
   talos:
     control_plane:
       - 10.0.28.33/24
-    nginx:
-      - 172.28.128.1/16
-    prom:
-      - 172.28.128.2/16
 # END AUTO GENERATED VARIABLES
