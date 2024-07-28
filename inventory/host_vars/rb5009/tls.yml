@@ -5,6 +5,7 @@ __cert_names: >-
   {%- for v in host_ips.values() | sort -%}
   {{- tmp.append('IP:' + v) -}}
   {%- endfor -%}
+  {{- tmp.append('DNS:' + inventory_hostname + "." + all_net.mgmt.domain) -}}
   {{ tmp }}
 
 ownca_ca_list:

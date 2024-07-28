@@ -2,6 +2,7 @@
 
 __cert_names:
   - "IP:{{ ansible_host }}"
+  - "DNS:{{ inventory_hostname }}.{{ all_net.mgmt.domain }}"
 
 ownca_vault_password_file: "{{ repo_base_dir }}/gopass-vault.sh"
 key_passphrase: "{{ lookup('community.general.passwordstore', 'ansible/mt_key_pass') }}"
@@ -13,6 +14,7 @@ ownca_cert_list:
   - privatekey_path: "{{ repo_base_dir }}/files/mikrotik/{{ inventory_hostname }}.key"
     publickey_path: "{{ repo_base_dir }}/files/mikrotik/{{ inventory_hostname }}.crt"
     passphrase: "{{ key_passphrase }}"
+    cn: "{{ inventory_hostname }}.{{ all_net.mgmt.domain }}"
     subject_alt_name: "{{ __cert_names }}"
     ca_passphrase: "{{ ca_passphrase }}"
     ca_publickey_path: "{{ ca_publickey_path }}"
