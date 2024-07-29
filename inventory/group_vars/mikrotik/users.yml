@@ -7,6 +7,10 @@ mt_groups:
   - name: "prometheus"
     args:
       - "policy=api,read,winbox"
+  - name: "external-dns"
+    args:
+      # Somehow the rest-api policy isn't needed and doesn't work
+      - "policy=api,read,write"
 
 mt_users:
   - name: "{{ api_username }}"
@@ -18,3 +22,8 @@ mt_users:
       - "password={{ lookup('community.general.passwordstore', 'network/mt_prom_pass') }}"
       - "group=prometheus"
       - "address={{ subnets.vm.prom | join(',') }}"
+  - name: "external-dns"
+    args:
+      - "password={{ lookup('community.general.passwordstore', 'network/mt_external_dns_pass') }}"
+      - "group=external-dns"
+      - "address={{ subnets.vm.localgw | join(',') }}"

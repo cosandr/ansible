@@ -4,7 +4,7 @@ mt_dns_settings:
   - allow-remote-requests: true
     cache-size: 2048  # default, but module provides 2048KiB
 
-mt_dns_exclude_comment_regex: "^(dhcp|manual|private)-.*"
+mt_dns_exclude_comment_regex: "^((dhcp|manual|private)-.*|external-dns managed$)"
 mt_dns_managed_comment: "ansible managed"
 
 mt_dns_entries: >-

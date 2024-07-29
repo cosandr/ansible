@@ -4,3 +4,8 @@ __nginx_upstreams_2: []
 __nginx_upstreams_1:
   - name: motion
     servers: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].motion_port }}"]
+
+__nginx_vhosts_1:
+  - filename: external-dns.conf
+    server_name: external-dns
+    template: "{{ repo_base_dir }}/files/webgw/nginx/external-dns.conf.j2"

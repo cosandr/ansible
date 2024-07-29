@@ -134,6 +134,16 @@
         - keepalived_instances is defined
         - keepalived_instances | length > 0
       tags: ["lego", "pg_cert"]
+
+    - name: Copy MikroTik CA
+      ansible.builtin.copy:
+        src: "{{ repo_base_dir }}/files/mikrotik/ca.crt"
+        dest: /etc/pki/tls/certs/mt-ca.crt
+        owner: root
+        group: root
+        mode: "0644"
+      when: nginx_vhosts | selectattr('server_name', 'search', 'external-dns')
+      tags: ["nginx"]
   roles:
     - role: wireguard
       when: wireguard_addresses is defined

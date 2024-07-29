@@ -14,7 +14,7 @@ mt_services:
     address: "{{ mt_admin_allowed_addresses | join(',') }}"
   - name: www-ssl
     disabled: false
-    address: "{{ mt_admin_allowed_addresses | join(',') }}"
+    address: "{{ (mt_admin_allowed_addresses + subnets.vm.localgw) | join(',') }}"
   - name: api-ssl
     disabled: false
     address: "{{ (mt_admin_allowed_addresses + (node_exporter_allow_ips | ansible.utils.ipaddr('host'))) | join(',') }}"
