@@ -51,6 +51,7 @@ base_pacman_packages:
   - git
   - gnu-netcat
   - go
+  - go-yq
   - gopass
   - grep
   - groff
