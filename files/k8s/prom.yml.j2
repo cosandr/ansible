@@ -1,3 +1,4 @@
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
 ---
 
 alertmanager:
@@ -10,6 +11,8 @@ alertmanager:
     paths:
       - /
     pathType: ImplementationSpecific
+    annotations:
+      nginx.ingress.kubernetes.io/whitelist-source-range: "{{ firewall_trusted_sources | join(',') }}"
 
   alertmanagerSpec:
     externalUrl: "http://am.{{ kube_ingress_domain }}"
@@ -45,6 +48,8 @@ prometheus:
     paths:
       - /
     pathType: ImplementationSpecific
+    annotations:
+      nginx.ingress.kubernetes.io/whitelist-source-range: "{{ firewall_trusted_sources | join(',') }}"
 
   prometheusSpec:
     podMonitorSelectorNilUsesHelmValues: false
