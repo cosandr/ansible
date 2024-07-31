@@ -1,6 +1,8 @@
 ---
 
-vm_mem: 4096
+# TODO: Give more resources once Theia is freed up a bit.
+vm_cpus: "{{ (vm_host in groups['ms01']) | ternary(12, 4) }}"
+vm_mem: "{{ (vm_host in groups['ms01']) | ternary(12288, 4096) }}"
 vm_host: "{{ vm_host_list[groups['talos'] | ansible.utils.index_of('eq', inventory_hostname) % (vm_host_list | length)] }}"
 vm_template: false
 vm_customize: false
