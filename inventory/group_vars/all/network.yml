@@ -216,8 +216,6 @@ vips:
       - 10.0.10.35
     ceph_nfs:
       - 10.0.10.36
-    ceph_rgw:
-      - 10.0.10.37
   general:
     ceph_nfs:
       - 10.0.50.36
@@ -238,8 +236,6 @@ vips_with_prefix:
       - 10.0.10.35/24
     ceph_nfs:
       - 10.0.10.36/24
-    ceph_rgw:
-      - 10.0.10.37/24
   general:
     ceph_nfs:
       - 10.0.50.36/24

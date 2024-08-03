@@ -38,7 +38,6 @@ vips:
     localgw02: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(2, wantlist=true) }}
     localgw03: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(3, wantlist=true) }}
     ceph_nfs: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
-    ceph_rgw: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(5, wantlist=true) }}
   general:
     ceph_nfs: {{ subnets.general.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
   san:

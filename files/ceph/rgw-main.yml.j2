@@ -5,3 +5,4 @@ placement:
 networks: {{ rgw_networks | to_json }}
 spec:
   rgw_frontend_port: {{ rgw_frontend_port | default(8080) }}
+  rgw_trust_forwarded_https: true

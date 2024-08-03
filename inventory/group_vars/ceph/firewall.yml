@@ -4,7 +4,7 @@ firewalld_default_zone: cluster
 
 __firewalld_zones_3:
   - name: cluster
-    sources: "{{ groups['ceph'] | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='san') | list }}"
+    sources: "{{ subnets.san.hosts }}"
 
 __firewalld_services_3:
   - name: ssh
@@ -14,16 +14,19 @@ __firewalld_services_3:
     zone: cluster
 
   - name: ceph
-    zone: internal
-    sources: ["{{ all_net.vm.cidr }}"]
+    zone: san
 
   - name: ceph-mon
-    zone: internal
-    sources: ["{{ all_net.vm.cidr }}"]
+    zone: san
 
 __firewall_rules_3:
-  - port: "{{ rgw_ingress_port }}"
-    zone: public
+  - port: "{{ rgw_frontend_port }}"
+    zone: san
+    sources: "{{ subnets.san.localgw }}"
+
+  - port: "{{ ceph_dashboard_port }}"
+    zone: san
+    sources: "{{ subnets.san.localgw }}"
 
   # NFS CephFS export on GENERAL and VM
   - port: "{{ ceph_nfs_clusters[0].port }}"
@@ -33,15 +36,16 @@ __firewall_rules_3:
 
   # NFS CephFS export on SAN
   - port: "{{ ceph_nfs_clusters[0].port }}"
-    zone: internal
-    sources: "{{ __ceph_nfs_client_addresses | ansible.utils.reduce_on_network(all_net.san.cidr) }}"
+    zone: san
 
+  # TODO: Decide what to do, allow routing for SAN or add prom to the network
   - port: "{{ ceph_exporter_port }}"
-    zone: internal
+    zone: san
     sources: "{{ node_exporter_allow_ips }}"
 
+  # For emergency use in case localgw's are down
   - port: "{{ ceph_dashboard_port }}"
-    zone: internal
+    zone: san
     sources: "{{ firewall_trusted_sources }}"
 
   # https://wiki.libvirt.org/page/FAQ#What_are_the_different_migration_methods.3F

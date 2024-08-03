@@ -1,6 +1,0 @@
----
-
-socat_proxies:
-  - name: rgw
-    src: "TCP4-LISTEN:{{ rgw_frontend_port }},reuseaddr,fork,bind={{ host_ips.mgmt }}"
-    dest: "TCP:{{ host_ips.vm }}:{{ rgw_frontend_port }}"

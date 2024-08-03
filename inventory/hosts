@@ -220,6 +220,7 @@ minio01 host_num=0
 host_subnet=minio
 
 [ceph:children]
+kvm_hv
 
 [ceph:vars]
 ansible_group_priority=3

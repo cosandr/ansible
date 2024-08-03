@@ -1,5 +1,7 @@
 ---
 
+ceph_version: reef
+
 prometheus_node_labels:
   cluster: "ceph"
   instance: "{{ inventory_hostname }}"
@@ -12,7 +14,3 @@ __unattended_package_blacklist_4:
   - "podman*"
   - "container*"
   - "crun*"
-
-__mt_dns_entries_vip:
-  - name: "rgw.{{ domain }}"
-    address: "{{ rgw_ingress_vip | ansible.utils.ipaddr('address') }}"

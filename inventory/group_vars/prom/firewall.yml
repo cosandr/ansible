@@ -49,3 +49,8 @@ firewall_rules:
   - port: 514
     protocol: udp
     sources: "{{ all_net.mgmt | json_query('[cidr, cidr6]') | flatten }}"
+  # Ceph
+  - port: "{{ prometheus_port }}"
+    sources: "{{ subnets.vm.hosts }}"
+  - port: "{{ alertmanager_port }}"
+    sources: "{{ subnets.vm.hosts }}"

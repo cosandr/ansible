@@ -1,9 +1,51 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
+- name: Ceph host preparation
+  hosts: ceph
+  tags: ["system"]
+  tasks:
+    - name: Download Ceph GPG key
+      ansible.builtin.get_url:
+        url: https://eu.ceph.com/keys/release.gpg
+        dest: /etc/apt/keyrings/ceph-keyring.gpg
+        owner: root
+        group: root
+        mode: "0644"
+      diff: false
+      tags: ["apt"]
+
+    - name: Add Ceph repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/ceph-keyring.gpg] https://eu.ceph.com/debian-{{ ceph_version }} {{ ansible_distribution_release | lower }} main"
+        state: present
+        filename: ceph
+      tags: ["apt"]
+
+    - name: Prefer repo packages
+      ansible.builtin.copy:
+        content: |
+          Package: *
+          Pin: origin ceph.com
+          Pin-Priority: 900
+        dest: "/etc/apt/preferences.d/99ceph"
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["apt"]
+
+    - name: Install Ceph packages
+      ansible.builtin.apt:
+        name:
+          - cephadm
+          - ceph-common
+        state: present
+      tags: ["install"]
+
 - name: Ceph configuration
   hosts: ceph
   gather_facts: false
+  tags: ["configure"]
   tasks:
     - name: Run on only one host
       run_once: true
@@ -13,32 +55,6 @@
           ceph_orch_apply:
             spec: "{{ lookup('template', repo_base_dir + '/files/ceph/rgw-main.yml.j2') }}"
           tags: ["rgw"]
-
-        - name: Read SSL cert from localgw
-          delegate_to: localgw01
-          ansible.builtin.slurp:
-            path: "{{ item }}"
-          loop:
-            - "/etc/lego/certificates/{{ domain }}.crt"
-            - "/etc/lego/certificates/{{ domain }}.key"
-          register: __certs
-          tags: ["rgw-ingress"]
-
-        - name: Deploy RGW ingress service
-          ceph_orch_apply:
-            spec: "{{ lookup('template', repo_base_dir + '/files/ceph/rgw-main-ingress.yml.j2') }}"
-          vars:
-            rgw_ingress_ssl_cert: |
-              {{ (__certs.results[0].content | b64decode).strip() }}
-              {{ (__certs.results[1].content | b64decode).strip() }}
-          tags: ["rgw-ingress"]
-
-    - name: Proxy RGW to MGMT
-      ansible.builtin.include_role:
-        name: socat_proxy
-        apply:
-          tags: ["rgw-ingress"]
-      tags: ["rgw-ingress"]
 
     - name: Mount CephFS
       ansible.posix.mount:
@@ -56,6 +72,7 @@
         setype: var_t
         state: present
       notify: Restore ceph SELinux context
+      when: ansible_selinux.status == "enabled"
       tags: ["cephfs", "selinux"]
 
     - name: Create libvirt dir on CephFS
@@ -75,6 +92,7 @@
         setype: virt_image_t
         state: present
       notify: Restore libvirt SELinux context
+      when: ansible_selinux.status == "enabled"
       tags: ["cephfs", "selinux"]
 
     - name: Set libvirt ignition CephFS SELinux context
@@ -84,6 +102,7 @@
         setype: virt_content_t
         state: present
       notify: Restore libvirt SELinux context
+      when: ansible_selinux.status == "enabled"
       tags: ["cephfs", "selinux"]
 
     - name: Define libvirt CephFS pool
@@ -128,6 +147,7 @@
         setype: user_home_dir_t
         state: present
       notify: Restore user SELinux context
+      when: ansible_selinux.status == "enabled"
       tags: ["user", "selinux"]
 
     - name: Set user files CephFS SELinux context
@@ -137,6 +157,7 @@
         setype: user_home_t
         state: present
       notify: Restore user SELinux context
+      when: ansible_selinux.status == "enabled"
       tags: ["user", "selinux"]
 
     - name: Configure user SSH keys
