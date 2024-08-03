@@ -1,7 +1,6 @@
 [all]
 # BEGIN AUTO GENERATED VARIABLES
 localgw01    ansible_host="10.0.10.64"
-localgw02    ansible_host="10.0.10.65"
 localgw03    ansible_host="10.0.10.66"
 localgw04    ansible_host="10.0.10.67"
 pg01         ansible_host="10.0.10.84"
