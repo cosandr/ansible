@@ -1,6 +1,10 @@
 ---
 
+# Generate with
+# ansible m1bp -m template -a 'src=roles/wireguard/templates/etc/wireguard/wg.conf.j2 dest=/tmp/mt.conf' -D -C
+
 wireguard_interface: "mt"
+wireguard_port: "51820"
 wireguard_addresses:
   - "{{ wireguard_ip }}/{{ wg_net[host_wg_net].cidr | ansible.utils.ipaddr('prefix') | string }}"
 
@@ -8,10 +12,11 @@ wireguard_dns_list:
   - "{{ hostvars['rb5009'].wireguard_ip }}"
   - "1.1.1.1"
   - "8.8.8.8"
+  - "{{ domains['hb'] }}"
+  - "vm.{{ domains['hb'] }}"
 
 wireguard_mt_allowed_ips:
-  - "{{ hostvars['rb5009'].wireguard_ip }}/32"
-  - "{{ home_net | json_query('*.cidr') }}"
+  - "{{ all_net | json_query('*.cidr') }}"
 
 wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"

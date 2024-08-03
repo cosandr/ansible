@@ -8,10 +8,11 @@ wireguard_dns_list:
   - "{{ hostvars['rb5009'].wireguard_ip }}"
   - "1.1.1.1"
   - "8.8.8.8"
+  - "{{ domains['hb'] }}"
+  - "vm.{{ domains['hb'] }}"
 
 wireguard_mt_allowed_ips:
-  - "{{ wg_net.mt.cidr }}"
-  - "{{ home_net | json_query('*.cidr') }}"
+  - "{{ all_net | json_query('*.cidr') }}"
 
 wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
