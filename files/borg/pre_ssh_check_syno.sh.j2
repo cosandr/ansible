@@ -8,6 +8,7 @@ syno_is_up() {
     local retries=$1
     while [[ $attempt -lt $retries ]]; do
         if ping -q -n -c1 -W1 "$syno_ip" &>/dev/null && ssh -q -o "BatchMode=yes" -i "$synoctl_key" "$syno_ssh_cmd" ping &>/dev/null; then
+            echo "Synology is up after $attempt attempts"
             return 0
         fi
         attempt=$(( attempt + 1 ))
@@ -28,6 +29,7 @@ syno_wake_if_needed() {
         wakeonlan -i "$syno_ip" "$syno_wol_address"
         # Wait 3 minutes for it to be up
         if syno_is_up 180; then
+            echo "Synology responded to WOL after $attempt attempts"
             return 0
         fi
         attempt=$(( attempt + 1 ))
