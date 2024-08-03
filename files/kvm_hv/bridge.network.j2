@@ -11,16 +11,14 @@ DNS=1.1.1.1
 DNS=8.8.8.8
 {% endif %}
 
-[Route]
 {% if overrides.get('route') %}
+[Route]
 {% if 'Gateway' not in overrides['route'] %}
 Gateway={{ hostvars['rb5009'].host_ips[name] }}
 {% endif %}
 {% for k, v in overrides['route'].items() %}
 {{ k }}={{ v }}
 {% endfor %}
-{% else %}
-Scope=link
 {% endif %}
 {% else %}
 LinkLocalAddressing=no
