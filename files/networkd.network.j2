@@ -1,17 +1,31 @@
+{%- set bootproto = nic.bootproto | default('static' if nic.address is defined else 'dhcp') -%}
+{%- if bootproto == 'static' -%}
+{%- set v4_prefix = all_net[nic.source.dev | lower].cidr | ansible.utils.ipaddr('prefix') -%}
+{%- set addresses = [nic.address + '/' + (v4_prefix | string)] -%}
+{%- if ansible_host6 | default(false) -%}
+{%- set v6_prefix = all_net[nic.source.dev | lower].cidr6 | ansible.utils.ipaddr('prefix') -%}
+{{- config['addresses'].append(ansible_host6 + '/' + (v6_prefix | string)) -}}
+{%- endif -%}
+{%- endif -%}
 [Match]
 Name={{ name }}
 
 [Network]
-{% for a in addresses %}
+{% for a in addresses | default([]) %}
 Address={{ a }}
 {% endfor %}
-{% for d in dns_servers | default([]) %}
+{% for d in nic.dns_servers | default([])%}
 DNS={{ d }}
 {% endfor %}
+{% if bootproto == 'dhcp' %}
+DHCP=yes
+{% endif %}
 
 [Link]
-MTUBytes={{ mtu }}
+MTUBytes={{ nic.mtu | default(1500) }}
 
+{% if nic.gateway | default(false) %}
 [Route]
-Gateway={{ gateway }}
-Scope=global
+Gateway={{ nic.gateway }}
+Scope={{ (nic.default_route | default(true) | bool) | ternary('global', 'link') }}
+{% endif %}
