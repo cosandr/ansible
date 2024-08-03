@@ -1,5 +1,8 @@
 ---
 
+__host_ips_3:
+  san: "{{ subnets.san[host_subnet] | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"
+
 nginx_exporter_web_listen_address: "{{ ansible_host }}:{{ nginx_exporter_port }}"
 
 prometheus_ignore_down: true

@@ -7,3 +7,11 @@ vm_root_size: "10G"
 
 # Intentionally fail if we have more than available hosts
 vm_host: "{{ vm_host_list[groups['localgw'] | ansible.utils.index_of('eq', inventory_hostname)] }}"
+vm_nics:
+  - "{{ vm_default_nic }}"
+  - type: bridge
+    source:
+      dev: "SAN"
+    mac: "{{ '52:54:{:02x}'.format(all_net.san.vlan) | community.general.random_mac(seed=inventory_hostname) }}"
+    address: "{{ host_ips.san }}"
+    mtu: "{{ all_net.san.mtu }}"

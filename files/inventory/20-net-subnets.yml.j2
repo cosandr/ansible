@@ -70,7 +70,7 @@ __subnet_extensions:
   mgmt: {{ all_net.mgmt | andrei.utils.subnets_from_map(__subnet_map, v4_start=32, v6_prefix_skip=3, v6_size=80) }}
 
 {% set __subnet_map = {
-  "_r10": 28,
+  "localgw": 28,
   "_r20": 28,
   "talos": 27,
   "clients": -25,
