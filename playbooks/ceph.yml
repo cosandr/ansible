@@ -3,6 +3,8 @@
 
 - name: Ceph host preparation
   hosts: ceph
+  gather_facts: true
+  gather_subset: ["min"]
   tags: ["system"]
   tasks:
     - name: Download Ceph GPG key
@@ -29,6 +31,17 @@
           Pin: origin ceph.com
           Pin-Priority: 900
         dest: "/etc/apt/preferences.d/99ceph"
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["apt"]
+
+    # Might not work, dpkg-divert should work if this doesn't
+    - name: Prevent ceph-common logrotate file from being installed
+      ansible.builtin.copy:
+        content: |
+          path-exclude /etc/logrotate.d/ceph-common
+        dest: /etc/dpkg/dpkg.cfg.d/99-no-ceph-common
         owner: root
         group: root
         mode: "0644"
