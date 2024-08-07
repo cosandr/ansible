@@ -1,3 +1,5 @@
 ---
 
 libvirt_security_driver: ''
+libvirt_shutdown_timeout: 60
+libvirt_parallel_shutdown: 10

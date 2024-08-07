@@ -23,3 +23,27 @@
     name: libvirtd.service
     state: started
     enabled: true
+
+- name: Configure libvirt-guests
+  when: libvirt_guests_config is defined
+  block:
+    - name: Check if libvirt-guests is active  # noqa command-instead-of-module
+      ansible.builtin.command: systemctl is-active -q libvirt-guests.service
+      check_mode: false
+      changed_when: false
+      failed_when: false
+      register: __libvirt_guests_active
+
+    - name: Configure libvirt-guests
+      ansible.builtin.lineinfile:
+        path: "{{ libvirt_guests_config }}"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - regexp: "^#?PARALLEL_SHUTDOWN="
+          line: "PARALLEL_SHUTDOWN={{ libvirt_parallel_shutdown }}"
+        - regexp: "^#?SHUTDOWN_TIMEOUT="
+          line: "SHUTDOWN_TIMEOUT={{ libvirt_shutdown_timeout }}"
+      loop_control:
+        label: "{{ item.line }}"
+      when: __libvirt_guests_active.rc == 0
