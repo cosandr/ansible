@@ -14,7 +14,7 @@
     {% endif %}
     sbctl create-keys
   args:
-    creates: "{{ chroot_path }}/usr/share/secureboot/GUID"
+    creates: "{{ chroot_path }}/var/lib/sbctl/GUID"
 
 - name: Fail if bundling is enabled but kernel params are missing
   ansible.builtin.fail:

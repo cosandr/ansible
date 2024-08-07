@@ -102,7 +102,7 @@
       loop:
         - "{{ chroot_path }}/{{ btrfs_root }}"
         - "{{ chroot_path }}/{{ esp_mount }}"
-        - "{{ chroot_path }}/usr/share/secureboot"
+        - "{{ chroot_path }}/var/lib/sbctl"
       tags: ["mount"]
 
     - name: Mount ESP
@@ -134,14 +134,14 @@
 
     - name: Check if sbctl is initialized on host
       ansible.builtin.stat:
-        path: /usr/share/secureboot/GUID
+        path: /var/lib/sbctl/GUID
       register: __sbctl_init
       tags: ["sbctl"]
 
     - name: Copy sbctl files
       ansible.builtin.copy:
-        src: "/usr/share/secureboot/{{ item }}"
-        dest: "{{ chroot_path }}/usr/share/secureboot/"
+        src: "/var/lib/sbctl/{{ item }}"
+        dest: "{{ chroot_path }}/var/lib/sbctl/"
         mode: preserve
       loop:
         - GUID
