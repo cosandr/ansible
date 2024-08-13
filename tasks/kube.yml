@@ -47,12 +47,8 @@
   loop:
     - name: prometheus-community
       repo_url: "https://prometheus-community.github.io/helm-charts"
-    - name: grafana
-      repo_url: "https://grafana.github.io/helm-charts"
     - name: jetstack
       repo_url: "https://charts.jetstack.io"
-    - name: cert-manager-webhook-hetzner
-      repo_url: "https://vadimkim.github.io/cert-manager-webhook-hetzner"
     - name: openebs-lvmlocalpv
       repo_url: "https://openebs.github.io/lvm-localpv"
   loop_control:
@@ -144,18 +140,6 @@
     update_repo_cache: true
     release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/prom.yml.j2') | from_yaml }}"
   tags: ["helm", "prometheus"]
-
-# https://github.com/grafana/helm-charts/tree/main/charts/promtail
-- name: Deploy Promtail chart
-  kubernetes.core.helm:
-    name: promtail
-    chart_ref: grafana/promtail
-    chart_version: "{{ promtail_version }}"
-    release_namespace: monitoring
-    create_namespace: false
-    update_repo_cache: true
-    release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/promtail.yml.j2') | from_yaml }}"
-  tags: ["helm", "promtail"]
 
 - name: Cert-manager tasks
   tags: ["cert-manager"]

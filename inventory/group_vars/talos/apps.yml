@@ -6,8 +6,6 @@ certmanager_version: "1.x"
 openebs_lvm_version: "~1.6"
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 prometheus_version: "61.x"
-# https://github.com/grafana/helm-charts/releases
-promtail_version: "6.x"
 # https://github.com/cilium/cilium/releases
 cilium_version: "1.16.x"
 # https://github.com/fluxcd/flux2/releases
