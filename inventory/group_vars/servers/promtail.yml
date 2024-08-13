@@ -1,9 +1,11 @@
 ---
 
+promtail_external_labels:
+  host: "{{ inventory_hostname }}"
+
 promtail_clients:
   - url: "http://{{ hostvars['loki01'].ansible_host }}:3100/loki/api/v1/push"
-    external_labels:
-      host: "{{ inventory_hostname }}"
+    external_labels: "{{ promtail_external_labels }}"
 
 __promtail_scrape_config_map:
   audit:
