@@ -180,6 +180,12 @@
       when: resolv_config | default('')
       tags: ["resolv"]
 
+    - name: Enable linux-modules-cleanup
+      ansible.builtin.systemd:
+        name: linux-modules-cleanup.service
+        enabled: true
+      when: ansible_distribution == 'Archlinux'
+
   handlers:
     - name: Dracut regenerate  # noqa no-changed-when
       become: true
