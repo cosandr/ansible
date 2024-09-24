@@ -8,7 +8,7 @@ __host_ips_3:
 # https://github.com/siderolabs/talos/releases
 talos_version: "1.7.6"
 # https://kubernetes.io/releases/
-kube_version: "1.29.7"
+kube_version: "1.30.5"
 
 talos_schedule_on_control_plane: true
 talos_kubeprism_enabled: true
