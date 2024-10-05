@@ -16,6 +16,7 @@ alertmanager:
 
   alertmanagerSpec:
     externalUrl: "http://am.{{ kube_ingress_domain }}"
+    retention: 192h
 
   templateFiles: {{ alertmanager_template_files | to_json }}
 
@@ -27,6 +28,10 @@ alertmanager:
 {% else %}
       receiver: 'null'
 {% endif %}
+      routes:
+        - receiver: 'null'
+          matchers:
+            - alertname = "InfoInhibitor"
     receivers:
       - name: 'null'
 {% if vault_alertmanager_discord_webhook_url is defined %}
