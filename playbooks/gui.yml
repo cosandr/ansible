@@ -347,11 +347,6 @@
       when: desktop_environment == "kde"
       tags: ["kde"]
 
-    - role: aisbergg.snapper
-      become: true
-      when: snapper_configs | default([])
-      tags: ["snapper"]
-
     - role: btrbk
       become: true
       when: btrbk_volumes | default([])

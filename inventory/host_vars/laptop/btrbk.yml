@@ -1,0 +1,17 @@
+---
+
+btrbk_timestamp_format: "long"
+btrbk_snapshot_preserve_min: "latest"
+
+btrbk_volumes:
+  - path: "/mnt/btrfs_root/arch_{{ desktop_environment }}"
+    options:
+      snapshot_dir: "@snapshots"
+    subvolumes:
+      - path: "@"
+        options:
+          snapshot_preserve: "2h 5d 3w"
+      - path: "@home/andrei"
+        options:
+          snapshot_name: "andrei"
+          snapshot_preserve: "8h 5d 1w"
