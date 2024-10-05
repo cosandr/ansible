@@ -14,8 +14,6 @@ my_groups:
   - video
   - wheel
 
-tlp_configure_platform: true
-
 host_nic_names:
   - wlan0
   - enp0s31f6

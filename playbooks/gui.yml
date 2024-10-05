@@ -279,11 +279,17 @@
       when: "'laptops' in group_names"
       tags: ["google-chrome"]
 
-    - role: tlp
+    - role: auto_cpufreq
       when:
         - "'laptops' in group_names"
         - desktop_environment in ["i3", "sway"]
-      tags: ["tlp"]
+      tags: ["auto-cpufreq"]
+
+    # [/sys/devices/platform/thinkpad_acpi/dytc_lapmode] present: Thermald can't run on this platform
+    # - role: thermald
+    #   when:
+    #     - "'laptops' in group_names"
+    #   tags: ["thermald"]
 
     - role: cups
       when:
