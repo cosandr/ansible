@@ -1,0 +1,9 @@
+{{ ansible_managed | comment }}
+
+# https://github.com/AdnanHodzic/auto-cpufreq/blob/master/auto-cpufreq.conf-example
+
+[battery]
+# reference: https://github.com/AdnanHodzic/auto-cpufreq/#battery-charging-thresholds
+enable_thresholds = {{ battery_charge_threshold_enabled | lower }}
+start_threshold = {{ battery_charge_threshold_start }}
+stop_threshold = {{ battery_charge_threshold_end }}

@@ -1,0 +1,7 @@
+---
+
+aur_build_user: builder
+
+battery_charge_threshold_enabled: true
+battery_charge_threshold_start: 0
+battery_charge_threshold_end: 80

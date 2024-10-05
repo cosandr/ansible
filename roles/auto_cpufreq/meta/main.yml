@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: prep_aur
+    when: ansible_distribution == 'Archlinux'
+    tags: ["install"]

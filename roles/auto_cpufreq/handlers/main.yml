@@ -1,0 +1,6 @@
+---
+
+- name: Restart auto-cpufreq
+  ansible.builtin.systemd_service:
+    name: auto-cpufreq.service
+    state: restarted
