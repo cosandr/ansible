@@ -54,7 +54,7 @@ prometheus:
       - /
     pathType: ImplementationSpecific
     annotations:
-      nginx.ingress.kubernetes.io/whitelist-source-range: "{{ firewall_trusted_sources | join(',') }}"
+      nginx.ingress.kubernetes.io/whitelist-source-range: "{{ (firewall_trusted_sources + node_exporter_allow_ips) | join(',') }}"
 
   prometheusSpec:
     podMonitorSelectorNilUsesHelmValues: false
