@@ -1,15 +1,13 @@
 {{ ansible_managed | comment }}
 {% set domain = domains['hb'] %}
 server {
-    listen 80;
-    listen [::]:80;
+    {{ nginx_listen_http | indent(4) }}
     server_name external-dns.{{ domain }};
     return 301 https://$host$request_uri;
 }
 
 server {
-    listen 443 ssl;
-    listen [::]:443 ssl;
+    {{ nginx_listen_https | indent(4) }}
     http2 on;
     server_name external-dns.{{ domain }};
 

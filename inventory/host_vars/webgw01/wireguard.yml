@@ -13,6 +13,7 @@ wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
   - "{{ hostvars['drepi'].ansible_host }}/32"
   - "{{ home_net.vm.cidr }}"
+  - "{{ k8s_nginx_public_address }}/32"
 
 wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"

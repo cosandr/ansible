@@ -1,16 +1,16 @@
 server {
-    listen      80 default_server;
-    listen      [::]:80 default_server;
+    listen {% if nginx_listen_v4 is defined %}{{ nginx_listen_v4 }}:{% endif %}80 default_server;
+    listen [{{ nginx_listen_v6 }}]:80 default_server;
     server_name _;
-    return      444;
+    return 444;
 }
 
 {% if nginx_default_reject_ssl | default(true) %}
 server {
-    listen       443 ssl default_server;
-    listen       [::]:443 ssl default_server;
-    http2        on;
-    server_name  _;
+    listen {% if nginx_listen_v4 is defined %}{{ nginx_listen_v4 }}:{% endif %}443 ssl default_server;
+    listen [{{ nginx_listen_v6 }}]:443 ssl default_server;
+    http2 on;
+    server_name _;
     ssl_reject_handshake on;
 }
 {% endif %}
