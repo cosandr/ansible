@@ -81,7 +81,7 @@ __mt_firewall_address_lists_manual:
     list: WANs
     comment: WAN
   - address: "{{ hostvars['p7'].wireguard_ip }}"
-    list: allow-general
+    list: roaming-general
     comment: p7
 
 __mt_firewall_address_lists_auto: >-
