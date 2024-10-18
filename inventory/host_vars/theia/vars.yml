@@ -27,6 +27,5 @@ grub_config:
     line: GRUB_CMDLINE_LINUX="rd.lvm.lv=vg01/root crashkernel=auto nmi_watchdog=0 amd_pstate=passive"
 
 ssh_conf_hosts: false
-ceph_mon: false
 
 syncthing_gui_listen_address: "{{ host_ips.general }}:8384"

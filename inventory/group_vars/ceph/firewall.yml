@@ -20,6 +20,10 @@ __firewalld_services_3:
     zone: san
 
 __firewall_rules_3:
+  - port: "{{ ceph_exporter_port }}"
+    zone: public
+    sources: "{{ node_exporter_allow_ips }}"
+
   - port: "{{ rgw_frontend_port }}"
     zone: san
     sources: "{{ subnets.san.localgw }}"
@@ -37,11 +41,6 @@ __firewall_rules_3:
   # NFS CephFS export on SAN
   - port: "{{ ceph_nfs_clusters[0].port }}"
     zone: san
-
-  # TODO: Decide what to do, allow routing for SAN or add prom to the network
-  - port: "{{ ceph_exporter_port }}"
-    zone: san
-    sources: "{{ node_exporter_allow_ips }}"
 
   # For emergency use in case localgw's are down
   - port: "{{ ceph_dashboard_port }}"
