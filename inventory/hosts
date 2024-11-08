@@ -19,7 +19,7 @@ talos03      ansible_host="10.0.28.66"
 talos04      ansible_host="10.0.28.80"
 desktop      ansible_host="10.0.50.64"
 laptop       ansible_host="10.0.50.65"   wireguard_ip="10.4.20.65"
-m1bp         ansible_host="10.0.50.66"   wireguard_ip="10.4.20.66"
+m3bp         ansible_host="10.0.50.66"   wireguard_ip="10.4.20.66"
 drepi        ansible_host="10.0.50.128"
 litr         ansible_host="10.0.50.129"
 ax56u        ansible_host="10.0.50.133"
@@ -65,7 +65,7 @@ desktop host_num=0
 
 [laptops]
 laptop  host_num=1 host_wg_num=1
-m1bp    host_num=2 host_wg_num=2
+m3bp    host_num=2 host_wg_num=2
 
 [kvm_hv]
 theia cpu_tier=2 host_num=0

@@ -1,7 +1,7 @@
 ---
 
 # Generate with
-# ansible m1bp -m template -a 'src=roles/wireguard/templates/etc/wireguard/wg.conf.j2 dest=/tmp/mt.conf' -D -C
+# ansible m3bp -m template -a 'src=roles/wireguard/templates/etc/wireguard/wg.conf.j2 dest=/tmp/mt.conf' -D -C
 
 wireguard_interface: "mt"
 wireguard_port: "51820"
