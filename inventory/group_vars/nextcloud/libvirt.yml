@@ -5,4 +5,4 @@ vm_mem: 6144
 
 vm_root_size: "20G"
 vm_data_disks:
-  - "50G"
+  - "100G"
