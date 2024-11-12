@@ -1,0 +1,10 @@
+[Unit]
+Description=Automatically prune Docker every week
+
+[Timer]
+OnCalendar=*-*-01,14 02:00:00
+RandomizedDelaySec=15m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

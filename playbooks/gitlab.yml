@@ -161,6 +161,39 @@
     - role: gitlab_runner
       tags: ["runner"]
 
+  post_tasks:
+    - name: Add automatic docker prune job
+      ansible.builtin.copy:
+        src: "{{ repo_base_dir }}/files/gitlab/docker-auto-prune.timer"
+        dest: "/etc/systemd/system/docker-auto-prune.timer"
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - Reload systemd
+        - Enable and start automatic docker prune
+      tags: ["docker", "prune"]
+
+    - name: Copy automatic docker prune service
+      ansible.builtin.copy:
+        src: "{{ repo_base_dir }}/files/gitlab/docker-auto-prune.service"
+        dest: "/etc/systemd/system/docker-auto-prune.service"
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload systemd
+      tags: ["docker", "prune"]
+
   handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Enable and start automatic docker prune
+      ansible.builtin.systemd:
+        name: docker-auto-prune.timer
+        state: started
+        enabled: true
+
     - name: Reboot
       ansible.builtin.reboot:
