@@ -1,7 +1,6 @@
 {{ ansible_managed | comment }}
 server {
-    listen 80;
-    listen [::]:80;
+    listen {{ nginx_listen_v4 }}:80;
     server_name {{ item.server_name }}.{{ domain }};
 
     root {{ web_root }}/direct;

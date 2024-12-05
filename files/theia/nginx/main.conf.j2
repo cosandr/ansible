@@ -1,7 +1,7 @@
 {{ ansible_managed | comment }}
 {% set domain = domains['dv'] %}
 server {
-    listen {{ nginx_listen_address }}:{{ nginx_ports[item.server_name] }};
+    listen {{ nginx_listen_v4 }}:{{ nginx_ports[item.server_name] }};
 
     root {{ web_root }}/main;
     index index.html index.php index.cgi;
