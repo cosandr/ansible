@@ -41,6 +41,11 @@ alertmanager_route:
         - alertname="ContainerCpuUsage"
         - name=~"plex.*"
 
+    - group_wait: 16h
+      matchers:
+        - alertname="ContainerCpuUsage"
+        - name=~"ceph-.*"
+
 alertmanager_inhibit_rules:
   # Only fire one out of memory alert
   - source_matchers:
