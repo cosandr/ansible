@@ -22,6 +22,8 @@
     default_root_size: "100%FREE"
     default_swap_size: 16
     default_extra_lvols:
+      - name: db01
+        size: 200G
       - name: k8s
         size: 150G
     # root_disk: "/dev/disk/by-id/"
