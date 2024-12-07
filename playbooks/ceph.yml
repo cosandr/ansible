@@ -71,7 +71,7 @@
 
     - name: Mount CephFS
       ansible.posix.mount:
-        src: admin@.cephfs=/
+        src: hv@.cephfs=/
         path: /mnt/ceph
         fstype: ceph
         opts: "noatime,nofail,x-systemd.device-timeout=30"
