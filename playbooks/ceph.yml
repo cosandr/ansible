@@ -65,7 +65,7 @@
       tags: ["orch"]
       block:
         - name: Deploy RGW service
-          ceph_orch_apply:
+          ceph.automation.ceph_orch_apply:
             spec: "{{ lookup('template', repo_base_dir + '/files/ceph/rgw-main.yml.j2') }}"
           tags: ["rgw"]
 
