@@ -66,6 +66,7 @@ base_pacman_packages:
   - k9s
   - kernel-modules-hook
   - kitty
+  - krew
   - kubectl
   - kubectx
   - kubeseal
@@ -145,7 +146,6 @@ base_pacman_packages:
 base_aur_packages:
   - hunspell-nb
   - jetbrains-toolbox
-  - krew-bin
   - paru-bin
   - pyenv-virtualenv
   - shellcheck-bin
