@@ -6,9 +6,9 @@ __host_ips_3:
   san: "{{ subnets.san.talos | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
 
 # https://github.com/siderolabs/talos/releases
-talos_version: "1.7.6"
+talos_version: "1.8.4"
 # https://kubernetes.io/releases/
-kube_version: "1.30.5"
+kube_version: "1.31.4"
 
 talos_schedule_on_control_plane: true
 talos_kubeprism_enabled: true
@@ -18,9 +18,15 @@ kube_proxy_enabled: false
 kube_api_server: "{{ domain }}"
 kube_ingress_domain: "{{ domain }}"
 
-# https://www.talos.dev/v1.7/talos-guides/install/boot-assets/#image-factory
-# Contains qemu-guest-agent and i915-ucode
-talos_schematic: 90015c0ada3ddd8b55e25342d736bbb1ef7c8e213883ec2ad1110cb44944503f
+# https://www.talos.dev/v1.8/talos-guides/install/boot-assets/#image-factory
+# customization:
+#     extraKernelArgs:
+#         - console=ttyS0
+#     systemExtensions:
+#         officialExtensions:
+#             - siderolabs/i915-ucode
+#             - siderolabs/qemu-guest-agent
+talos_schematic: 67118dfe57ed26bff60416399f9f11eff657788bf634b19ae6e5febf9b887de1
 talos_image: "factory.talos.dev/installer/{{ talos_schematic }}:v{{ talos_version }}"
 
 talos_kubectl_context: "admin@{{ kube_api_server }}"

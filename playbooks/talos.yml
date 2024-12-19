@@ -38,7 +38,7 @@
           failed_when: false
           ansible.builtin.command:
             chdir: "{{ tmp_dir }}"
-            cmd: "talosctl -n {{ ansible_host }} disks --insecure"
+            cmd: "talosctl -n {{ ansible_host }} get disks --insecure"
           until: __wait.rc == 0
           retries: 20
           delay: 5
@@ -162,7 +162,7 @@
           failed_when: false
           ansible.builtin.command:
             chdir: "{{ tmp_dir }}"
-            cmd: "talosctl -n {{ ansible_host }} disks"
+            cmd: "talosctl -n {{ ansible_host }} get disks"
           until: __wait.rc == 0
           retries: 20
           delay: 5
@@ -180,9 +180,10 @@
         - __disks_check.rc != 0
         - "'bad certificate' not in __disks_check.stderr"  # talosctl <= 1.5
         - "'certificate required' not in __disks_check.stderr"  # talosctl >= 1.6
+        - "'unknown authority' not in __disks_check.stderr"  # talosctl >= 1.8
       ansible.builtin.command:
         chdir: "{{ tmp_dir }}"
-        cmd: "talosctl -n {{ ansible_host }} disks --insecure"
+        cmd: "talosctl -n {{ ansible_host }} get disks --insecure"
       environment:
         TALOSCONFIG: "{{ tmp_dir }}/talosconfig"
       tags: ["node"]

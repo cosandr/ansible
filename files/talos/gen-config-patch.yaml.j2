@@ -25,6 +25,8 @@ machine:
   install:
     image: "{{ talos_image }}"
     disk: /dev/disk/by-id/virtio-root01
+    extraKernelArgs:
+      - console=ttyS0
   network:
     nameservers: {{ vm_default_nic.dns_servers[:2] | to_json }}
   kubelet:
