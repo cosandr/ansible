@@ -13,7 +13,6 @@ samba_sebooleans:
 
 samba_extra_global_options:
   "security": user
-  "server string": "{{ inventory_hostname }} {{ ansible_distribution }}"
   "client min protocol": SMB2
   "server min protocol": SMB2
   "passdb backend": tdbsam

@@ -1,6 +1,0 @@
-vm_extra_disks:
-  - name: "talos-boot.iso"
-    type: "file"
-    target: "vdc"
-    device: "cdrom"
-    format: "raw"

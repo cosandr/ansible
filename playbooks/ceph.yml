@@ -485,7 +485,7 @@
         fstype: ceph
         opts: "noatime,nofail,x-systemd.device-timeout=30"
         state: mounted
-      tags: ["cephfs"]
+      tags: ["cephfs", "mount"]
 
     - name: Mount Tank
       ansible.posix.mount:
@@ -494,7 +494,7 @@
         fstype: ceph
         opts: "noatime,nofail,x-systemd.device-timeout=30"
         state: mounted
-      tags: ["cephfs"]
+      tags: ["cephfs", "mount"]
 
     - name: Set CephFS SELinux context
       community.general.sefcontext:
@@ -600,11 +600,6 @@
         exclusive: true
       tags: ["user", "ssh"]
 
-  roles:
-    - role: ceph_nfs
-      run_once: true
-      tags: ["nfs"]
-
   handlers:
     - name: Restore ceph SELinux context  # noqa no-changed-when - handler
       run_once: true
@@ -639,3 +634,6 @@
           tags: ["keepalived"]
       when: inventory_hostname in keepalived_hosts
       tags: ["keepalived"]
+  roles:
+    - role: samba
+      tags: ["samba"]

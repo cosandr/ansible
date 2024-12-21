@@ -9,9 +9,6 @@ __firewalld_services_1:
   - name: nfs3
     zone: public
 
-  - name: samba
-    zone: public
-
   - name: http
     sources: "{{ firewall_trusted_sources }}"
     zone: public

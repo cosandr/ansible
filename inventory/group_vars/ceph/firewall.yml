@@ -13,11 +13,17 @@ __firewalld_services_3:
   - name: nfs3
     zone: cluster
 
+  - name: ctdb
+    zone: cluster
+
   - name: ceph
     zone: san
 
   - name: ceph-mon
     zone: san
+
+  - name: samba
+    zone: public
 
 __firewall_rules_3:
   - port: "{{ ceph_exporter_port }}"

@@ -219,6 +219,8 @@ vips:
     ceph_nfs:
       - 10.0.10.36
   general:
+    smb:
+      - 10.0.50.33
     ceph_nfs:
       - 10.0.50.36
   san:
@@ -239,6 +241,8 @@ vips_with_prefix:
     ceph_nfs:
       - 10.0.10.36/24
   general:
+    smb:
+      - 10.0.50.33/24
     ceph_nfs:
       - 10.0.50.36/24
   san:
