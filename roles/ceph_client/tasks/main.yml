@@ -6,7 +6,7 @@
     dest: /etc/yum.repos.d/ceph.repo
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when:
     - ansible_os_family == 'RedHat'
     - ansible_distribution != 'Fedora'
@@ -26,9 +26,10 @@
 - name: Ensure /etc/ceph exists
   ansible.builtin.file:
     path: /etc/ceph
+    state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Fetch config
   when:
@@ -54,16 +55,38 @@
     dest: "/etc/ceph/ceph.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when: ceph_config_content
 
-- name: Write client keyrings
-  ansible.builtin.template:
-    src: client.keyring.j2
-    dest: "/etc/ceph/ceph.client.{{ item.key }}.keyring"
-    owner: root
-    group: root
-    mode: 0600
-  loop: "{{ ceph_user_keys | dict2items }}"
-  loop_control:
-    label: "{{ item.key }}"
+- name: Fetch config
+  when: ceph_config_fetch_host
+  block:
+    - name: Ensure keys exist
+      throttle: 1
+      delegate_to: "{{ ceph_config_fetch_host }}"
+      ceph.automation.ceph_key:
+        name: "{{ item.name }}"
+        state: present
+        caps: "{{ item.caps }}"
+      loop: "{{ ceph_keys }}"
+
+    - name: Get key info
+      throttle: 1
+      check_mode: false
+      changed_when: false
+      delegate_to: "{{ ceph_config_fetch_host }}"
+      ansible.builtin.command:
+        cmd: "ceph auth get {{ item.name }}"
+      register: key_info
+      loop: "{{ ceph_keys }}"
+
+    - name: Write keys to file
+      ansible.builtin.copy:
+        content: "{{ item.stdout }}\n"
+        dest: "/etc/ceph/ceph.{{ item.item.name }}.keyring"
+        owner: root
+        group: root
+        mode: "0600"
+      loop: "{{ key_info.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"

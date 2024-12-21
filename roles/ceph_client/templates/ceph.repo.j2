@@ -1,7 +1,7 @@
 # https://docs.ceph.com/en/quincy/install/get-packages/#rhel
 [ceph]
 name=Ceph packages for $basearch
-baseurl={{ ceph_repo_mirror }}/rpm-{{ ceph_release }}/{{ ceph_repo_distro }}/$basearch
+baseurl={{ ceph_repo_mirror }}/rpm-{{ ceph_version }}/{{ ceph_repo_distro }}/$basearch
 enabled=1
 priority=2
 gpgcheck=1
@@ -9,7 +9,7 @@ gpgkey={{ ceph_repo_mirror }}/keys/release.asc
 
 [ceph-noarch]
 name=Ceph noarch packages
-baseurl={{ ceph_repo_mirror }}/rpm-{{ ceph_release }}/{{ ceph_repo_distro }}/noarch
+baseurl={{ ceph_repo_mirror }}/rpm-{{ ceph_version }}/{{ ceph_repo_distro }}/noarch
 enabled=1
 priority=2
 gpgcheck=1
@@ -17,7 +17,7 @@ gpgkey={{ ceph_repo_mirror }}/keys/release.asc
 
 [ceph-source]
 name=Ceph source packages
-baseurl={{ ceph_repo_mirror }}/rpm-{{ ceph_release }}/{{ ceph_repo_distro }}/SRPMS
+baseurl={{ ceph_repo_mirror }}/rpm-{{ ceph_version }}/{{ ceph_repo_distro }}/SRPMS
 enabled=0
 priority=2
 gpgcheck=1
