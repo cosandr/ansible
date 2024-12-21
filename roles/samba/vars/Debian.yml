@@ -5,3 +5,6 @@ __samba_packages:
   - samba
   - samba-vfs-modules
   - smbclient
+
+samba_ctdb_packages:
+  - ctdb

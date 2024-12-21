@@ -7,6 +7,14 @@
     hosts allow = {{ samba_hosts_allow | join(' ') }}
 {% endif %}
 
+    netbios name = {{ samba_netbios_name }}
+
+{% if samba_clustering %}
+    clustering = yes
+    idmap config * : backend = autorid
+    idmap config * : range = 1000000-1999999
+{% endif %}
+
     logging = {{ samba_logging }}
 {% if samba_logging == 'file' %}
     log file = {{ samba_log_file }}

@@ -17,6 +17,14 @@
   when: not samba_skip_install
   tags: ["install"]
 
+- name: Install and configure CTDB
+  ansible.builtin.include_tasks:
+    file: ctdb.yml
+    apply:
+      tags: ["ctdb"]
+  when: samba_clustering
+  tags: ["ctdb"]
+
 - name: Configure VFS
   ansible.builtin.include_tasks: "add_vfs.yml"
   when: samba_add_vfs

@@ -1,0 +1,66 @@
+---
+
+- name: Sanity checks
+  ansible.builtin.assert:
+    that:
+      - samba_ctdb_packages is defined
+      - samba_cluster_lock | length > 0
+      - samba_ctdb_nodes | length > 1
+
+- name: Install CTDB
+  ansible.builtin.package:
+    name: "{{ samba_ctdb_packages }}"
+    state: present
+  tags: ["install"]
+
+- name: Copy ctdb.conf
+  ansible.builtin.template:
+    src: ctdb.conf.j2
+    dest: /etc/ctdb/ctdb.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart ctdb
+
+- name: Copy nodes file
+  ansible.builtin.copy:
+    content: "{{ samba_ctdb_nodes | join('\n') }}\n"
+    dest: /etc/ctdb/nodes
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart ctdb
+
+- name: Copy public_addresses file
+  ansible.builtin.copy:
+    content: "{{ samba_ctdb_public_addresses | join('\n') }}\n"
+    dest: /etc/ctdb/public_addresses
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart ctdb
+  when: samba_ctdb_public_addresses | length > 0
+
+- name: Remove public_addresses file
+  ansible.builtin.file:
+    path: /etc/ctdb/public_addresses
+    state: absent
+  when: samba_ctdb_public_addresses | length == 0
+
+- name: Ensure lock dir exists
+  ansible.builtin.file:
+    path: "{{ samba_cluster_lock | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Enable and start ctdb
+  ansible.builtin.systemd:
+    name: ctdb.service
+    state: started
+    enabled: true
+
+# CTDB needs to be running for Samba to validate its config
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

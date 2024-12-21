@@ -1,0 +1,24 @@
+{{ ansible_managed | comment }}
+# See ctdb.conf(5) for documentation
+# https://ctdb.samba.org/manpages/ctdb.conf.5.html
+# See ctdb-script.options(5) for documentation about event script
+# options
+
+[logging]
+	# Enable logging to syslog
+	location = syslog
+	log level = {{ samba_ctdb_log_level | upper }}
+
+[cluster]
+	# Shared cluster lock file to avoid split brain.  Daemon
+	# default is no cluster lock.  Do NOT run CTDB without a
+	# cluster lock file unless you know exactly what you are
+	# doing.
+	#
+	# Please see the CLUSTER LOCK section in ctdb(7) for more
+	# details.
+	#
+	cluster lock = {{ samba_cluster_lock }}
+{% if samba_ctdb_node_address %}
+	node address = {{ samba_ctdb_node_address }}
+{% endif %}

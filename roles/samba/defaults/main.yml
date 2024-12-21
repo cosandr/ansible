@@ -4,7 +4,7 @@ samba_skip_install: false
 
 samba_workgroup: WORKGROUP
 
-samba_server_role: standalone server
+samba_server_role: STANDALONE
 
 samba_hosts_allow: []
 
@@ -18,6 +18,14 @@ samba_logging: systemd
 # Used when logging is 'file'
 samba_log_file: "/var/log/samba/%m.log"
 samba_max_log_size: 50
+
+samba_netbios_name: "{{ inventory_hostname }}"
+samba_clustering: false
+samba_cluster_lock: ""
+samba_ctdb_node_address: ""
+samba_ctdb_log_level: "notice"
+samba_ctdb_nodes: []
+samba_ctdb_public_addresses: []
 
 # Key, value pairs of extra options
 samba_extra_global_options: {}

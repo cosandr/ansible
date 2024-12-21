@@ -2,6 +2,7 @@
 ---
 
 - name: Create samba users
+  throttle: "{{ 1 if samba_clustering else omit }}"
   ansible.builtin.shell:
     cmd: >
       set -e -o pipefail
@@ -15,6 +16,7 @@
   no_log: true
 
 - name: Set samba passwords correctly
+  throttle: "{{ 1 if samba_clustering else omit }}"
   ansible.builtin.shell:
     cmd: >
       set -e -o pipefail
