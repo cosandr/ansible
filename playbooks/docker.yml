@@ -10,13 +10,16 @@
     - role: systemd
       tags: ["systemd"]
 
+    - role: ceph_client
+      tags: ["ceph"]
+
   post_tasks:
     - name: Setup Docker service overrides
       ansible.builtin.copy:
         content: |
           [Unit]
-          After=mnt-containers.mount mnt-media.mount mnt-downloads.mount mnt-yes.mount
-          Requires=mnt-containers.mount mnt-media.mount mnt-downloads.mount mnt-yes.mount
+          After=mnt-containers.mount mnt-media.mount mnt-downloads.mount
+          Requires=mnt-containers.mount mnt-media.mount mnt-downloads.mount
         dest: "/etc/systemd/system/docker.service.d/override.conf"
         owner: root
         group: root
@@ -44,6 +47,23 @@
         exclusive: true
       tags: ["user", "ssh"]
 
+    - name: Mount CephFS
+      ansible.posix.mount:
+        src: "docker@.{{ item.src }}"
+        path: "{{ item.dest }}"
+        opts: "defaults,noatime"
+        state: mounted
+        fstype: ceph
+      loop:
+        - src: "cephfs=/containers"
+          dest: "/mnt/containers"
+        # TODO: Enable after Tank is moved
+        # - src: "tank=/media"
+        #   dest: "/mnt/media"
+        # - src: "tank=/downloads"
+        #   dest: "/mnt/downloads"
+      tags: ["ceph", "cephfs"]
+
     - name: Mount NFS shares
       ansible.posix.mount:
         src: "{{ hostvars['theia'].host_ips.vm }}:{{ item.src }}"
@@ -52,12 +72,8 @@
         state: mounted
         fstype: nfs
       loop:
-        - src: "/mnt/containers"
-          dest: "/mnt/containers"
         - src: "/mnt/tank/media"
           dest: "/mnt/media"
-        - src: "/mnt/tank/yes"
-          dest: "/mnt/yes"
         - src: "/mnt/tank/downloads"
           dest: "/mnt/downloads"
       tags: ["nfs"]

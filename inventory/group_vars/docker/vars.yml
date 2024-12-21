@@ -20,3 +20,10 @@ sshd_extra_config: |
     StreamLocalBindUnlink yes
 
 swapfile_size: 4G
+
+ceph_keys:
+  - name: client.docker
+    caps:
+      mds: "allow rw fsname=cephfs path=/containers, allow rw fsname=tank path=/media, allow rw fsname=tank path=/downloads"
+      mon: "allow r fsname=cephfs, allow r fsname=tank"
+      osd: "allow rw tag cephfs data=cephfs, allow rw tag cephfs data=tank"

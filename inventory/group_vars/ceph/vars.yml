@@ -1,7 +1,5 @@
 ---
 
-ceph_version: squid
-
 prometheus_node_labels:
   cluster: "ceph"
   instance: "{{ inventory_hostname }}"
