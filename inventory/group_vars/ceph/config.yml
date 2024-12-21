@@ -1,0 +1,113 @@
+---
+
+ceph_alertmanager_api_host: "http://prom01.{{ hostvars['prom01'].domain }}:{{ hostvars['prom01'].alertmanager_port }}"
+ceph_prometheus_api_host: "http://prom01.{{ hostvars['prom01'].domain }}:{{ hostvars['prom01'].prometheus_port }}"
+ceph_config:
+  - option: "mgr/cephadm/autotune_memory_target_ratio"
+    value: "0.2"
+    who: mgr
+  - option: "mgr/cephadm/device_enhanced_scan"
+    value: "true"
+    who: mgr
+  - option: "mgr/dashboard/standby_behaviour"
+    value: "error"
+    who: mgr
+  - option: "mgr/dashboard/standby_error_status_code"
+    value: "503"
+    who: mgr
+  - option: "osd_memory_target_autotune"
+    value: "true"
+    who: osd
+  - option: log_to_file
+    value: "true"
+  - option: log_to_journald
+    value: "false"
+  - option: log_to_stderr
+    value: "false"
+  - option: mon_cluster_log_to_file
+    value: "true"
+  - option: mon_cluster_log_to_journald
+    value: "false"
+  - option: mon_cluster_log_to_stderr
+    value: "false"
+  - option: osd_pool_default_pg_num
+    value: 16
+  - option: osd_pool_default_size
+    value: 3
+  - option: osd_pool_default_min_size
+    value: 2
+  - option: mon_max_pg_per_osd
+    value: 350
+  - option: bluestore_compression_algorithm
+    value: lz4
+  - option: bluestore_compression_mode
+    value: aggressive
+  - option: rgw_trust_forwarded_https
+    value: "true"
+  - option: mon_data_avail_warn
+    value: 20
+    who: mon
+
+ceph_pools:
+  # CephFS
+  - name: cephfs.ssd.meta
+    application: cephfs
+    pool_type: replicated
+    rule_name: replicated_host_ssd
+    zstd_compression: true
+  - name: cephfs.ssd.data
+    application: cephfs
+    pool_type: replicated
+    rule_name: replicated_host_ssd
+    zstd_compression: true
+
+  - name: cephfs.hdd.meta
+    application: cephfs
+    pool_type: replicated
+    rule_name: replicated_host_hdd
+    zstd_compression: true
+  - name: cephfs.hdd.data
+    application: cephfs
+    pool_type: replicated
+    rule_name: replicated_host_hdd
+    zstd_compression: true
+  # RGW
+  - name: default.rgw.ssd.index
+    application: rgw
+    pool_type: replicated
+    rule_name: replicated_host_ssd
+  - name: default.rgw.ssd.non-ec
+    application: rgw
+    pool_type: replicated
+    rule_name: replicated_host_ssd
+  - name: default.rgw.ssd.data
+    application: rgw
+    pool_type: replicated
+    rule_name: replicated_host_ssd
+    zstd_compression: true
+
+  # RBD
+  - name: rbd
+    application: rbd
+    pool_type: replicated
+    rule_name: replicated_host_ssd
+    zstd_compression: true
+
+ceph_keys:
+  - name: client.hv
+    caps:
+      mds: "allow rws fsname=cephfs, allow rws fsname=tank"
+      mon: "allow r fsname=cephfs, allow r fsname=tank"
+      osd: "allow rw tag cephfs data=cephfs, allow rw tag cephfs data=tank"
+  - name: client.libvirt
+    caps:
+      mon: "profile rbd"
+      osd: "profile rbd pool=rbd"
+
+cephfs_snap_schedules:
+  - fs: cephfs
+    path: /
+    retention:
+      hours: 1
+      days: 2
+      weeks: 1
