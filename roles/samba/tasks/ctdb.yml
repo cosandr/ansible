@@ -6,6 +6,7 @@
       - samba_ctdb_packages is defined
       - samba_cluster_lock | length > 0
       - samba_ctdb_nodes | length > 1
+      - samba_ctdb_node_address | length > 0
 
 - name: Install CTDB
   ansible.builtin.package:

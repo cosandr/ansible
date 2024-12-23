@@ -25,18 +25,29 @@
   when: samba_clustering
   tags: ["ctdb"]
 
+- name: Remove CTDB if host is not part of cluster
+  ansible.builtin.package:
+    name: "{{ samba_ctdb_packages }}"
+    state: absent
+  when: (samba_clustering and samba_ctdb_node_address not in samba_ctdb_nodes) or not samba_clustering
+
 - name: Configure VFS
   ansible.builtin.include_tasks: "add_vfs.yml"
-  when: samba_add_vfs
+  when:
+    - samba_add_vfs
+    - (samba_clustering and samba_ctdb_node_address in samba_ctdb_nodes) or not samba_clustering
   tags: ["vfs"]
 
 - name: Include configuration tasks
   ansible.builtin.include_tasks: "configure.yml"
+  when: (samba_clustering and samba_ctdb_node_address in samba_ctdb_nodes) or not samba_clustering
   tags: ["configure"]
 
 - name: Configure users
   ansible.builtin.include_tasks: users.yml
-  when: samba_users
+  when:
+    - samba_users
+    - (samba_clustering and samba_ctdb_node_address in samba_ctdb_nodes) or not samba_clustering
   tags: ["users"]
 
 - name: Enable and start samba
@@ -44,3 +55,14 @@
     name: smb
     state: started
     enabled: true
+  when: (samba_clustering and samba_ctdb_node_address in samba_ctdb_nodes) or not samba_clustering
+
+- name: Disable and stop samba if node is not part of cluster
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop:
+    - smb
+    - nmb
+  when: samba_clustering and samba_ctdb_node_address not in samba_ctdb_nodes
