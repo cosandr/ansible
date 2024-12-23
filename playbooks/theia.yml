@@ -78,9 +78,6 @@
           tags: ["script"]
 
   roles:
-    - role: samba
-      tags: ["samba"]
-
     - role: systemd
       tags: ["systemd", "rclone"]
 

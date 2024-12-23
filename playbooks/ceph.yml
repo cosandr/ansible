@@ -490,7 +490,7 @@
     - name: Mount Tank
       ansible.posix.mount:
         src: hv@.tank=/
-        path: /mnt/ceph_tank  # TODO: Change to tank once migration is completed
+        path: /mnt/tank
         fstype: ceph
         opts: "noatime,nofail,x-systemd.device-timeout=30"
         state: mounted
@@ -624,6 +624,25 @@
       when:
         - ansible_os_family == 'RedHat'
         - ansible_selinux.status == "enabled"
+      tags: ["keepalived"]
+
+    - name: Disable keepalived
+      ansible.builtin.systemd:
+        name: keepalived.service
+        state: stopped
+        enabled: false
+      register: __svc
+      failed_when:
+        - __svc.failed
+        - "'Could not find the requested service' not in __svc.msg"
+      when: inventory_hostname not in keepalived_hosts
+      tags: ["keepalived"]
+
+    - name: Remove keepalived config
+      ansible.builtin.file:
+        path: "/etc/keepalived/keepalived.conf"
+        state: absent
+      when: inventory_hostname not in keepalived_hosts
       tags: ["keepalived"]
 
     # Use include to avoid crash due to invalid keepalived_instances on some hosts

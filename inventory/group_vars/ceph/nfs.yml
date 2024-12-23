@@ -3,54 +3,58 @@
 # MacOS needs to mount with -o resvport or share needs insecure option
 nfs_shares:
   # Backup shares
-  # - path: /mnt/ceph_tank/backup/pgsql
-  #   options: "rw,no_root_squash,no_subtree_check"
-  #   sources: "{{ subnets.vm.pg }}"
-  #   gen_uuid: true
-  # - path: /mnt/ceph_tank/backup/gitlab
-  #   options: "rw,no_root_squash,no_subtree_check"
-  #   sources: "{{ subnets.vm.gitlab }}"
-  #   gen_uuid: true
-  # - path: /mnt/ceph_tank/backup/pgbackrest
-  #   options: "rw,no_root_squash,no_subtree_check"
-  #   sources: "{{ subnets.vm.pgbackrest }}"
-  #   gen_uuid: true
+  - path: /mnt/tank/backup/pgsql
+    options: "rw,no_root_squash,no_subtree_check"
+    sources: "{{ subnets.vm.pg }}"
+    gen_uuid: true
+  - path: /mnt/tank/backup/gitlab
+    options: "rw,no_root_squash,no_subtree_check"
+    sources: "{{ subnets.vm.gitlab }}"
+    gen_uuid: true
+  - path: /mnt/tank/backup/pgbackrest
+    options: "rw,no_root_squash,no_subtree_check"
+    sources: "{{ subnets.vm.pgbackrest }}"
+    gen_uuid: true
   # All dataset shares
-  # - path: /mnt/ceph/andrei
-  #   options: "rw,root_squash,no_subtree_check"
-  #   sources: "{{ firewall_trusted_sources }}"
-  #   gen_uuid: true
+  - path: /mnt/ceph/andrei
+    options: "rw,root_squash,no_subtree_check"
+    sources: "{{ firewall_trusted_sources }}"
+    gen_uuid: true
   - path: /mnt/ceph/containers
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
     gen_uuid: true
-  - path: /mnt/ceph_tank
+  - path: /mnt/tank
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
     gen_uuid: true
-  # - path: /mnt/ceph_tank/media/motion
-  #   options: "rw,no_root_squash,no_subtree_check"
-  #   sources: "{{ [hostvars['drepi'].ansible_host] }}"
-  #   gen_uuid: true
+  - path: /mnt/tank/media/motion
+    options: "rw,no_root_squash,no_subtree_check"
+    sources: "{{ [hostvars['drepi'].ansible_host] }}"
+    gen_uuid: true
   # Docker shares
-  # - path: /mnt/ceph_tank/media
-  #   options: "rw,no_root_squash,no_subtree_check"
-  #   sources: "{{ subnets.vm.docker }}"
-  #   gen_uuid: true
-  # - path: /mnt/ceph_tank/yes
-  #   options: "ro,no_root_squash,no_subtree_check"
-  #   sources: "{{ subnets.vm.docker }}"
-  #   gen_uuid: true
-  # - path: /mnt/ceph_tank/downloads
-  #   options: "rw,no_root_squash,no_subtree_check"
-  #   sources: "{{ subnets.vm.docker }}"
-  #   gen_uuid: true
-  # # Kubernetes shares
-  # - path: /mnt/ceph_tank/yes
-  #   options: "ro,no_root_squash,no_subtree_check"
-  #   sources: "{{ subnets.san.talos }}"
-  #   gen_uuid: true
-  # - path: /mnt/ceph/kube
-  #   options: "rw,no_root_squash,no_subtree_check"
-  #   sources: "{{ subnets.san.talos }}"
-  #   gen_uuid: true
+  - path: /mnt/tank/media
+    options: "rw,no_root_squash,no_subtree_check"
+    sources: "{{ subnets.vm.docker }}"
+    gen_uuid: true
+  - path: /mnt/tank/yes
+    options: "ro,no_root_squash,no_subtree_check"
+    sources: "{{ subnets.vm.docker }}"
+    gen_uuid: true
+  - path: /mnt/tank/downloads
+    options: "rw,no_root_squash,no_subtree_check"
+    sources: "{{ subnets.vm.docker }}"
+    gen_uuid: true
+  # Kubernetes shares
+  - path: /mnt/tank/media/photo
+    options: "ro,no_root_squash,no_subtree_check"
+    sources: "{{ subnets.san.talos }}"
+    gen_uuid: true
+  - path: /mnt/tank/yes
+    options: "ro,no_root_squash,no_subtree_check"
+    sources: "{{ subnets.san.talos }}"
+    gen_uuid: true
+  - path: /mnt/ceph/kube
+    options: "rw,no_root_squash,no_subtree_check"
+    sources: "{{ subnets.san.talos }}"
+    gen_uuid: true

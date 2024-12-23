@@ -57,26 +57,11 @@
       loop:
         - src: "cephfs=/containers"
           dest: "/mnt/containers"
-        # TODO: Enable after Tank is moved
-        # - src: "tank=/media"
-        #   dest: "/mnt/media"
-        # - src: "tank=/downloads"
-        #   dest: "/mnt/downloads"
-      tags: ["ceph", "cephfs"]
-
-    - name: Mount NFS shares
-      ansible.posix.mount:
-        src: "{{ hostvars['theia'].host_ips.vm }}:{{ item.src }}"
-        path: "{{ item.dest }}"
-        opts: "defaults,noatime"
-        state: mounted
-        fstype: nfs
-      loop:
-        - src: "/mnt/tank/media"
+        - src: "tank=/media"
           dest: "/mnt/media"
-        - src: "/mnt/tank/downloads"
+        - src: "tank=/downloads"
           dest: "/mnt/downloads"
-      tags: ["nfs"]
+      tags: ["ceph", "cephfs"]
 
     - name: Install python3-docker
       ansible.builtin.dnf:

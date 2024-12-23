@@ -13,6 +13,12 @@ __firewalld_services_3:
   - name: nfs3
     zone: cluster
 
+  - name: nfs3
+    zone: public
+
+  - name: nfs3
+    zone: san
+
   - name: ctdb
     zone: cluster
 
@@ -37,16 +43,6 @@ __firewall_rules_3:
   - port: "{{ ceph_dashboard_port }}"
     zone: san
     sources: "{{ subnets.san.localgw }}"
-
-  # NFS CephFS export on GENERAL and VM
-  - port: "{{ ceph_nfs_clusters[0].port }}"
-    zone: public
-    sources: "{{ __ceph_nfs_client_addresses | ansible.utils.reduce_on_network(all_net.general.cidr) +
-                 __ceph_nfs_client_addresses | ansible.utils.reduce_on_network(all_net.vm.cidr) }}"
-
-  # NFS CephFS export on SAN
-  - port: "{{ ceph_nfs_clusters[0].port }}"
-    zone: san
 
   # For emergency use in case localgw's are down
   - port: "{{ ceph_dashboard_port }}"

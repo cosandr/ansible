@@ -29,7 +29,7 @@
   tasks:
     - name: Mount NFS share
       ansible.posix.mount:
-        src: "{{ hostvars['theia'].host_ips.vm }}:/mnt/tank/backup/pgbackrest"
+        src: "{{ vips.vm.ceph_nfs[0] }}:/mnt/tank/backup/pgbackrest"
         path: "/var/lib/pgbackrest"
         opts: "defaults,vers=4,rw,noatime,bg"
         state: mounted

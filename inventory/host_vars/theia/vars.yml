@@ -11,12 +11,6 @@ btrfs_subvols:
   - "@snapshots"
   - "@/var/lib/libvirt/images"
   - "@home/{{ my_user }}"
-  - "@/mnt/containers"
-  - "@/mnt/kube"
-
-btrfs_scrub_targets:
-  - /
-  - /mnt/tank
 
 prometheus_node_targets: ["{{ host_ips.vm + ':' + node_exporter_port | string }}"]
 

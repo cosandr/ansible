@@ -111,3 +111,24 @@ cephfs_snap_schedules:
       hours: 1
       days: 2
       weeks: 1
+
+  - fs: tank
+    path: /
+    retention:
+      hours: 3
+      days: 5
+      months: 1
+
+  - fs: tank
+    path: /borg
+    schedule: 1d
+    retention:
+      days: 2
+      weeks: 1
+
+  - fs: tank
+    path: /media/photo
+    retention:
+      hours: 1
+      days: 7
+      months: 1

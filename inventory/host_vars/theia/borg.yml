@@ -24,20 +24,6 @@ borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
 borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
 borg_cephfs_tank_passphrase: "{{ vault_borg_cephfs_tank_passphrase }}"
 
-__borg_btrfs_snaps:
-  tank:
-    snap_src: "/mnt/tank"
-    snap_dir: ".snapshots/borg_tmp.$(date +%Y%m%dT%H%M)"
-    snap_subvols:
-      - "archive"
-      - "backup"
-      - "borg"
-      - "games"
-      - "media"
-      - "media/motion"
-      - "media/photo"
-      - "yes"
-
 borg_backups:
   - name: "syno-tank"
     timer_description: "Backup tank to Synology every 14 days"
@@ -48,14 +34,18 @@ borg_backups:
     archive_path: "tank"
     pre_ssh_check: "{{ lookup('template', repo_base_dir + '/files/borg/pre_ssh_check_syno.sh.j2') }}"
     pre_run: |
-      {{ lookup('template', repo_base_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
+      mountpoint -q /mnt/tank || exit 1
+      snap_dir="/mnt/tank/.snap/borg_tmp.$(date +%Y%m%dT%H%M)"
+      mkdir -p "$snap_dir"
+      cd "$snap_dir" || exit 1
     post_run: |
-      {{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}
+      cd /
+      rmdir "$snap_dir"
       {{ lookup('file', repo_base_dir + '/files/borg/post_run_syno.sh') }}
     paths:
       - "."
     create_args:
-      - "--exclude '**/.snapshots'"
+      - "--exclude '**/.snap'"
     # Manually add to Task Scheduler
     # /usr/local/bin/borg compact --info /volume1/backup/borg/theia/tank
     append_only: true
@@ -74,12 +64,17 @@ borg_backups:
     archive_name: "tank"
     archive_path: "tank"
     pre_run: |
-      {{ lookup('template', repo_base_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps.tank) }}
-    post_run: "{{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}"
+      mountpoint -q /mnt/tank || exit 1
+      snap_dir="/mnt/tank/.snap/borg_tmp.$(date +%Y%m%dT%H%M)"
+      mkdir -p "$snap_dir"
+      cd "$snap_dir" || exit 1
+    post_run: |
+      cd /
+      rmdir "$snap_dir"
     paths:
       - "."
     create_args:
-      - "--exclude '**/.snapshots'"
+      - "--exclude '**/.snap'"
       - "--upload-ratelimit 20000"
     prune_args:
       - "--keep-monthly 3"
@@ -101,6 +96,8 @@ borg_backups:
       rmdir "$snap_dir"
     paths:
       - "."
+    create_args:
+      - "--exclude '**/.snap'"
     prune_args:
       - "--keep-weekly 2"
       - "--keep-monthly 3"
