@@ -1,41 +1,8 @@
 ---
 
-btrbk_root_target: "/mnt/tank/backup/btrbk/{{ inventory_hostname }}"
-
 btrbk_volumes_host:
   - path: "/mnt/btrfs_root"
     subvolumes:
       - path: "@home"
         options:
           snapshot_name: "home"
-
-      - path: "@/mnt/containers"
-        options:
-          snapshot_name: "containers"
-
-      - path: "@/mnt/kube"
-        options:
-          snapshot_name: "kube"
-
-  - path: "/mnt/tank"
-    options:
-      snapshot_dir: ".snapshots"
-      snapshot_preserve: "3h 5d 1m"
-    subvolumes:
-      - path: "archive"
-      - path: "backup"
-      - path: "borg"
-        options:
-          snapshot_preserve: "2d 1w"
-      - path: "media"
-        options:
-          snapshot_preserve: "1h 7d 1m"
-      - path: "media/photo"
-        options:
-          snapshot_preserve: "1h 7d 1m"
-      - path: "media/motion"
-        options:
-          snapshot_preserve: "2d 1w"
-      - path: "yes"
-        options:
-          snapshot_preserve: "2d 2w"

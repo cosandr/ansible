@@ -13,16 +13,6 @@
       when: ansible_selinux.status == "enabled"
       tags: ["selinux"]
 
-    - name: Ensure btrbk backup targets exist
-      ansible.builtin.file:
-        path: "/mnt/tank/backup/btrbk/{{ item }}"
-        state: directory
-        owner: root
-        group: root
-        mode: "0755"
-      loop: "{{ groups['kvm_hv'] }}"
-      tags: ["btrbk"]
-
     - name: Install tmuxinator
       community.general.gem:
         name: tmuxinator
