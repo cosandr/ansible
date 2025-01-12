@@ -21,3 +21,4 @@ certmanager_cluster_issuers:
   - key: hb
     staging: true
   - key: hb
+  - key: dv

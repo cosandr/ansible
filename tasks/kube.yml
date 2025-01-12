@@ -108,6 +108,7 @@
             namespace: cert-manager
           type: Opaque
           data:
+            dv-key: "{{ rfc2136_keys['dv'] | b64encode }}"
             hb-key: "{{ rfc2136_keys['hb'] | b64encode }}"
       tags: ["secret"]
 
