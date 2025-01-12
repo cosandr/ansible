@@ -28,10 +28,6 @@ __nginx_vhosts_3:
     server_name: grafana
     template: "{{ repo_base_dir }}/files/webgw/nginx/grafana.conf.j2"
 
-  - filename: jellyfin.conf
-    server_name: jellyfin
-    template: "{{ repo_base_dir }}/files/webgw/nginx/jellyfin.conf.j2"
-
   - filename: dv-main.conf
     server_name: www
     template: "{{ repo_base_dir }}/files/webgw/nginx/dv-main.conf.j2"

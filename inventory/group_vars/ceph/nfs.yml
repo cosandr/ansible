@@ -46,7 +46,7 @@ nfs_shares:
     sources: "{{ subnets.vm.docker }}"
     gen_uuid: true
   # Kubernetes shares
-  - path: /mnt/tank/media/photo
+  - path: /mnt/tank/media
     options: "ro,no_root_squash,no_subtree_check"
     sources: "{{ subnets.san.talos }}"
     gen_uuid: true

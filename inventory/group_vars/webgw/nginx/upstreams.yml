@@ -33,9 +33,6 @@ __nginx_upstreams_3:
   - name: mrbot_web
     servers: ["{{ hostvars['docker01'].ansible_host }}:{{ hostvars['docker01'].mrbot_web_port }}"]
 
-  - name: jellyfin
-    servers: ["{{ hostvars['docker01'].ansible_host }}:{{ hostvars['docker01'].jellyfin_port }}"]
-
 __nginx_upstreams_2:
   - name: nextcloud_ta
     servers: ["{{ hostvars['romsto'].wireguard_ip }}:{{ hostvars['romsto'].nextcloud_port }}"]

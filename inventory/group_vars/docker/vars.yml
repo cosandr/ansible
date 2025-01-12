@@ -6,7 +6,6 @@ provisioned_disks:
     path: "/mnt/containers"
     opts: "defaults,noatime"
 
-jellyfin_port: 8096
 mrbot_web_port: 8001
 plex_port: 32400
 
