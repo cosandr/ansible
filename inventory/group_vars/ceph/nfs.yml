@@ -37,8 +37,8 @@ nfs_shares:
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ subnets.vm.docker }}"
     gen_uuid: true
-  - path: /mnt/tank/yes
-    options: "ro,no_root_squash,no_subtree_check"
+  - path: /mnt/ceph/containers
+    options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ subnets.vm.docker }}"
     gen_uuid: true
   - path: /mnt/tank/downloads

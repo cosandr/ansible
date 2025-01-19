@@ -10,9 +10,6 @@
     - role: systemd
       tags: ["systemd"]
 
-    - role: ceph_client
-      tags: ["ceph"]
-
   post_tasks:
     - name: Setup Docker service overrides
       ansible.builtin.copy:
@@ -47,21 +44,21 @@
         exclusive: true
       tags: ["user", "ssh"]
 
-    - name: Mount CephFS
+    - name: Mount NFS shares
       ansible.posix.mount:
-        src: "docker@.{{ item.src }}"
+        src: "{{ vips.vm.ceph_nfs[0] }}:{{ item.src }}"
         path: "{{ item.dest }}"
         opts: "defaults,noatime"
         state: mounted
-        fstype: ceph
+        fstype: nfs
       loop:
-        - src: "cephfs=/containers"
+        - src: "/mnt/ceph/containers"
           dest: "/mnt/containers"
-        - src: "tank=/media"
+        - src: "/mnt/tank/media"
           dest: "/mnt/media"
-        - src: "tank=/downloads"
+        - src: "/mnt/tank/downloads"
           dest: "/mnt/downloads"
-      tags: ["ceph", "cephfs"]
+      tags: ["nfs"]
 
     - name: Install python3-docker
       ansible.builtin.dnf:
