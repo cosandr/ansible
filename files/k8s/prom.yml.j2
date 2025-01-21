@@ -63,10 +63,15 @@ prometheus:
     probeSelectorNilUsesHelmValues: false
     externalLabels: {}
     externalUrl: "http://prom.{{ kube_ingress_domain }}"
-    retention: 1h
+    retention: 1y
     storageSpec:
-      emptyDir:
-        sizeLimit: "512Mi"
+      volumeClaimTemplate:
+        spec:
+          storageClassName: nfs-csi
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
 prometheus-node-exporter:
   extraArgs:
     - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
