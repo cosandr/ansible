@@ -1,0 +1,35 @@
+---
+
+borg_pool: "/mnt/tank/borg/repos"
+borg_root_passphrase: "{{ vault_borg_root_passphrase }}"
+
+borg_backups: "{{ (borg_backups_group | default([])) + (borg_backups_host | default([])) }}"
+
+__borg_btrfs_snaps:
+  snap_src: "/mnt/btrfs_root"
+  snap_dir: "@snapshots/borg_tmp.$(date +%Y%m%dT%H%M)"
+  snap_subvols:
+    - "@"
+    - "@home"
+    - "@home/andrei"
+    - "@/var/lib/libvirt/images"
+
+borg_backups_group:
+  - name: "root-tank"
+    timer_description: "Backup root to tank every 7 days"
+    oncalendar: "*-*-02,09,16,23 02:00:00"
+    random_delay: "2h"
+    passphrase: "{{ borg_root_passphrase }}"
+    archive_name: "{{ inventory_hostname }}"
+    repo: "{{ borg_pool }}/kvm_hv"
+    lock_file: "/mnt/tank/borg/kvm_hv.flock"
+    pre_run: |
+      mountpoint -q /mnt/tank || exit 1
+      {{ lookup('template', repo_base_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps) }}
+    post_run: |
+      {{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}
+    paths:
+      - "."
+    prune_args:
+      - "--keep-weekly 2"
+      - "--keep-monthly 3"

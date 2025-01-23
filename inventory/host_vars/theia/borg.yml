@@ -7,7 +7,6 @@ borg_user: "backup"
 borg_group: "backup"
 borg_uid: 1002
 borg_gid: 1002
-borg_pool: "/mnt/tank/borg/repos"
 
 borg_ansible_host_general: "{{ host_ips.general }}"
 borg_ansible_host_vm: "{{ host_ips.vm }}"
@@ -24,7 +23,7 @@ borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
 borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
 borg_cephfs_tank_passphrase: "{{ vault_borg_cephfs_tank_passphrase }}"
 
-borg_backups:
+borg_backups_host:
   - name: "syno-tank"
     timer_description: "Backup tank to Synology every 14 days"
     oncalendar: "*-*-01/14 02:15:00"
