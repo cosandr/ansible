@@ -7,7 +7,11 @@ After=network-online.target
 {% endif %}
 
 [Service]
+{% if conf.lock_file is defined %}
+ExecStart=/usr/bin/flock -x {{ conf.lock_file }} {{ borg_backup_script_path }}/backup-{{ conf.name }}
+{% else %}
 ExecStart={{ borg_backup_script_path }}/backup-{{ conf.name }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

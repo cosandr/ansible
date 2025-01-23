@@ -5,6 +5,9 @@ Description={{ conf.timer_description | default('Scheduled borg backup for ' + c
 [Timer]
 OnCalendar={{ conf.oncalendar | default('*-*-* ' + ansible_date_time.time) }}
 Persistent={{ conf.persistent | andrei.utils.bool_to_yes('yes') }}
+{% if conf.random_delay is defined %}
+RandomizedDelaySec={{ conf.random_delay }}
+{% endif %}
 
 [Install]
 WantedBy=timers.target
