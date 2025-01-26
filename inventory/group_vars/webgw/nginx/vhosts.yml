@@ -36,10 +36,6 @@ __nginx_vhosts_3:
     server_name: nextcloud
     template: "{{ repo_base_dir }}/files/webgw/nginx/nextcloud.conf.j2"
 
-  - filename: plex.conf
-    server_name: plex
-    template: "{{ repo_base_dir }}/files/webgw/nginx/plex.conf.j2"
-
 __nginx_vhosts_2:
   - filename: nextcloud_ta.conf
     server_name: nextcloud_ta

@@ -24,9 +24,6 @@ __nginx_upstreams_3:
     servers: ["{{ hostvars['nextcloud01'].ansible_host }}:{{ hostvars['nextcloud01'].nextcloud_port }}"]
     keepalive: 16
 
-  - name: plex
-    servers: ["{{ hostvars['docker01'].ansible_host }}:{{ hostvars['docker01'].plex_port }}"]
-
   - name: dv-main
     servers: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].nginx_ports['www'] }}"]
 

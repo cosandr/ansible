@@ -7,7 +7,6 @@ provisioned_disks:
     opts: "defaults,noatime"
 
 mrbot_web_port: 8001
-plex_port: 32400
 
 docker_registries:
   - url: "{{ gitlab_registry_external_url | regex_replace('^https?://', '') }}"

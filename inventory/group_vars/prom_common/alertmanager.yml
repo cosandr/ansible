@@ -36,11 +36,6 @@ alertmanager_route:
       matchers:
         - job=~"blackbox.*"
 
-    - group_wait: 2h
-      matchers:
-        - alertname="ContainerCpuUsage"
-        - name=~"plex.*"
-
     - group_wait: 16h
       matchers:
         - alertname="ContainerCpuUsage"
