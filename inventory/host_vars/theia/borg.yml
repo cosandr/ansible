@@ -25,8 +25,8 @@ borg_cephfs_tank_passphrase: "{{ vault_borg_cephfs_tank_passphrase }}"
 
 borg_backups_host:
   - name: "syno-tank"
-    timer_description: "Backup tank to Synology every 14 days"
-    oncalendar: "*-*-01/14 02:15:00"
+    timer_description: "Backup tank to Synology every 10 days"
+    oncalendar: "*-*-01,10,20 02:15:00"
     passphrase: "{{ borg_syno_tank_passphrase }}"
     target_host: "syno"
     archive_name: "tank"
@@ -54,8 +54,8 @@ borg_backups_host:
       - "--keep-yearly 1"
 
   - name: "remote-tank"
-    timer_description: "Backup tank to remote location every 30 days"
-    oncalendar: "*-*-01/30 00:12:00"
+    timer_description: "Backup tank to remote location every month"
+    oncalendar: "*-*-04 00:12:00"
     passphrase: "{{ borg_remote_tank_passphrase }}"
     target_host: "romsto"
     # Need to manually update /boot/config/ssh/andrei.pubkeys
