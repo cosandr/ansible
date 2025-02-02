@@ -6,13 +6,18 @@ __postgresql_hba_entries_manual:
   - { type: host, database: all, user: all, address: "{{ all_net.vm.cidr }}", auth_method: "md5" }
   - { type: host, database: certs, user: certs_reader, address: "all", auth_method: "md5" }
 
-__postgresql_hba_entries_trusted: >-
+__postgresql_hba_entries_auto: >-
   {%- set tmp = [] -%}
   {%- for net in subnets | json_query('*.trusted') | flatten -%}
   {{- tmp.append(
     { 'type': 'host', 'database': 'all', 'user': 'all', 'address': net, 'auth_method': 'md5' }
   ) -}}
   {%- endfor -%}
+  {%- for net in subnets.talos.pod -%}
+  {{- tmp.append(
+    { 'type': 'host', 'database': 'all', 'user': 'all', 'address': net, 'auth_method': 'md5' }
+  ) -}}
+  {%- endfor -%}
   {{ tmp }}
 
-postgresql_hba_entries: "{{ __postgresql_hba_entries_manual + __postgresql_hba_entries_trusted }}"
+postgresql_hba_entries: "{{ __postgresql_hba_entries_manual + __postgresql_hba_entries_auto }}"
