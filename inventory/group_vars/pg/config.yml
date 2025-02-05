@@ -3,19 +3,19 @@
 # https://www.postgresql.org/docs/13/auth-pg-hba-conf.html
 __postgresql_hba_entries_manual:
   - { type: local, database: all, user: postgres, auth_method: peer }
-  - { type: host, database: all, user: all, address: "{{ all_net.vm.cidr }}", auth_method: "md5" }
-  - { type: host, database: certs, user: certs_reader, address: "all", auth_method: "md5" }
+  - { type: host, database: all, user: all, address: "{{ all_net.vm.cidr }}", auth_method: "scram-sha-256" }
+  - { type: host, database: certs, user: certs_reader, address: "all", auth_method: "scram-sha-256" }
 
 __postgresql_hba_entries_auto: >-
   {%- set tmp = [] -%}
   {%- for net in subnets | json_query('*.trusted') | flatten -%}
   {{- tmp.append(
-    { 'type': 'host', 'database': 'all', 'user': 'all', 'address': net, 'auth_method': 'md5' }
+    { 'type': 'host', 'database': 'all', 'user': 'all', 'address': net, 'auth_method': 'scram-sha-256' }
   ) -}}
   {%- endfor -%}
   {%- for net in subnets.talos.pod -%}
   {{- tmp.append(
-    { 'type': 'host', 'database': 'all', 'user': 'all', 'address': net, 'auth_method': 'md5' }
+    { 'type': 'host', 'database': 'all', 'user': 'all', 'address': net, 'auth_method': 'scram-sha-256' }
   ) -}}
   {%- endfor -%}
   {{ tmp }}

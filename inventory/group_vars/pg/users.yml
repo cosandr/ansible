@@ -1,30 +1,32 @@
 ---
 
 postgresql_users:
-  - name: postgres
-    password: "{{ vault_postgresql_passwords.postgres }}"
-
-  - name: discord
-
-  - name: discord_public
-
-  - name: gitlab
-
-  - name: grafana
-
-  - name: nextcloud
-
-  - name: sharpbot
-
-  - name: uuid_gen
-
-  - name: web
-
-  - name: terraform
-    password: "{{ vault_postgresql_passwords.terraform }}"
-
   - name: certs_pusher
     password: "{{ vault_postgresql_passwords.certs_pusher }}"
 
   - name: certs_reader
     password: "{{ vault_postgresql_passwords.certs_reader }}"
+
+  - name: discord
+    password: "{{ vault_postgresql_passwords.discord }}"
+
+  - name: discord_public
+    password: "{{ vault_postgresql_passwords.discord_public }}"
+
+  - name: discord_test
+    password: "{{ vault_postgresql_passwords.discord_test }}"
+
+  - name: grafana
+    password: "{{ vault_postgresql_passwords.grafana }}"
+
+  - name: nextcloud
+    password: "{{ vault_postgresql_passwords.nextcloud }}"
+
+  - name: postgres
+    password: "{{ vault_postgresql_passwords.postgres }}"
+
+  - name: uuid_gen
+    password: "{{ vault_postgresql_passwords.uuid_gen }}"
+
+  - name: web
+    password: "{{ vault_postgresql_passwords.web }}"

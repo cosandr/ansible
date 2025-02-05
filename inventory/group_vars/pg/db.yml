@@ -1,14 +1,14 @@
 ---
 
 postgresql_databases:
+  - name: certs
+    owner: certs_pusher
+
   - name: discord
     owner: postgres
 
   - name: discord_public
     owner: postgres
-
-  - name: gitlabhq_production
-    owner: gitlab
 
   - name: grafana
     owner: grafana
@@ -16,11 +16,8 @@ postgresql_databases:
   - name: nextcloud
     owner: nextcloud
 
-  - name: web
+  - name: test
     owner: postgres
 
-  - name: terraform
-    owner: terraform
-
-  - name: certs
-    owner: certs_pusher
+  - name: web
+    owner: postgres
