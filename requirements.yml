@@ -28,10 +28,6 @@ roles:
     src: https://github.com/geerlingguy/ansible-role-gitlab.git
     version: master
 
-  - name: cloudalchemy.pushgateway
-    src: https://github.com/cloudalchemy/ansible-pushgateway.git
-    version: master
-
   - name: cosandr.dnf_automatic
     src: https://github.com/cosandr/ansible-role-dnf-automatic.git
     scm: git

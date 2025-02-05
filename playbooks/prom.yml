@@ -82,9 +82,6 @@
     - role: grafana
       tags: ["grafana"]
 
-    - role: cloudalchemy.pushgateway
-      tags: ["pushgateway"]
-
   handlers:
     - name: Restart rsyslog
       ansible.builtin.service:
