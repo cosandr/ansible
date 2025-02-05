@@ -5,6 +5,7 @@ ansible_python_interpreter: /usr/bin/python3
 
 repo_base_dir: "{{ ansible_config_file | dirname }}"
 
+bw_token: "{{ lookup('community.general.passwordstore', 'ansible/bw_token') }}"
 domains: "{{ vault_domains }}"
 
 ansible_managed: "Ansible managed"

@@ -3,6 +3,8 @@
 collections:
   - name: ansible.posix
   - name: ansible.utils
+  - name: bitwarden.secrets
+    version: ">=1.0,<2.0"
   - name: community.docker
   - name: community.general
     version: '>=7.5'
