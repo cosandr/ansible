@@ -186,6 +186,13 @@
         enabled: true
       when: ansible_distribution == 'Archlinux'
 
+    - name: Enable paccache timer
+      ansible.builtin.systemd:
+        name: paccache.timer
+        enabled: true
+        state: started
+      when: ansible_distribution == 'Archlinux'
+
   handlers:
     - name: Dracut regenerate  # noqa no-changed-when
       become: true
