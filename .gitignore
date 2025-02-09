@@ -1,3 +1,4 @@
+.ansible/
 .secrets/
 __pycache__
 *.retry

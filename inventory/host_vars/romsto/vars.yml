@@ -35,3 +35,6 @@ persistent_disk:
   path: "/pstore"
 swap_disk: "/dev/disk/by-uuid/eee1d5fb-be1e-4344-a1c7-9a3d3d990b53"
 ssd_mount_opts: "space_cache=v2,compress-force=zstd,relatime,ssd,discard=async"
+
+__host_ips_1:
+  ipmi: "10.1.0.60"
