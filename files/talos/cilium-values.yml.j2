@@ -9,7 +9,7 @@ bgpControlPlane:
   enabled: true
 
 # https://docs.cilium.io/en/stable/network/kubernetes/kubeproxy-free/#nodeport-devices-port-and-bind-settings
-devices: "enx{{ vm_default_mac.split(':')[:3] | join('') }}+"
+devices: "enp1s0"
 
 # https://docs.cilium.io/en/stable/network/kubernetes/ipam-multi-pool/#enable-multi-pool-ipam-mode
 autoDirectNodeRoutes: true

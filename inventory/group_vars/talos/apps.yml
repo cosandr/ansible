@@ -1,14 +1,15 @@
 ---
 
+# TODO: Renovate?
 # https://cert-manager.io/docs/releases/
-certmanager_version: "1.x"
+certmanager_version: "1.17.0"
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
-prometheus_version: "68.x"
+prometheus_version: "69.3.0"
 # https://github.com/cilium/cilium/releases
-cilium_version: "1.16.x"
+cilium_version: "1.17.0"
 # https://github.com/fluxcd/flux2/releases
 # https://github.com/fluxcd-community/helm-charts/releases
-flux_version: "~2.14"
+flux_version: "2.14.1"
 
 alertmanager_template_files: >-
   {%- set tmp = {} -%}
