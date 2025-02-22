@@ -28,7 +28,7 @@ __nginx_upstreams_3:
     servers: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].nginx_ports['www'] }}"]
 
   - name: mrbot_web
-    servers: ["{{ hostvars['docker01'].ansible_host }}:{{ hostvars['docker01'].mrbot_web_port }}"]
+    servers: ["mrbot-web.{{ all_net.talos.domain }}"]
 
 __nginx_upstreams_2:
   - name: nextcloud_ta
