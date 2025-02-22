@@ -54,10 +54,6 @@
       loop:
         - src: "/mnt/ceph/containers"
           dest: "/mnt/containers"
-        - src: "/mnt/tank/media"
-          dest: "/mnt/media"
-        - src: "/mnt/tank/downloads"
-          dest: "/mnt/downloads"
       tags: ["nfs"]
 
     - name: Install python3-docker

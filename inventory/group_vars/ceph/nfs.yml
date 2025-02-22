@@ -33,21 +33,13 @@ nfs_shares:
     sources: "{{ [hostvars['drepi'].ansible_host] }}"
     gen_uuid: true
   # Docker shares
-  - path: /mnt/tank/media
-    options: "rw,no_root_squash,no_subtree_check"
-    sources: "{{ subnets.vm.docker }}"
-    gen_uuid: true
   - path: /mnt/ceph/containers
-    options: "rw,no_root_squash,no_subtree_check"
-    sources: "{{ subnets.vm.docker }}"
-    gen_uuid: true
-  - path: /mnt/tank/downloads
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ subnets.vm.docker }}"
     gen_uuid: true
   # Kubernetes shares
   - path: /mnt/tank/media
-    options: "ro,no_root_squash,no_subtree_check"
+    options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ subnets.san.talos }}"
     gen_uuid: true
   - path: /mnt/tank/yes
@@ -55,6 +47,10 @@ nfs_shares:
     sources: "{{ subnets.san.talos }}"
     gen_uuid: true
   - path: /mnt/ceph/kube
+    options: "rw,no_root_squash,no_subtree_check"
+    sources: "{{ subnets.san.talos }}"
+    gen_uuid: true
+  - path: /mnt/tank/downloads
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ subnets.san.talos }}"
     gen_uuid: true
