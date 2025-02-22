@@ -12,7 +12,6 @@ gitrun02     ansible_host="10.0.10.93"
 loki01       ansible_host="10.0.10.96"
 minio01      ansible_host="10.0.10.100"
 nextcloud01  ansible_host="10.0.10.104"
-docker01     ansible_host="10.0.10.106"
 prom01       ansible_host="10.0.10.108"
 talos01      ansible_host="10.0.28.64"
 talos02      ansible_host="10.0.28.65"
@@ -112,7 +111,6 @@ localgw
 loki
 minio
 nextcloud
-docker
 prom
 talos
 
@@ -209,12 +207,6 @@ nextcloud01 host_num=0
 
 [nextcloud:vars]
 host_subnet=nextcloud
-
-[docker]
-docker01 host_num=0
-
-[docker:vars]
-host_subnet=docker
 
 [minio]
 minio01 host_num=0

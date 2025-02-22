@@ -32,11 +32,6 @@ nfs_shares:
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ [hostvars['drepi'].ansible_host] }}"
     gen_uuid: true
-  # Docker shares
-  - path: /mnt/ceph/containers
-    options: "rw,no_root_squash,no_subtree_check"
-    sources: "{{ subnets.vm.docker }}"
-    gen_uuid: true
   # Kubernetes shares
   - path: /mnt/tank/media
     options: "rw,no_root_squash,no_subtree_check"

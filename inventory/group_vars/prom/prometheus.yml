@@ -96,17 +96,6 @@ __extra_prometheus_scrape_configs:
       - target_label: __address__
         replacement: "localhost:{{ blackbox_exporter_port }}"
 
-  - job_name: "federate"
-    scrape_interval: 15s
-    honor_labels: true
-    metrics_path: '/federate'
-    params:
-      'match[]':
-        - '{job=~".+"}'
-    static_configs:
-      - targets:
-          - "{{ hostvars['docker01'].ansible_host }}:9090"
-
   - job_name: "ceph"
     scrape_interval: 15s
     honor_labels: true
