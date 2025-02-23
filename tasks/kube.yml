@@ -95,6 +95,9 @@
         update_repo_cache: true
         release_values:
           installCRDs: true
+          prometheus:
+            servicemonitor:
+              enabled: true
       tags: ["helm"]
 
     - name: Create TSIG secret
