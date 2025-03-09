@@ -1,5 +1,0 @@
----
-
-__dnf_automatic_excludes_3:
-  - "docker*"
-  - "container*"

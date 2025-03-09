@@ -10,9 +10,6 @@
         file: ../tasks/common_servers.yml
       tags: ["always"]
 
-- name: Import Docker playbook
-  ansible.builtin.import_playbook: docker.yml
-
 - name: Import Gitlab playbook
   ansible.builtin.import_playbook: gitlab.yml
 
