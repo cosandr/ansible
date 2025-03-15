@@ -77,6 +77,38 @@
             mode: "0755"
           tags: ["script"]
 
+    - name: ZFS tasks
+      tags: ["zfs"]
+      block:
+        - name: Prefer ZFS backports packages
+          ansible.builtin.copy:
+            content: |
+              Package: src:zfs-linux
+              Pin: release n={{ ansible_distribution_release | lower }}-backports
+              Pin-Priority: 990
+            dest: "/etc/apt/preferences.d/90_zfs"
+            owner: root
+            group: root
+            mode: "0644"
+          tags: ["apt"]
+
+        - name: Install ZFS requirements
+          ansible.builtin.apt:
+            name:
+              - dpkg-dev
+              - "linux-headers-amd64{% if deb_backports_kernel %}/{{ ansible_distribution_release | lower }}-backports{% endif %}"
+            state: present
+          tags: ["install"]
+
+        - name: Install ZFS
+          ansible.builtin.apt:
+            name:
+              - zfs-dkms
+              - zfsutils-linux
+              - zfs-dracut
+            state: present
+          tags: ["install"]
+
   roles:
     - role: samba
       tags: ["samba"]
