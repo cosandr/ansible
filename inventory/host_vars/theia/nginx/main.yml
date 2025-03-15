@@ -1,6 +1,5 @@
 ---
 
-# Conflicts with Ceph RGW ingress
 nginx_default_reject_ssl: false
 nginx_nis_enabled: true
 nginx_listen_v4: "{{ host_ips.vm }}"

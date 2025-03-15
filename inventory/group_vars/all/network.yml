@@ -214,16 +214,9 @@ vips:
       - 10.0.10.34
     localgw03:
       - 10.0.10.35
-    ceph_nfs:
-      - 10.0.10.36
   general:
     smb:
       - 10.0.50.33
-    ceph_nfs:
-      - 10.0.50.36
-  san:
-    ceph_nfs:
-      - 10.0.2.36
   talos:
     control_plane:
       - 10.0.28.33
@@ -236,16 +229,9 @@ vips_with_prefix:
       - 10.0.10.34/24
     localgw03:
       - 10.0.10.35/24
-    ceph_nfs:
-      - 10.0.10.36/24
   general:
     smb:
       - 10.0.50.33/24
-    ceph_nfs:
-      - 10.0.50.36/24
-  san:
-    ceph_nfs:
-      - 10.0.2.36/24
   talos:
     control_plane:
       - 10.0.28.33/24

@@ -13,12 +13,6 @@ nfs_shares:
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ subnets.vm.pgbackrest }}"
   # All dataset shares
-  - path: /mnt/ceph/andrei
-    options: "rw,root_squash,no_subtree_check"
-    sources: "{{ firewall_trusted_sources }}"
-  - path: /mnt/ceph/containers
-    options: "rw,no_root_squash,no_subtree_check"
-    sources: "{{ firewall_trusted_sources }}"
   - path: /mnt/tank
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
@@ -32,7 +26,7 @@ nfs_shares:
   - path: /mnt/tank/yes
     options: "ro,no_root_squash,no_subtree_check"
     sources: "{{ subnets.san.talos }}"
-  - path: /mnt/ceph/kube
+  - path: /mnt/kube
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ subnets.san.talos }}"
   - path: /mnt/tank/downloads

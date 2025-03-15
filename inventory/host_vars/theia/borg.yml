@@ -21,7 +21,6 @@ borg_remote_repo_general: "ssh://{{ borg_ssh_check_general }}/."
 
 borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
 borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
-borg_cephfs_tank_passphrase: "{{ vault_borg_cephfs_tank_passphrase }}"
 
 borg_backups_host:
   - name: "syno-tank"
@@ -32,14 +31,11 @@ borg_backups_host:
     archive_name: "tank"
     archive_path: "tank"
     pre_ssh_check: "{{ lookup('template', repo_base_dir + '/files/borg/pre_ssh_check_syno.sh.j2') }}"
+    # TODO: ZFS snapshot, need to bind mount/symlink each dataset
     pre_run: |
       mountpoint -q /mnt/tank || exit 1
-      snap_dir="/mnt/tank/.snap/borg_tmp.$(date +%Y%m%dT%H%M)"
-      mkdir -p "$snap_dir"
-      cd "$snap_dir" || exit 1
+      cd /mnt/tank
     post_run: |
-      cd /
-      rmdir "$snap_dir"
       {{ lookup('file', repo_base_dir + '/files/borg/post_run_syno.sh') }}
     paths:
       - "."
@@ -62,14 +58,10 @@ borg_backups_host:
     ssh_dest_dir: "/home/andrei"
     archive_name: "tank"
     archive_path: "tank"
+    # TODO: ZFS snapshot, need to bind mount/symlink each dataset
     pre_run: |
       mountpoint -q /mnt/tank || exit 1
-      snap_dir="/mnt/tank/.snap/borg_tmp.$(date +%Y%m%dT%H%M)"
-      mkdir -p "$snap_dir"
-      cd "$snap_dir" || exit 1
-    post_run: |
-      cd /
-      rmdir "$snap_dir"
+      cd /mnt/tank
     paths:
       - "."
     create_args:
@@ -78,26 +70,3 @@ borg_backups_host:
     prune_args:
       - "--keep-monthly 3"
       - "--keep-yearly 2"
-
-  - name: "cephfs"
-    timer_description: "Backup CephFS to tank every 7 days"
-    oncalendar: "*-*-01/7 01:21:00"
-    passphrase: "{{ borg_cephfs_tank_passphrase }}"
-    archive_name: "cephfs"
-    repo: "{{ borg_pool }}/cephfs"
-    pre_run: |
-      mountpoint -q /mnt/ceph || exit 1
-      snap_dir="/mnt/ceph/.snap/borg_tmp.$(date +%Y%m%dT%H%M)"
-      mkdir -p "$snap_dir"
-      cd "$snap_dir" || exit 1
-    post_run: |
-      cd /
-      rmdir "$snap_dir"
-    paths:
-      - "."
-    create_args:
-      - "--exclude '**/.snap'"
-    prune_args:
-      - "--keep-weekly 2"
-      - "--keep-monthly 3"
-      - "--keep-yearly 1"

@@ -2,7 +2,7 @@ groups:
 - name: Prometheus self-monitoring
   rules:
   - alert: InstanceDown
-    expr: up{ignore_down!="true", job!="ceph"} == 0
+    expr: up{ignore_down!="true"} == 0
     for: 10m
     labels:
       severity: critical

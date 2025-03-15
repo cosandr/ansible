@@ -4,17 +4,8 @@ __nginx_upstreams_2: []
 __nginx_upstreams_1:
   - name: motion
     servers: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].motion_port }}"]
-  - name: ceph-dashboard
-    servers: "{{ groups['ceph'] | map('extract', hostvars, 'host_ips') | map(attribute='san') |
-      map('regex_replace', '$', ':' + (ceph_dashboard_port | string)) | list }}"
-  - name: ceph-rgw
-    servers: "{{ groups['ceph'] | map('extract', hostvars, 'host_ips') | map(attribute='san') |
-      map('regex_replace', '$', ':' + (rgw_frontend_port | string)) | list }}"
 
 __nginx_vhosts_1:
   - filename: external-dns.conf
     server_name: external-dns
     template: "{{ repo_base_dir }}/files/webgw/nginx/external-dns.conf.j2"
-  - filename: ceph.conf
-    server_name: ceph
-    template: "{{ repo_base_dir }}/files/webgw/nginx/ceph.conf.j2"

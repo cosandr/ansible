@@ -1,7 +1,0 @@
-service_type: rgw
-service_id: main
-placement:
-  count: {{ groups['ceph'] | length }}
-networks: {{ rgw_networks | to_json }}
-spec:
-  rgw_frontend_port: {{ rgw_frontend_port | default(8080) }}
