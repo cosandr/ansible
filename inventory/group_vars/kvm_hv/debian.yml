@@ -1,7 +1,5 @@
 ---
 
-# 6.7 freezes on boot when first installing on MS01's
-# Don't need backports on Theia
 deb_backports_kernel: false
 
 deb_packages: "{{ __group_deb_packages + (__host_deb_packages | default([])) }}"

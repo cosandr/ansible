@@ -1,5 +1,8 @@
 ---
 
+# Use newer kernel for E core optimizations, probably
+deb_backports_kernel: true
+
 __host_ips_3:
   vpro: "{{ subnets.mgmt.ipmi | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"
 
