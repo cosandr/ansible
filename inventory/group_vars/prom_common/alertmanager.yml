@@ -17,6 +17,7 @@ alertmanager_template_files:
 
 # https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl
 alertmanager_receivers:
+  - name: 'null'
   - name: discord
     discord_configs:
       - send_resolved: true
@@ -31,6 +32,11 @@ alertmanager_route:
   repeat_interval: 168h
   receiver: discord
   routes:
+    - receiver: 'null'
+      matchers:
+        - alertname=~"BlackboxSslCertificate.+"
+        - instance="https://google.com"
+
     - group_by: ["job"]
       group_wait: 10m
       matchers:
