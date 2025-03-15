@@ -1,0 +1,35 @@
+---
+
+samba_hosts_allow: "{{ ['127.0.0.1'] + [all_net.general.cidr] + subnets.mt.trusted }}"
+
+samba_interfaces:
+  - lo
+  - GENERAL
+
+samba_users: "{{ vault_samba_users }}"
+
+samba_extra_global_options:
+  "security": user
+  "client min protocol": SMB2
+  "server min protocol": SMB2
+  "passdb backend": tdbsam
+  "load printers": false
+  "allow insecure wide links": false
+  "mangled names": false
+  "unix extensions": false
+  "unix password sync": true
+  "pam password change": true
+  "include": "registry"
+
+samba_shares:
+  homes:
+    comment: "Home Directories"
+    browseable: false
+    writable: true
+    "follow symlinks": true
+    "wide links": true
+
+  tank:
+    comment: "Rust Storage"
+    path: "/mnt/tank"
+    writable: true

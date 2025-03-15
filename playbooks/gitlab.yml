@@ -20,7 +20,7 @@
 
     - name: Mount backup NFS share
       ansible.posix.mount:
-        src: "{{ vips.vm.ceph_nfs[0] }}:/mnt/tank/backup/gitlab"
+        src: "{{ hostvars['theia'].host_ips.vm }}:/mnt/tank/backup/gitlab"
         path: "{{ gitlab_backup_upload_connection.local_root }}"
         opts: "defaults,vers=4,rw,noatime,bg"
         state: mounted

@@ -20,7 +20,7 @@
       block:
         - name: Mount motion share
           ansible.posix.mount:
-            src: "{{ vips.general.ceph_nfs[0] }}:/mnt/tank/media/motion"
+            src: "{{ hostvars['theia'].host_ips.general }}:/mnt/tank/media/motion"
             path: "/mnt/motion"
             opts: "defaults,vers=4,rw,noatime,bg"
             state: mounted
