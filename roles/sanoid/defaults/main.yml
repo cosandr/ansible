@@ -1,7 +1,7 @@
 ---
 
 # 'latest' will get the newest release, 'master' gets the current master branch
-sanoid_version: 2.0.3
+sanoid_version: 2.2.0
 
 sanoid_config_dir: /etc/sanoid
 
@@ -11,7 +11,7 @@ sanoid_unit_dir: /etc/systemd/system
 
 sanoid_timer_minutes: 15
 
-sanoid_enable_units: yes
+sanoid_enable_units: true
 
 sanoid_backup_modules: {}
 # sanoid_backup_modules:

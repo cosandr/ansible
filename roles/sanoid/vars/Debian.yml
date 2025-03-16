@@ -4,6 +4,8 @@ sanoid_dependencies:
   - debhelper
   - libcapture-tiny-perl
   - libconfig-inifiles-perl
+  - pv
   - lzop
   - mbuffer
-  - pv
+  - build-essential
+  - git

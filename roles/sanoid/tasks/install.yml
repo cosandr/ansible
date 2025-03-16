@@ -1,7 +1,7 @@
 ---
 
 - name: Update apt cache
-  apt:
+  ansible.builtin.apt:
     update_cache: true
   register: _pre_update_apt_cache
   until: _pre_update_apt_cache is succeeded
@@ -9,7 +9,7 @@
     - ansible_pkg_mgr == "apt"
 
 - name: Install dependencies
-  package:
+  ansible.builtin.package:
     name: "{{ sanoid_dependencies }}"
     state: present
   register: _install_dep_packages
@@ -18,44 +18,44 @@
   delay: 2
 
 - name: Ensure binary path exists
-  file:
+  ansible.builtin.file:
     path: "{{ sanoid_bin_dir }}"
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Copy binaries
-  diff: no
-  copy:
+  diff: false
+  ansible.builtin.copy:
     src: "/tmp/sanoid-git/{{ item }}"
     dest: "{{ sanoid_bin_dir }}/{{ item }}"
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
-    remote_src: yes
+    remote_src: true
   with_items:
     - sanoid
     - syncoid
     - findoid
 
 - name: Ensure config path exists
-  file:
+  ansible.builtin.file:
     path: "{{ sanoid_config_dir }}"
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Copy default and example config files
-  diff: no
-  copy:
+  diff: false
+  ansible.builtin.copy:
     src: "/tmp/sanoid-git/{{ item.key }}"
     dest: "{{ sanoid_config_dir }}/{{ item.value }}"
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
-    remote_src: yes
+    remote_src: true
   with_dict:
     "sanoid.defaults.conf": "sanoid.defaults.conf"
     "sanoid.conf": "sanoid.example.conf"

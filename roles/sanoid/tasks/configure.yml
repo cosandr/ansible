@@ -5,7 +5,7 @@
     dest: "{{ sanoid_unit_dir }}/{{ item | basename | regex_replace('(.*)\\.j2$', '\\1') }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   loop:
     - sanoid-prune.service.j2
     - sanoid.service.j2
@@ -17,7 +17,7 @@
     dest: "{{ sanoid_unit_dir }}/sanoid.timer"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   notify: Reload systemd
 
 - name: Install config file
@@ -26,7 +26,7 @@
     dest: "{{ sanoid_config_dir }}/sanoid.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
 
 - name: Register previously copied configuration files
   ansible.builtin.find:
@@ -43,7 +43,7 @@
     dest: "/etc/systemd/system/{{ svc_name }}"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   vars:
     svc_name: "syncoid-{{ item.1.name }}.{{ item.0 }}"
   notify: Reload systemd

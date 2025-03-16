@@ -1,11 +1,11 @@
 ---
 # Variable setup.
 - name: Include OS-specific variables.
-  include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
   tags: ["install"]
 
 - name: Fail if unconfigured
-  fail:
+  ansible.builtin.fail:
     msg: "Backup modules must be configured"
   when:
     - sanoid_backup_modules is not defined or sanoid_backup_modules | length == 0
