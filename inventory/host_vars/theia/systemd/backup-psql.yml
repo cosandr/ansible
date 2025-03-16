@@ -55,7 +55,7 @@ __sd_backup_psql:
 
         trap cleanup EXIT
 
-        set -e
+        set -e -o pipefail
 
         env PGHOST="{{ hostvars['pg01'].ansible_host }}" \
             PGUSER="postgres" \

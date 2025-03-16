@@ -3,6 +3,23 @@
 
 - name: Configure KVM hypervisors
   hosts: kvm_hv
+  pre_tasks:
+    - name: Copy pgdg GPG key
+      ansible.builtin.get_url:
+        url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+        dest: /etc/apt/keyrings/apt.postgresql.org.asc
+        owner: root
+        group: root
+        mode: "0644"
+      diff: false
+      tags: ["apt", "postgres"]
+
+    - name: Add pgdg repo
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release | lower }}-pgdg main" # noqa yaml[line-length]
+        state: present
+        filename: pgdg
+      tags: ["apt", "postgres"]
   roles:
     - role: grub
       tags: ["grub"]
