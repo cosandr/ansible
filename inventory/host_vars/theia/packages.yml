@@ -29,14 +29,6 @@ __host_common_packages:
   - php-pgsql
   - php-xml
 
-__host_dnf_packages:
-  - libxml2-devel
-  - libxslt-devel
-  - php-pecl-imagick
-  - php-pecl-zip
-  - php-process
-  - php-sodium
-
 __host_deb_packages:
   - libsodium-dev
   - libxml2-dev

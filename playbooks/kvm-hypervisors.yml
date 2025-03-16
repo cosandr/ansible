@@ -186,8 +186,6 @@
         owner: "{{ my_user }}"
         group: "{{ my_user }}"
         mode: "0700"
-      # Should only change after we created the subvolume
-      notify: Restore user SELinux context
       tags: ["user"]
 
     - name: Configure user SSH keys
@@ -197,24 +195,6 @@
         state: present
         exclusive: true
       tags: ["user", "ssh"]
-
-  post_tasks:
-    - name: Symlink cockpit certs
-      ansible.builtin.file:
-        src: "/etc/pki/tls/{{ 'certs' if item == 'crt' else 'private' }}/{{ domain }}.{{ item }}"
-        dest: "/etc/cockpit/ws-certs.d/99-live.{{ item }}"
-        follow: false
-        state: link
-        force: true
-      loop: ["crt", "key"]
-      # TODO: Debian, maybe. Or remove it.
-      when: ansible_os_family == 'RedHat'
-      tags: ["cockpit"]
-
-  handlers:
-    - name: Restore user SELinux context
-      ansible.builtin.command: "restorecon -r /home/{{ my_user }}"
-      when: ansible_selinux.status == "enabled"
 
 - name: Import Theia playbook
   ansible.builtin.import_playbook: theia.yml

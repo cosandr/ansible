@@ -4,24 +4,6 @@
 - name: Provision Theia
   hosts: theia
   tasks:
-    - name: Set tank SELinux context
-      community.general.sefcontext:
-        target: "/mnt/tank(/.*)?"
-        setype: var_t
-        state: present
-      notify: Restore tank SELinux context
-      when: ansible_selinux.status == "enabled"
-      tags: ["selinux"]
-
-    - name: Install tmuxinator
-      community.general.gem:
-        name: tmuxinator
-        state: present
-        norc: true
-        user_install: false
-      when: ansible_os_family == "RedHat"
-      tags: ["tmuxinator"]
-
     - name: Setup syno auto shutdown
       tags: ["borg", "syno"]
       vars:
@@ -124,8 +106,3 @@
 
     - role: syncthing
       tags: ["syncthing"]
-
-  handlers:
-    - name: Restore tank SELinux context  # noqa no-changed-when - handler
-      ansible.builtin.command: restorecon -r /mnt/tank
-      when: ansible_selinux.status == "enabled"
