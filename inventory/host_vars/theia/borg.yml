@@ -7,6 +7,7 @@ borg_user: "backup"
 borg_group: "backup"
 borg_uid: 1002
 borg_gid: 1002
+borg_pool: "/mnt/tank/borg/repos"
 
 borg_ansible_host_general: "{{ host_ips.general }}"
 borg_ansible_host_vm: "{{ host_ips.vm }}"
@@ -22,7 +23,25 @@ borg_remote_repo_general: "ssh://{{ borg_ssh_check_general }}/."
 borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
 borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
 
-borg_backups_host:
+borg_backups:
+  - name: "root-tank"
+    timer_description: "Backup root to tank every 7 days"
+    oncalendar: "*-*-02,09,16,23 02:00:00"
+    random_delay: "2h"
+    passphrase: "{{ borg_root_passphrase }}"
+    archive_name: "root"
+    repo: "{{ borg_pool }}/{{ inventory_hostname }}"
+    pre_run: |
+      mountpoint -q /mnt/tank || exit 1
+      {{ lookup('template', repo_base_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps) }}
+    post_run: |
+      {{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}
+    paths:
+      - "."
+    prune_args:
+      - "--keep-weekly 2"
+      - "--keep-monthly 3"
+
   - name: "syno-tank"
     timer_description: "Backup tank to Synology every 10 days"
     oncalendar: "*-*-01,10,20 02:15:00"
