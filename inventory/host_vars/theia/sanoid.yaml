@@ -1,0 +1,118 @@
+---
+
+sanoid_version: master
+
+syncoid_timers:
+  - name: rpool
+    src: rpool
+    dest: tank/backup/theia/rpool
+    oncalendar: Daily
+    options:
+      - "--recursive"
+      - "--no-sync-snap"
+      - '--exclude-datasets=".*\\/var\\/(cache|log|tmp)"'
+      - '--exclude-datasets=".*\\/var\\/lib\\/containers"'
+      - '--exclude-datasets=".*\\/\\.cache$"'
+
+sanoid_timer_minutes: 30
+
+sanoid_backup_modules:
+  "rpool":
+    recursive: true
+    process_children_only: true
+    use_template: "main"
+
+  "rpool/home/andrei":
+    frequently: 0
+    hourly: 24
+    daily: 5
+    monthly: 2
+    yearly: 0
+    autosnap: true
+    autoprune: true
+
+  "rpool/home/andrei/.cache":
+    use_template: "ignore"
+
+  "rpool/home/backup/.cache":
+    use_template: "ignore"
+
+  "rpool/home/root/.cache":
+    use_template: "ignore"
+
+  "rpool/k8s":
+    use_template: "ignore"
+
+  "rpool/var/cache":
+    use_template: "ignore"
+
+  "rpool/var/log":
+    use_template: "ignore"
+
+  "rpool/var/tmp":
+    use_template: "ignore"
+
+  "rpool/var/lib/containers":
+    recursive: true
+    use_template: "ignore"
+
+  "tank":
+    recursive: true
+    process_children_only: true
+    use_template: "main"
+
+  "tank/media":
+    recursive: true
+    use_template: "rare"
+
+  "tank/media/motion":
+    use_template: "ignore"
+
+  "tank/downloads":
+    use_template: "ignore"
+
+  "tank/games":
+    use_template: "ignore"
+
+  "tank/yes":
+    daily: 3
+    monthly: 1
+    autosnap: true
+    autoprune: true
+
+  "tank/backup/theia":
+    recursive: true
+    use_template: "prune_lts"
+
+sanoid_backup_templates:
+  "main":
+    frequently: 0
+    hourly: 3
+    daily: 5
+    monthly: 1
+    yearly: 0
+    autosnap: true
+    autoprune: true
+
+  "rare":
+    frequently: 0
+    hourly: 1
+    daily: 7
+    monthly: 3
+    yearly: 1
+    autosnap: true
+    autoprune: true
+
+  "ignore":
+    autoprune: false
+    autosnap: false
+    monitor: false
+
+  "prune_lts":
+    autoprune: true
+    autosnap: false
+    frequently: 0
+    hourly: 3
+    daily: 10
+    monthly: 3
+    yearly: 0

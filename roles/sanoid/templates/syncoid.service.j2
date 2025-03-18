@@ -5,8 +5,8 @@ Requires=zfs.target
 After=zfs.target
 
 [Service]
+Environment=HOME=/root
 ExecStart={{ sanoid_bin_dir }}/syncoid \
-    --quiet \
 {% for o in item.1.options %}
     {{ o }} \
 {% endfor %}

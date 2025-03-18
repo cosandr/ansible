@@ -64,6 +64,7 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
+  notify: Reload systemd
   loop: "{{ _timers_present_list | difference(_timers_copied_list) }}"
   when: syncoid_provisioning_synced
 

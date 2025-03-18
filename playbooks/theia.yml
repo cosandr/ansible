@@ -3,6 +3,38 @@
 
 - name: Provision Theia
   hosts: theia
+  pre_tasks:
+    - name: ZFS tasks
+      tags: ["zfs"]
+      block:
+        - name: Prefer ZFS backports packages
+          ansible.builtin.copy:
+            content: |
+              Package: src:zfs-linux
+              Pin: release n={{ ansible_distribution_release | lower }}-backports
+              Pin-Priority: 990
+            dest: "/etc/apt/preferences.d/90_zfs"
+            owner: root
+            group: root
+            mode: "0644"
+          tags: ["apt", "install"]
+
+        - name: Install ZFS requirements
+          ansible.builtin.apt:
+            name:
+              - dpkg-dev
+              - "linux-headers-amd64{% if deb_backports_kernel %}/{{ ansible_distribution_release | lower }}-backports{% endif %}"
+            state: present
+          tags: ["install"]
+
+        - name: Install ZFS
+          ansible.builtin.apt:
+            name:
+              - zfs-dkms
+              - zfsutils-linux
+              - zfs-dracut
+            state: present
+          tags: ["install"]
   tasks:
     - name: Setup syno auto shutdown
       tags: ["borg", "syno"]
@@ -62,34 +94,24 @@
     - name: ZFS tasks
       tags: ["zfs"]
       block:
-        - name: Prefer ZFS backports packages
+        - name: Enable zpool scrub timers
+          ansible.builtin.systemd:
+            name: "zfs-scrub-{{ item.schedule }}@{{ item.pool }}.timer"
+            state: started
+            enabled: true
+          loop: "{{ zfs_scrub_timers | default([]) }}"
+          tags: ["scrub"]
+
+        - name: Configure max ZFS ARC size
           ansible.builtin.copy:
-            content: |
-              Package: src:zfs-linux
-              Pin: release n={{ ansible_distribution_release | lower }}-backports
-              Pin-Priority: 990
-            dest: "/etc/apt/preferences.d/90_zfs"
+            dest: /etc/modprobe.d/zfs.conf
             owner: root
             group: root
             mode: "0644"
-          tags: ["apt"]
-
-        - name: Install ZFS requirements
-          ansible.builtin.apt:
-            name:
-              - dpkg-dev
-              - "linux-headers-amd64{% if deb_backports_kernel %}/{{ ansible_distribution_release | lower }}-backports{% endif %}"
-            state: present
-          tags: ["install"]
-
-        - name: Install ZFS
-          ansible.builtin.apt:
-            name:
-              - zfs-dkms
-              - zfsutils-linux
-              - zfs-dracut
-            state: present
-          tags: ["install"]
+            content: |
+              options zfs zfs_arc_max={{ zfs_arc_max_gb * 2**30 }}
+          notify: Dracut regenerate
+          tags: ["arc"]
 
   roles:
     - role: samba
@@ -106,3 +128,13 @@
 
     - role: syncthing
       tags: ["syncthing"]
+
+    - role: zfs_zed
+      tags: ["zfs", "zed"]
+
+    - role: sanoid
+      tags: ["zfs", "sanoid"]
+
+  handlers:
+    - name: Dracut regenerate  # noqa no-changed-when - handler
+      ansible.builtin.command: dracut -f

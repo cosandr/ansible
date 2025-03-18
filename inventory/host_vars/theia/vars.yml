@@ -7,10 +7,11 @@ domain: "{{ domains['hb'] }}"
 web_root: "/var/www"
 pip_wheel_dir: "{{ web_root }}/pip"
 
-btrfs_subvols:
-  - "@snapshots"
-  - "@/var/lib/libvirt/images"
-  - "@home/{{ my_user }}"
+btrfs_subvols: []
+btrbk_volumes: []
+btrfs_scrub_targets: []
+btrfs_src: ""
+btrfs_root: ""
 
 prometheus_node_targets: ["{{ host_ips.vm + ':' + node_exporter_port | string }}"]
 
@@ -18,7 +19,7 @@ grub_config:
   - regexp: '^GRUB_TIMEOUT'
     line: "GRUB_TIMEOUT=2"
   - regexp: '^GRUB_CMDLINE_LINUX'
-    line: GRUB_CMDLINE_LINUX="rd.lvm.lv=vg01/root crashkernel=auto nmi_watchdog=0 amd_pstate=passive"
+    line: GRUB_CMDLINE_LINUX="root=ZFS=rpool/ROOT/debian crashkernel=auto amd_pstate=passive"
 
 ssh_conf_hosts: false
 

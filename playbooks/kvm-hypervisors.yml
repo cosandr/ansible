@@ -31,6 +31,7 @@
       tags: ["auto-ssh"]
 
     - role: btrbk
+      when: btrbk_volumes | default([])
       tags: ["btrbk"]
 
     - role: cpupower
