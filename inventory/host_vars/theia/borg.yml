@@ -24,24 +24,6 @@ borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
 borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
 
 borg_backups:
-  - name: "root-tank"
-    timer_description: "Backup root to tank every 7 days"
-    oncalendar: "*-*-02,09,16,23 02:00:00"
-    random_delay: "2h"
-    passphrase: "{{ borg_root_passphrase }}"
-    archive_name: "root"
-    repo: "{{ borg_pool }}/{{ inventory_hostname }}"
-    pre_run: |
-      mountpoint -q /mnt/tank || exit 1
-      {{ lookup('template', repo_base_dir + '/files/borg/pre_run_btrfs.sh.j2', template_vars=__borg_btrfs_snaps) }}
-    post_run: |
-      {{ lookup('file', repo_base_dir + '/files/borg/post_run_btrfs.sh') }}
-    paths:
-      - "."
-    prune_args:
-      - "--keep-weekly 2"
-      - "--keep-monthly 3"
-
   - name: "syno-tank"
     timer_description: "Backup tank to Synology every 10 days"
     oncalendar: "*-*-01,10,20 02:15:00"
@@ -58,8 +40,10 @@ borg_backups:
       {{ lookup('file', repo_base_dir + '/files/borg/post_run_syno.sh') }}
     paths:
       - "."
+      # It's mounted but doesn't show up, accessing it directly works.
+      - "backup/theia/rpool/ROOT/debian"
     create_args:
-      - "--exclude '**/.snap'"
+      - "--numeric-ids"
     # Manually add to Task Scheduler
     # /usr/local/bin/borg compact --info /volume1/backup/borg/theia/tank
     append_only: true
@@ -83,8 +67,9 @@ borg_backups:
       cd /mnt/tank
     paths:
       - "."
+      - "backup/theia/rpool/ROOT/debian"
     create_args:
-      - "--exclude '**/.snap'"
+      - "--numeric-ids"
       - "--upload-ratelimit 20000"
     prune_args:
       - "--keep-monthly 3"
