@@ -13,6 +13,8 @@ syncoid_timers:
       - '--exclude-datasets=".*\\/var\\/(cache|log|tmp)"'
       - '--exclude-datasets=".*\\/var\\/lib\\/containers"'
       - '--exclude-datasets=".*\\/\\.cache$"'
+      - '--exclude-datasets="^rpool$"'
+      - '--exclude-datasets="^rpool\\/k8s$"'
 
 sanoid_timer_minutes: 30
 
