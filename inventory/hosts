@@ -231,14 +231,14 @@ host_net=talos
 
 [talos_cp]
 talos01 vm_host=theia
-talos02 vm_host=ymir
+talos02 vm_host=aegir
 talos03 vm_host=gerd
 
 [talos_cp:vars]
 host_subnet=control_plane
 
 [talos_worker]
-talos04 vm_host=aegir
+talos04 vm_host=ymir
 
 [talos_worker:vars]
 host_subnet=worker

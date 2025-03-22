@@ -27,7 +27,7 @@ vm_extra_disks:
   - type: block
     device: disk
     format: raw
-    dev: "/dev/vg01/k8s"
+    dev: "{{ (vm_host in groups['ms01']) | ternary('/dev/vg01/k8s', '/dev/zvol/rpool/k8s') }}"
     serial: "raw01"
     target: "vdb"
     driver_options:
