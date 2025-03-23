@@ -15,8 +15,6 @@ chezmoi_overrides:
     QT_AUTO_SCREEN_SCALE_FACTOR="1"
     MOUSE_SENS="-0.65"
     MOUSE_NAME="pointer:Logitech G502"
-    NVIDIA_CORE_OFFSET="100"
-    NVIDIA_MEM_OFFSET="1500"
     USE_AUTORANDR=0
 
     export __GL_SYNC_TO_VBLANK=1
