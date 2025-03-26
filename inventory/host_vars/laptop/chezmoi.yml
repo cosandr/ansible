@@ -34,7 +34,7 @@ chezmoi_overrides:
       WS["1"]="laptop"
     fi
   bar-env: |
-    export DDCUTIL_SLEEP_MULTIPLIER=3
+    export DDCUTIL_SLEEP_MULTIPLIER=1
   polybar: |
     MONITOR_MAP["eDP-1"]="laptop"
     MONITOR_MAP["HDMI-1"]="laptop-ext"
@@ -44,16 +44,22 @@ chezmoi_overrides:
     export MOZ_ENABLE_WAYLAND=1
     export MOZ_USE_XINPUT2=1
   swayidle: |
-    SCREEN_ON=1
+    SCREEN_ON=0
+    # At home
+    if [ "$(swaymsg -r -t get_outputs | jq -r '. | map(select(.model | ascii_downcase | contains("oled"))) | length')" -gt 0 ]; then
+      NO_LOCK=1
+      SCREEN_ON=1
+    fi
   gui: |
     QT_AUTO_SCREEN_SCALE_FACTOR="1"
     QT_QPA_PLATFORMTHEME="qt5ct"
   xinitrc: |
     MOZ_X11_EGL="1"
   lock: |
-    idle_hook="xidlehook_lock_screen_on"
-    LOCKER="i3lock"
-    OPTS="-i $HOME/.wallpaper -t --clock"
+    if [ "$XDG_SESSION_TYPE" = "x11" ]; then
+      idle_hook="xss-lock"
+      LOCKER="xsecurelock"
+    fi
   xorg: |
     DPI=120
   xorg_2: |
@@ -82,7 +88,7 @@ chezmoi_overrides:
     monitor_map:
       laptop_ext:
         - "Lenovo Group Limited L32p-30 U511L1X2"
-        - "GIGA-BYTE TECHNOLOGY CO., LTD. Gigabyte M32U 21311B001327"
+        - "Microstep MPG321UX OLED 0x01010101"
       laptop_ext_secondary:
         - "Samsung Electric Company LS27A800U HNMTA00225"
         - "Samsung Electric Company U24E850 HTHH300363"
