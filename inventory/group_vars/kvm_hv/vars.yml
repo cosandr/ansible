@@ -61,7 +61,6 @@ __group_common_packages:
   - lsof
   - make
   - man-db
-  - mc
   - mlocate
   - ncdu
   - net-tools

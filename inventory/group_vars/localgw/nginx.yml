@@ -4,8 +4,22 @@ __nginx_upstreams_2: []
 __nginx_upstreams_1:
   - name: motion
     servers: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].motion_port }}"]
+  - name: minio-console
+    servers: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].minio_console_port }}"]
+    keepalive: 16
+  - name: minio-api
+    servers: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].minio_server_port }}"]
+    keepalive: 16
 
 __nginx_vhosts_1:
   - filename: external-dns.conf
     server_name: external-dns
     template: "{{ repo_base_dir }}/files/webgw/nginx/external-dns.conf.j2"
+
+  - filename: minio-console.conf
+    server_name: minio-console
+    template: "{{ repo_base_dir }}/files/webgw/nginx/minio-console.conf.j2"
+
+  - filename: minio-api.conf
+    server_name: minio-api
+    template: "{{ repo_base_dir }}/files/webgw/nginx/minio-api.conf.j2"

@@ -1,17 +1,17 @@
 ---
 
 # https://github.com/minio/mc/releases
-minio_client_release: "RELEASE.2024-01-18T07-03-39Z"
+minio_client_release: "RELEASE.2025-03-12T17-29-24Z"
 # https://github.com/minio/minio/releases
-minio_server_release: "RELEASE.2024-01-18T22-51-28Z"
+minio_server_release: "RELEASE.2025-03-12T18-04-18Z"
 
-minio_server_ip: 127.0.0.1
+minio_server_ip: "{{ host_ips.vm }}"
 minio_server_port: 9091
-minio_console_ip: 127.0.0.1
+minio_console_ip: "{{ host_ips.vm }}"
 minio_console_port: 9001
 
 # Used by minio role to check that the UI is running
-minio_hostname: "{{ inventory_hostname }}"
+minio_hostname: "{{ minio_server_ip }}"
 
 minio_root_username: "{{ vault_minio_root_username }}"
 minio_root_password: "{{ vault_minio_root_password }}"
@@ -19,11 +19,18 @@ minio_root_password: "{{ vault_minio_root_password }}"
 minio_install_server: true
 minio_install_client: true
 
+# Create ZFS dataset manually
+minio_server_datadirs:
+  - /var/lib/minio
+
+minio_server_env_extra: |
+  MINIO_BROWSER_REDIRECT_URL="https://{{ minio_domain }}/"
+
 minio_client_config:
   version: "10"
   aliases:
     local:
-      url: "http://localhost:{{ minio_server_port }}"
+      url: "http://{{ minio_server_ip }}:{{ minio_server_port }}"
       accessKey: "{{ minio_root_username }}"
       secretKey: "{{ minio_root_password }}"
       api: "S3v4"

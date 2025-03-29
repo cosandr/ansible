@@ -1,0 +1,11 @@
+groups:
+- name: Minio
+  rules:
+  - alert: MinioDiskSpaceUsage
+    expr: minio_cluster_capacity_usable_free_bytes / minio_cluster_capacity_usable_total_bytes * 100 < 10
+    for: 0m
+    labels:
+      severity: warning
+    annotations:
+      summary: Minio disk space usage (instance {{ $labels.instance }})
+      description: "Minio available free space is low ({{ $value }}%)"

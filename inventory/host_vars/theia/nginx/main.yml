@@ -1,12 +1,9 @@
 ---
 
 nginx_default_reject_ssl: false
-nginx_nis_enabled: true
 nginx_listen_v4: "{{ host_ips.vm }}"
 nginx_ports:
   www: 8013
-
-nginx_modules_path: "/usr/lib64/nginx/modules"
 
 nginx_access_log_options: "main buffer=16k flush=2m"
 nginx_access_log: "/var/log/nginx/access.log {{ nginx_access_log_options }}"
@@ -31,8 +28,6 @@ nginx_extra_http_options: |
     server unix:/run/php/php-fpm.sock;
   }
 
-nginx_ssl_cert_main: "/etc/pki/tls/certs/{{ domain }}.crt"
-nginx_ssl_key_main: "/etc/pki/tls/private/{{ domain }}.key"
 nginx_remove_default_vhost: true
 nginx_server_tokens: "off"
 nginx_status_url: "nginx_status"  # http://localhost/<nginx_status_url>

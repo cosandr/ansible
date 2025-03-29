@@ -28,6 +28,14 @@ __firewall_rules_1:
     zone: public
     sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
 
+  - port: "{{ minio_console_port }}"
+    zone: public
+    sources: "{{ subnets.vm.localgw }}"
+
+  - port: "{{ minio_server_port }}"
+    zone: public
+    sources: "{{ subnets.vm.localgw + node_exporter_allow_ips }}"
+
 mt_firewall_address_lists:
   - address: "{{ host_ips.vm }}"
     list: backup

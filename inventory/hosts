@@ -10,7 +10,6 @@ gitlab01     ansible_host="10.0.10.90"
 gitrun01     ansible_host="10.0.10.92"
 gitrun02     ansible_host="10.0.10.93"
 loki01       ansible_host="10.0.10.96"
-minio01      ansible_host="10.0.10.100"
 nextcloud01  ansible_host="10.0.10.104"
 prom01       ansible_host="10.0.10.108"
 talos01      ansible_host="10.0.28.64"
@@ -109,7 +108,6 @@ gitlab
 gitrun
 localgw
 loki
-minio
 nextcloud
 prom
 talos
@@ -207,12 +205,6 @@ nextcloud01 host_num=0
 
 [nextcloud:vars]
 host_subnet=nextcloud
-
-[minio]
-minio01 host_num=0
-
-[minio:vars]
-host_subnet=minio
 
 [rom]
 romsto  ansible_host=10.1.0.6  host_wg_subnet=rom host_wg_num=0

@@ -224,3 +224,12 @@ __extra_prometheus_scrape_configs:
   - job_name: 'nginx'
     scrape_interval: 60s
     static_configs: "{{ __prom_nginx_configs }}"
+
+  - job_name: minio
+    scrape_interval: 1m
+    authorization:
+      # mc admin prometheus generate local
+      credentials: "{{ vault_minio_token }}"
+    metrics_path: /minio/v2/metrics/cluster
+    static_configs:
+      - targets: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].minio_server_port }}"]

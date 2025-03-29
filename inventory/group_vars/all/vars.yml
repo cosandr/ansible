@@ -30,7 +30,9 @@ locale_conf:
 
 systemd_script_install_path: "/usr/local/bin/systemd"
 
-s3_url: "https://s3.{{ domains['hb'] }}"
+s3_domain: "s3.{{ domains['hb'] }}"
+s3_url: "https://{{ s3_domain }}"
+minio_domain: "minio.{{ domains['hb'] }}"
 localgw_dns_name: "localgw.{{ domains['hb'] }}"
 
 prometheus_blackbox_icmp_targets: ["{{ wireguard_ip | default(ansible_host) }}"]

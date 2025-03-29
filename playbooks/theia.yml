@@ -135,6 +135,28 @@
     - role: sanoid
       tags: ["zfs", "sanoid"]
 
+    - role: minio
+      tags: ["minio"]
+
+  post_tasks:
+    - name: Create .mc dir
+      ansible.builtin.file:
+        state: directory
+        path: "/root/.mc"
+        owner: root
+        group: root
+        mode: "0755"
+      tags: ["minio", "config"]
+
+    - name: Write client config
+      ansible.builtin.copy:
+        content: "{{ minio_client_config | to_nice_json(indent=2) }}"
+        dest: "/root/.mc/config.json"
+        owner: root
+        group: root
+        mode: "0600"
+      tags: ["minio", "config"]
+
   handlers:
     - name: Dracut regenerate  # noqa no-changed-when - handler
       ansible.builtin.command: dracut -f

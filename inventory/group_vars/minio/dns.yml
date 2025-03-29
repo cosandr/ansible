@@ -1,7 +1,0 @@
----
-
-mt_dns_entries:
-  - name: "minio.{{ domain }}"
-    address: "{{ ansible_host }}"
-  - name: "s3.{{ domain }}"
-    address: "{{ ansible_host }}"

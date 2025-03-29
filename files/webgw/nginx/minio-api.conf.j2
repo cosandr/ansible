@@ -1,4 +1,6 @@
 {{ ansible_managed | comment }}
+{% if nginx_upstreams | selectattr('name', 'search', 'minio-api') %}
+{% set domain = domains['hb'] %}
 server {
     listen 80;
     listen [::]:80;
@@ -12,8 +14,8 @@ server {
     http2 on;
     server_name s3.{{ domain }};
 
-    ssl_certificate {{ nginx_certs_dir }}/{{ domain }}.pem;
-    ssl_certificate_key {{ nginx_certs_dir }}/{{ domain }}.key;
+    ssl_certificate /etc/lego/certificates/{{ domain }}.crt;
+    ssl_certificate_key /etc/lego/certificates/{{ domain }}.key;
 
     access_log {{ nginx_sites_logs }}/access-s3.{{ domain }}.log {{ nginx_access_log_options }};
     error_log {{ nginx_sites_logs }}/error-s3.{{ domain }}.log {{ nginx_error_log_options }};
@@ -41,3 +43,4 @@ server {
         proxy_pass http://minio-api/;
     }
 }
+{% endif %}

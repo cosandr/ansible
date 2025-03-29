@@ -13,9 +13,6 @@
 - name: Import Gitlab playbook
   ansible.builtin.import_playbook: gitlab.yml
 
-- name: Import MinIO playbook
-  ansible.builtin.import_playbook: minio.yml
-
 - name: Import Nextcloud playbook
   ansible.builtin.import_playbook: nextcloud.yml
 
