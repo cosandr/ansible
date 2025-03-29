@@ -14,12 +14,19 @@ vm_nics:
       dev: "SAN"
     mac: "{{ vm_mac_san }}"
 
-vm_pci_devices: "{{ (vm_host in groups['ms01']) | ternary(__igpu_vm_pci_devices, []) }}"
+vm_pci_devices: "{{ (vm_host in groups['ms01']) | ternary(__igpu_vm_pci_devices, __nvidia_vm_pci_devices) }}"
 __igpu_vm_pci_devices:
   - address:
       domain: "0x0000"
       bus: "0x00"
       slot: "0x02"
+      function: "0x0"
+
+__nvidia_vm_pci_devices:
+  - address:
+      domain: "0x0000"
+      bus: "0x01"
+      slot: "0x00"
       function: "0x0"
 
 vm_extra_disks:

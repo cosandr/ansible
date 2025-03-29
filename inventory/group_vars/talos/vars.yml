@@ -6,7 +6,7 @@ __host_ips_3:
   san: "{{ subnets.san.talos | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
 
 # https://github.com/siderolabs/talos/releases
-talos_version: "1.9.4"
+talos_version: "1.9.5"
 # https://kubernetes.io/releases/
 kube_version: "1.31.6"
 
@@ -24,9 +24,19 @@ kube_ingress_domain: "{{ domain }}"
 #         - console=ttyS0
 #     systemExtensions:
 #         officialExtensions:
-#             - siderolabs/i915
 #             - siderolabs/qemu-guest-agent
-talos_schematic: 9c4db4ee9e890177e32dada9587c772fccf53241981274f0be527d721b853f7f
+#             - siderolabs/i915
+__igpu_talos_schematic: 2ef6d3a39f4f5eb2782fcf5f398b406ff676dc0e026810eb11f7f7c756f7e28c
+# customization:
+#     extraKernelArgs:
+#         - console=ttyS0
+#     systemExtensions:
+#         officialExtensions:
+#             - siderolabs/qemu-guest-agent
+#             - siderolabs/nvidia-container-toolkit-production
+#             - siderolabs/nvidia-open-gpu-kernel-modules-production
+__nvidia_talos_schematic: b9495ca70e959bf5f5336a9ac70d9b46e468dbde7b53599c45b6d51d2c79920e
+talos_schematic: "{{ (vm_host in groups['ms01']) | ternary(__igpu_talos_schematic, __nvidia_talos_schematic) }}"
 talos_image: "factory.talos.dev/installer/{{ talos_schematic }}:v{{ talos_version }}"
 
 talos_kubectl_context: "admin@{{ kube_api_server }}"
@@ -43,8 +53,11 @@ node_labels: >-
   {%- if host_subnet == 'worker' -%}
   {{- tmp.update({"node-role.kubernetes.io/worker": ""}) -}}
   {%- endif -%}
-  {%- if vm_pci_devices -%}
+  {%- if __igpu_vm_pci_devices == vm_pci_devices -%}
   {{- tmp.update({"intel.feature.node.kubernetes.io/gpu": "true"}) -}}
+  {%- endif -%}
+  {%- if __nvidia_vm_pci_devices == vm_pci_devices -%}
+  {{- tmp.update({"nvidia.com/gpu.present": "true"}) -}}
   {%- endif -%}
   {{ tmp }}
 
