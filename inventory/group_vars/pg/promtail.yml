@@ -8,3 +8,10 @@ __promtail_scrape_configs_2:
         labels:
           job: postgres
           __path__: /var/log/postgresql/*log
+  - job_name: pgbackrest
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: pgbackrest
+          __path__: /var/log/pgbackrest/*log

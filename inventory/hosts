@@ -5,7 +5,6 @@ localgw02    ansible_host="10.0.10.65"
 localgw03    ansible_host="10.0.10.66"
 localgw04    ansible_host="10.0.10.67"
 pg01         ansible_host="10.0.10.84"
-pgbak01      ansible_host="10.0.10.88"
 gitlab01     ansible_host="10.0.10.90"
 gitrun01     ansible_host="10.0.10.92"
 gitrun02     ansible_host="10.0.10.93"
@@ -103,7 +102,7 @@ ansible_group_priority=1
 ansible_group_priority=2
 
 [libvirt:children]
-db
+pg
 gitlab
 gitrun
 localgw
@@ -120,21 +119,11 @@ ansible_group_priority=2
 drepi   ansible_user=andrei host_num=0
 rompi   ansible_user=andrei
 
-[db:children]
-pg
-pgbackrest
-
 [pg]
 pg01 host_num=0
 
 [pg:vars]
 host_subnet=pg
-
-[pgbackrest]
-pgbak01 host_num=0
-
-[pgbackrest:vars]
-host_subnet=pgbackrest
 
 [mikrotik]
 rb5009 host_num=1 host_wg_num=1

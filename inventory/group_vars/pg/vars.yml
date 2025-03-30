@@ -12,6 +12,7 @@ provisioned_disks:
 
 node_exporter_config_firewall: false
 
+postgresql_version: 16
 postgresql_daemon: "postgresql-{{ postgresql_version }}"
 postgresql_bin_path: "/usr/pgsql-{{ postgresql_version }}/bin"
 postgresql_data_dir: "/var/lib/pgsql/{{ postgresql_version }}/data"

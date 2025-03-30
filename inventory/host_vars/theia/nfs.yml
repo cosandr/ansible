@@ -11,7 +11,7 @@ nfs_shares:
     sources: "{{ subnets.vm.gitlab }}"
   - path: /mnt/tank/backup/pgbackrest
     options: "rw,no_root_squash,no_subtree_check"
-    sources: "{{ subnets.vm.pgbackrest }}"
+    sources: "{{ subnets.vm.pg }}"
   # All dataset shares
   - path: /mnt/tank
     options: "rw,no_root_squash,no_subtree_check"

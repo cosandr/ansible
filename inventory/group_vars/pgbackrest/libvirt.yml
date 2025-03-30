@@ -1,6 +1,0 @@
----
-
-vm_cpus: 2
-vm_mem: 2048
-
-vm_root_size: "20G"

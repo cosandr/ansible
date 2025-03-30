@@ -1,8 +1,0 @@
----
-
-ssh_src_dir: /var/lib/pgsql/.ssh
-ssh_src_user: postgres
-ssh_dest_dir: /var/lib/pgsql/.ssh
-ssh_dest_user: postgres
-ssh_key_options: 'no-agent-forwarding,no-X11-forwarding,no-port-forwarding,command="/usr/bin/pgbackrest ${SSH_ORIGINAL_COMMAND#* }"'
-ssh_dest_hosts: "{{ groups['db'] | difference([inventory_hostname]) }}"

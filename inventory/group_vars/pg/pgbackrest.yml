@@ -1,10 +1,19 @@
 ---
 
+pgbackrest_async_archive: true
 pgbackrest_stanzas:
   - name: main
     pg_config:
       - path: "/var/lib/pgsql/{{ postgresql_version }}/data"
+    schedules:
+      - backup_type: full
+        oncalendar: 'Weekly'
+      - backup_type: diff
+        oncalendar: 'daily'
+      - backup_type: incr
+        oncalendar: 'hourly'
 
 pgbackrest_repos:
-  - host: "{{ hostvars['pgbak01'].ansible_host }}"
-    host-user: "postgres"
+  - path: /var/lib/pgbackrest
+    retention-full: "7"
+    retention-diff: "3"

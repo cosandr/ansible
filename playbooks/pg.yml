@@ -1,21 +1,12 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-# TODO: Configure NFS share on Theia for /mnt/tank/backup/pgbackrest
-
 - name: Configure PG and pgbackrest
-  hosts: db
+  hosts: pg
   roles:
     - role: pgbackrest
       tags: ["pgbackrest"]
 
-    - role: auto_ssh
-      tags: ["auto-ssh"]
-
-- name: Configure PostgreSQL
-  hosts: pg
-  gather_facts: true
-  roles:
     - role: postgresql
       tags: ["pg"]
 
@@ -24,8 +15,6 @@
         postgres_service_name: "{{ postgresql_daemon }}"
       tags: ["prometheus-stack", "postgres_exporter"]
 
-- name: Configure pgbackrest
-  hosts: pgbackrest
   tasks:
     - name: Mount NFS share
       ansible.posix.mount:
