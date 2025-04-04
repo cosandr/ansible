@@ -20,22 +20,26 @@ kube_ingress_domain: "{{ domain }}"
 
 # https://www.talos.dev/v1.9/talos-guides/install/boot-assets/#image-factory
 # customization:
-#     extraKernelArgs:
-#         - console=ttyS0
-#     systemExtensions:
-#         officialExtensions:
-#             - siderolabs/qemu-guest-agent
-#             - siderolabs/i915
-__igpu_talos_schematic: 2ef6d3a39f4f5eb2782fcf5f398b406ff676dc0e026810eb11f7f7c756f7e28c
+#   extraKernelArgs:
+#     - console=ttyS0
+#   systemExtensions:
+#     officialExtensions:
+#       - siderolabs/qemu-guest-agent
+#       - siderolabs/i915
+#       - siderolabs/iscsi-tools
+#       - siderolabs/util-linux-tools
+__igpu_talos_schematic: 23293ae34adb32524dfeb0a84d919764443f3bc7654ec8e3b59ec7f99697be8a
 # customization:
-#     extraKernelArgs:
-#         - console=ttyS0
-#     systemExtensions:
-#         officialExtensions:
-#             - siderolabs/qemu-guest-agent
-#             - siderolabs/nvidia-container-toolkit-production
-#             - siderolabs/nvidia-open-gpu-kernel-modules-production
-__nvidia_talos_schematic: b9495ca70e959bf5f5336a9ac70d9b46e468dbde7b53599c45b6d51d2c79920e
+#   extraKernelArgs:
+#     - console=ttyS0
+#   systemExtensions:
+#     officialExtensions:
+#       - siderolabs/qemu-guest-agent
+#       - siderolabs/nvidia-container-toolkit-production
+#       - siderolabs/nvidia-open-gpu-kernel-modules-production
+#       - siderolabs/iscsi-tools
+#       - siderolabs/util-linux-tools
+__nvidia_talos_schematic: 7e59fd4b601ed5c7dbcc4e0e401c8460787a16242b77498976ede36bc1935407
 talos_schematic: "{{ (vm_host in groups['ms01']) | ternary(__igpu_talos_schematic, __nvidia_talos_schematic) }}"
 talos_image: "factory.talos.dev/installer/{{ talos_schematic }}:v{{ talos_version }}"
 

@@ -27,6 +27,10 @@ machine:
     disk: /dev/disk/by-id/virtio-root01
     extraKernelArgs:
       - console=ttyS0
+  disks:
+    - device: /dev/disk/by-id/virtio-talosdata01
+      partitions:
+        - mountpoint: /var/mnt/talosdata01
   network:
     nameservers: {{ vm_default_nic.dns_servers[:2] | to_json }}
   kubelet:
@@ -35,6 +39,11 @@ machine:
         - "{{ all_net[host_net].cidr }}"
     extraArgs:
       rotate-server-certificates: true
+    extraMounts:
+      - destination: /var/lib/longhorn
+        type: bind
+        source: /var/mnt/talosdata01
+        options: ["bind", "rshared", "rw"]
   features:
     kubePrism:
       enabled: {{ talos_kubeprism_enabled }}

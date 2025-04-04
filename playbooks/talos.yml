@@ -22,7 +22,7 @@
           vars:
             ansible_connection: ssh
           ansible.builtin.command:
-            cmd: "virsh change-media {{ inventory_hostname }} vdc /var/lib/libvirt/images/talos-boot.iso --config --live"
+            cmd: "virsh change-media {{ inventory_hostname }} vdd /var/lib/libvirt/images/talos-boot.iso --config --live"
 
         - name: Reset node  # noqa no-changed-when - Always changed
           ansible.builtin.command:
@@ -259,7 +259,7 @@
         ok_err: "doesn't have media"
       ansible.builtin.command:
         cmd: >-
-          virsh change-media {{ inventory_hostname }} vdc
+          virsh change-media {{ inventory_hostname }} vdd
           --eject
           --config
           {% if 'eject' in ansible_run_tags %}

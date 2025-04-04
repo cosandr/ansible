@@ -42,8 +42,23 @@ vm_extra_disks:
       discard: "unmap"
       cache: "none"
 
+  # Used by Longhorn
+  - type: block
+    device: disk
+    format: raw
+    # Preferrably partition it before.
+    dev: "/dev/mapper/talosdata01"
+    serial: "talosdata01"
+    target: "vdc"
+    driver_options:
+      discard: "unmap"
+      cache: "none"
+    blockio:
+      logical_block_size: 4096
+      physical_block_size: 4096
+
   - name: "talos-boot.iso"
     type: "file"
-    target: "vdc"
+    target: "vdd"
     device: "cdrom"
     format: "raw"
