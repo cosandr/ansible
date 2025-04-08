@@ -30,7 +30,7 @@ machine:
   disks:
     - device: /dev/disk/by-id/virtio-talosdata01
       partitions:
-        - mountpoint: /var/mnt/talosdata01
+        - mountpoint: /var/lib/longhorn
   network:
     nameservers: {{ vm_default_nic.dns_servers[:2] | to_json }}
   kubelet:
@@ -42,7 +42,7 @@ machine:
     extraMounts:
       - destination: /var/lib/longhorn
         type: bind
-        source: /var/mnt/talosdata01
+        source: /var/lib/longhorn
         options: ["bind", "rshared", "rw"]
   features:
     kubePrism:
