@@ -1,0 +1,15 @@
+---
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Ensure gitea is running
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:3000"
+        return_content: true
+      register: res
+
+    - name: Ensure we got something
+      ansible.builtin.assert:
+        that: "'Gitea: Git with a cup of tea' in res.content"

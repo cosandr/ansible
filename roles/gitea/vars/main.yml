@@ -1,0 +1,12 @@
+---
+
+go_arch_map:
+  i386: '386'
+  x86_64: 'amd64'
+  aarch64: 'arm64'
+
+go_arch: "{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}"
+gitea_filename: "gitea-{{ gitea_version }}-linux-{{ go_arch }}"
+
+gitea_archive_url: "https://github.com/go-gitea/gitea/releases/download/v{{ gitea_version }}/{{ gitea_filename }}.xz"
+gitea_archive_checksum: "{{ lookup('url', gitea_archive_url + '.sha256').split()[0] }}"

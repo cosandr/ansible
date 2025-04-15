@@ -1,0 +1,32 @@
+---
+
+- name: Check vars
+  ansible.builtin.assert:
+    that:
+      - gitea_secret_key
+      - gitea_internal_token
+      - gitea_jwt_secret
+      - gitea_oauth2_jwt_secret
+
+- name: Include installation tasks
+  ansible.builtin.include_tasks:
+    file: install.yml
+    apply:
+      tags: ["install"]
+  tags: ["install"]
+
+- name: Install gitea config
+  ansible.builtin.template:
+    src: "{{ gitea_config_template }}"
+    dest: /etc/gitea/app.ini
+    owner: root
+    group: git
+    mode: "0640"
+  notify: Restart gitea
+
+- name: Enable and start Gitea systemd service
+  ansible.builtin.systemd:
+    name: gitea.service
+    enabled: true
+    state: started
+    daemon_reload: true

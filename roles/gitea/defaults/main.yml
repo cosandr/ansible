@@ -1,0 +1,12 @@
+---
+
+gitea_version: latest
+gitea_port: 3000
+gitea_uid: ""
+gitea_gid: ""
+gitea_secret_key: ""
+gitea_internal_token: ""
+gitea_jwt_secret: ""
+gitea_oauth2_jwt_secret: ""
+gitea_domain: "example.org"
+gitea_config_template: "app.ini.j2"

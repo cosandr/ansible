@@ -1,0 +1,37 @@
+---
+
+dependency:
+  name: galaxy
+  options:
+    requirements-file: requirements.yml
+driver:
+  name: podman
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+platforms:
+  - name: debian12-gitea
+    image: "docker.io/geerlingguy/docker-debian12-ansible"
+    pre_build_image: true
+    tty: false
+    command: "/sbin/init"
+    systemd: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+provisioner:
+  name: ansible
+  log: true
+  playbooks:
+    prepare: ../resources/playbooks/prepare.yml
+    converge: ../resources/playbooks/converge.yml
+    verify: ../resources/playbooks/verify.yml
+  inventory:
+    group_vars:
+      all:
+        gitea_secret_key: "ZTFkYre9JiNWTQV4fxRYs85ebxvb9DlDauXBU8AKX8fG5cnfF7G3ZhFYQUlMve5G"
+        gitea_internal_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYmYiOjE3NDQ2Mzc4NDh9.fYJA7UfVVdwgdR9oZ5F6mjyAAli1_JFzuM1Yy1iLhxE"
+        gitea_jwt_secret: "SiXk7VFsCjwKQc3AXJ9VuDAc9u0HARRQvcIXv9TYLbE"
+        gitea_oauth2_jwt_secret: "3g6b_JINtzDFWlr-UxZAiPJ3VqADgMjY6pzFlXlm7w0"
+verifier:
+  name: ansible

@@ -1,0 +1,124 @@
+---
+
+- name: Install prerequisites
+  ansible.builtin.package:
+    name:
+      - git
+      - git-lfs
+      - openssh-server
+    state: present
+
+- name: Fetch latest release
+  when: gitea_version == "latest"
+  block:
+    - name: Get latest release
+      become: false
+      delegate_to: localhost
+      run_once: true
+      ansible.builtin.uri:
+        url: "https://api.github.com/repos/go-gitea/gitea/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      register: _latest_release
+      until:
+        - _latest_release.status is defined
+        - _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set gitea_version version to {{ _latest_release.json.tag_name[1:] }}"
+      ansible.builtin.set_fact:
+        gitea_version: "{{ _latest_release.json.tag_name[1:] }}"
+
+- name: Download gitea archive
+  become: false
+  ansible.builtin.get_url:
+    url: "{{ gitea_archive_url }}"
+    dest: "/tmp/{{ gitea_filename }}.xz"
+    checksum: "sha256:{{ gitea_archive_checksum }}"
+    mode: "0644"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  delegate_to: localhost
+  check_mode: false
+
+# unarchive doesn't support xz files
+- name: Unpack gitea binaries
+  become: false
+  ansible.builtin.command:
+    cmd: "unxz --keep /tmp/{{ gitea_filename }}.xz"
+    chdir: "/tmp"
+    creates: "/tmp/{{ gitea_filename }}"
+  delegate_to: localhost
+  check_mode: false
+
+- name: Copy binary to target host
+  ansible.builtin.copy:
+    src: "/tmp/{{ gitea_filename }}"
+    dest: "/usr/local/bin/gitea"
+    mode: "0755"
+    owner: root
+    group: root
+  notify: Restart gitea
+
+- name: Create git group
+  ansible.builtin.group:
+    name: git
+    state: present
+    system: true
+    gid: "{{ gitea_gid | default(omit, true) }}"
+  tags: ["user"]
+
+- name: Create git user
+  ansible.builtin.user:
+    name: git
+    group: git
+    comment: "Git Version Control"
+    state: present
+    system: true
+    shell: /bin/bash
+    create_home: true
+    home: /home/git
+    password_lock: true
+    uid: "{{ gitea_uid | default(omit, true) }}"
+  tags: ["user"]
+
+- name: Create /etc/gitea
+  ansible.builtin.file:
+    path: /etc/gitea
+    state: directory
+    owner: root
+    group: git
+    mode: "0750"
+
+- name: Create /var/lib/gitea directories
+  ansible.builtin.file:
+    path: "/var/lib/gitea/{{ item }}"
+    state: directory
+    owner: git
+    group: git
+    mode: "0750"
+  loop:
+    - custom
+    - data
+
+- name: Create /var/log/gitea
+  ansible.builtin.file:
+    path: /var/log/gitea
+    state: directory
+    owner: git
+    group: git
+    mode: "0750"
+
+- name: Install Gitea systemd service
+  ansible.builtin.template:
+    src: gitea.service.j2
+    dest: /etc/systemd/system/gitea.service
+    owner: root
+    group: root
+    mode: "0644"
