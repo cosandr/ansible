@@ -27,3 +27,15 @@
   roles:
     - role: loki
       tags: ["loki"]
+
+- name: Setup Gitea
+  hosts: gitea
+  roles:
+    - role: elastic.elasticsearch
+      tags: ["elasticsearch"]
+
+    - role: elastic_exporter
+      tags: ["elasticsearch"]
+
+    - role: gitea
+      tags: ["gitea"]

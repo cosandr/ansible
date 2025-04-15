@@ -34,6 +34,10 @@ __mt_dns_entries_once:
     cname: "{{ localgw_dns_name }}"
     ttl: 5m
     type: CNAME
+  - name: "gitea.{{ domains['dv'] }}"
+    cname: "{{ localgw_dns_name }}"
+    ttl: 5m
+    type: CNAME
   - name: "gitlab.{{ domains['dv'] }}"
     cname: "{{ localgw_dns_name }}"
     ttl: 5m

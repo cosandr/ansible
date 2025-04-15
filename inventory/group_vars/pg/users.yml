@@ -16,6 +16,9 @@ postgresql_users:
   - name: discord_test
     password: "{{ vault_postgresql_passwords.discord_test }}"
 
+  - name: gitea
+    password: "{{ vault_postgresql_passwords.gitea }}"
+
   - name: grafana
     password: "{{ vault_postgresql_passwords.grafana }}"
 

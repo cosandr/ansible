@@ -1,0 +1,10 @@
+---
+
+__promtail_scrape_configs_2:
+  - job_name: gitea
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: gitea
+          __path__: /var/log/gitea/gitea.log

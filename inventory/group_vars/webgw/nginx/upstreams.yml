@@ -8,6 +8,9 @@ nginx_upstreams: >-
   {{ tmp }}
 
 __nginx_upstreams_3:
+  - name: gitea
+    servers: ["{{ hostvars['gitea01'].ansible_host }}:{{ hostvars['gitea01'].gitea_port }}"]
+
   - name: gitlab
     servers: ["{{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_nginx_listen_port }}"]
     keepalive: 16

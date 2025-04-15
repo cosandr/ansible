@@ -1,0 +1,9 @@
+---
+
+firewall_rules:
+  - port: "{{ gitea_port }}"
+    sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
+
+firewalld_services:
+  - name: ssh
+    zone: public

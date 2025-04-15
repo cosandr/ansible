@@ -16,6 +16,10 @@ __nginx_vhosts_3:
     server_name: status
     template: "{{ repo_base_dir }}/roles/nginx_exporter/templates/status.conf.j2"
 
+  - filename: gitea.conf
+    server_name: gitea
+    template: "{{ repo_base_dir }}/files/webgw/nginx/gitea.conf.j2"
+
   - filename: gitlab.conf
     server_name: gitlab
     template: "{{ repo_base_dir }}/files/webgw/nginx/gitlab.conf.j2"

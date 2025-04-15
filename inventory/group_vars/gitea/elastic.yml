@@ -1,0 +1,25 @@
+---
+
+es_version: "7.17.28"
+es_heap_size: "1g"
+es_api_host: "127.0.0.1"
+es_templates: true
+es_templates_fileglob: "{{ repo_base_dir }}/files/gitea/index_defaults"
+es_enable_auto_ssl_configuration: false
+es_config:
+  network.host: "{{ es_api_host }}"
+  cluster.name: "gitea"
+  node.name: "{{ inventory_hostname }}"
+  discovery.type: single-node
+  http.host: "{{ es_api_host }}"
+  http.port: 9200
+  transport.host: "{{ es_api_host }}"
+  transport.port: 9300
+  bootstrap.memory_lock: true
+
+elastic_exporter_port: 9114
+elastic_exporter_web_listen_address: ":{{ elastic_exporter_port }}"
+elastic_exporter_allow_ips: "{{ node_exporter_allow_ips }}"
+elastic_exporter_es_config:
+  - es.indices
+  - es.node="{{ inventory_hostname }}"

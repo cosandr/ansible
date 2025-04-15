@@ -1,0 +1,35 @@
+{{ ansible_managed | comment }}
+{% if nginx_upstreams | selectattr('name', 'search', 'gitea') %}
+{% set domain = hostvars['gitea01'].domain %}
+server {
+    {{ nginx_listen_http | indent(4) }}
+    server_name gitea.{{ domain }};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    {{ nginx_listen_https | indent(4) }}
+    http2 on;
+    server_name gitea.{{ domain }};
+
+    ssl_certificate /etc/lego/certificates/{{ domain }}.crt;
+    ssl_certificate_key /etc/lego/certificates/{{ domain }}.key;
+
+    access_log {{ nginx_sites_logs }}/access-gitea.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-gitea.{{ domain }}.log {{ nginx_error_log_options }};
+
+    # https://docs.gitea.com/administration/reverse-proxies#nginx
+    location / {
+        client_max_body_size 512M;
+
+        proxy_set_header Connection $http_connection;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_pass              http://gitea/;
+    }
+}
+{% endif %}

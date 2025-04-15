@@ -5,6 +5,7 @@ localgw02    ansible_host="10.0.10.65"
 localgw03    ansible_host="10.0.10.66"
 localgw04    ansible_host="10.0.10.67"
 pg01         ansible_host="10.0.10.84"
+gitea01      ansible_host="10.0.10.88"
 gitlab01     ansible_host="10.0.10.90"
 gitrun01     ansible_host="10.0.10.92"
 gitrun02     ansible_host="10.0.10.93"
@@ -110,6 +111,7 @@ loki
 nextcloud
 prom
 talos
+gitea
 
 [libvirt:vars]
 host_net=vm
@@ -149,6 +151,12 @@ gitrun02 host_num=1
 
 [gitrun:vars]
 host_subnet=gitrun
+
+[gitea]
+gitea01 host_num=0
+
+[gitea:vars]
+host_subnet=gitea
 
 [prom_common]
 webgw01

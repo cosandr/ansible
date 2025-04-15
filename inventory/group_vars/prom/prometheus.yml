@@ -221,6 +221,11 @@ __extra_prometheus_scrape_configs:
       - targets: ["{{ hostvars['loki01'].ansible_host }}:3100"]
         labels: "{{ hostvars['loki01'].prometheus_node_labels }}"
 
+  - job_name: "elastic"
+    static_configs:
+      - targets: ["{{ hostvars['gitea01'].ansible_host }}:{{ hostvars['gitea01'].elastic_exporter_port }}"]
+        labels: "{{ hostvars['gitea01'].prometheus_node_labels }}"
+
   - job_name: 'nginx'
     scrape_interval: 60s
     static_configs: "{{ __prom_nginx_configs }}"

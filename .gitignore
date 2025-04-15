@@ -12,5 +12,6 @@ ansible_collections/*
 roles/geerlingguy.*
 roles/cosandr.*
 roles/cloudalchemy.*
+roles/elastic.*
 
 playbooks/test.yml

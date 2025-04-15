@@ -1,0 +1,17 @@
+---
+
+# Create initial user manually
+# https://docs.gitea.com/administration/command-line#admin
+# sudo -u git gitea --config /etc/gitea/app.ini admin user create --admin --username andrei --password asecurepassword --must-change-password --email <email>
+
+gitea_port: 3000
+gitea_version: "1.23.7"
+gitea_uid: "990"
+gitea_gid: "990"
+gitea_secret_key: "{{ vault_gitea_secret_key }}"
+gitea_internal_token: "{{ vault_gitea_internal_token }}"
+gitea_jwt_secret: "{{ vault_gitea_jwt_secret }}"
+gitea_oauth2_jwt_secret: "{{ vault_gitea_oauth2_jwt_secret }}"
+gitea_domain: "gitea.{{ domains['dv'] }}"
+gitea_config_template: "{{ repo_base_dir }}/files/gitea/app.ini.j2"
+gitea_elastic_url: "http://localhost:9200"

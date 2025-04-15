@@ -1,0 +1,9 @@
+---
+
+vm_template: "debian12_packer.{{ vm_disk_format }}"
+vm_cpus: 4
+vm_mem: 4096
+
+vm_root_size: "20G"
+vm_data_disks:
+  - "50G"

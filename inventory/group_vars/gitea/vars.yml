@@ -1,0 +1,10 @@
+---
+
+domain: "{{ domains['dv'] }}"
+provisioned_disks:
+  - dev: "/dev/disk/by-id/virtio-data01"
+    vols:
+      - name: gitea
+        path: "/var/lib/gitea"
+        shrink: false
+        size: "100%FREE"
