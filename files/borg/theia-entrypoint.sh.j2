@@ -38,6 +38,14 @@ borg_is_running() {
     return 1
 }
 
+scrub_is_running() {
+    if /usr/local/bin/pgrep -f 'btrfs scrub' >/dev/null; then
+        return 0
+    fi
+
+    return 1
+}
+
 maybe_compact() {
     local last_run_ts=0
     [[ -f "$last_run_file" ]] && last_run_ts=$(<"$last_run_file")
@@ -58,6 +66,10 @@ case "$cmd" in
     poweroff)
         if borg_is_running; then
             echo "Borg is running, refusing shutdown"
+            exit 100
+        fi
+        if scrub_is_running; then
+            echo "Scrub is running, refusing shutdown"
             exit 100
         fi
         maybe_compact
