@@ -42,6 +42,8 @@ borg_backups:
       - "."
       # It's mounted but doesn't show up, accessing it directly works.
       - "backup/theia/rpool/ROOT/debian"
+      - "backup/theia/rpool/var/lib/libvirt/images"
+      - "backup/theia/rpool/var/lib/minio"
     create_args:
       - "--numeric-ids"
     # Manually add to Task Scheduler
@@ -68,6 +70,8 @@ borg_backups:
     paths:
       - "."
       - "backup/theia/rpool/ROOT/debian"
+      - "backup/theia/rpool/var/lib/libvirt/images"
+      - "backup/theia/rpool/var/lib/minio"
     create_args:
       - "--numeric-ids"
       - "--upload-ratelimit 20000"
