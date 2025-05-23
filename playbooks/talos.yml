@@ -429,12 +429,7 @@
       register: __admin_pod
       tags: ["lvm"]
 
-    - name: Create LVG
-      community.general.lvg:
-        vg: "localpv"
-        pvs: "/dev/disk/by-id/virtio-raw01"
-        pesize: "32"
-        state: present
+    - name: Prepare OpenEBS LVM provisioner
       vars:
         ansible_connection: kubernetes.core.kubectl
         ansible_kubectl_context: "{{ talos_kubectl_context }}"
@@ -444,6 +439,19 @@
         - __admin_pod.resources
         - vm_extra_disks | selectattr('serial', 'defined') | selectattr('serial', 'eq', 'raw01')
       tags: ["lvm"]
+      block:
+        - name: Create LVG
+          community.general.lvg:
+            vg: "localpv"
+            pvs: "/dev/disk/by-id/virtio-raw01"
+            pesize: "32"
+            state: present
+
+        - name: Create thin pool
+          community.general.lvol:
+            vg: localpv
+            thinpool: localpv_thinpool
+            size: 95%VG
 
     - name: Disable admin daemonset
       run_once: true

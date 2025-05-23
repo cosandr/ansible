@@ -1,8 +1,10 @@
 machine:
-{% if __nvidia_vm_pci_devices == vm_pci_devices %}
-  # https://www.talos.dev/v1.9/talos-guides/configuration/nvidia-gpu/#enabling-the-nvidia-oss-modules
   kernel:
     modules:
+      - name: dm_thin_pool
+      - name: dm-snapshot
+{% if __nvidia_vm_pci_devices == vm_pci_devices %}
+      # https://www.talos.dev/v1.9/talos-guides/configuration/nvidia-gpu/#enabling-the-nvidia-oss-modules
       - name: nvidia
       - name: nvidia_uvm
       - name: nvidia_drm
