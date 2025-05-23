@@ -6,10 +6,13 @@ certmanager_version: "1.17.1"
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 prometheus_version: "70.4.1"
 # https://github.com/cilium/cilium/releases
-cilium_version: "1.17.2"
+cilium_version: "1.17.3"
 # https://github.com/fluxcd/flux2/releases
 # https://github.com/fluxcd-community/helm-charts/releases
 flux_version: "2.15.0"
+# https://github.com/kubernetes-sigs/gateway-api/releases
+# https://docs.cilium.io/en/v1.17/network/servicemesh/gateway-api/gateway-api/#prerequisites
+gateway_api_version: "1.2.1"
 
 alertmanager_template_files: >-
   {%- set tmp = {} -%}

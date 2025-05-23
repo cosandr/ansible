@@ -320,6 +320,12 @@
       notify: Restart CoreDNS
       tags: ["coredns"]
 
+    - name: Install Gateway API CRDs
+      kubernetes.core.k8s:
+        src: "https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{ gateway_api_version }}/experimental-install.yaml"
+        state: present
+      tags: ["cilium", "crd"]
+
     - name: Add Cilium Helm repo
       kubernetes.core.helm_repository:
         name: "cilium"
