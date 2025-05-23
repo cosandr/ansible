@@ -465,6 +465,22 @@
   vars:
     ansible_connection: local
   tasks:
+    - name: Create restic-ca secret
+      kubernetes.core.k8s:
+        state: present
+        namespace: default
+        resource_definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: restic-ca
+            annotations:
+              reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+          type: Opaque
+          stringData:
+            theia.crt: "{{ lookup('file', hostvars['theia'].ca_publickey_path) }}"
+      tags: ["ca", "restic"]
+
     - name: Add fluxcd-community Helm repo
       kubernetes.core.helm_repository:
         name: "fluxcd-community"
