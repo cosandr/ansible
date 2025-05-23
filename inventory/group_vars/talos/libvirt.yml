@@ -42,11 +42,10 @@ vm_extra_disks:
       discard: "unmap"
       cache: "none"
 
-  # Used by Longhorn
+  # Used by Rook
   - type: block
     device: disk
     format: raw
-    # Preferrably partition it before.
     dev: "/dev/mapper/talosdata01"
     serial: "talosdata01"
     target: "vdc"
