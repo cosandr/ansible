@@ -1,0 +1,26 @@
+---
+
+ca_passphrase: "{{ lookup('community.general.passwordstore', 'ansible/theia_ca_pass') }}"
+ca_publickey_path: "{{ repo_base_dir }}/files/theia/ca.crt"
+ca_privatekey_path: "{{ repo_base_dir }}/files/theia/ca.key"
+
+ownca_ca_list:
+  - cn: "{{ inventory_hostname }} CA"
+    passphrase: "{{ ca_passphrase }}"
+    publickey_path: "{{ ca_publickey_path }}"
+    privatekey_path: "{{ ca_privatekey_path }}"
+
+ownca_cert_list:
+  - privatekey_path: "{{ restic_server_tls_key }}"
+    publickey_path: "{{ restic_server_tls_cert }}"
+    cn: "{{ inventory_hostname }}-restic"
+    subject_alt_name: >-
+      {%- set tmp = [] -%}
+      {%- for item in mt_dns_entries -%}
+      {{- tmp.append("IP:" + item.address) -}}
+      {{- tmp.append("DNS:" + item.name) -}}
+      {%- endfor -%}
+      {{ tmp }}
+    ca_passphrase: "{{ ca_passphrase }}"
+    ca_publickey_path: "{{ ca_publickey_path }}"
+    ca_privatekey_path: "{{ ca_privatekey_path }}"

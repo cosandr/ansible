@@ -238,3 +238,14 @@ __extra_prometheus_scrape_configs:
     metrics_path: /minio/v2/metrics/cluster
     static_configs:
       - targets: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].minio_server_port }}"]
+
+  - job_name: rest_server
+    basic_auth:
+      username: metrics
+      password: "{{ hostvars['theia'].restic_server_users['metrics'] }}"
+    scheme: https
+    tls_config:
+      ca: "{{ lookup('file', hostvars['theia'].ca_publickey_path) }}"
+    static_configs:
+      - targets: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].restic_server_port }}"]
+        labels: "{{ hostvars['theia'].prometheus_node_labels }}"

@@ -114,6 +114,10 @@
           tags: ["arc"]
 
   roles:
+    - role: ownca
+      tags: ["ownca"]
+      when: "'generate' in ansible_run_tags"
+
     - role: samba
       tags: ["samba"]
 
@@ -138,6 +142,8 @@
     - role: minio
       tags: ["minio"]
 
+    - role: restic_server
+      tags: ["restic"]
   post_tasks:
     - name: Create .mc dir
       ansible.builtin.file:

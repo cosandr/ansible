@@ -4,7 +4,6 @@ __cert_names:
   - "IP:{{ ansible_host }}"
   - "DNS:{{ inventory_hostname }}.{{ all_net.mgmt.domain }}"
 
-ownca_vault_password_file: "{{ repo_base_dir }}/gopass-vault.sh"
 key_passphrase: "{{ lookup('community.general.passwordstore', 'ansible/mt_key_pass') }}"
 ca_passphrase: "{{ lookup('community.general.passwordstore', 'ansible/mt_ca_pass') }}"
 ca_publickey_path: "{{ repo_base_dir }}/files/mikrotik/ca.crt"

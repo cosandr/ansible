@@ -51,3 +51,5 @@ wireguard_managed_peers: []
 
 # 172.28.128.10, set in Flux. Not ideal.
 k8s_nginx_public_address: "{{ subnets.talos.lb | andrei.utils.ipaddr_concat(10) }}"
+
+ownca_vault_password_file: "{{ repo_base_dir }}/gopass-vault.sh"

@@ -36,6 +36,10 @@ __firewall_rules_1:
     zone: public
     sources: "{{ subnets.vm.localgw + node_exporter_allow_ips }}"
 
+  - port: "{{ restic_server_port }}"
+    zone: public
+    sources: "{{ [all_net.talos.cidr_internal] + node_exporter_allow_ips }}"
+
 mt_firewall_address_lists:
   - address: "{{ host_ips.vm }}"
     list: backup
