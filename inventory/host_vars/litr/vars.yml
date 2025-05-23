@@ -1,6 +1,5 @@
 ---
 
-prometheus_node_targets: []
 root_disk: "/dev/disk/by-id/ata-SAMSUNG_MZ7WD120HAFV-00003_S16KNYAF400837"
 extra_lvols: []
 
