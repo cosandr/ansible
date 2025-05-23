@@ -1,0 +1,78 @@
+# https://github.com/restic/rest-server/blob/master/examples/systemd/rest-server.service
+[Unit]
+Description=Rest Server
+After=syslog.target
+After=network.target
+Requires=rest-server.socket
+After=rest-server.socket
+
+[Service]
+Type=simple
+# You may prefer to use a different user or group on your system.
+User={{ restic_server_user }}
+Group={{ restic_server_group }}
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/rest-server \
+{% for arg in restic_server_args %}
+  {{ arg }} \
+{% endfor %}
+{% if restic_server_tls_cert and restic_server_tls_key %}
+  --tls \
+  --tls-cert {{ restic_server_data_path }}/server.crt \
+  --tls-key {{ restic_server_data_path }}/server.key \
+{% endif %}
+  --path {{ restic_server_data_path }}
+Restart=always
+RestartSec=5
+
+# The following options are available (in systemd v247) to restrict the
+# actions of the rest-server.
+
+# As a whole, the purpose of these are to provide an additional layer of
+# security by mitigating any unknown security vulnerabilities which may exist
+# in rest-server or in the libraries, tools and operating system components
+# which it relies upon.
+
+# IMPORTANT!
+# The following line must be customised to your individual requirements.
+ReadWritePaths={{ restic_server_data_path }}
+
+# Set to `UMask=007` and pass `--group-accessible-repos` to rest-server to
+# make created files group-readable
+UMask=077
+
+# If your system doesn't support all of the features below (e.g. because of
+# the use of an older version of systemd), you may wish to comment-out
+# some of the lines below as appropriate.
+CapabilityBoundingSet=
+LockPersonality=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=yes
+
+# As the listen socket is created by systemd via the rest-server.socket unit, it is
+# no longer necessary for rest-server to have access to the host network namespace.
+PrivateNetwork=yes
+
+PrivateTmp=yes
+PrivateDevices=true
+PrivateUsers=true
+ProtectSystem=strict
+ProtectHome=yes
+ProtectClock=true
+ProtectControlGroups=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectHostname=true
+RemoveIPC=true
+RestrictNamespaces=true
+RestrictAddressFamilies=none
+RestrictSUIDSGID=true
+RestrictRealtime=true
+# if your service crashes with "code=killed, status=31/SYS", you probably tried to run linux_i386 (32bit) binary on a amd64 host
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target

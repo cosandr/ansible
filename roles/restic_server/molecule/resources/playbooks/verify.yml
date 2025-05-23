@@ -1,0 +1,24 @@
+---
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Ensure rest-server is running
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:8000/test/?create=true"
+        headers:
+          Accept: application/vnd.x.restic.rest.v2
+        method: POST
+      register: res
+
+    - name: Check that repo was created
+      ansible.builtin.stat:
+        path: /var/lib/restic/test/index
+      register: index
+
+    - name: Check that it worked
+      ansible.builtin.assert:
+        that:
+          - res.status == 200
+          - index.stat.exists

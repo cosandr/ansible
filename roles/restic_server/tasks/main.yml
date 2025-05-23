@@ -1,0 +1,62 @@
+---
+
+- name: Include installation tasks
+  ansible.builtin.include_tasks:
+    file: install.yml
+    apply:
+      tags: ["install"]
+  tags: ["install"]
+
+- name: Copy TLS certs
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: "{{ restic_server_group }}"
+    mode: "0640"
+  loop:
+    - src: "{{ restic_server_tls_cert }}"
+      dest: "{{ restic_server_data_path }}/server.crt"
+    - src: "{{ restic_server_tls_key }}"
+      dest: "{{ restic_server_data_path }}/server.key"
+  notify: Restart rest-server
+  when: restic_server_tls_cert and restic_server_tls_key
+  tags: ["tls"]
+
+- name: Configure users
+  community.general.htpasswd:
+    path: "{{ restic_server_data_path }}/.htpasswd"
+    name: "{{ item.key }}"
+    password: "{{ item.value }}"
+    hash_scheme: bcrypt
+    owner: root
+    group: "{{ restic_server_group }}"
+    mode: "0640"
+  loop: "{{ restic_server_users | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  notify: Reload rest-server
+  tags: ["users"]
+
+- name: Copy service and socket
+  ansible.builtin.template:
+    src: "rest-server.{{ item }}.j2"
+    dest: "/etc/systemd/system/rest-server.{{ item }}"
+    owner: root
+    group: root
+    mode: "0644"
+  loop:
+    - service
+    - socket
+  notify:
+    - Reload systemd
+    - Restart rest-server
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start rest-server systemd socket
+  ansible.builtin.systemd:
+    name: rest-server.socket
+    enabled: true
+    state: started

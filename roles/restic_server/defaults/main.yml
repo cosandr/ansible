@@ -1,0 +1,12 @@
+---
+
+restic_server_version: latest
+restic_server_user: restic
+restic_server_group: restic
+restic_server_create_user: true
+restic_server_port: 8000
+restic_server_data_path: /var/lib/restic
+restic_server_args: []
+restic_server_tls_cert: ""
+restic_server_tls_key: ""
+restic_server_users: {}

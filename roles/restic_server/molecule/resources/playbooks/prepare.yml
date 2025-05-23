@@ -1,0 +1,11 @@
+---
+
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Update cache and install sudo
+      ansible.builtin.package:
+        name: sudo
+        update_cache: true
+        state: present

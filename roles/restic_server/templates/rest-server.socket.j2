@@ -1,0 +1,6 @@
+# https://github.com/restic/rest-server/blob/master/examples/systemd/rest-server.socket
+[Socket]
+ListenStream = {{ restic_server_port }}
+
+[Install]
+WantedBy = sockets.target

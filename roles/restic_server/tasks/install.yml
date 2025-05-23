@@ -1,0 +1,91 @@
+---
+
+- name: Fetch latest release
+  when: restic_server_version == "latest"
+  block:
+    - name: Get latest release
+      become: false
+      delegate_to: localhost
+      run_once: true
+      ansible.builtin.uri:
+        url: "https://api.github.com/repos/restic/rest-server/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      register: _latest_release
+      until:
+        - _latest_release.status is defined
+        - _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set restic_server_version version to {{ _latest_release.json.tag_name[1:] }}"
+      ansible.builtin.set_fact:
+        restic_server_version: "{{ _latest_release.json.tag_name[1:] }}"
+
+- name: Get checksum list
+  ansible.builtin.set_fact:
+    __restic_server_checksums: "{{ lookup('url', restic_server_checksum_url, wantlist=True) | list }}"
+  run_once: true
+  check_mode: false
+  delegate_to: localhost
+
+- name: Download rest-server to local folder
+  become: false
+  ansible.builtin.get_url:
+    url: "{{ restic_server_archive_url }}"
+    dest: "/tmp/{{ restic_server_filename }}.tar.gz"
+    checksum: "sha256:{{ (__restic_server_checksums | select('search', restic_server_filename + '.tar.gz') | first).split()[0] }}"
+    mode: "0644"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  delegate_to: localhost
+  check_mode: false
+
+- name: Unpack rest-server
+  become: false
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ restic_server_filename }}.tar.gz"
+    dest: "/tmp"
+    creates: "/tmp/{{ restic_server_filename }}/rest-server"
+  delegate_to: localhost
+  check_mode: false
+
+- name: Copy rest-server binary
+  ansible.builtin.copy:
+    src: "/tmp/{{ restic_server_filename }}/rest-server"
+    dest: "/usr/local/bin/rest-server"
+    owner: root
+    group: root
+    mode: "0755"
+  notify: Restart rest-server
+
+- name: Create restic server group
+  ansible.builtin.group:
+    name: "{{ restic_server_group }}"
+    gid: "{{ restic_server_gid | default(omit) }}"
+    state: present
+  when: restic_server_create_user
+
+- name: Create restic server user
+  ansible.builtin.user:
+    name: "{{ restic_server_user }}"
+    shell: /usr/sbin/nologin
+    home: /nonexistent
+    createhome: false
+    group: "{{ restic_server_group }}"
+    uid: "{{ restic_server_uid | default(omit) }}"
+    state: present
+  when: restic_server_create_user
+
+- name: Ensure data dir is owned by restic user
+  ansible.builtin.file:
+    path: "{{ restic_server_data_path }}"
+    state: directory
+    owner: "{{ restic_server_user }}"
+    group: "{{ restic_server_group }}"
+    mode: "0750"
