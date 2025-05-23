@@ -19,7 +19,7 @@ grub_config:
   - regexp: '^GRUB_TIMEOUT'
     line: "GRUB_TIMEOUT=2"
   - regexp: '^GRUB_CMDLINE_LINUX'
-    line: GRUB_CMDLINE_LINUX="root=ZFS=rpool/ROOT/debian crashkernel=auto amd_pstate=passive"
+    line: GRUB_CMDLINE_LINUX="root=ZFS=rpool/ROOT/debian crashkernel=auto vfio-pci.ids=10de:2204,10de:1aef amd_pstate=passive"
 
 ssh_conf_hosts: false
 
