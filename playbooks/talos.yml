@@ -197,6 +197,9 @@
           {% if __disks_check.rc == 0 %}
           --insecure
           {% endif %}
+          {% if talos_staged | default(false) | bool %}
+          --mode=staged
+          {% endif %}
           --file {{ inventory_hostname }}.yaml
       environment:
         TALOSCONFIG: "{{ tmp_dir }}/talosconfig"
@@ -230,10 +233,15 @@
           throttle: 1
           ansible.builtin.command:
             chdir: "{{ tmp_dir }}"
-            cmd: "talosctl -n {{ ansible_host }} upgrade --image {{ talos_image }}"
+            cmd: >-
+              talosctl -n {{ ansible_host }} upgrade
+              {% if talos_staged | default(false) | bool %}
+              --stage
+              {% endif %}
+              --image {{ talos_image }}
           vars:
             server_tag: "{{ __version.stdout | regex_search('^Server:\\n.+\\n\\s+Tag:\\s+v(\\S+)$', '\\1', multiline=true) | first }}"
-          when: server_tag is version(talos_version, '<')
+          when: server_tag is version(talos_version, '<') or "'force-upgrade' in ansible_run_tags"
 
         - name: Get node info
           run_once: true
