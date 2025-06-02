@@ -114,5 +114,7 @@ kubeProxy:
   enabled: {{ kube_proxy_enabled }}
 
 defaultRules:
+  disabled:
+    KubePdbNotEnoughHealthyPods: true
   rules:
     kubeProxy: {{ kube_proxy_enabled }}
