@@ -36,8 +36,16 @@ alertmanager:
         - receiver: 'null'
           matchers:
             - alertname = "InfoInhibitor"
+        - receiver: 'watchdog'
+          group_interval: 30s
+          repeat_interval: 1m
+          matchers:
+            - alertname = "Watchdog"
     receivers:
       - name: 'null'
+      - name: watchdog
+        webhook_configs:
+          - url: "{{ vault_alertmanager_watchdog_url }}"
 {% if vault_alertmanager_discord_webhook_url is defined %}
       - name: discord
         discord_configs:
@@ -106,7 +114,5 @@ kubeProxy:
   enabled: {{ kube_proxy_enabled }}
 
 defaultRules:
-  disabled:
-    Watchdog: true
   rules:
     kubeProxy: {{ kube_proxy_enabled }}
