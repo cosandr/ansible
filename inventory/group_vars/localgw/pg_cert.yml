@@ -13,6 +13,13 @@ pg_cert_pull_pre_script: |
     exit 0
   fi
 
+pg_cert_pull_hooks:
+  - name: restart-nginx
+    content: |
+      #!/bin/sh
+
+      systemctl restart nginx
+
 pg_cert_pull: >-
   {%- set tmp = [] -%}
   {%- for k in lego_domain_keys -%}
