@@ -9,7 +9,6 @@
   gather_facts: false
   vars:
     tmp_dir: "/tmp/talos-config"
-    ansible_connection: local
     force: false
   tags: ["system"]
   pre_tasks:
@@ -19,12 +18,11 @@
       block:
         - name: Mount boot disk  # noqa no-changed-when - Output is the same
           delegate_to: "{{ vm_host }}"
-          vars:
-            ansible_connection: ssh
           ansible.builtin.command:
             cmd: "virsh change-media {{ inventory_hostname }} vdd /var/lib/libvirt/images/talos-boot.iso --config --live"
 
         - name: Reset node  # noqa no-changed-when - Always changed
+          delegate_to: localhost
           ansible.builtin.command:
             chdir: "{{ tmp_dir }}"
             cmd: "talosctl -n {{ ansible_host }} reset --graceful=false --wait=false --reboot"
@@ -33,6 +31,7 @@
 
         # Wait flag hangs, this is is much more reliable
         - name: Wait until node is up
+          delegate_to: localhost
           check_mode: false
           changed_when: false
           failed_when: false
@@ -55,12 +54,11 @@
         owner: root
         group: root
         mode: "0644"
-      vars:
-        ansible_connection: ssh
       tags: ["download"]
       when: "'download' in ansible_run_tags"
 
     - name: Create temporary Talos config dir
+      delegate_to: localhost
       run_once: true
       ansible.builtin.file:
         path: "{{ tmp_dir }}"
@@ -69,6 +67,7 @@
       tags: ["config", "host"]
 
     - name: Copy secrets
+      delegate_to: localhost
       run_once: true
       ansible.builtin.copy:
         src: "{{ repo_base_dir }}/files/talos/secrets_vault.yml"
@@ -77,6 +76,7 @@
       tags: ["config"]
 
     - name: Copy config patch
+      delegate_to: localhost
       run_once: true
       ansible.builtin.template:
         src: "{{ repo_base_dir }}/files/talos/gen-config-patch.yaml.j2"
@@ -85,6 +85,7 @@
       tags: ["config"]
 
     - name: Generate Talos config
+      delegate_to: localhost
       run_once: true
       ansible.builtin.command:
         chdir: "{{ tmp_dir }}"
@@ -103,6 +104,7 @@
       tags: ["config"]
 
     - name: Configure endpoints  # noqa no-changed-when - no output
+      delegate_to: localhost
       run_once: true
       ansible.builtin.command:
         chdir: "{{ tmp_dir }}"
@@ -112,6 +114,7 @@
       tags: ["config"]
 
     - name: Copy host patches
+      delegate_to: localhost
       ansible.builtin.template:
         src: "{{ repo_base_dir }}/files/talos/node-patch.yaml.j2"
         dest: "{{ tmp_dir }}/{{ inventory_hostname }}-patch.yaml"
@@ -119,6 +122,7 @@
       tags: ["host"]
 
     - name: Generate host configs
+      delegate_to: localhost
       ansible.builtin.command:
         chdir: "{{ tmp_dir }}"
         creates: "{{ force | bool | ternary(omit, '{{ tmp_dir }}/{{ inventory_hostname }}.yaml') }}"
@@ -131,6 +135,7 @@
       tags: ["host"]
 
     - name: Check if cluster is bootstrapped
+      delegate_to: localhost
       check_mode: false
       changed_when: false
       failed_when: false
@@ -144,6 +149,7 @@
       register: __etcd_check
 
     - name: Bootstrap tasks
+      delegate_to: localhost
       tags: ["bootstrap"]
       environment:
         TALOSCONFIG: "{{ tmp_dir }}/talosconfig"
@@ -174,6 +180,7 @@
             cmd: "talosctl -n {{ ansible_host }} bootstrap"
 
     - name: Check if node is configured
+      delegate_to: localhost
       check_mode: false
       changed_when: false
       failed_when:
@@ -190,6 +197,7 @@
       register: __disks_check
 
     - name: Apply node configs  # noqa no-changed-when
+      delegate_to: localhost
       ansible.builtin.command:
         chdir: "{{ tmp_dir }}"
         cmd: >-
@@ -206,6 +214,7 @@
       tags: ["node"]
 
     - name: Update kubeconfig  # noqa no-changed-when
+      delegate_to: localhost
       run_once: true
       ansible.builtin.command:
         chdir: "{{ tmp_dir }}"
@@ -215,6 +224,7 @@
       tags: ["kubeconfig"]
 
     - name: Upgrade Talos and Kubernetes
+      delegate_to: localhost
       tags: ["upgrade"]
       when: '"upgrade" in ansible_run_tags'
       environment:
@@ -263,7 +273,6 @@
     - name: Eject boot disk
       delegate_to: "{{ vm_host }}"
       vars:
-        ansible_connection: ssh
         ok_err: "doesn't have media"
       ansible.builtin.command:
         cmd: >-
@@ -281,6 +290,7 @@
       tags: ["eject"]
 
     - name: Wait until API servers are up
+      delegate_to: localhost
       kubernetes.core.k8s_info:
         context: "{{ talos_kubectl_context }}"
         kind: Pod
@@ -301,11 +311,10 @@
   module_defaults:
     group/k8s:
       context: "{{ talos_kubectl_context }}"
-  vars:
-    ansible_connection: local
   tags: ["system"]
   pre_tasks:
     - name: Get pending CSRs
+      delegate_to: localhost
       kubernetes.core.k8s_info:
         api_version: certificates.k8s.io/v1
         kind: CertificateSigningRequest
@@ -313,6 +322,7 @@
       tags: ["certs"]
 
     - name: Approve pending certificates  # noqa no-changed-when
+      delegate_to: localhost
       ansible.builtin.command:
         cmd: "kubectl --context {{ talos_kubectl_context }} certificate approve {{ item.metadata.name }}"
       loop: "{{ __csrs.resources | selectattr('status', 'eq', {}) }}"
@@ -322,6 +332,7 @@
 
   tasks:
     - name: Configure CoreDNS
+      delegate_to: localhost
       kubernetes.core.k8s:
         template: "{{ repo_base_dir }}/files/talos/coredns-cm.yml.j2"
         state: present
@@ -329,18 +340,21 @@
       tags: ["coredns"]
 
     - name: Install Gateway API CRDs
+      delegate_to: localhost
       kubernetes.core.k8s:
         src: "https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{ gateway_api_version }}/experimental-install.yaml"
         state: present
       tags: ["cilium", "crd"]
 
     - name: Add Cilium Helm repo
+      delegate_to: localhost
       kubernetes.core.helm_repository:
         name: "cilium"
         repo_url: "https://helm.cilium.io/"
       tags: ["cilium"]
 
     - name: Deploy Cilium chart
+      delegate_to: localhost
       kubernetes.core.helm:
         name: cilium
         chart_ref: cilium/cilium
@@ -351,6 +365,7 @@
       tags: ["cilium"]
 
     - name: Wait until Cilium Operator is ready
+      delegate_to: localhost
       kubernetes.core.k8s_info:
         context: "{{ talos_kubectl_context }}"
         kind: Deployment
@@ -364,18 +379,21 @@
       tags: ["cilium"]
 
     - name: Apply Cilium BGP config
+      delegate_to: localhost
       kubernetes.core.k8s:
         template: "{{ repo_base_dir }}/files/talos/cilium-bgp.yml.j2"
         state: present
       tags: ["cilium"]
 
     - name: Apply Cilium LB config
+      delegate_to: localhost
       kubernetes.core.k8s:
         template: "{{ repo_base_dir }}/files/talos/cilium-lb-pool.yml.j2"
         state: present
       tags: ["cilium"]
 
     - name: Check if admin nodes should be force enabled
+      delegate_to: localhost
       when: not enable_admin_pods | bool
       block:
         - name: Get OpenEBS release status
@@ -393,6 +411,7 @@
           when: __ebs_release.status is not defined
 
     - name: Create admin daemonset
+      delegate_to: localhost
       kubernetes.core.k8s:
         template: "{{ repo_base_dir }}/files/talos/admin-daemonset.yml.j2"
         state: present
@@ -401,6 +420,7 @@
       tags: ["admin"]
   handlers:
     - name: Restart CoreDNS  # noqa no-changed-when
+      delegate_to: localhost
       ansible.builtin.command:
         cmd: "kubectl --context {{ talos_kubectl_context }} -n kube-system rollout restart deployments/coredns"
 
@@ -411,11 +431,10 @@
   module_defaults:
     group/k8s:
       context: "{{ talos_kubectl_context }}"
-  vars:
-    ansible_connection: local
   tags: ["system"]
   tasks:
     - name: Apply node labels
+      delegate_to: localhost
       kubernetes.core.k8s:
         kind: Node
         name: "{{ inventory_hostname }}"
@@ -426,6 +445,7 @@
       tags: ["node", "labels"]
 
     - name: Get admin pod on self
+      delegate_to: localhost
       kubernetes.core.k8s_info:
         kind: Pod
         namespace: kube-system
@@ -462,6 +482,7 @@
             size: 95%VG
 
     - name: Disable admin daemonset
+      delegate_to: localhost
       run_once: true
       kubernetes.core.k8s:
         template: "{{ repo_base_dir }}/files/talos/admin-daemonset.yml.j2"
@@ -478,10 +499,9 @@
   module_defaults:
     group/k8s:
       context: "{{ talos_kubectl_context }}"
-  vars:
-    ansible_connection: local
   tasks:
     - name: Create restic-ca secret
+      delegate_to: localhost
       kubernetes.core.k8s:
         state: present
         namespace: default
@@ -498,12 +518,14 @@
       tags: ["ca", "restic"]
 
     - name: Add fluxcd-community Helm repo
+      delegate_to: localhost
       kubernetes.core.helm_repository:
         name: "fluxcd-community"
         repo_url: "https://fluxcd-community.github.io/helm-charts"
       tags: ["flux"]
 
     - name: Create Flux namespace
+      delegate_to: localhost
       kubernetes.core.k8s:
         state: present
         resource_definition:
@@ -515,6 +537,7 @@
       tags: ["flux"]
 
     - name: Deploy Flux chart
+      delegate_to: localhost
       kubernetes.core.helm:
         name: flux2
         chart_ref: fluxcd-community/flux2
@@ -525,6 +548,7 @@
       tags: ["flux"]
 
     - name: Get GitLab host keys
+      delegate_to: localhost
       check_mode: false
       changed_when: false
       ansible.builtin.command:
@@ -538,6 +562,7 @@
       tags: ["flux"]
 
     - name: Create Flux bootstrap resources
+      delegate_to: localhost
       kubernetes.core.k8s:
         state: present
         resource_definition: "{{ lookup('template', '{{ repo_base_dir }}/files/talos/{{ item }}') | from_yaml_all }}"
