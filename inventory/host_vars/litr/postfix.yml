@@ -1,7 +1,9 @@
 ---
 
-postfix_exporter_port: 9154
+postfix_exporter_port: 9907
 postfix_exporter_listen_address: "0.0.0.0:{{ postfix_exporter_port }}"
+postfix_exporter_args:
+  - "--collector=journald"
 
 smtp_credentials: "{{ vault_smtp_credentials }}"
 
@@ -24,7 +26,7 @@ postfix_relay_domains:
     user: "{{ smtp_credentials['ti'].user }}"
     password: "{{ smtp_credentials['ti'].password }}"
 
-postfix_hostname: "{{ inventory_hostname }}.{{ domain }}"
+postfix_hostname: "{{ postfix_relay_hostname }}"
 postfix_relay_hosts: []
 __postfix_relay_domains:
   - "{{ postfix_relay_domains | map(attribute='relay_host') | unique | list }}"
@@ -37,11 +39,25 @@ __postfix_networks:
   - "{{ all_net.mgmt.cidr }}"
 
 postfix_networks: "{{ __postfix_networks | flatten }}"
+postfix_extra_packages:
+  - postfix-pcre
 
 postfix_custom_maps:
   - name: sender_canonical_maps
     content: |
       /^(.*)@(.+)\.(.+\..+)$/ ${1}-${2}@${3}
+  # https://community.centminmod.com/threads/removing-ip-from-postfix-smtp-relay.16658/
+  - name: smtp_header_checks
+    content: |
+      /^Received:/ IGNORE
+
+postfix_master_config:
+  - regexp: "^#?smtp .*smtpd$"
+    line: "smtp      inet  n       -       y       -       -       smtpd"
+  - regexp: "^#?smtps .*smtpd$"
+    line: "smtps     inet  n       -       y       -       -       smtpd"
+  - regexp: "^#?submission .*smtpd$"
+    line: "submission inet n       -       y       -       -       smtpd"
 
 postfix_main_config:
   - regexp: "^#?smtp_use_tls"
@@ -84,3 +100,5 @@ postfix_main_config:
     line: "sender_canonical_classes = envelope_sender, header_sender"
   - regexp: "^#?sender_canonical_maps"
     line: "sender_canonical_maps = regexp:/etc/postfix/sender_canonical_maps"
+  - regexp: "^#?smtp_header_checks"
+    line: "smtp_header_checks = pcre:/etc/postfix/smtp_header_checks"

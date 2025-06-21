@@ -4,15 +4,6 @@ firewall_rules:
   - port: 22
     source: "{{ home_net.general.cidr }}"
 
-  - port: 25
-    sources: "{{ __postfix_networks | flatten }}"
-
-  - port: 465
-    sources: "{{ __postfix_networks | flatten }}"
-
-  - port: 587
-    sources: "{{ __postfix_networks | flatten }}"
-
   - port: 8081
     source: "{{ home_net.general.cidr }}"
 
@@ -27,14 +18,7 @@ firewall_rules:
   - port: "{{ node_exporter_port }}"
     sources: "{{ node_exporter_allow_ips }}"
 
-  - port: "{{ postfix_exporter_port }}"
-    sources: "{{ node_exporter_allow_ips }}"
-
   # RouterOS neighbour discovery
   - port: 5678
     source: "fe80::/64"
     protocol: "udp"
-
-mt_firewall_address_lists:
-  - address: "{{ ansible_host }}"
-    list: smtp

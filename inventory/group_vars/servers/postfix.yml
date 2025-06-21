@@ -8,7 +8,7 @@ postfix_interfaces:
 postfix_networks: []
 
 postfix_relay_hosts:
-  - "[{{ hostvars['drepi'].postfix_hostname }}]:587"
+  - "[{{ postfix_relay_hostname }}]:587"
 
 postfix_main_config:
   - regexp: "^#?smtp_use_tls"

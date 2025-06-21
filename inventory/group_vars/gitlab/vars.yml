@@ -44,7 +44,7 @@ gitlab_email_display_name: "Gitlab"
 gitlab_email_reply_to: "no-reply@{{ domain }}"
 
 gitlab_smtp_enable: "true"
-gitlab_smtp_address: "{{ hostvars['drepi'].postfix_hostname }}"
+gitlab_smtp_address: "{{ postfix_relay_hostname }}"
 gitlab_smtp_port: "587"
 gitlab_smtp_domain: "{{ domain }}"
 gitlab_smtp_authentication: ''

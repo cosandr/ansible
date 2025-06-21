@@ -12,7 +12,7 @@ grafana_security:
   admin_user: "{{ grafana_admin_user }}"
   admin_password: "{{ grafana_admin_pass }}"
 grafana_smtp:
-  host: "{{ hostvars['drepi'].postfix_hostname }}:587"
+  host: "{{ postfix_relay_hostname }}:587"
   from_address: "grafana@{{ domains['hb'] }}"
   startTLS_policy: "OpportunisticStartTLS"
 grafana_database:

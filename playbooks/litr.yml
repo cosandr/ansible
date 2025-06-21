@@ -19,3 +19,9 @@
 
     - role: withings_sync
       tags: ["withings_sync"]
+
+    - role: lego
+      tags: ["lego"]
+
+    - role: postfix_exporter
+      tags: ["postfix_exporter"]

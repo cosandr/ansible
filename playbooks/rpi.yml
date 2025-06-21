@@ -102,16 +102,6 @@
       when: motion_is_rpi | default(false)
       tags: ["motion"]
 
-    - role: lego
-      tags: ["lego"]
-      when:
-        - lego_domains is defined
-        - lego_domains | length > 0
-
-    - role: postfix_exporter
-      when: postfix_exporter_listen_address | default(false)
-      tags: ["postfix_exporter"]
-
     - role: wireguard
       when:
         - wireguard_addresses is defined

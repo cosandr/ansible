@@ -54,7 +54,7 @@ PATH = /var/lib/gitea/data/lfs
 [mailer]
 ENABLED = true
 PROTOCOL = smtp+starttls
-SMTP_ADDR = {{ hostvars['drepi'].postfix_hostname }}
+SMTP_ADDR = {{ postfix_relay_hostname }}
 SMTP_PORT = 587
 FROM = Gitea <gitea@{{ domain }}>
 
