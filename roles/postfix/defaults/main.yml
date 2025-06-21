@@ -1,5 +1,6 @@
 ---
 
+postfix_extra_packages: []
 postfix_hostname: "{{ ansible_fqdn }}"
 postfix_interfaces:
   - all
@@ -9,6 +10,7 @@ postfix_networks: []
 postfix_relay_hosts: []
 
 postfix_main_config: []
+postfix_master_config: []
 
 __postfix_networks:
   - "127.0.0.0/8"

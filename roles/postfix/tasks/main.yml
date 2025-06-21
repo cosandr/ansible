@@ -5,7 +5,7 @@
 
 - name: Install postfix packages
   ansible.builtin.package:
-    name: "{{ __postfix_packages }}"
+    name: "{{ __postfix_packages + postfix_extra_packages }}"
     state: present
   tags: ["install"]
 
@@ -51,6 +51,17 @@
     line: "{{ item.line | default(omit) }}"
     state: "{{ item.state | default('present') }}"
   loop: "{{ postfix_main_config }}"
+  loop_control:
+    label: "{{ item.line }}"
+  notify: Restart postfix
+
+- name: Configure postfix master.cf options
+  ansible.builtin.lineinfile:
+    dest: "/etc/postfix/master.cf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ postfix_master_config }}"
   loop_control:
     label: "{{ item.line }}"
   notify: Restart postfix
