@@ -35,7 +35,7 @@ alertmanager:
       routes:
         - receiver: 'null'
           matchers:
-            - alertname = "InfoInhibitor"
+            - alertname =~ "(InfoInhibitor|CephNodeDiskspaceWarning|CephNodeRootFilesystemFull)"
         - receiver: 'watchdog'
           group_interval: 30s
           repeat_interval: 1m
