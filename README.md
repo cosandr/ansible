@@ -149,7 +149,7 @@ ssh-keygen -C "flux@talos" -N "$(gopass show -o k8s/flux-gitlab-ssh)" -t ed25519
 Decrypt [flux-gitlab-secret_vault.yml](./files/talos/flux-gitlab-secret_vault.yml) and add the contents of `/tmp/flux-ssh`
 in the `identity` field.
 
-Add the contents of `/tmp/flux-ssh.pub` to GitLab in Settings/Repository/Deploy Keys (`/flux/talos/-/settings/repository`), ensure write access is enabled.
+Add the contents of `/tmp/flux-ssh.pub` to GitLab in Settings/Repository/Deploy Keys (`/flux/infra/-/settings/repository`), ensure write access is enabled.
 
 Remove key from disk
 
