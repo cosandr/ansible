@@ -17,9 +17,6 @@ firewalld_services:
     sources: "{{ __postfix_networks | flatten }}"
 
 firewall_rules:
-  - port: "{{ (serial_proxies | selectattr('name', 'eq', 'pwr') | first).port }}"
-    source: "{{ hostvars['ha'].ansible_host }}"
-
   - port: "{{ postfix_exporter_port }}"
     sources: "{{ node_exporter_allow_ips }}"
 
