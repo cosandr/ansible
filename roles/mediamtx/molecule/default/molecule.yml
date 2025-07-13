@@ -1,0 +1,35 @@
+---
+
+dependency:
+  name: galaxy
+  options:
+    requirements-file: requirements.yml
+driver:
+  name: podman
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+platforms:
+  - name: debian12-mediamtx
+    image: "docker.io/geerlingguy/docker-debian12-ansible"
+    pre_build_image: true
+    tty: false
+    command: "/sbin/init"
+    systemd: true
+    volumes:
+      - "/sys/fs/cgroup:/sys/fs/cgroup:ro"
+provisioner:
+  name: ansible
+  log: true
+  playbooks:
+    prepare: ../resources/playbooks/prepare.yml
+    converge: ../resources/playbooks/converge.yml
+    verify: ../resources/playbooks/verify.yml
+  inventory:
+    group_vars:
+      all:
+        mediamtx_args:
+          - "--no-auth"
+verifier:
+  name: ansible

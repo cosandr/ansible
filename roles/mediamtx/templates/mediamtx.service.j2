@@ -1,0 +1,21 @@
+{{ ansible_managed | comment }}
+
+[Unit]
+Description=MediaMTX
+Documentation=https://github.com/bluenviron/mediamtx
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=mediamtx
+Group=mediamtx
+SupplementaryGroups=video
+ExecStart=/usr/local/bin/mediamtx /etc/mediamtx.yml
+Restart=always
+NoNewPrivileges=true
+ProtectHome=read-only
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,29 @@
+---
+
+mediamtx_version: latest
+mediamtx_metrics_ips: []
+mediamtx_rtsp_port: 8554
+mediamtx_metrics_port: 9998
+mediamtx_rtp_port: 8000
+mediamtx_rtcp_port: 8001
+mediamtx_paths: {}
+mediamtx_users:
+  # Default unprivileged user.
+  # Username. 'any' means any user, including anonymous ones.
+  - user: any
+    # Password. Not used in case of 'any' user.
+    pass:
+    # IPs or networks allowed to use this user. An empty list means any IP.
+    ips: []
+    # List of permissions.
+    permissions:
+        # Available actions are: publish, read, playback, api, metrics, pprof.
+      - action: publish
+        # Paths can be set to further restrict access to a specific path.
+        # An empty path means any path.
+        # Regular expressions can be used by using a tilde as prefix.
+        path:
+      - action: read
+        path:
+      - action: playback
+        path:

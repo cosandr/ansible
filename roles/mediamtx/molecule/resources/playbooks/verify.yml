@@ -1,0 +1,13 @@
+---
+
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check RTMP port is open
+      ansible.builtin.wait_for:
+        port: "1935"
+        state: "started"
+        host: "localhost"
+        connect_timeout: "3"
+        timeout: "3"

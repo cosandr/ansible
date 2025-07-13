@@ -1,0 +1,90 @@
+---
+
+- name: Fetch latest release
+  when: mediamtx_version == "latest"
+  block:
+    - name: Get latest release
+      become: false
+      delegate_to: localhost
+      run_once: true
+      ansible.builtin.uri:
+        url: "https://api.github.com/repos/bluenviron/mediamtx/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      register: _latest_release
+      until:
+        - _latest_release.status is defined
+        - _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set mediamtx_version version to {{ _latest_release.json.tag_name[1:] }}"
+      ansible.builtin.set_fact:
+        mediamtx_version: "{{ _latest_release.json.tag_name[1:] }}"
+
+- name: Get checksum list
+  ansible.builtin.set_fact:
+    __mediamtx_checksums: "{{ lookup('url', mediamtx_checksum_url, wantlist=True) | list }}"
+  run_once: true
+  check_mode: false
+  delegate_to: localhost
+
+- name: Download mediamtx to local folder
+  become: false
+  ansible.builtin.get_url:
+    url: "{{ mediamtx_archive_url }}"
+    dest: "/tmp/{{ mediamtx_filename }}.tar.gz"
+    checksum: "sha256:{{ (__mediamtx_checksums | select('search', mediamtx_filename + '.tar.gz') | first).split()[0] }}"
+    mode: "0644"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  delegate_to: localhost
+  check_mode: false
+
+- name: Create dir to extract archive
+  become: false
+  delegate_to: localhost
+  check_mode: false
+  ansible.builtin.file:
+    path: "/tmp/{{ mediamtx_filename }}"
+    state: directory
+    mode: "0755"
+
+- name: Unpack mediamtx
+  become: false
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ mediamtx_filename }}.tar.gz"
+    dest: "/tmp/{{ mediamtx_filename }}"
+    creates: "/tmp/{{ mediamtx_filename }}/mediamtx"
+  delegate_to: localhost
+  check_mode: false
+
+- name: Copy mediamtx binary
+  ansible.builtin.copy:
+    src: "/tmp/{{ mediamtx_filename }}/mediamtx"
+    dest: "/usr/local/bin/mediamtx"
+    owner: root
+    group: root
+    mode: "0755"
+  notify: Restart mediamtx
+
+- name: Create mediamtx group
+  ansible.builtin.group:
+    name: mediamtx
+    state: present
+
+- name: Create mediamtx user
+  ansible.builtin.user:
+    name: mediamtx
+    shell: /usr/sbin/nologin
+    home: /nonexistent
+    createhome: false
+    group: mediamtx
+    groups:
+      - video
+    state: present
