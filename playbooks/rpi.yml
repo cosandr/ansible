@@ -14,40 +14,6 @@
       loop: "{{ ssh_authorized_keys }}"
       tags: ["ssh"]
 
-    - name: Configure motion
-      when: motion_is_rpi | default(false)
-      tags: ["motion"]
-      block:
-        - name: Mount motion share
-          ansible.posix.mount:
-            src: "{{ hostvars['theia'].host_ips.general }}:/mnt/tank/media/motion"
-            path: "/mnt/motion"
-            opts: "defaults,vers=4,rw,noatime,bg"
-            state: mounted
-            fstype: nfs
-
-        - name: Ensure camera is enabled
-          ansible.builtin.lineinfile:
-            dest: "/boot/config.txt"
-            regexp: "{{ item.regexp }}"
-            line: "{{ item.line }}"
-            state: present
-          notify: Reboot
-          with_items:
-            - regexp: "^#?start_x"
-              line: "start_x=1"
-            - regexp: "^#?gpu_mem"
-              line: "gpu_mem=128"
-
-        # NOTE: might need 'sudo rpi-update'
-        # - name: Ensure kernel module is loaded at boot
-        #   ansible.builtin.lineinfile:
-        #     dest: "/etc/modules-load.d/modules.conf"
-        #     regexp: "^#?bcm2835-v4l2"
-        #     line: "bcm2835-v4l2"
-        #     state: present
-        #   notify: Reboot
-
   tasks:
     - name: Configure interactive shell stuff
       tags: ["bash", "vim"]
@@ -98,9 +64,9 @@
     - role: hostname
       tags: ["hostname"]
 
-    - role: motion
-      when: motion_is_rpi | default(false)
-      tags: ["motion"]
+    - role: mediamtx
+      tags: ["mediamtx"]
+      when: mediamtx_paths | default(false)
 
     - role: wireguard
       when:
@@ -124,6 +90,4 @@
     - name: Include common tasks
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
-      vars:
-        _sshd_pkg: "openssh-server"
       tags: ["always"]

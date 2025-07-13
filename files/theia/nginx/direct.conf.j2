@@ -17,19 +17,6 @@ server {
         deny all;
     }
 
-{% if nginx_upstreams | selectattr('name', 'search', 'motion') %}
-    location /motion/ {
-        proxy_pass http://motion/;
-        proxy_set_header Host $http_host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        {% for a in firewall_trusted_sources %}
-        allow {{ a }};
-        {% endfor %}
-        deny all;
-    }
-{% endif %}
     location ~ \.php$ {
         include /etc/nginx/fastcgi_params;
         fastcgi_pass php-fpm;

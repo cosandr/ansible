@@ -4,19 +4,23 @@ firewall_rules:
   - port: 22
     source: "{{ home_net.general.cidr }}"
 
-  - port: 8081
-    source: "{{ home_net.general.cidr }}"
-
-  - port: 2049
-    protocol: tcp
-    source: "{{ hostvars['theia'].host_ips.general }}"
-
-  - port: 2049
-    protocol: udp
-    source: "{{ hostvars['theia'].host_ips.general }}"
-
   - port: "{{ node_exporter_port }}"
     sources: "{{ node_exporter_allow_ips }}"
+
+  - port: "{{ mediamtx_metrics_port }}"
+    sources: "{{ mediamtx_metrics_ips }}"
+
+  - port: "{{ mediamtx_rtsp_port }}"
+    protocol: tcp
+    sources: "{{ subnets.talos.pod }}"
+
+  - port: "{{ mediamtx_rtp_port }}"
+    protocol: udp
+    sources: "{{ subnets.talos.pod }}"
+
+  - port: "{{ mediamtx_rtcp_port }}"
+    protocol: udp
+    sources: "{{ subnets.talos.pod }}"
 
   # RouterOS neighbour discovery
   - port: 5678

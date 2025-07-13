@@ -1,5 +1,0 @@
----
-
-nginx_upstreams:
-  - name: motion
-    servers: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].motion_port }}"]

@@ -2,8 +2,6 @@
 
 __nginx_upstreams_2: []
 __nginx_upstreams_1:
-  - name: motion
-    servers: ["{{ hostvars['drepi'].ansible_host }}:{{ hostvars['drepi'].motion_port }}"]
   - name: minio-console
     servers: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].minio_console_port }}"]
     keepalive: 16

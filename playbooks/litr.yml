@@ -7,8 +7,6 @@
     - name: Include common tasks
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
-      vars:
-        _sshd_pkg: "openssh-server"
       tags: ["always"]
   roles:
     - role: nut_exporter

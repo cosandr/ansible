@@ -1,0 +1,19 @@
+---
+
+mediamtx_metrics_ips: "{{ node_exporter_allow_ips }}"
+mediamtx_rtsp_port: 8554
+mediamtx_rtp_port: 8000
+mediamtx_rtcp_port: 8001
+mediamtx_metrics_port: 9998
+mediamtx_paths:
+  cam:
+    source: rpiCamera
+mediamtx_users:
+  - user: frigate
+    pass: "{{ vault_mediamtx_passwords.frigate }}"
+    ips: []  # Controlled by firewall
+    permissions:
+      - action: read
+        path:
+      - action: playback
+        path:

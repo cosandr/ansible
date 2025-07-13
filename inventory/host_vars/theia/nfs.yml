@@ -43,10 +43,6 @@ nfs_shares:
   - path: /mnt/tank/yes
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
-  # Misc
-  - path: /mnt/tank/media/motion
-    options: "rw,no_root_squash,no_subtree_check"
-    sources: "{{ [hostvars['drepi'].ansible_host] }}"
   # Kubernetes shares
   - path: /mnt/tank/media
     options: "rw,no_root_squash,no_subtree_check"
