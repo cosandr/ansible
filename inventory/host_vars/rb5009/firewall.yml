@@ -74,6 +74,7 @@ __mt_firewall_subnet_lists:
   - "{{ vips.vm | dict2items | selectattr('key', 'match', 'localgw\\d+') | map(attribute='value') | flatten
     | andrei.utils.items2dictlist('address', list='allow-www', comment='vm-localgw-vips') }}"
   - "{{ subnets.talos.lb | andrei.utils.items2dictlist('address', list='talos-lb', comment='talos-lb') }}"
+  - "{{ [hostvars['ha'].ansible_host] | andrei.utils.items2dictlist('address', list='allow-talos-lb', comment='ha-talos-lb') }}"
 
 __mt_firewall_address_lists_manual:
   - address: "{{ wireguard_endpoint.split(':', 1)[0] }}"
