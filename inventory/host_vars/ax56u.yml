@@ -12,4 +12,15 @@ merlin_guest_interfaces:
   - name: "wl0.1"
     vlan: PUBLIC
 
-merlin_access_ports: [eth1, eth2, eth3, eth4, eth5, eth6]
+merlin_access_ports:
+  - vlan: GENERAL
+    ports:
+      - eth1
+      - eth2
+      - eth3
+      - eth5
+      - eth6
+
+  - vlan: MGMT
+    ports:
+      - eth4
