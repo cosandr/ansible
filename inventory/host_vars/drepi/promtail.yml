@@ -1,0 +1,7 @@
+---
+
+promtail_scrape_configs:
+  - "{{ __promtail_scrape_config_map['audit'] }}"
+  - "{{ __promtail_scrape_config_map['journal'] }}"
+  - "{{ __promtail_scrape_config_map['system'] }}"
+  - "{{ __promtail_scrape_config_map['unattended_upgrades'] }}"

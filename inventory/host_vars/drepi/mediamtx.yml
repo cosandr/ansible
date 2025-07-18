@@ -8,8 +8,28 @@ mediamtx_metrics_port: 9998
 mediamtx_paths:
   cam:
     source: rpiCamera
+    rpiCameraWidth: 1920
+    rpiCameraHeight: 1080
+    # rpiCameraWidth: 2304
+    # rpiCameraHeight: 1296
+    # rpiCameraCodec: softwareH264  # hardware maxes out at 1080p
+    rpiCameraFPS: 15
     rpiCameraHFlip: true
     rpiCameraVFlip: true
+    rpiCameraAfMode: manual
+    rpiCameraLensPosition: 0.0
+    rpiCameraTextOverlayEnable: true
+    rpiCameraTextOverlay: '%Y-%m-%d %H:%M:%S'
+  secondary:
+    source: rpiCamera
+    rpiCameraSecondary: true
+    # rpiCameraWidth: 1152
+    # rpiCameraHeight: 648
+    rpiCameraWidth: 1280
+    rpiCameraHeight: 720
+    rpiCameraFPS: 5
+    rpiCameraTextOverlayEnable: false
+
 mediamtx_users:
   - user: frigate
     pass: "{{ vault_mediamtx_passwords.frigate }}"
