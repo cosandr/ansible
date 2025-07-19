@@ -28,9 +28,6 @@ p7           ansible_host="10.0.50.139"  wireguard_ip="10.4.20.139"
 lgtv         ansible_host="10.0.50.148"
 ps5          ansible_host="10.0.50.149"
 deck         ansible_host="10.0.50.150"
-bme01        ansible_host="10.0.55.65"
-bme04        ansible_host="10.0.55.68"
-bme05        ansible_host="10.0.55.69"
 deltaco_plug ansible_host="10.0.55.74"
 rb5009       ansible_host="10.0.100.1"   wireguard_ip="10.4.20.1"
 crs226       ansible_host="10.0.100.2"
@@ -240,9 +237,6 @@ p7           host_num=11 host_wg_num=11
 lgtv         host_num=20
 ps5          host_num=21
 deck         host_num=22
-bme01        host_num=1   host_net=public
-bme04        host_num=4   host_net=public
-bme05        host_num=5   host_net=public
 deltaco_plug host_num=10  host_net=public
 
 [unmanaged_hosts:vars]
