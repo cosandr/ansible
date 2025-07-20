@@ -28,8 +28,15 @@
   },
 } %}
 
+{% set __wg_net_late_merge = {
+  "mt": {
+    "domain": "mt.{{ domains['hb'] }}",
+  },
+} %}
+
 home_net: {{ home_net | combine(__home_net_late_merge, recursive=true) }}
 internal_net: {{ internal_net | combine(__internal_net_late_merge, recursive=true) }}
+wg_net: {{ wg_net | combine(__wg_net_late_merge, recursive=true) }}
 
 vips:
   # Consider using list and ansible.utils.reduce_on_network instead?

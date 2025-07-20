@@ -44,4 +44,12 @@ mt_dns_entries: >-
   {{- tmp.append(tmp_dict) -}}
   {%- endfor -%}
   {%- endfor -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].wireguard_ip | default(false)) -%}
+  {{- tmp.append({
+    "name": h + "." + all_net.mt.domain,
+    "address": hostvars[h].wireguard_ip,
+    "comment": mt_dns_managed_comment,
+    "ttl": "1h"
+  }) -}}
+  {%- endfor -%}
   {{ tmp }}

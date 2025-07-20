@@ -95,6 +95,7 @@ internal_net:
 wg_net:
   mt:
     cidr: 10.4.20.0/24
+    domain: mt.{{ domains['hb'] }}
 
 subnets:
   vm:
