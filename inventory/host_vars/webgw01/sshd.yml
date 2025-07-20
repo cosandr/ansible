@@ -1,3 +1,8 @@
 ---
 
 sshd_permit_root: "no"
+sshd_config_host:
+  - regexp: "^#?AddressFamily"
+    line: "AddressFamily inet"
+  - regexp: "^#?ListenAddress"
+    line: "ListenAddress {{ wireguard_ip }}"

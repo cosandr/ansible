@@ -2,7 +2,7 @@
 
 sshd_permit_root: "prohibit-password"
 
-sshd_config:
+sshd_config_group:
   - regexp: "^#?StrictModes"
     line: "StrictModes yes"
   - regexp: "^#?AllowAgentForwarding"
@@ -23,3 +23,5 @@ sshd_config:
     line: "ClientAliveInterval 30"
   - regexp: "^#?ClientAliveCountMax"
     line: "ClientAliveCountMax 3"
+
+sshd_config: "{{ (sshd_config_group | default([])) + (sshd_config_host | default([])) }}"

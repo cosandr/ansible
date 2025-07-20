@@ -40,13 +40,27 @@ __firewalld_services_2:
     zone: internal
 
 __firewall_rules_2:
-  - port: 22
-    zone: public
-
   - port: "{{ node_exporter_port }}"
     zone: internal
 
   - port: "{{ nginx_exporter_port }}"
     zone: internal
 
-__firewall_rules_3: "{{ wireguard_endpoint is defined | ternary([{'port': wireguard_endpoint.rsplit(':', 1)[1], 'protocol': 'udp', 'zone': 'public'}], []) }}"
+__firewall_rules_3: >-
+  {%- set tmp = [] -%}
+  {%- if wireguard_endpoint is defined -%}
+  {{- tmp.append({
+    'port': wireguard_endpoint.rsplit(':', 1)[1],
+    'protocol': 'udp',
+    'zone': 'public',
+    }
+  ) -}}
+  {%- endif -%}
+  {%- if ansible_port != 22 -%}
+  {{- tmp.append({
+    'port': 22,
+    'zone': 'public',
+    }
+  ) -}}
+  {%- endif -%}
+  {{ tmp }}

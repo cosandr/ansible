@@ -1,6 +1,6 @@
 ---
 
-ansible_port: 5622
+ansible_port: 22
 
 domain: "{{ domains['hb'] }}"
 

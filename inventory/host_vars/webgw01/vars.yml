@@ -1,5 +1,7 @@
 ---
 
+# Overrides ansible_host, presumably deprecated but still works :shrug:
+ansible_ssh_host: "{{ wireguard_ip }}"
 ansible_host: "{{ vault_ansible_host }}"
 ansible_host6: "{{ vault_ansible_host6 }}"
 ansible_user: "{{ vault_ansible_user }}"
