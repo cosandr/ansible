@@ -58,6 +58,7 @@
           ansible.builtin.user:
             name: "{{ ansible_conf_user }}"
             create_home: true
+            password: "{{ ansible_user_password }}"
             groups:
               - wheel
 
