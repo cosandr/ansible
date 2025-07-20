@@ -10,10 +10,7 @@ wireguard_dns_list:
   - "8.8.8.8"
 
 wireguard_mt_allowed_ips:
-  - "{{ hostvars['rb5009'].wireguard_ip }}/32"
-  - "{{ hostvars['litr'].ansible_host }}/32"
-  - "{{ home_net.vm.cidr }}"
-  - "{{ subnets.talos.lb[0] }}"
+  - "{{ all_net | json_query('*.cidr') }}"
 
 wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"
@@ -26,7 +23,7 @@ wireguard_reresolve_dns_retry_delay: 30
 wireguard_unmanaged_peers:
   mt:
     endpoint: "{{ hostvars['rb5009'].wireguard_endpoint }}"
-    allowed_ips: "{{ wireguard_mt_allowed_ips | join(', ') }}"
+    allowed_ips: "{{ wireguard_mt_allowed_ips | flatten | join(', ') }}"
     public_key: "{{ hostvars['rb5009'].wireguard_public_key }}"
     preshared_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_psk_mt') }}"
   romgw:

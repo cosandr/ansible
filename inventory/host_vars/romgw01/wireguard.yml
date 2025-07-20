@@ -7,8 +7,10 @@ wireguard_addresses:
 
 wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
-  - "{{ hostvars['loki01'].ansible_host }}/32"
   - "{{ hostvars['litr'].ansible_host }}/32"
+  - "{{ subnets.vm.loki }}"
+  - "{{ subnets.vm.prom }}"
+  - "{{ firewall_trusted_sources }}"
 
 wireguard_webgw_allowed_ips:
   - "{{ hostvars['webgw01'].wireguard_ip }}/32"
@@ -21,7 +23,7 @@ wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
 wireguard_unmanaged_peers:
   mt:
     endpoint: "{{ hostvars['rb5009'].wireguard_endpoint }}"
-    allowed_ips: "{{ wireguard_mt_allowed_ips | join(', ') }}"
+    allowed_ips: "{{ wireguard_mt_allowed_ips | flatten | join(', ') }}"
     public_key: "{{ hostvars['rb5009'].wireguard_public_key }}"
     preshared_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_psk_mt') }}"
     persistent_keepalive: "{{ wireguard_persistent_keepalive }}"

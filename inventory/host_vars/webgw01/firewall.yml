@@ -5,21 +5,21 @@ __firewalld_services_1:
     zone: internal
 
 __firewall_rules_1:
-  # Alertmanager cluster, thanks masquarade
+  # Alertmanager cluster
   - port: "{{ alertmanager_port }}"
     zone: internal
-    source: "{{ hostvars['rb5009'].wireguard_ip }}"
+    sources: "{{ subnets.vm.prom + firewall_trusted_sources }}"
   - port: "{{ prometheus_port }}"
     zone: internal
-    source: "{{ hostvars['rb5009'].wireguard_ip }}"
+    sources: "{{ subnets.vm.prom }}"
   - port: "{{ alertmanager_peer_port }}"
     protocol: tcp
     zone: internal
-    source: "{{ hostvars['rb5009'].wireguard_ip }}"
+    sources: "{{ subnets.vm.prom }}"
   - port: "{{ alertmanager_peer_port }}"
     protocol: udp
     zone: internal
-    source: "{{ hostvars['rb5009'].wireguard_ip }}"
+    sources: "{{ subnets.vm.prom }}"
 
 firewalld_rich_rules:
   - zone: public
