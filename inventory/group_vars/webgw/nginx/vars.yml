@@ -24,11 +24,12 @@ nginx_extra_conf_options: |
     }
 
     server {
-      listen 22;
-      listen [::]:22;
+      listen {% if nginx_listen_v4 is defined %}{{ nginx_listen_v4 }}:{% endif %}22;
+      listen [{{ nginx_listen_v6 }}]:22;
       proxy_pass gitlab-ssh;
       proxy_protocol on;
     }
+
   {% if pip_k8s_v4 is defined or pip_k8s_v6 is defined %}
     server {
   {% if pip_k8s_v4 is defined %}
