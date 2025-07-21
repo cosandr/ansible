@@ -1,4 +1,0 @@
----
-
-withings_sync_garmin_username: "{{ lookup('community.general.passwordstore', 'ansible/garmin-username') }}"
-withings_sync_garmin_password: "{{ lookup('community.general.passwordstore', 'ansible/garmin-password') }}"

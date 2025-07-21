@@ -12,9 +12,6 @@
     - role: nut_exporter
       tags: ["nut_exporter"]
 
-    - role: withings_sync
-      tags: ["withings_sync"]
-
     - role: lego
       tags: ["lego"]
 
