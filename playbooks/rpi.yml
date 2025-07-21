@@ -60,6 +60,15 @@
       tags: ["dhcpcd"]
       when: dhcpcd_config | default('')
 
+    - name: Configure IPv6 sysctl
+      ansible.posix.sysctl:
+        name: net.ipv6.conf.all.disable_ipv6
+        value: "1"
+        sysctl_set: true
+        state: "{{ ipv6_sysctl_enabled | ternary('absent', 'present') }}"
+      when: ipv6_sysctl_enabled is defined
+      tags: ["sysctl"]
+
   roles:
     - role: hostname
       tags: ["hostname"]

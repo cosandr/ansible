@@ -11,6 +11,8 @@ resolv_config: |
   nameserver 1.1.1.1
   nameserver 8.8.8.8
 
+# Disable IPv6 to prevent WG from using it.
+# It seems to be unhappy when one end has a AAAA record and the other doesn't
 networkd_config:
   enp1s0: |
     [Match]
@@ -19,6 +21,8 @@ networkd_config:
     [Network]
     Address={{ ansible_host }}/24
     Gateway=10.1.0.1
+    LinkLocalAddressing=no
+    IPv6AcceptRA=no
 
 host_nic_names:
   - enp1s0
