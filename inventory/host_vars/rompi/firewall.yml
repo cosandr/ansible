@@ -13,7 +13,3 @@ firewall_rules:
 
   - port: "{{ wireguard_port }}"
     protocol: udp
-
-  - port: "{{ (serial_proxies | selectattr('name', 'eq', 'pwr') | first).port }}"
-    # Sad double NAT noises
-    source: "192.168.100.5"

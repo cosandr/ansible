@@ -1,9 +1,0 @@
----
-
-serial_proxies:
-  - name: pwr
-    src: "/dev/ttyUSB0"
-    port: 8888
-
-node_exporter_allow_ips:
-  - "{{ wg_net.mt.cidr }}"
