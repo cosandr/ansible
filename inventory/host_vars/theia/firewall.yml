@@ -40,6 +40,15 @@ __firewall_rules_1:
     zone: public
     sources: "{{ [all_net.talos.cidr_internal] + node_exporter_allow_ips }}"
 
+  # NUT
+  - port: 3493
+    zone: internal
+    sources: "{{ subnets[host_net].hosts }}"
+
+  # NUT exporter
+  - port: 9199
+    sources: "{{ node_exporter_allow_ips }}"
+
 mt_firewall_address_lists:
   - address: "{{ host_ips.vm }}"
     list: backup

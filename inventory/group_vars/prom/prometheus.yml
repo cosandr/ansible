@@ -162,9 +162,9 @@ __extra_prometheus_scrape_configs:
     metrics_path: /ups_metrics
     scrape_interval: 1m
     static_configs:
-      - targets: ["{{ hostvars['litr'].ansible_host }}:9199"]
+      - targets: ["{{ hostvars['theia'].host_ips.vm }}:9199"]
         labels:
-          instance: "litr"
+          instance: "theia"
           ups: "apc"
           __param_ups: "apc"
 

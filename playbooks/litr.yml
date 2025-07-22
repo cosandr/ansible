@@ -9,9 +9,6 @@
         file: ../tasks/common_servers.yml
       tags: ["always"]
   roles:
-    - role: nut_exporter
-      tags: ["nut_exporter"]
-
     - role: lego
       tags: ["lego"]
 

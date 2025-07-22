@@ -4,7 +4,7 @@ nut_config:
   MODE: "netclient"
 
 nut_monitors:
-  - system: "apc@{{ hostvars['litr'].ansible_host }}"
+  - system: "apc@{{ hostvars['theia'].ansible_host }}"
     username: client
-    password: "{{ hostvars['litr'].vault_nut_upsd_passwords.client }}"
+    password: "{{ hostvars['theia'].vault_nut_upsd_passwords.client }}"
     type: "secondary"

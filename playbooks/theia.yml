@@ -144,6 +144,9 @@
 
     - role: restic_server
       tags: ["restic"]
+
+    - role: nut_exporter
+      tags: ["nut_exporter"]
   post_tasks:
     - name: Create .mc dir
       ansible.builtin.file:
