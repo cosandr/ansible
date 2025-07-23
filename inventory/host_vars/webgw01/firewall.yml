@@ -4,6 +4,18 @@ __firewalld_services_1:
   - name: dns
     zone: internal
 
+  - name: smtp
+    zone: internal
+    sources: "{{ __postfix_networks | flatten }}"
+
+  - name: smtps
+    zone: internal
+    sources: "{{ __postfix_networks | flatten }}"
+
+  - name: smtp-submission
+    zone: internal
+    sources: "{{ __postfix_networks | flatten }}"
+
 __firewall_rules_1:
   # Alertmanager cluster
   - port: "{{ alertmanager_port }}"
@@ -21,6 +33,14 @@ __firewall_rules_1:
     zone: internal
     sources: "{{ subnets.vm.prom }}"
 
+  - port: "{{ postfix_exporter_port }}"
+    zone: internal
+    sources: "{{ node_exporter_allow_ips }}"
+
 firewalld_rich_rules:
   - zone: public
     rich_rule: 'rule service name="dns" accept limit value="30/s"'
+
+mt_firewall_address_lists:
+  - address: "{{ wireguard_ip }}"
+    list: smtp

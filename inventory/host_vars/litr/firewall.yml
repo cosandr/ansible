@@ -6,20 +6,3 @@ firewalld_zones:
 
 firewalld_services:
   - name: ssh
-
-  - name: smtp
-    sources: "{{ __postfix_networks | flatten }}"
-
-  - name: smtps
-    sources: "{{ __postfix_networks | flatten }}"
-
-  - name: smtp-submission
-    sources: "{{ __postfix_networks | flatten }}"
-
-firewall_rules:
-  - port: "{{ postfix_exporter_port }}"
-    sources: "{{ node_exporter_allow_ips }}"
-
-mt_firewall_address_lists:
-  - address: "{{ ansible_host }}"
-    list: smtp

@@ -4,6 +4,7 @@ postfix_exporter_port: 9907
 postfix_exporter_listen_address: "0.0.0.0:{{ postfix_exporter_port }}"
 postfix_exporter_args:
   - "--collector=journald"
+  - "--journald.unit=postfix.service"
 
 smtp_credentials: "{{ vault_smtp_credentials }}"
 
@@ -78,8 +79,6 @@ postfix_main_config:
     line: "smtp_sasl_security_options = noanonymous"
   - regexp: "^#?smtp_sasl_password_maps"
     line: "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd"
-  - regexp: "^#?smtp_tls_CAfile"
-    line: "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt"
   - regexp: "^#?smtp_sender_dependent_authentication"
     line: "smtp_sender_dependent_authentication = yes"
   - regexp: "^#?transport_maps"
@@ -91,9 +90,9 @@ postfix_main_config:
   - regexp: "^#?smtpd_use_tls"
     line: "smtpd_use_tls = yes"
   - regexp: "^#?smtpd_tls_cert_file"
-    line: "smtpd_tls_cert_file = /etc/lego/certificates/{{ postfix_hostname }}.crt"
+    line: "smtpd_tls_cert_file = /etc/lego/certificates/{{ postfix_hostname | community.dns.get_registrable_domain }}.crt"
   - regexp: "^#?smtpd_tls_key_file"
-    line: "smtpd_tls_key_file = /etc/lego/certificates/{{ postfix_hostname }}.key"
+    line: "smtpd_tls_key_file = /etc/lego/certificates/{{ postfix_hostname | community.dns.get_registrable_domain }}.key"
   - regexp: "^#?smtpd_tls_security_level"
     line: "smtpd_tls_security_level = may"
   - regexp: "^#?sender_canonical_classes"

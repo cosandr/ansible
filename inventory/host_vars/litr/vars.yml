@@ -33,9 +33,3 @@ networkd_config:
     [Network]
     Address={{ ansible_host }}/24
     Gateway={{ hostvars['rb5009'].host_ips[host_net] }}
-
-prometheus_blackbox_tls_targets:
-  - "{{ postfix_hostname }}:465"
-
-prometheus_blackbox_starttls_targets:
-  - "{{ postfix_hostname }}:587"

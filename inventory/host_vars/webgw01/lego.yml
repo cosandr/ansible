@@ -1,0 +1,9 @@
+---
+
+__host_lego_renew_hooks:
+  - name: sudo-restart-postfix
+    content: |
+      #!/bin/sh
+
+      [ "$LEGO_CERT_DOMAIN" = "{{ postfix_hostname | community.dns.get_registrable_domain }}" ] || exit 0
+      systemctl restart postfix

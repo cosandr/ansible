@@ -15,3 +15,9 @@ prometheus_alert_rules_files:
 
 prometheus_required_services:
   - "wg-quick@mt.service"
+
+prometheus_blackbox_tls_targets:
+  - "{{ postfix_hostname }}:465"
+
+prometheus_blackbox_starttls_targets:
+  - "{{ postfix_hostname }}:587"

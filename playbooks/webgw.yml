@@ -177,3 +177,7 @@
 
     - role: nginx_exporter
       tags: ["nginx_exporter"]
+
+    - role: postfix_exporter
+      tags: ["postfix_exporter"]
+      when: postfix_exporter_port is defined

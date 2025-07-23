@@ -8,9 +8,3 @@
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
       tags: ["always"]
-  roles:
-    - role: lego
-      tags: ["lego"]
-
-    - role: postfix_exporter
-      tags: ["postfix_exporter"]
