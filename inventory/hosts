@@ -20,7 +20,6 @@ desktop      ansible_host="10.0.50.64"
 laptop       ansible_host="10.0.50.65"   wireguard_ip="10.4.20.65"
 m3bp         ansible_host="10.0.50.66"   wireguard_ip="10.4.20.66"
 drepi        ansible_host="10.0.50.128"
-litr         ansible_host="10.0.50.129"
 ax56u        ansible_host="10.0.50.133"
 ha           ansible_host="10.0.50.134"
 ipad         ansible_host="10.0.50.138"  wireguard_ip="10.4.20.138"
@@ -84,7 +83,6 @@ host_subnet=hosts
 
 [servers]
 syno    ansible_user=andrei host_net=mgmt host_num=0
-litr    host_num=1
 
 [servers:children]
 kvm_hv
