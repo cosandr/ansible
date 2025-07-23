@@ -42,9 +42,12 @@ __firewalld_services_2:
 __firewall_rules_2:
   - port: "{{ node_exporter_port }}"
     zone: internal
+    # If using wireguard, limit to IPs, otherwise there's no need
+    sources: "{{ wireguard_interface | default(false) | ternary(node_exporter_allow_ips, []) }}"
 
   - port: "{{ nginx_exporter_port }}"
     zone: internal
+    sources: "{{ wireguard_interface | default(false) | ternary(node_exporter_allow_ips, []) }}"
 
 __firewall_rules_3: >-
   {%- set tmp = [] -%}
