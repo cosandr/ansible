@@ -12,6 +12,13 @@ nfs_shares:
   - path: /mnt/tank/backup/pgbackrest
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ subnets.vm.pg }}"
+  # HA shares
+  - path: /mnt/tank/backup/ha
+    options: "rw,no_root_squash,no_subtree_check"
+    sources: ["{{ hostvars['ha'].ansible_host }}"]
+  - path: /mnt/tank/media/ha
+    options: "rw,all_squash,no_subtree_check,anonuid=1000,anongid=1000"
+    sources: ["{{ hostvars['ha'].ansible_host }}"]
   # All dataset shares
   - path: /mnt/tank
     options: "rw,no_root_squash,no_subtree_check"
