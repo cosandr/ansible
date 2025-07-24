@@ -9,7 +9,12 @@ proxy_hosts: >-
 
 smartd_email: "{{ my_email }}"
 # Send from root domain
-smartd_from_address: "{{ inventory_hostname }}@{{ domain | regex_search('(\\w+\\.\\w+)$', '\\1') | first }}"
+smartd_from_address: "{{ inventory_hostname }}@{{ domain | community.dns.get_registrable_domain }}"
+# Monitor all drives, send an email if there's a problem, don't run if drive is in standby
+# Run short self-test every Friday starting at 01:00 with 1 hour staggering
+# Run long self-test every month on the 1st starting at 03:00 with 5 hours staggering
+smartd_config: |
+  DEVICESCAN -a -m {{ smartd_email }} -M exec /usr/local/bin/smartdnotify -n standby,10,q -s (S/../../5/01:001|L/../01/./03:005)
 
 # Fetch with timedatectl -p Timezone --value show
 sys_timezone: "Europe/Oslo"

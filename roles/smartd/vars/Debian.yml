@@ -1,3 +1,4 @@
 ---
 
 smartd_config_path: "/etc/smartd.conf"
+smartd_service_name: "smartmontools.service"

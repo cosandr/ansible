@@ -17,23 +17,19 @@
     owner: root
     group: root
     mode: "0755"
-  when:
-    - smartd_email
-    - smartd_from_address
+  when: smartd_from_address | length > 0
 
 - name: Configure smartd email address
-  ansible.builtin.lineinfile:
-    path: "{{ smartd_config_path }}"
-    regexp: '^DEVICESCAN'
-    line: 'DEVICESCAN -H -m {{ smartd_email }} -M exec {{ __exec_custom if smartd_from_address else __exec_stock }} -n standby,10,q'
-  vars:
-    __exec_stock: "/usr/libexec/smartmontools/smartdnotify"
-    __exec_custom: "/usr/local/bin/smartdnotify"
-  when: smartd_email
-  notify: Restart smartd
+  ansible.builtin.copy:
+    dest: "{{ smartd_config_path }}"
+    content: "{{ smartd_config }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload smartd
 
 - name: Enable and start smartd
   ansible.builtin.systemd:
-    name: smartd.service
+    name: "{{ smartd_service_name }}"
     state: started
     enabled: true

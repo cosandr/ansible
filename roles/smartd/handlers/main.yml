@@ -1,6 +1,6 @@
 ---
 
-- name: Restart smartd
+- name: Reload smartd
   ansible.builtin.systemd:
-    name: smartd.service
-    state: restarted
+    name: "{{ smartd_service_name }}"
+    state: reloaded
