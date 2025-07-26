@@ -16,7 +16,7 @@ smartd_from_address: "{{ inventory_hostname }}@{{ domain | community.dns.get_reg
 # No error log reporting for NVMe drives
 smartd_config: |
   DEFAULT -m {{ smartd_email }} -M exec /usr/local/bin/smartdnotify -n standby,15,q -s (S/../../5/01:001|L/../01/./03:005)
-  {% for d in ansible_devices.keys() if d.startswith('nvme') %}
+  {% for d in ansible_devices.keys() | map('regex_search', '(nvme\\d+)') | select | unique %}
   /dev/{{ d }} -H -f -t -l selftest -l selfteststs
   {% endfor %}
   DEVICESCAN -a
