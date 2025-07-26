@@ -13,8 +13,13 @@ smartd_from_address: "{{ inventory_hostname }}@{{ domain | community.dns.get_reg
 # Monitor all drives, send an email if there's a problem, don't run if drive is in standby
 # Run short self-test every Friday starting at 01:00 with 1 hour staggering
 # Run long self-test every month on the 1st starting at 03:00 with 5 hours staggering
+# No error log reporting for NVMe drives
 smartd_config: |
-  DEVICESCAN -a -m {{ smartd_email }} -M exec /usr/local/bin/smartdnotify -n standby,10,q -s (S/../../5/01:001|L/../01/./03:005)
+  DEFAULT -m {{ smartd_email }} -M exec /usr/local/bin/smartdnotify -n standby,15,q -s (S/../../5/01:001|L/../01/./03:005)
+  {% for d in ansible_devices.keys() if d.startswith('nvme') %}
+  /dev/{{ d }} -H -f -t -l selftest -l selfteststs
+  {% endfor %}
+  DEVICESCAN -a
 
 # Fetch with timedatectl -p Timezone --value show
 sys_timezone: "Europe/Oslo"
