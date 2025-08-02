@@ -40,7 +40,7 @@ groups:
       summary: Temperature sensor "{{ $labels.friendly_name }}" appears to be stuck
 
   - alert: HassTemperatureSensorDown
-    expr: hass_entity_available{entity=~"sensor\\..+_temperature$"} == 0
+    expr: hass_entity_available{entity=~"sensor\\..+_temperature$", entity!="sensor.heat_pump_outdoor_temperature"} == 0
     for: 15m
     labels:
       severity: warning
