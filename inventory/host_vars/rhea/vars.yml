@@ -1,0 +1,5 @@
+---
+
+root_disk: "/dev/disk/by-id/nvme-KINGSTON_SKC3000S1024G_50026B73837B46FB"
+
+grub_cmdline_group: "console=tty0 console=ttyS0,115200n8 amd_pstate=passive"

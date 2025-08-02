@@ -1,0 +1,12 @@
+---
+
+__host_ips_1:
+  ipmi: "{{ subnets.mgmt.ipmi | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"
+
+# TODO
+__bond0_primary_iface: "enp1s0"
+__bond0_backup_iface: "enp6s0"
+
+__mt_dns_entries_host:
+  - name: "{{ inventory_hostname }}.ipmi.{{ domains['hb'] }}"
+    address: "{{ host_ips.ipmi }}"

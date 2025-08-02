@@ -157,6 +157,11 @@ __extra_prometheus_scrape_configs:
           instance: "{{ hostvars['romsto'].prometheus_node_labels.instance }}"
           __param_target: "{{ hostvars['romsto'].host_ips.ipmi }}"
           __param_module: "romsto"
+      - targets: ["localhost:{{ ipmi_exporter_port }}"]
+        labels:
+          instance: "{{ hostvars['rhea'].prometheus_node_labels.instance }}"
+          __param_target: "{{ hostvars['rhea'].host_ips.ipmi }}"
+          __param_module: "rhea"
 
   - job_name: "nut"
     metrics_path: /ups_metrics

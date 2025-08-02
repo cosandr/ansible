@@ -13,3 +13,8 @@ ipmi_exporter_modules:
     pass: "{{ vault_ipmi_exporter_pass.romsto }}"
     driver: "LAN_2_0"
     privilege: "operator"
+  rhea:
+    user: "exporter"
+    pass: "{{ vault_ipmi_exporter_pass.rhea }}"
+    driver: "LAN_2_0"
+    privilege: "operator"

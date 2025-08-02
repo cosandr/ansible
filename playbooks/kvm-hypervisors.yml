@@ -100,6 +100,16 @@
           loop: "{{ btrfs_subvols | default([]) }}"
           tags: ["subvols"]
 
+        # Use if community module crashes
+        # https://github.com/ansible-collections/community.general/issues/7098
+        # - name: Create subvolumes
+        #   ansible.builtin.command: "btrfs subvolume create {{ btrfs_root }}/{{ item }}"
+        #   register: btrfs_subvolume_create
+        #   changed_when: "btrfs_subvolume_create.rc == 0"
+        #   failed_when: "btrfs_subvolume_create.rc != 0 and 'target path already exists' not in btrfs_subvolume_create.stderr"
+        #   loop: "{{ btrfs_subvols | default([]) }}"
+        #   tags: ["subvols"]
+
         - name: Create root snapshots dir
           ansible.builtin.file:
             path: "/.snapshots"

@@ -22,8 +22,6 @@
     default_root_size: "100%FREE"
     default_swap_size: 16
     default_extra_lvols:
-      - name: db01
-        size: 200G
       - name: k8s
         size: 150G
     # root_disk: "/dev/disk/by-id/"
@@ -618,7 +616,7 @@
       ansible.builtin.copy:
         content: |
           GRUB_TIMEOUT=2
-          GRUB_CMDLINE_LINUX="{% if intel_cpu %}intel_iommu=on {% endif %}nmi_watchdog=0"
+          GRUB_CMDLINE_LINUX="{% if intel_cpu %}intel_iommu=on {% endif %}"
         dest: "{{ chroot_path }}/etc/default/grub"
         owner: root
         group: root

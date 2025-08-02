@@ -2,8 +2,6 @@
 
 root_disk: "/dev/disk/by-id/nvme-SAMSUNG_MZ1LB1T9HALS-00007_S436NC0R532548"
 
-domain: "{{ domains['hb'] }}"
-
 web_root: "/var/www"
 pip_wheel_dir: "{{ web_root }}/pip"
 
