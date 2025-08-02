@@ -9,7 +9,7 @@ prometheus_version: "75.4.0"
 cilium_version: "1.17.5"
 # https://github.com/fluxcd/flux2/releases
 # https://github.com/fluxcd-community/helm-charts/releases
-flux_version: "2.16.0"
+flux_version: "2.16.3"
 # https://github.com/kubernetes-sigs/gateway-api/releases
 # https://docs.cilium.io/en/v1.17/network/servicemesh/gateway-api/gateway-api/#prerequisites
 gateway_api_version: "1.2.1"
