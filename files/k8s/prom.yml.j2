@@ -78,12 +78,18 @@ prometheus:
     retention: 1y
     storageSpec:
       volumeClaimTemplate:
+        metadata:
+          name: data
         spec:
-          storageClassName: nfs-csi
+          storageClassName: ceph-block
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 20Gi
+              storage: 200Gi
+          dataSourceRef:
+            kind: ReplicationDestination
+            apiGroup: volsync.backube
+            name: prometheus
 prometheus-node-exporter:
   extraArgs:
     - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
