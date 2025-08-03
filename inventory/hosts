@@ -16,6 +16,7 @@ talos01      ansible_host="10.0.28.64"
 talos02      ansible_host="10.0.28.65"
 talos03      ansible_host="10.0.28.66"
 talos04      ansible_host="10.0.28.80"
+talos05      ansible_host="10.0.28.81"
 desktop      ansible_host="10.0.50.64"
 laptop       ansible_host="10.0.50.65"   wireguard_ip="10.4.20.65"
 m3bp         ansible_host="10.0.50.66"   wireguard_ip="10.4.20.66"
@@ -216,7 +217,7 @@ talos_worker
 host_net=talos
 
 [talos_cp]
-talos01 vm_host=theia
+talos01 vm_host=theia vm_cpus=6 # TODO: Give more resources once Theia is freed up a bit.
 talos02 vm_host=aegir
 talos03 vm_host=gerd
 
@@ -225,6 +226,7 @@ host_subnet=control_plane
 
 [talos_worker]
 talos04 vm_host=ymir
+talos05 vm_host=rhea vm_mem=20480
 
 [talos_worker:vars]
 host_subnet=worker

@@ -1,0 +1,20 @@
+---
+
+# TODO: Remove once Rook is removed
+vm_extra_disks:
+  # Used by OpenEBS LVM provisioner
+  - type: block
+    device: disk
+    format: raw
+    dev: /dev/vg01/k8s
+    serial: "raw01"
+    target: "vdb"
+    driver_options:
+      discard: "unmap"
+      cache: "none"
+
+  - name: "talos-boot.iso"
+    type: "file"
+    target: "vdd"
+    device: "cdrom"
+    format: "raw"

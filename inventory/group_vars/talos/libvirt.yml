@@ -1,7 +1,6 @@
 ---
 
-# TODO: Give more resources once Theia is freed up a bit.
-vm_cpus: "{{ (vm_host in groups['ms01']) | ternary(12, 6) }}"
+vm_cpus: 12
 vm_mem: 12288
 vm_host: "{{ vm_host_list[groups['talos'] | ansible.utils.index_of('eq', inventory_hostname) % (vm_host_list | length)] }}"
 vm_template: false
@@ -15,7 +14,15 @@ vm_nics:
       dev: "SAN"
     mac: "{{ vm_mac_san }}"
 
-vm_pci_devices: "{{ (vm_host in groups['ms01']) | ternary(__igpu_vm_pci_devices, __nvidia_vm_pci_devices) }}"
+vm_pci_devices: >-
+  {%- if vm_host in groups['ms01'] -%}
+  {{ __igpu_vm_pci_devices }}
+  {%- elif vm_host == 'theia' -%}
+  {{ __nvidia_vm_pci_devices }}
+  {%- else -%}
+  {{ [] }}
+  {%- endif -%}
+
 __igpu_vm_pci_devices:
   - address:
       domain: "0x0000"

@@ -54,6 +54,7 @@
         owner: root
         group: root
         mode: "0644"
+        timeout: 600
       tags: ["download"]
       when: "'download' in ansible_run_tags"
 
