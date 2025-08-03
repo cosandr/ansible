@@ -32,7 +32,7 @@ groups:
     expr: |
       (sum_over_time(hass_sensor_temperature_celsius[6h]) / 720 == hass_sensor_temperature_celsius)
       and
-      (hass_sensor_temperature_celsius{entity!~".*device.*$"} != 0)
+      (hass_sensor_temperature_celsius{entity!~".*device.*$", entity!="sensor.heat_pump_outdoor_temperature"} != 0)
     for: 15m
     labels:
       severity: warning
