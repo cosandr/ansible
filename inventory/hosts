@@ -228,7 +228,7 @@ host_subnet=control_plane
 
 [talos_worker]
 talos04 vm_host=ymir
-talos05 vm_host=rhea vm_mem=20480
+talos05 vm_host=rhea
 
 [talos_worker:vars]
 host_subnet=worker
