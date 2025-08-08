@@ -145,13 +145,13 @@ host_subnet=gitlab
 
 [gitrun]
 gitrun01 host_num=0
-gitrun02 host_num=1
+gitrun02 host_num=1 vm_host=rhea
 
 [gitrun:vars]
 host_subnet=gitrun
 
 [gitea]
-gitea01 host_num=0
+gitea01 host_num=0 vm_host=rhea
 
 [gitea:vars]
 host_subnet=gitea
