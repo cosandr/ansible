@@ -121,7 +121,7 @@ drepi   ansible_user=andrei host_num=0
 rompi   ansible_user=andrei
 
 [pg]
-pg01 host_num=0
+pg01 host_num=0 vm_host=gerd
 
 [pg:vars]
 host_subnet=pg
@@ -145,7 +145,7 @@ gitlab01 host_num=0
 host_subnet=gitlab
 
 [gitrun]
-gitrun01 host_num=0
+gitrun01 host_num=0 vm_host=aegir
 gitrun02 host_num=1 vm_host=rhea
 
 [gitrun:vars]
@@ -171,7 +171,7 @@ host_subnet=prom
 ansible_group_priority=10
 
 [loki]
-loki01 host_num=0
+loki01 host_num=0 vm_host=ymir
 
 [loki:vars]
 host_subnet=loki
