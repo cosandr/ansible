@@ -8,6 +8,7 @@ wireguard_addresses:
 wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"
   - "{{ hostvars['theia'].host_ips.vm }}/32"
+  - "{{ hostvars['theia'].host_ips.general }}/32" # GENERAL is main interface, required when Theia is initiating connections
   - "{{ subnets.vm.loki }}"
   - "{{ subnets.vm.prom }}"
   - "{{ firewall_trusted_sources }}"
