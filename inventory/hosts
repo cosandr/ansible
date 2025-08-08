@@ -4,6 +4,7 @@ localgw01    ansible_host="10.0.10.64"
 localgw02    ansible_host="10.0.10.65"
 localgw03    ansible_host="10.0.10.66"
 localgw04    ansible_host="10.0.10.67"
+localgw05    ansible_host="10.0.10.68"
 pg01         ansible_host="10.0.10.84"
 gitea01      ansible_host="10.0.10.88"
 gitlab01     ansible_host="10.0.10.90"
@@ -180,6 +181,7 @@ localgw01 vm_host=theia
 localgw02 vm_host=aegir
 localgw03 vm_host=gerd
 localgw04 vm_host=ymir
+localgw05 vm_host=rhea
 
 [localgw:vars]
 host_subnet=localgw

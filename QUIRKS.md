@@ -2,11 +2,11 @@
 
 ## localgw
 
-First time provisioning is a bit finnicky. If it crashes due to low memory, create swapfile first with `-t swapfile`.
+First time provisioning is a bit finnicky. If it crashes due to low memory, create swapfile first with `-t swap`.
 
 Afterwards the inter-dependencies should work if the playbook is run twice.
 
-First with `--skip-tags pg_cert_store,nginx,nginx_exporter` followed by `-t pg_cert_store,nginx,nginx_exporter`
+First with `--skip-tags pg_cert,nginx,nginx_exporter` followed by `-t pg_cert,nginx,nginx_exporter`
 
 Need to request certificates manually the first time.
 
