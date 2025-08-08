@@ -198,7 +198,7 @@ host_wg_subnet=webgw
 ansible_group_priority=3
 
 [nextcloud]
-nextcloud01 host_num=0
+nextcloud01 host_num=0 vm_host=rhea
 
 [nextcloud:vars]
 host_subnet=nextcloud
