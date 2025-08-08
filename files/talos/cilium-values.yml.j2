@@ -30,6 +30,20 @@ ipam:
           cidrs: {{ subnets.talos.pod | ansible.utils.ipv6 | to_json }}
           maskSize: 80
 {% endif %}
+      monitoring:
+{% if subnets.talos.mon | ansible.utils.ipv4 %}
+        ipv4:
+          cidrs: {{ subnets.talos.mon | ansible.utils.ipv4 | to_json }}
+          # Add 3 to CIDR, i.e. /24 -> /27
+          # Needs to be increased if there's more than 8 nodes in cluster.
+          maskSize: {{ subnets.talos.mon | ansible.utils.ipv4 | first | ansible.utils.ipaddr('prefix') + 3 }}
+{% endif %}
+{% if subnets.talos.mon | ansible.utils.ipv6 %}
+        ipv6:
+          cidrs: {{ subnets.talos.mon | ansible.utils.ipv6 | to_json }}
+          maskSize: 80
+{% endif %}
+
 kubeProxyReplacement: true
 enableIPv4Masquerade: false
 ipv4:
