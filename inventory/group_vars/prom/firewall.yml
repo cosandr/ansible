@@ -49,3 +49,6 @@ firewall_rules:
   - port: 514
     protocol: udp
     sources: "{{ all_net.mgmt | json_query('[cidr, cidr6]') | flatten }}"
+  # Loki sends alerts too
+  - port: "{{ alertmanager_port }}"
+    sources: "{{ subnets.vm.loki }}"
