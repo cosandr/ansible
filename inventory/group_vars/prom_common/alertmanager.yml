@@ -37,6 +37,11 @@ alertmanager_route:
         - alertname=~"BlackboxSslCertificate.+"
         - instance="https://google.com"
 
+    - receiver: 'null'
+      matchers:
+        - alertname="HostOutOfMemory"
+        - instance="syno"
+
     - group_by: ["job"]
       group_wait: 10m
       matchers:
