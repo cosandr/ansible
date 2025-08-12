@@ -18,8 +18,6 @@ wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' 
 wireguard_public_key: "{{ vault_wireguard_public_key }}"
 wireguard_endpoint: "{{ vault_wireguard_endpoint }}"
 wireguard_reresolve_dns: true
-wireguard_reresolve_dns_retries: 5
-wireguard_reresolve_dns_retry_delay: 30
 
 wireguard_unmanaged_peers:
   mt:
