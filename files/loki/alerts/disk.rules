@@ -4,7 +4,16 @@ groups:
   - name: Disk Alerts
     rules:
       - alert: BtrfsErrors
-        expr: sum by (host) (count_over_time({job="systemd-journal"} |= "BTRFS error"[5m])) > 0
+        expr: sum by (host) (count_over_time({job="systemd-journal", unit!~".+"} |= "BTRFS error"[5m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: '{{ $labels.host }} has BTRFS errors!'
+          description: 'Node is reporting {{ $value }} errors'
+
+      - alert: BtrfsErrorsSyslog
+        expr: sum by (host) (count_over_time({job="varlogs", program="kernel"} |= "BTRFS error"[5m])) > 0
         for: 0m
         labels:
           severity: critical
@@ -13,7 +22,16 @@ groups:
           description: 'Node is reporting {{ $value }} errors'
 
       - alert: IOErrors
-        expr: sum by (host) (count_over_time({job="systemd-journal"} |= "I/O error"[5m])) > 0
+        expr: sum by (host) (count_over_time({job="systemd-journal", unit!~".+"} |= "I/O error"[5m])) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: '{{ $labels.host }} has I/O errors!'
+          description: 'Node is reporting {{ $value }} errors'
+
+      - alert: IOErrorsSyslog
+        expr: sum by (host) (count_over_time({job="varlogs", program="kernel"} |= "I/O error"[5m])) > 0
         for: 0m
         labels:
           severity: critical
