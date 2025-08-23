@@ -1,23 +1,62 @@
 ---
-apiVersion: "cilium.io/v2alpha1"
-kind: CiliumBGPPeeringPolicy
+apiVersion: cilium.io/v2
+kind: CiliumBGPClusterConfig
 metadata:
-  name: rb5009
+  name: cilium-bgp
 spec:
-  virtualRouters:
-    - localASN: 64528
-      exportPodCIDR: true
-      neighbors:
-        - peerAddress: "{{ (hostvars['rb5009'].mt_routing_ids | selectattr('name', 'eq', host_net) | first).id }}/32"
-          peerASN: {{ mt_bgp_peers[0].as }}
-          gracefulRestart:
-            enabled: true
-            restartTimeSeconds: 120
-      # Announce all services
-      serviceSelector:
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/os: linux
+  bgpInstances:
+  - name: "instance-64528"
+    localASN: 64528
+    peers:
+    - name: "peer-rb5009"
+      peerASN: {{ mt_bgp_peers[0].as }}
+      peerAddress: "{{ (hostvars['rb5009'].mt_routing_ids | selectattr('name', 'eq', host_net) | first).id }}"
+      peerConfigRef:
+        name: "cilium-peer"
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPPeerConfig
+metadata:
+  name: cilium-peer
+spec:
+  gracefulRestart:
+    enabled: true
+    restartTimeSeconds: 120
+  families:
+{% if subnets.talos.pod | ansible.utils.ipv4 %}
+    - afi: ipv4
+      safi: unicast
+      advertisements:
+        matchLabels:
+          advertise: "bgp"
+{% endif %}
+{% if subnets.talos.pod | ansible.utils.ipv6 %}
+    - afi: ipv6
+      safi: unicast
+      advertisements:
+        matchLabels:
+          advertise: "bgp"
+{% endif %}
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPAdvertisement
+metadata:
+  name: cilium-advertisements
+  labels:
+    advertise: bgp
+spec:
+  advertisements:
+    - advertisementType: "CiliumPodIPPool"
+      selector:
         matchExpressions:
-          - {key: somekey, operator: NotIn, values: ['never-used-value']}
-      # Announce all pod IPs
-      podIPPoolSelector:
+        - {key: somekey, operator: NotIn, values: ['never-used-value']}
+    - advertisementType: "Service"
+      selector:
         matchExpressions:
-          - {key: somekey, operator: NotIn, values: ['never-used-value']}
+         - {key: somekey, operator: NotIn, values: ['never-used-value']}
+      service:
+        addresses:
+          - LoadBalancerIP
