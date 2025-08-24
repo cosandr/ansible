@@ -1,5 +1,14 @@
 ---
 
+__host_ips_1:
+  # Same number as GENERAL, don't want to create trusted subnet as it's an oxymoron in a VLAN called PUBLIC.
+  public: "{{ all_net.public.cidr | andrei.utils.ipaddr_concat(ansible_host | andrei.utils.host_num_in_net(all_net[host_net].cidr)) }}" # 10.0.55.64
+
+mt_dhcp_leases:
+  - address: "{{ host_ips.public }}"
+    mac_address: "{{ vault_mac_address }}"
+    server: "dhcp-public"
+
 resolv_config: |
   nameserver {{ hostvars['rb5009'].host_ips[host_net] }}
   nameserver 1.1.1.1

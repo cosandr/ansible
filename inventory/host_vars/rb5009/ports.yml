@@ -6,7 +6,7 @@ mt_trunk_ports:
   - vlan: TALOS
     ports: [sfp-sfpplus1]
   - vlan: GENERAL
-    ports: [sfp-sfpplus1, ether6]
+    ports: [sfp-sfpplus1, ether1, ether6]
   - vlan: PUBLIC
     ports: [ether6]
   - vlan: MGMT
@@ -17,7 +17,6 @@ mt_trunk_ports:
 mt_access_ports:
   - vlan: GENERAL
     ports:
-      - ether1
       - ether3
       - ether4
       - ether5
@@ -26,6 +25,10 @@ mt_access_ports:
   - vlan: MGMT
     ports:
       - ether8
+
+  - vlan: PUBLIC
+    ports:
+      - ether1 # desktop
 
 # !!! Do NOT add to bridge !!!
 mt_wan_port: ether2

@@ -1,0 +1,59 @@
+---
+
+networkd_netdevs:
+  GENERAL: |
+    [NetDev]
+    Name=GENERAL
+    Kind=vlan
+    MTUBytes={{ all_net.general.mtu | default(1500) }}
+
+    [VLAN]
+    Id={{ all_net.general.vlan }}
+
+networkd_config:
+  enp42s0: |
+    [Match]
+    Name=enp42s0
+
+    [Network]
+    VLAN=GENERAL
+    LinkLocalAddressing=no
+    IPv6AcceptRA=no
+
+    [Link]
+    RequiredForOnline=no
+
+  GENERAL: |
+    [Match]
+    Name=GENERAL
+
+    [Network]
+    Address={{ host_ips_with_prefix[host_net] }}
+    DNS={{ hostvars['rb5009'].host_ips[host_net] }}
+    DNS=1.1.1.1
+    DNS=8.8.8.8
+    IPForward=yes
+    IPv6PrivacyExtensions=yes
+    IPv6AcceptRA=yes
+
+    [Route]
+    Gateway={{ hostvars['rb5009'].host_ips[host_net] }}
+
+  wlan: |
+    [Match]
+    Type=wlan
+
+    [Link]
+    RequiredForOnline=no
+
+    [Network]
+    DHCP=ipv4
+    IPForward=yes
+    IPv6PrivacyExtensions=yes
+    IPv6AcceptRA=yes
+
+    [DHCP]
+    RouteMetric=2048
+
+    [IPv6AcceptRA]
+    RouteMetric=2048
