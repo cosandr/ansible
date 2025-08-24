@@ -3,9 +3,6 @@
 aquaero_exporter_port: 2782
 node_exporter_port: 9100
 nvidia_exporter_port: 9401
-fah_exporter_port: 9659
-wmi_exporter_port: 9182
-hwinfo_exporter_port: 10445
 
 node_exporter_web_listen_address: "0.0.0.0:{{ node_exporter_port }}"
 borg_desktop_passphrase: "{{ vault_borg_desktop_passphrase }}"
