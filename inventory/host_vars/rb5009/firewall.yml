@@ -75,6 +75,8 @@ __mt_firewall_subnet_lists:
     | andrei.utils.items2dictlist('address', list='allow-www', comment='vm-localgw-vips') }}"
   - "{{ subnets.talos.lb | andrei.utils.items2dictlist('address', list='talos-lb', comment='talos-lb') }}"
   - "{{ [hostvars['ha'].ansible_host] | andrei.utils.items2dictlist('address', list='allow-talos-lb', comment='ha-talos-lb') }}"
+  - "{{ [hostvars['theia'].host_ips.general] | andrei.utils.items2dictlist('address', list='samba', comment='theia-samba') }}"
+  - "{{ [hostvars['desktop'].host_ips.public] | andrei.utils.items2dictlist('address', list='allow-samba', comment='desktop-samba-public') }}"
 
 __mt_firewall_address_lists_manual:
   - address: "{{ wireguard_endpoint.split(':', 1)[0] }}"
