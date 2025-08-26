@@ -21,6 +21,12 @@ alertmanager:
   alertmanagerSpec:
     externalUrl: "http://am.{{ kube_ingress_domain }}"
     retention: 192h
+    resources:
+      requests:
+        cpu: 10m
+        memory: 128Mi
+      limits:
+        memory: 128Mi
 
   templateFiles: {{ alertmanager_template_files | to_json }}
 
@@ -56,6 +62,20 @@ alertmanager:
 {% endif %}
 grafana:
   enabled: false
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      memory: 128Mi
+  prometheusConfigReloader:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        memory: 64Mi
 prometheus:
   ingress:
     enabled: true
@@ -90,7 +110,20 @@ prometheus:
             kind: ReplicationDestination
             apiGroup: volsync.backube
             name: prometheus
+    resources:
+      requests:
+        cpu: 300m
+        memory: 3Gi
+      limits:
+        memory: 4Gi
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus-node-exporter/values.yaml
 prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+    limits:
+      memory: 64Mi
   extraArgs:
     - --collector.filesystem.mount-points-exclude=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
     - --collector.filesystem.fs-types-exclude=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
@@ -124,3 +157,12 @@ defaultRules:
     KubePdbNotEnoughHealthyPods: true
   rules:
     kubeProxy: {{ kube_proxy_enabled }}
+
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-state-metrics/values.yaml
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      memory: 128Mi

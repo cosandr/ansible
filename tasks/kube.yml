@@ -57,11 +57,22 @@
         release_namespace: cert-manager
         create_namespace: true
         update_repo_cache: true
+        # https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml
         release_values:
           installCRDs: true
           prometheus:
             servicemonitor:
               enabled: true
+          resources: &cert-manager-resources
+            requests:
+              cpu: 10m
+              memory: 128Mi
+            limits:
+              memory: 128Mi
+          webhook:
+            resources: *cert-manager-resources
+          cainjector:
+            resources: *cert-manager-resources
       tags: ["helm"]
 
     - name: Create TSIG secret
