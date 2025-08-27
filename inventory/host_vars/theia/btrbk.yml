@@ -1,0 +1,8 @@
+---
+
+btrbk_volumes_host:
+  - path: "/mnt/btrfs_root"
+    subvolumes:
+      - path: "@home"
+        options:
+          snapshot_name: "home"

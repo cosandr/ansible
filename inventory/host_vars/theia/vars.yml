@@ -1,15 +1,15 @@
 ---
 
-root_disk: "/dev/disk/by-id/nvme-SAMSUNG_MZ1LB1T9HALS-00007_S436NC0R532548"
+root_disk: "/dev/disk/by-id/ata-SAMSUNG_MZ7LH960HAJR-00003_S4F4NA0M701202"
 
 web_root: "/var/www"
 pip_wheel_dir: "{{ web_root }}/pip"
 
-btrfs_subvols: []
-btrbk_volumes: []
-btrfs_scrub_targets: []
-btrfs_src: ""
-btrfs_root: ""
+btrfs_subvols:
+  - "@snapshots"
+  - "@/var/lib/libvirt/images"
+  - "@/mnt/kube"
+  - "@home/{{ my_user }}"
 
 prometheus_node_targets: ["{{ host_ips.vm + ':' + node_exporter_port | string }}"]
 
@@ -17,11 +17,7 @@ __unattended_package_blacklist_4:
   - ".*zfs.*"
   - ".*zpool.*"
 
-grub_config:
-  - regexp: '^GRUB_TIMEOUT'
-    line: "GRUB_TIMEOUT=2"
-  - regexp: '^GRUB_CMDLINE_LINUX'
-    line: GRUB_CMDLINE_LINUX="root=ZFS=rpool/ROOT/debian crashkernel=auto vfio-pci.ids=10de:2204,10de:1aef amd_pstate=passive"
+grub_cmdline_group: "vfio-pci.ids=10de:2204,10de:1aef amd_pstate=passive"
 
 ssh_conf_hosts: false
 

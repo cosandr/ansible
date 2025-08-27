@@ -2,62 +2,9 @@
 
 sanoid_version: master
 
-syncoid_timers:
-  - name: rpool
-    src: rpool
-    dest: tank/backup/theia/rpool
-    oncalendar: Daily
-    options:
-      - "--recursive"
-      - "--no-sync-snap"
-      - '--exclude-datasets=".*\\/var\\/(cache|log|tmp)"'
-      - '--exclude-datasets=".*\\/var\\/lib\\/containers"'
-      - '--exclude-datasets=".*\\/\\.cache$"'
-      - '--exclude-datasets="^rpool$"'
-      - '--exclude-datasets="^rpool\\/k8s$"'
-
 sanoid_timer_minutes: 30
 
 sanoid_backup_modules:
-  "rpool":
-    recursive: true
-    process_children_only: true
-    use_template: "main"
-
-  "rpool/home/andrei":
-    frequently: 0
-    hourly: 24
-    daily: 5
-    monthly: 2
-    yearly: 0
-    autosnap: true
-    autoprune: true
-
-  "rpool/home/andrei/.cache":
-    use_template: "ignore"
-
-  "rpool/home/backup/.cache":
-    use_template: "ignore"
-
-  "rpool/home/root/.cache":
-    use_template: "ignore"
-
-  "rpool/k8s":
-    use_template: "ignore"
-
-  "rpool/var/cache":
-    use_template: "ignore"
-
-  "rpool/var/log":
-    use_template: "ignore"
-
-  "rpool/var/tmp":
-    use_template: "ignore"
-
-  "rpool/var/lib/containers":
-    recursive: true
-    use_template: "ignore"
-
   "tank":
     recursive: true
     process_children_only: true
