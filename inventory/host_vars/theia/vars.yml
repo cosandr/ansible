@@ -13,6 +13,10 @@ btrfs_root: ""
 
 prometheus_node_targets: ["{{ host_ips.vm + ':' + node_exporter_port | string }}"]
 
+__unattended_package_blacklist_4:
+  - "*zfs*"
+  - "*zpool*"
+
 grub_config:
   - regexp: '^GRUB_TIMEOUT'
     line: "GRUB_TIMEOUT=2"
