@@ -18,8 +18,8 @@ __dnf_automatic_excludes_2:
   - "systemd*"
 
 __unattended_package_blacklist_2:
-  - "linux-image*"
-  - "systemd*"
+  - "linux-image.*"
+  - "systemd.*"
 
 unattended_origins_patterns:
   - "origin=*"

@@ -34,7 +34,9 @@ __dnf_automatic_excludes_3:
   - "libvirt*"
   - "qemu*"
 
-__unattended_package_blacklist_3: "{{ __dnf_automatic_excludes_3 }}"
+__unattended_package_blacklist_3:
+  - "libvirt.*"
+  - "qemu.*"
 
 intel_gvt_enabled: false
 
