@@ -5,7 +5,7 @@ domain: "{{ domains['hb'] }}"
 fstrim_timer_enabled: true
 
 # schedutil is best for amd_pstate while powersave is for intel_pstate
-cpupower_start_governor: "{{ 'schedutil' if inventory_hostname == 'theia' else 'powersave' }}"
+cpupower_start_governor: "{{ 'powersave' if inventory_hostname in groups['ms01'] else 'schedutil' }}"
 cpupower_stop_governor: "{{ cpupower_start_governor }}"
 
 cadvisor_port: 9101
