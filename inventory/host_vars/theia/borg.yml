@@ -20,9 +20,9 @@ borg_remote_repo_ip: "ssh://{{ borg_ssh_check_ip }}/."
 borg_ssh_check_general: "{{ borg_user }}@{{ inventory_hostname }}.{{ domain }}"
 borg_remote_repo_general: "ssh://{{ borg_ssh_check_general }}/."
 
-borg_syno_tank_passphrase: "{{ vault_borg_syno_tank_passphrase }}"
-borg_remote_tank_passphrase: "{{ vault_borg_remote_tank_passphrase }}"
-borg_cephfs_tank_passphrase: "{{ vault_borg_cephfs_tank_passphrase }}"
+__borg_rbd_vars:
+  pools: ["rbd.libvirt"]
+  temp_dir: "/mnt/tank/backup/temp"
 
 borg_backups:
   - name: "root-tank"
@@ -45,7 +45,7 @@ borg_backups:
   - name: "syno-tank"
     timer_description: "Backup tank to Synology every 10 days"
     oncalendar: "*-*-01,10,20 02:15:00"
-    passphrase: "{{ borg_syno_tank_passphrase }}"
+    passphrase: "{{ vault_borg_syno_tank_passphrase }}"
     target_host: "syno"
     archive_name: "tank"
     archive_path: "tank"
@@ -75,7 +75,7 @@ borg_backups:
   - name: "remote-tank"
     timer_description: "Backup tank to remote location every month"
     oncalendar: "*-*-04 00:12:00"
-    passphrase: "{{ borg_remote_tank_passphrase }}"
+    passphrase: "{{ vault_borg_remote_tank_passphrase }}"
     target_host: "romsto"
     # Need to manually update /boot/config/ssh/andrei.pubkeys
     ssh_dest_dir: "/home/andrei"
@@ -100,7 +100,7 @@ borg_backups:
   - name: "cephfs"
     timer_description: "Backup CephFS to tank every 7 days"
     oncalendar: "*-*-01/7 01:21:00"
-    passphrase: "{{ borg_cephfs_tank_passphrase }}"
+    passphrase: "{{ vault_borg_cephfs_tank_passphrase }}"
     archive_name: "cephfs"
     repo: "{{ borg_pool }}/cephfs"
     pre_run: |
@@ -119,3 +119,21 @@ borg_backups:
       - "--keep-weekly 2"
       - "--keep-monthly 3"
       - "--keep-yearly 1"
+
+  - name: "rbd-tank"
+    timer_description: "Backup RBD to tank every 7 days"
+    oncalendar: "*-*-03,10,17,24 02:00:00"
+    random_delay: "2h"
+    passphrase: "{{ vault_borg_rbd_passphrase }}"
+    archive_name: "rbd"
+    repo: "{{ borg_pool }}/rbd"
+    pre_run: |
+      {{ lookup('template', repo_base_dir + '/files/theia/pre_run_rbd.sh.j2', template_vars=__borg_rbd_vars) }}
+    post_run: |
+      cd /
+      rm -fv "$temp_export_dir"/*.raw
+    paths:
+      - "."
+    prune_args:
+      - "--keep-weekly 3"
+      - "--keep-monthly 2"

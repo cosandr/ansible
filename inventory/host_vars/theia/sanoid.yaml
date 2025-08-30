@@ -33,6 +33,9 @@ sanoid_backup_modules:
     recursive: true
     use_template: "prune_lts"
 
+  "tank/backup/temp":
+    use_template: "ignore"
+
 sanoid_backup_templates:
   "main":
     frequently: 0

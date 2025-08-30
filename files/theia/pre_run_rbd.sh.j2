@@ -1,0 +1,42 @@
+pools=(
+{% for p in pools %}
+    "{{ p }}"
+{% endfor %}
+)
+snap_name="temp-backup"
+# qemu-img convert cannot output to stdout
+# https://www.mail-archive.com/qemu-discuss@nongnu.org/msg05176.html
+temp_export_dir="{{ temp_dir }}"
+
+{% raw %}
+if [[ ! -d $temp_export_dir ]]; then
+    echo "$temp_export_dir does not exist"
+    exit 1
+fi
+
+echo "Using temporary dir $temp_export_dir"
+
+rm -fv "$temp_export_dir"/*.raw
+
+# TODO: parallelize?
+# https://stackoverflow.com/questions/17307800/how-to-run-given-function-in-bash-in-parallel/17316302#17316302
+for p in "${pools[@]}"; do
+    # ["localgw01-root01"]
+    rbd -p "$p" ls --format json | jq -r '.[]' | while read -r name; do
+        # [{"id":3,"name":"test","size":10737418240,"protected":"false","timestamp":"Sat Aug 30 17:52:50 2025"}]
+        snaps="$(rbd -p "$p" snap ls "$name" --format json)"
+        if [[ "$(jq "map(select(.name==\"$snap_name\")) | length" <<< "$snaps")" -gt 0 ]]; then
+            echo "Deleting existing temp snap for $name"
+            rbd -p "$p" snap rm "${name}@${snap_name}"
+        fi
+        echo "Creating temp snap for $name"
+        rbd -p "$p" snap create "${name}@${snap_name}"
+        echo "Writing disk to ${name}.raw"
+        qemu-img convert -p -f rbd "rbd:${p}/${name}@${snap_name}" -O raw "${temp_export_dir}/${name}.raw"
+        echo "Deleting temp snap for $name"
+        rbd -p "$p" snap rm "${name}@${snap_name}"
+    done
+done
+
+cd "$temp_export_dir" || exit 1
+{% endraw %}
