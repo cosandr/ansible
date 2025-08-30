@@ -1,0 +1,8 @@
+---
+
+nfs_shares: "{{ group_nfs_shares + (host_nfs_shares | default([])) }}"
+group_nfs_shares:
+  - path: /mnt/ceph/andrei
+    options: "rw,root_squash,no_subtree_check"
+    sources: "{{ firewall_trusted_sources }}"
+    gen_uuid: true

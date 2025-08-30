@@ -80,6 +80,8 @@ __firewalld_services_2:
   - name: ssh
     zone: san
     sources: "{{ subnets.san.hosts }}"
+    # Ceph group creates a cluster zone which allows SSH between hosts
+    state: "{{ ('ceph' in group_names) | ternary('absent', 'present') }}"
 
 __firewall_rules_2:
   - port: "{{ nvme_exporter_port }}"

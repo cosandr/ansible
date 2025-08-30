@@ -1,0 +1,10 @@
+---
+
+prometheus_node_labels:
+  cluster: "ceph"
+  instance: "{{ inventory_hostname }}"
+
+__unattended_package_blacklist_4:
+  - "podman.*"
+  - "container.*"
+  - "crun.*"

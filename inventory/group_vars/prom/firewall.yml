@@ -52,3 +52,8 @@ firewall_rules:
   # Loki sends alerts too
   - port: "{{ alertmanager_port }}"
     sources: "{{ subnets.vm.loki }}"
+  # Ceph
+  - port: "{{ prometheus_port }}"
+    sources: "{{ subnets.vm.hosts }}"
+  - port: "{{ alertmanager_port }}"
+    sources: "{{ subnets.vm.hosts }}"

@@ -203,6 +203,12 @@ nextcloud01 host_num=0 vm_host=rhea
 [nextcloud:vars]
 host_subnet=nextcloud
 
+[ceph:children]
+kvm_hv
+
+[ceph:vars]
+ansible_group_priority=3
+
 [rom]
 romsto  ansible_host=10.1.0.6  host_wg_subnet=rom host_wg_num=0
 rompi   ansible_host=10.1.0.3  host_wg_subnet=rom host_wg_num=1

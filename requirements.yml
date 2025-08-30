@@ -14,6 +14,9 @@ collections:
     version: ">=1.3"
   - name: hifis.toolkit
     version: '>4.0,<5.0'
+  - name: https://github.com/ceph/ceph.automation.git
+    type: git
+    version: main
 
 roles:
   # https://www.jeffgeerling.com/blog/2023/ansible-galaxy-error-unable-compare-role-versions

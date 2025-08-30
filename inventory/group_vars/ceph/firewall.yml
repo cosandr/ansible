@@ -1,0 +1,50 @@
+---
+
+firewalld_default_zone: cluster
+
+__firewalld_zones_3:
+  - name: cluster
+    sources: "{{ subnets.san.hosts }}"
+
+__firewalld_services_3:
+  - name: ssh
+    zone: cluster
+
+  - name: nfs3
+    zone: cluster
+
+  - name: nfs3
+    zone: public
+
+  - name: nfs3
+    zone: san
+
+  - name: ceph
+    zone: san
+
+  - name: ceph-mon
+    zone: san
+
+  # GW has no reason to access Ceph itself
+  - name: ceph
+    zone: san
+    action: drop
+    sources: "{{ subnets.san.localgw }}"
+
+  - name: ceph-mon
+    zone: san
+    action: drop
+    sources: "{{ subnets.san.localgw }}"
+
+__firewall_rules_3:
+  - port: "{{ ceph_exporter_port }}"
+    zone: public
+    sources: "{{ node_exporter_allow_ips }}"
+
+  - port: "{{ rgw_frontend_port }}"
+    zone: san
+    sources: "{{ subnets.san.localgw }}"
+
+  - port: "{{ ceph_dashboard_port }}"
+    zone: san
+    sources: "{{ subnets.san.localgw }}"

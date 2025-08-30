@@ -1,0 +1,561 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Ceph host preparation
+  hosts: ceph
+  gather_facts: true
+  gather_subset: ["min"]
+  tags: ["system"]
+  tasks:
+    - name: Download Ceph GPG key
+      ansible.builtin.get_url:
+        url: https://eu.ceph.com/keys/release.gpg
+        dest: /etc/apt/keyrings/ceph-keyring.gpg
+        owner: root
+        group: root
+        mode: "0644"
+      diff: false
+      tags: ["apt"]
+
+    - name: Add Ceph repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/ceph-keyring.gpg] https://eu.ceph.com/debian-{{ ceph_version }} {{ ansible_distribution_release | lower }} main"
+        state: present
+        filename: ceph
+      tags: ["apt"]
+
+    - name: Prefer repo packages
+      ansible.builtin.copy:
+        content: |
+          Package: *
+          Pin: origin ceph.com
+          Pin-Priority: 900
+        dest: "/etc/apt/preferences.d/99ceph"
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["apt"]
+
+    # Might not work, dpkg-divert should work if this doesn't
+    - name: Prevent ceph-common logrotate file from being installed
+      ansible.builtin.copy:
+        content: |
+          path-exclude /etc/logrotate.d/ceph-common
+        dest: /etc/dpkg/dpkg.cfg.d/99-no-ceph-common
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["apt"]
+
+    - name: Install Ceph packages
+      ansible.builtin.apt:
+        name:
+          - cephadm
+          - ceph-common
+        state: present
+      tags: ["install"]
+
+- name: Configure Ceph
+  hosts: ceph
+  gather_facts: false
+  run_once: true
+  tasks:
+    - name: Check if cluster exists
+      ansible.builtin.stat:
+        path: "/etc/ceph/ceph.client.admin.keyring"
+      register: __ceph_exists
+      tags: ["bootstrap"]
+
+    - name: Bootstrap cluster
+      ceph.automation.cephadm_bootstrap:
+        mon_ip: "{{ host_ips.san }}"
+        skip_monitoring_stack: true
+        log_to_file: true
+      when: not __ceph_exists.stat.exists
+      notify: Create dashboard ssl cert
+      tags: ["bootstrap"]
+
+    - name: Set config values
+      ceph.automation.ceph_config:
+        action: set
+        who: "{{ item.who | default('global') }}"
+        option: "{{ item.option }}"
+        value: "{{ item.value }}"
+      loop: "{{ ceph_config }}"
+      tags: ["config"]
+
+    - name: Enable Prometheus
+      ceph.automation.ceph_mgr_module:
+        name: prometheus
+        state: enable
+      tags: ["mgr", "prometheus"]
+
+    - name: Get alertmanager API host
+      check_mode: false
+      changed_when: false
+      ansible.builtin.command:
+        cmd: ceph dashboard get-alertmanager-api-host
+      register: __alertmanager_host
+      tags: ["prometheus"]
+
+    - name: Set alertmanager API host  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: "ceph dashboard set-alertmanager-api-host {{ ceph_alertmanager_api_host }}"
+      when: __alertmanager_host.stdout != ceph_alertmanager_api_host
+      tags: ["prometheus"]
+
+    - name: Get prometheus API host
+      check_mode: false
+      changed_when: false
+      ansible.builtin.command:
+        cmd: ceph dashboard get-prometheus-api-host
+      register: __prometheus_host
+      tags: ["prometheus"]
+
+    - name: Set prometheus API host  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: "ceph dashboard set-prometheus-api-host {{ ceph_prometheus_api_host }}"
+      when: __prometheus_host.stdout != ceph_prometheus_api_host
+      tags: ["prometheus"]
+
+    - name: Read Ceph SSH key
+      ansible.builtin.slurp:
+        path: /etc/ceph/ceph.pub
+      register: __ceph_ssh
+      tags: ["ssh"]
+
+    - name: Ensure Ceph SSH key exists for root
+      run_once: false
+      ansible.posix.authorized_key:
+        user: root
+        key: "{{ __ceph_ssh.content | b64decode }}"
+        state: present
+      tags: ["ssh"]
+
+    - name: Add hosts
+      # Need to run on same host as bootstrap did
+      # Error initializing cluster client: ObjectNotFound('RADOS object not found (error calling conf_read_file)')
+      # MODULE FAILURE: No start of json char found
+      delegate_to: "{{ ansible_play_batch | first }}"
+      run_once: false
+      throttle: 1
+      ceph.automation.ceph_orch_host:
+        name: "{{ inventory_hostname }}"
+        address: "{{ host_ips.san }}"
+        set_admin_label: true
+        labels: "{{ ['mon'] if inventory_hostname in ['theia', 'aegir', 'rhea'] else omit }}"
+      tags: ["host"]
+
+    - name: Wipe disk
+      run_once: false
+      tags: ["zap"]
+      when: "'zap' in ansible_run_tags"
+      block:
+        - name: Wait for confirmation
+          ansible.builtin.pause:
+            prompt: "Are you sure?"
+
+        - name: Wipe SSD  # noqa no-changed-when
+          ansible.builtin.shell:
+            cmd: |
+              set -e
+              if ! cephadm shell ceph-volume lvm zap "$disk"; then
+                wipefs --all "$disk"
+                /usr/bin/dd if=/dev/zero of="$disk" bs=1M count=10 conv=fsync
+              fi
+          environment:
+            disk: "{{ item }}"
+          loop:
+            - /dev/mapper/cephssd01
+            # - /dev/mapper/cephssd02
+
+    - name: Get host OSDs
+      run_once: false
+      check_mode: false
+      changed_when: false
+      ansible.builtin.command:
+        cmd: "ceph device ls-by-host {{ inventory_hostname }} -f json"
+      # Retry a bit in case host was just added
+      retries: 5
+      delay: 10
+      register: __osd_info
+      tags: ["osd"]
+
+    - name: Set OSD info fact
+      run_once: false
+      ansible.builtin.set_fact:
+        osd_info: "{{ __osd_info.stdout | from_json }}"
+      tags: ["osd"]
+
+    - name: Create OSDs
+      run_once: false
+      throttle: 1
+      ansible.builtin.command:
+        cmd: "ceph orch daemon add osd {{ inventory_hostname }}:{{ item }} raw"
+      register: output
+      changed_when: "'Created osd' in output.stdout"
+      loop:
+        - /dev/mapper/cephssd01
+        # - /dev/mapper/cephssd02
+      tags: ["osd"]
+
+    - name: Apply MDS
+      ceph.automation.ceph_orch_apply:
+        spec: |
+          service_type: mds
+          service_id: cephfs
+          placement:
+            count: 2
+      tags: ["mds"]
+
+    - name: Create replicated CRUSH rule
+      ceph.automation.ceph_crush_rule:
+        name: "replicated_host_ssd"
+        state: present
+        rule_type: replicated
+        device_class: ssd
+        bucket_root: default
+        bucket_type: host
+      tags: ["crush"]
+
+    - name: Create EC profile
+      ceph.automation.ceph_ec_profile:
+        name: ec_host_ssd32
+        k: 3
+        m: 2
+        crush_device_class: ssd
+        crush_failure_domain: host
+      tags: ["crush"]
+
+    - name: Create pools
+      ceph.automation.ceph_pool:
+        name: "{{ item.name }}"
+        state: "{{ item.state | default('present') }}"
+        application: "{{ item.application }}"
+        pool_type: "{{ item.pool_type }}"
+        rule_name: "{{ item.rule_name | default(omit) }}"
+        erasure_profile: "{{ item.erasure_profile | default(omit) }}"
+      loop: "{{ ceph_pools }}"
+      loop_control:
+        label: "{{ item.name }}"
+      tags: ["pool", "create"]
+
+    - name: Get pool info
+      check_mode: false
+      changed_when: false
+      ansible.builtin.command:
+        cmd: ceph osd pool ls detail -f json
+      register: __pool_info
+      tags: ["pool"]
+
+    - name: Set pool info fact
+      ansible.builtin.set_fact:
+        pool_info: "{{ __pool_info.stdout | from_json }}"
+      tags: ["pool"]
+
+    # TODO: Cannot unset/disable ZSTD or EC overwrites
+    - name: Set facts for updating pool options
+      ansible.builtin.set_fact:
+        pool_set_options: >-
+          {%- set tmp = [] -%}
+          {%- set zstd_compressed_pools = ceph_pools | selectattr('zstd_compression', 'defined') | selectattr('zstd_compression', 'eq', true) | map(attribute='name') -%}
+          {%- set ec_allow_override_pools = ceph_pools | selectattr('ec_overwrites', 'defined') | selectattr('ec_overwrites', 'eq', true) | map(attribute='name') -%}
+          {%- for pool in pool_info if pool.pool_name in zstd_compressed_pools -%}
+          {%- if pool.options.get("compression_algorithm", None) != "zstd" -%}
+          {{- tmp.append({"name": pool.pool_name, "option": "compression_algorithm", "value": "zstd"}) -}}
+          {%- endif -%}
+          {%- if pool.options.get("compression_mode", None) != "aggressive" -%}
+          {{- tmp.append({"name": pool.pool_name, "option": "compression_mode", "value": "aggressive"}) -}}
+          {%- endif -%}
+          {%- endfor -%}
+          {%- for pool in pool_info if pool.pool_name in ec_allow_override_pools -%}
+          {%- if "ec_overwrites" not in pool.flags_names -%}
+          {{- tmp.append({"name": pool.pool_name, "option": "allow_ec_overwrites", "value": "true"}) -}}
+          {%- endif -%}
+          {%- endfor -%}
+          {{ tmp }}
+      tags: ["pool"]
+
+    - name: Set Ceph pool options  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: "ceph osd pool set {{ item.name }} {{ item.option }} {{ item.value }}"
+      loop: "{{ pool_set_options }}"
+      tags: ["pool"]
+
+    # ceph.automation.ceph_fs doesn't support --force which is required for EC
+    - name: Create CephFS
+      ansible.builtin.command:
+        cmd: ceph fs new cephfs cephfs.meta cephfs.data --force
+      changed_when: "'new fs' in __out.stdout"
+      register: __out
+      tags: ["cephfs"]
+
+    - name: Enable snapshot module
+      ceph.automation.ceph_mgr_module:
+        name: snap_schedule
+        state: enable
+      tags: ["cephfs", "snapshot"]
+
+    - name: Configure snapshots
+      andrei.utils.ceph_fs_snap_schedule:
+        fs: "{{ item.fs }}"
+        state: "{{ item.state | default('present') }}"
+        schedule: "{{ item.schedule | default(omit) }}"
+        path: "{{ item.path }}"
+        retention: "{{ item.retention }}"
+      loop: "{{ cephfs_snap_schedules }}"
+      tags: ["cephfs", "snapshot"]
+
+    - name: Deploy RGW service
+      ceph.automation.ceph_orch_apply:
+        spec: "{{ lookup('template', repo_base_dir + '/files/ceph/rgw-main.yml.j2') }}"
+      tags: ["rgw"]
+
+    - name: Get RGW zonegroup placement info
+      check_mode: false
+      changed_when: false
+      ansible.builtin.command:
+        cmd: radosgw-admin zonegroup placement list
+      # Retry a bit in case RGW service was just deployed
+      retries: 5
+      delay: 10
+      register: __zonegroup_info
+      tags: ["rgw"]
+
+    - name: Get RGW zone placement info
+      check_mode: false
+      changed_when: false
+      ansible.builtin.command:
+        cmd: radosgw-admin zone placement list
+      register: __zone_info
+      tags: ["rgw"]
+
+    - name: Set RGW info fact
+      ansible.builtin.set_fact:
+        zonegroup_info: "{{ __zonegroup_info.stdout | from_json | items2dict(key_name='key', value_name='val') }}"
+        zone_info: "{{ __zone_info.stdout | from_json | items2dict(key_name='key', value_name='val') }}"
+      tags: ["rgw"]
+
+    - name: Add missing zonegroup placements  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: "radosgw-admin zonegroup placement add --rgw-zonegroup default --placement-id ssd"
+      when: "'ssd' not in zonegroup_info"
+      tags: ["rgw"]
+
+    - name: Add missing zone placements  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: >-
+          radosgw-admin zone placement add
+          --rgw-zone default
+          --placement-id ssd
+          --data-pool default.rgw.data
+          --index-pool default.rgw.index
+          --data-extra-pool default.rgw.non-ec
+          --compression zstd
+      when: "'ssd' not in zone_info"
+      tags: ["rgw"]
+
+    - name: Set default placement zone to ssd  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: radosgw-admin zonegroup placement default --rgw-zonegroup default --placement-id ssd
+      when: "'default-placement' in zonegroup_info or 'default-placement' in zone_info"
+      tags: ["rgw"]
+
+    - name: Remove default-placement zonegroup placement  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: radosgw-admin zonegroup placement rm --placement-id default-placement
+      when: "'default-placement' in zonegroup_info"
+      tags: ["rgw"]
+
+    - name: Remove default-placement zone placement  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: radosgw-admin zone placement rm --placement-id default-placement
+      when: "'default-placement' in zone_info"
+      tags: ["rgw"]
+
+    - name: Get default pool crush rules
+      check_mode: false
+      changed_when: false
+      ansible.builtin.command:
+        cmd: "ceph osd pool get {{ item }} crush_rule -f json"
+      loop:
+        - default.rgw.control
+        - default.rgw.log
+        - default.rgw.meta
+        - .rgw.root
+        - .mgr
+      register: __default_pool_info
+      failed_when:
+        - __default_pool_info.rc != 0
+        - "'unrecognized pool' not in __default_pool_info.stderr"
+      tags: ["pool", "default"]
+
+    - name: Set fact for default pools that must be changed
+      ansible.builtin.set_fact:
+        default_pool_change_crush: >-
+          {%- set tmp = [] -%}
+          {%- for item in __default_pool_info.results if item.rc == 0 -%}
+          {%- if (item.stdout | from_json).crush_rule != "replicated_host_ssd" -%}
+          {{- tmp.append(item.item) -}}
+          {%- endif -%}
+          {%- endfor -%}
+          {{ tmp }}
+      tags: ["pool", "default"]
+
+    - name: Set default pool CRUSH rule to replicated_host_ssd  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: "ceph osd pool set {{ item }} crush_rule replicated_host_ssd"
+      loop: "{{ default_pool_change_crush }}"
+      tags: ["pool", "default"]
+
+    - name: Get .mgr pool info
+      check_mode: false
+      changed_when: false
+      ansible.builtin.command:
+        cmd: ceph osd pool get .mgr all -f json
+      register: __mgr_info
+      tags: ["pool", ".mgr"]
+
+    - name: Set .mgr pool info fact
+      ansible.builtin.set_fact:
+        mgr_info: "{{ __mgr_info.stdout | from_json }}"
+      tags: ["pool", ".mgr"]
+
+    - name: Ensure .mgr has at least 8 PGs # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: "ceph osd pool set .mgr {{ item }} 8"
+      loop:
+        - pg_num
+        - pg_num_min
+      when: mgr_info[item] < 8
+      tags: ["pool", ".mgr"]
+
+    - name: Ensure keys exist
+      ceph.automation.ceph_key:
+        name: "{{ item.name }}"
+        state: present
+        caps: "{{ item.caps }}"
+        secret: "{{ item.secret | default(omit) }}"
+      loop: "{{ ceph_keys }}"
+      tags: ["keys"]
+
+    - name: Get key info
+      check_mode: false
+      changed_when: false
+      ansible.builtin.command:
+        cmd: "ceph auth get {{ item.name }}"
+      register: key_info
+      loop: "{{ ceph_keys | selectattr('no_write_host', 'undefined') }}"
+      tags: ["keys"]
+
+    - name: Write keys to file
+      run_once: false
+      ansible.builtin.copy:
+        content: "{{ item.stdout }}\n"
+        dest: "/etc/ceph/ceph.{{ item.item.name }}.keyring"
+        owner: root
+        group: root
+        mode: "0600"
+      loop: "{{ key_info.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+      tags: ["keys"]
+
+    - name: Write key config to ceph.conf
+      run_once: false
+      ansible.builtin.blockinfile:
+        dest: /etc/ceph/ceph.conf
+        marker: "# {mark} {{ item.name }}"
+        content: |
+          [{{ item.name }}]
+          {{ item.config }}
+      loop: "{{ ceph_keys | selectattr('config', 'defined') }}"
+      tags: ["keys", "config"]
+
+    # https://ceph-users.ceph.narkive.com/5HuYT7zp/data-pool-option-for-qemu-img-ec-pool
+    - name: Add custom block to config
+      run_once: false
+      ansible.builtin.blockinfile:
+        dest: /etc/ceph/ceph.conf
+        marker: "# {mark} custom config"
+        content: |
+          [client]
+          rbd_default_data_pool = rbd.libvirt.data
+      tags: ["ceph.conf"]
+
+  handlers:
+    - name: Create dashboard ssl cert  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: ceph dashboard create-self-signed-cert
+      notify: Restart manager
+
+    - name: Restart manager  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: ceph mgr fail mgr
+      notify: Restart manager
+
+- name: Host configuration
+  hosts: ceph
+  gather_facts: false
+  tags: ["host-config"]
+  tasks:
+    - name: Mount CephFS
+      ansible.posix.mount:
+        src: hv@.cephfs=/
+        path: /mnt/ceph
+        fstype: ceph
+        opts: "noatime,nofail,x-systemd.device-timeout=30"
+        state: mounted
+      tags: ["cephfs", "mount"]
+
+    - name: Create my user
+      ansible.builtin.user:
+        name: "{{ my_user }}"
+        password: "{{ my_user_pass }}"
+        shell: "/usr/bin/zsh"
+        home: "/mnt/ceph/{{ my_user }}"
+        create_home: true
+        groups: wheel
+        append: true
+        uid: 1000
+      tags: ["user"]
+
+    - name: Configure user SSH keys
+      run_once: true
+      ansible.posix.authorized_key:
+        user: "{{ my_user }}"
+        key: "{{ ssh_authorized_keys | join('\n') }}"
+        state: present
+        exclusive: true
+      tags: ["user", "ssh"]
+
+- name: Configure other stuff
+  hosts: ceph
+  tasks:
+    - name: Disable keepalived
+      ansible.builtin.systemd:
+        name: keepalived.service
+        state: stopped
+        enabled: false
+      register: __svc
+      failed_when:
+        - __svc.failed
+        - "'Could not find the requested service' not in __svc.msg"
+      when: inventory_hostname not in keepalived_hosts
+      tags: ["keepalived"]
+
+    - name: Remove keepalived config
+      ansible.builtin.file:
+        path: "/etc/keepalived/keepalived.conf"
+        state: absent
+      when: inventory_hostname not in keepalived_hosts
+      tags: ["keepalived"]
+
+    # Use include to avoid crash due to invalid keepalived_instances on some hosts
+    - name: Include keepalived role
+      ansible.builtin.include_role:
+        name: keepalived
+        apply:
+          tags: ["keepalived"]
+      when: inventory_hostname in keepalived_hosts
+      tags: ["keepalived"]

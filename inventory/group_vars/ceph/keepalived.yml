@@ -1,0 +1,52 @@
+---
+
+# Limit to 3 so we avoid split brain, hopefully
+keepalived_hosts: "{{ groups['ceph'][:3] }}"
+
+keepalived_global_defs:
+  - enable_script_security
+
+keepalived_scripts:
+  check_nfs_cephfs:
+    check_script: "/etc/keepalived/check_nfs_cephfs.sh"
+    src_check_script: "{{ repo_base_dir }}/files/ceph/check_nfs_cephfs.sh"
+    user: root
+
+keepalived_selinux_compile_rules: []
+
+keepalived_instances:
+  nfs_general:
+    interface: "GENERAL"
+    state: "{{ (keepalived_hosts | ansible.utils.index_of('eq', inventory_hostname) == 1) | ternary('MASTER', 'BACKUP') }}"
+    virtual_router_id: 51
+    priority: "{{ (inventory_hostname == keepalived_hosts[1]) | ternary('200', '100') }}"
+    unicast_src_ip: "{{ host_ips.general }}"
+    unicast_peers: "{{ keepalived_hosts | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='general') | list }}"
+    authentication_password: "{{ vault_keepalived_authentication_password }}"
+    vips: "{{ vips_with_prefix.general.ceph_nfs | map('regex_replace', '$', ' dev GENERAL') }}"
+    track_scripts:
+      - check_nfs_cephfs
+
+  nfs_vm:
+    interface: "VM"
+    state: "{{ (keepalived_hosts | ansible.utils.index_of('eq', inventory_hostname) == 2) | ternary('MASTER', 'BACKUP') }}"
+    virtual_router_id: 52
+    priority: "{{ (inventory_hostname == keepalived_hosts[2]) | ternary('200', '100') }}"
+    unicast_src_ip: "{{ host_ips.vm }}"
+    unicast_peers: "{{ keepalived_hosts | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='vm') | list }}"
+    authentication_password: "{{ vault_keepalived_authentication_password }}"
+    vips: "{{ vips_with_prefix.vm.ceph_nfs | map('regex_replace', '$', ' dev VM') }}"
+    track_scripts:
+      - check_nfs_cephfs
+
+  nfs_san:
+    interface: "SAN"
+    state: "{{ (keepalived_hosts | ansible.utils.index_of('eq', inventory_hostname) == 0) | ternary('MASTER', 'BACKUP') }}"
+    virtual_router_id: 53
+    priority: "{{ (inventory_hostname == keepalived_hosts[0]) | ternary('200', '100') }}"
+    unicast_src_ip: "{{ host_ips.san }}"
+    unicast_peers: "{{ keepalived_hosts | difference([inventory_hostname]) | map('extract', hostvars, 'host_ips') | map(attribute='san') | list }}"
+    authentication_password: "{{ vault_keepalived_authentication_password }}"
+    vips: "{{ vips_with_prefix.san.ceph_nfs | map('regex_replace', '$', ' dev SAN') }}"
+    track_scripts:
+      - check_nfs_cephfs

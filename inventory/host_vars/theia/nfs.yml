@@ -1,7 +1,7 @@
 ---
 
 # MacOS needs to mount with -o resvport or share needs insecure option
-nfs_shares:
+host_nfs_shares:
   # Backup shares
   - path: /mnt/tank/backup/pgsql
     options: "rw,no_root_squash,no_subtree_check"
