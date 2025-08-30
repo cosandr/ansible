@@ -131,7 +131,10 @@ borg_backups:
       {{ lookup('template', repo_base_dir + '/files/theia/pre_run_rbd.sh.j2', template_vars=__borg_rbd_vars) }}
     post_run: |
       cd /
-      rm -fv "$temp_export_dir"/*.raw
+      for p in "${pools[@]}"; do
+        echo "Deleting temporary dir for pool $p"
+        rm -rf "${temp_export_dir:?}/$p"
+      done
     paths:
       - "."
     prune_args:

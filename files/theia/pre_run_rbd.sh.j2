@@ -1,42 +1,72 @@
-pools=(
+declare -a pools=()
+declare -a check_pools=(
 {% for p in pools %}
     "{{ p }}"
 {% endfor %}
 )
+
 snap_name="temp-backup"
 # qemu-img convert cannot output to stdout
 # https://www.mail-archive.com/qemu-discuss@nongnu.org/msg05176.html
 temp_export_dir="{{ temp_dir }}"
+num_jobs=4
+global_exit=0
 
 {% raw %}
-if [[ ! -d $temp_export_dir ]]; then
+if [[ ! -d "${temp_export_dir:?}" ]]; then
     echo "$temp_export_dir does not exist"
+    exit 1
+fi
+
+for p in "${check_pools[@]}"; do
+    if rbd -p "$p" ls &>/dev/null; then
+        pools+=("$p")
+    else
+        echo "WARN: cannot backup $p: not found"
+        global_exit=1
+    fi
+done
+
+if [[ ${#pools[@]} -eq 0 ]]; then
+    echo "No valid RBD pools found"
     exit 1
 fi
 
 echo "Using temporary dir $temp_export_dir"
 
-rm -fv "$temp_export_dir"/*.raw
+run_cmd() {
+    "$@"
+    local tmp_exit=$?
+    global_exit=$(( tmp_exit > global_exit ? tmp_exit : global_exit ))
+    return $tmp_exit
+}
 
-# TODO: parallelize?
-# https://stackoverflow.com/questions/17307800/how-to-run-given-function-in-bash-in-parallel/17316302#17316302
+export_disk() {
+    local p="$1"
+    local name="$2"
+    # [{"id":3,"name":"test","size":10737418240,"protected":"false","timestamp":"Sat Aug 30 17:52:50 2025"}]
+    if [[ "$(rbd -p "$p" snap ls "$name" --format json | jq "map(select(.name==\"$snap_name\")) | length")" -gt 0 ]]; then
+        echo "Deleting existing temp snap for $name"
+        run_cmd rbd -p "$p" snap rm "${name}@${snap_name}"
+    fi
+    echo "Creating temp snap for $name"
+    run_cmd rbd -p "$p" snap create "${name}@${snap_name}"
+    echo "Writing disk to ${name}.raw"
+    run_cmd qemu-img convert -f rbd "rbd:${p}/${name}@${snap_name}" -O raw "${pool_temp_dir}/${name}.raw"
+    echo "Deleting temp snap for $name"
+    run_cmd rbd -p "$p" snap rm "${name}@${snap_name}"
+}
+
 for p in "${pools[@]}"; do
-    # ["localgw01-root01"]
-    rbd -p "$p" ls --format json | jq -r '.[]' | while read -r name; do
-        # [{"id":3,"name":"test","size":10737418240,"protected":"false","timestamp":"Sat Aug 30 17:52:50 2025"}]
-        snaps="$(rbd -p "$p" snap ls "$name" --format json)"
-        if [[ "$(jq "map(select(.name==\"$snap_name\")) | length" <<< "$snaps")" -gt 0 ]]; then
-            echo "Deleting existing temp snap for $name"
-            rbd -p "$p" snap rm "${name}@${snap_name}"
-        fi
-        echo "Creating temp snap for $name"
-        rbd -p "$p" snap create "${name}@${snap_name}"
-        echo "Writing disk to ${name}.raw"
-        qemu-img convert -p -f rbd "rbd:${p}/${name}@${snap_name}" -O raw "${temp_export_dir}/${name}.raw"
-        echo "Deleting temp snap for $name"
-        rbd -p "$p" snap rm "${name}@${snap_name}"
-    done
+    pool_temp_dir="$temp_export_dir/$p"
+    [[ -d "$pool_temp_dir" ]] && rm -rf "$pool_temp_dir"
+    mkdir "$pool_temp_dir"
+    while read -r name; do
+        [[ "$(jobs | wc -l)" -ge $num_jobs ]] && wait -n
+        export_disk "$p" "$name" &
+    done < <(rbd -p "$p" ls --format json | jq -r '.[]')
 done
+wait
 
 cd "$temp_export_dir" || exit 1
 {% endraw %}
