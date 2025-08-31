@@ -137,6 +137,9 @@ borg_backups:
       done
     paths:
       - "."
+    create_args:
+      - "--list"
+      - "--filter=AME"
     prune_args:
       - "--keep-weekly 3"
       - "--keep-monthly 2"
