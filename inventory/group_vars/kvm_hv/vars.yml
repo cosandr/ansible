@@ -18,6 +18,8 @@ nvme_exporter_listen_address: "{{ host_ips.vm }}:{{ nvme_exporter_port }}"
 prometheus_smartctl_targets: ["{{ smartctl_exporter_listen_address }}"]
 prometheus_nvme_targets: ["{{ nvme_exporter_listen_address }}"]
 
+libvirt_ceph_secret_uuid: "{{ ['client.libvirt', inventory_hostname] | to_uuid }}"
+
 btrfs_src: "LABEL=DEBIAN-BTRFS"
 swapfile_path: ""
 btrfs_nocow_paths:

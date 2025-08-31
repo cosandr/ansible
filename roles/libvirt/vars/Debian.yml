@@ -5,7 +5,8 @@ libvirt_guests_config: "/etc/default/libvirt-guests"
 libvirt_pkgs:
   - guestfs-tools
   - libvirt-daemon
+  - libvirt-daemon-driver-storage-rbd
   - python3-libvirt
   - qemu-kvm
-  - virtinst
   - virt-manager
+  - virtinst

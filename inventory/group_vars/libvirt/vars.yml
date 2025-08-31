@@ -51,6 +51,16 @@ vm_seclabel_options:
 vm_data_disks: []
 # vm_data_disks: ["200G", "150G"]
 
+vm_rbd_auth:
+  username: libvirt
+  type: ceph
+  usage: "client.libvirt secret"
+
+vm_rbd_root_enabled: false
+vm_rbd_pool: "rbd.libvirt"
+vm_rbd_hosts_list: "{{ groups['ceph_mon'] | map('extract', hostvars, 'host_ips') | map(attribute='san') | list }}"
+vm_rbd_data_disks: []
+
 vm_root_size: "20G"
 vm_root_disk:
   name: '{{ inventory_hostname }}-root01.{{ vm_disk_format }}'
@@ -63,6 +73,22 @@ vm_root_disk:
   create_volume: true
   # https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/1677398
   type: file
+  driver_options:
+    discard: "unmap"
+
+vm_root_disk_rbd:
+  name: '{{ inventory_hostname }}-root01'
+  type: network
+  format: "raw"
+  capacity: "{{ vm_root_size }}"
+  copy_image: "{{ vm_rbd_pool }}/{{ (vm_template | split('.'))[0] }}"
+  serial: "root01"
+  auth: "{{ vm_rbd_auth }}"
+  source:
+    protocol: rbd
+    port: 3300
+    name: "{{ vm_rbd_pool }}/{{ inventory_hostname }}-root01"
+    hosts_list: "{{ vm_rbd_hosts_list }}"
   driver_options:
     discard: "unmap"
 
@@ -99,7 +125,7 @@ vm_default_definition:
   vcpus: "{{ vm_cpus }}"
   boot_firmware: efi
   os_id: "{{ vm_os_id }}"
-  volumes: "{{ [vm_root_disk] + vm_extra_disks }}"
+  volumes: "{{ [vm_root_disk_rbd if vm_rbd_root_enabled else vm_root_disk] + vm_extra_disks }}"
   interfaces: "{{ vm_nics }}"
   mdev_uuids: "{{ vm_mdev_uuids }}"
   pci_devices: "{{ vm_pci_devices }}"

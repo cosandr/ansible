@@ -46,3 +46,26 @@
       ansible.builtin.file:
         path: "/var/log/libvirt/qemu/{{ inventory_hostname }}.log"
         state: absent
+
+    - name: Delete RBD volumes
+      tags: ["rbd"]
+      when:
+        - delete_storage | bool
+        - vm_rbd_root_enabled or vm_rbd_data_disks | length > 0
+      delegate_to: "{{ vm_host }}"
+      block:
+        - name: Get images in RBD pool
+          check_mode: false
+          changed_when: false
+          ansible.builtin.command:
+            cmd: "rbd -p {{ vm_rbd_pool }} ls --format json"
+          register: __rbd_ls
+
+        - name: Set fact for present images in RBD pool
+          ansible.builtin.set_fact:
+            rbd_ls: "{{ __rbd_ls.stdout | from_json }}"
+
+        - name: Delete RBD images  # noqa no-changed-when
+          ansible.builtin.command:
+            cmd: "rbd -p {{ vm_rbd_pool }} rm {{ item }}"
+          loop: "{{ rbd_ls | select('match', '^' + inventory_hostname + '-(root|data)\\d+') }}"

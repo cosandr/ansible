@@ -143,7 +143,7 @@
         name: "{{ inventory_hostname }}"
         address: "{{ host_ips.san }}"
         set_admin_label: true
-        labels: "{{ ['mon'] if inventory_hostname in ['theia', 'aegir', 'rhea'] else omit }}"
+        labels: "{{ ['mon'] if 'ceph_mon' in group_names else omit }}"
       tags: ["host"]
 
     - name: Wipe disk
@@ -481,7 +481,7 @@
         content: |
           [client]
           rbd_default_data_pool = rbd.libvirt.data
-      tags: ["ceph.conf"]
+      tags: ["ceph.conf", "libvirt"]
 
   handlers:
     - name: Create dashboard ssl cert  # noqa no-changed-when
@@ -528,6 +528,51 @@
         state: present
         exclusive: true
       tags: ["user", "ssh"]
+
+    - name: Configure libvirt RBD secret
+      tags: ["libvirt"]
+      block:
+        - name: Get libvirt secrets
+          check_mode: false
+          changed_when: false
+          ansible.builtin.command:
+            cmd: "virsh secret-list"
+          register: virsh_secrets
+
+        - name: Define libvirt RBD secret
+          ansible.builtin.command:
+            cmd: virsh secret-define /dev/stdin
+            stdin: "{{ lookup('template', repo_base_dir + '/files/kvm_hv/libvirt-ceph-secret.xml.j2') }}"
+          register: virsh_define
+          changed_when: "'created' in virsh_define.stdout"
+          when: libvirt_ceph_secret_uuid not in virsh_secrets.stdout
+
+        - name: Get RBD client key
+          run_once: true
+          check_mode: false
+          changed_when: false
+          delegate_to: "{{ ceph_config_fetch_host }}"
+          ansible.builtin.command:
+            cmd: "ceph auth get-key client.libvirt"
+          register: libvirt_key_info
+
+        - name: Get current libvirt RBD secret value
+          check_mode: false
+          changed_when: false
+          ansible.builtin.command:
+            cmd: "virsh secret-get-value {{ libvirt_ceph_secret_uuid }}"
+          register: virsh_secret_value
+          failed_when:
+            - virsh_secret_value.rc != 0
+            - "'does not have a value' not in virsh_secret_value.stderr"
+
+        - name: Set libvirt RBD secret value
+          ansible.builtin.command:
+            cmd: "virsh secret-set-value {{ libvirt_ceph_secret_uuid }} --file /dev/stdin"
+            stdin: "{{ libvirt_key_info.stdout }}"
+          register: virsh_set_value
+          changed_when: "'Secret value set' in virsh_set_value.stdout"
+          when: "'does not have a value' in virsh_secret_value.stderr or libvirt_key_info.stdout != virsh_secret_value.stdout"
 
 - name: Configure other stuff
   hosts: ceph
