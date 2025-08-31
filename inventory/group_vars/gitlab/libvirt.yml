@@ -3,6 +3,9 @@
 vm_cpus: 4
 vm_mem: 8192
 
+# Allows for live migrations between Theia and Rhea
+vm_cpu_model_name: "EPYC-Rome"
+vm_rbd_root_enabled: true
 vm_root_size: "20G"
-vm_data_disks:
+vm_rbd_data_disks:
   - "50G"

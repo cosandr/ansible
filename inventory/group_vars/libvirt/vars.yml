@@ -32,8 +32,8 @@ vm_started: true
 vm_autostart: "{{ vm_started }}"
 vm_customize: true
 vm_cpu_mode: "{{ 'custom' if vm_cpu_model_name else 'host-passthrough' }}"
+# virsh cpu-models x86_64
 vm_cpu_model_name: ""
-# vm_cpu_model_name: "Skylake-Client-noTSX-IBRS"
 vm_cpu_features: []
 # vm_cpu_features:
 #   - ssbd
