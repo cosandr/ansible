@@ -27,6 +27,19 @@ alertmanager:
         memory: 128Mi
       limits:
         memory: 128Mi
+    persistentVolumeClaimRetentionPolicy:
+      whenDeleted: Delete
+      whenScaled: Delete
+    storage:
+      volumeClaimTemplate:
+        metadata:
+          name: data
+        spec:
+          storageClassName: rbd-ec
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 64Mi
 
   templateFiles: {{ alertmanager_template_files | to_json }}
 
@@ -101,7 +114,7 @@ prometheus:
         metadata:
           name: data
         spec:
-          storageClassName: ceph-block
+          storageClassName: rbd-ec
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
