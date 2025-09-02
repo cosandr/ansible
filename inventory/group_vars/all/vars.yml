@@ -38,14 +38,9 @@ postfix_relay_hostname: "smtp.{{ domains['hb'] }}"
 
 prometheus_blackbox_icmp_targets: ["{{ wireguard_ip | default(ansible_host) }}"]
 prometheus_node_targets: ["{{ wireguard_ip | default(ansible_host) + ':' + node_exporter_port | string }}"]
-prometheus_node_labels: >-
-  {%- set tmp = {
-    "instance": inventory_hostname,
-  } -%}
-  {%- if prometheus_ignore_down | default(false) -%}
-  {{- tmp.update({"ignore_down": "true"}) -}}
-  {%- endif -%}
-  {{ tmp }}
+prometheus_node_labels: "{{ group_prometheus_node_labels | default({}) | combine(host_prometheus_node_labels) }}"
+host_prometheus_node_labels:
+  instance: "{{ inventory_hostname }}"
 
 # Using "unmanaged" instead
 wireguard_managed_peers: []

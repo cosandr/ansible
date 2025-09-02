@@ -1,5 +1,4 @@
 ---
 
-promtail_external_labels:
-  host: "{{ inventory_hostname }}"
+group_promtail_external_labels:
   group: "kvm_hv"

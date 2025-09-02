@@ -1,6 +1,7 @@
 ---
 
-promtail_external_labels:
+promtail_external_labels: "{{ group_promtail_external_labels | default({}) | combine(host_promtail_external_labels) }}"
+host_promtail_external_labels:
   host: "{{ inventory_hostname }}"
 
 promtail_clients:

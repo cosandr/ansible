@@ -1,8 +1,8 @@
 ---
 
-prometheus_node_labels:
+group_prometheus_node_labels:
   cluster: "ceph"
-  instance: "{{ inventory_hostname }}"
+  group: "kvm_hv"
 
 __unattended_package_blacklist_4:
   - "podman.*"

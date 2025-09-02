@@ -9,7 +9,10 @@ systemd_user_override: "/home/{{ systemd_user }}/.config/override"
 ddcutil_udev_rule: |
   KERNEL=="i2c-[0-9]*", GROUP="wheel", MODE="0660"
 
-prometheus_ignore_down: true
+group_prometheus_node_labels:
+  group: "gui"
+  ignore_down: "true"
+
 prometheus_blackbox_icmp_targets: []
 
 pip_i3_packages:
