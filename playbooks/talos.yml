@@ -19,7 +19,7 @@
         - name: Mount boot disk  # noqa no-changed-when - Output is the same
           delegate_to: "{{ vm_host }}"
           ansible.builtin.command:
-            cmd: "virsh change-media {{ inventory_hostname }} vdd /var/lib/libvirt/images/talos-boot.iso --config --live"
+            cmd: "virsh change-media {{ inventory_hostname }} vdb /var/lib/libvirt/images/talos-boot.iso --config --live"
 
         - name: Reset node  # noqa no-changed-when - Always changed
           delegate_to: localhost
@@ -280,7 +280,7 @@
         ok_err: "doesn't have media"
       ansible.builtin.command:
         cmd: >-
-          virsh change-media {{ inventory_hostname }} vdd
+          virsh change-media {{ inventory_hostname }} vdb
           --eject
           --config
           {% if 'eject' in ansible_run_tags %}
@@ -396,24 +396,6 @@
         state: present
       tags: ["cilium"]
 
-    - name: Check if admin nodes should be force enabled
-      delegate_to: localhost
-      when: not enable_admin_pods | bool
-      block:
-        - name: Get OpenEBS release status
-          kubernetes.core.helm_info:
-            release_name: lvm-localpv
-            release_namespace: openebs
-            release_state:
-              - deployed
-          register: __ebs_release
-
-        - name: Enable admin pods
-          ansible.builtin.set_fact:
-            enable_admin_pods: true
-            admin_pods_force_enabled: true
-          when: __ebs_release.status is not defined
-
     - name: Create admin daemonset
       delegate_to: localhost
       kubernetes.core.k8s:
@@ -447,54 +429,6 @@
           metadata:
             labels: "{{ node_labels }}"
       tags: ["node", "labels"]
-
-    - name: Get admin pod on self
-      delegate_to: localhost
-      kubernetes.core.k8s_info:
-        kind: Pod
-        namespace: kube-system
-        label_selectors:
-          - app.kubernetes.io/name=admin
-          - app.kubernetes.io/managed-by=ansible
-        field_selectors:
-          - "spec.nodeName={{ inventory_hostname }}"
-      register: __admin_pod
-      tags: ["lvm"]
-
-    - name: Prepare OpenEBS LVM provisioner
-      vars:
-        ansible_connection: kubernetes.core.kubectl
-        ansible_kubectl_context: "{{ talos_kubectl_context }}"
-        ansible_kubectl_namespace: "{{ __admin_pod.resources[0].metadata.namespace }}"
-        ansible_kubectl_pod: "{{ __admin_pod.resources[0].metadata.name }}"
-      when:
-        - __admin_pod.resources
-        - vm_extra_disks | selectattr('serial', 'defined') | selectattr('serial', 'eq', 'raw01')
-      tags: ["lvm"]
-      block:
-        - name: Create LVG
-          community.general.lvg:
-            vg: "localpv"
-            pvs: "/dev/disk/by-id/virtio-raw01"
-            pesize: "32"
-            state: present
-
-        - name: Create thin pool
-          community.general.lvol:
-            vg: localpv
-            thinpool: localpv_thinpool
-            size: 95%VG
-
-    - name: Disable admin daemonset
-      delegate_to: localhost
-      run_once: true
-      kubernetes.core.k8s:
-        template: "{{ repo_base_dir }}/files/talos/admin-daemonset.yml.j2"
-        state: present
-      vars:
-        enable_admin_pods: false
-      when: admin_pods_force_enabled | default(false)
-      tags: ["admin", "lvm"]
 
 - name: Setup Kubernetes
   hosts: talos_cp[0]

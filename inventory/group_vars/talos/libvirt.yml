@@ -3,7 +3,7 @@
 vm_cpus: 12
 vm_mem: 12288
 vm_host: "{{ vm_host_list[groups['talos'] | ansible.utils.index_of('eq', inventory_hostname) % (vm_host_list | length)] }}"
-vm_template: false
+vm_template: ""
 vm_customize: false
 vm_mac_san: "{{ '52:54:{:02x}'.format(all_net.san.vlan) | community.general.random_mac(seed=inventory_hostname) }}"
 vm_root_size: "100G"
@@ -38,33 +38,8 @@ __nvidia_vm_pci_devices:
       function: "0x0"
 
 vm_extra_disks:
-  # Used by OpenEBS LVM provisioner
-  - type: block
-    device: disk
-    format: raw
-    dev: "{{ (vm_host in groups['ms01']) | ternary('/dev/vg01/k8s', '/dev/zvol/rpool/k8s') }}"
-    serial: "raw01"
-    target: "vdb"
-    driver_options:
-      discard: "unmap"
-      cache: "none"
-
-  # Used by Rook
-  - type: block
-    device: disk
-    format: raw
-    dev: "/dev/mapper/talosdata01"
-    serial: "talosdata01"
-    target: "vdc"
-    driver_options:
-      discard: "unmap"
-      cache: "none"
-    blockio:
-      logical_block_size: 4096
-      physical_block_size: 4096
-
   - name: "talos-boot.iso"
     type: "file"
-    target: "vdd"
+    target: "vdb"
     device: "cdrom"
     format: "raw"
