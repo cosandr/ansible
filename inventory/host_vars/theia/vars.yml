@@ -8,7 +8,6 @@ pip_wheel_dir: "{{ web_root }}/pip"
 btrfs_subvols:
   - "@snapshots"
   - "@/var/lib/libvirt/images"
-  - "@/mnt/kube"
   - "@home/{{ my_user }}"
 
 prometheus_node_targets: ["{{ host_ips.vm + ':' + node_exporter_port | string }}"]

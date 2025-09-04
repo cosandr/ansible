@@ -63,9 +63,6 @@ host_nfs_shares:
   - path: /mnt/tank/yes
     options: "ro,no_root_squash,no_subtree_check"
     sources: "{{ subnets.san.talos }}"
-  - path: /mnt/kube
-    options: "rw,no_root_squash,no_subtree_check"
-    sources: "{{ subnets.san.talos }}"
   - path: /mnt/tank/downloads
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ subnets.san.talos }}"
