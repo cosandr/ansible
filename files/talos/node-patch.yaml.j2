@@ -1,10 +1,9 @@
 machine:
   kernel:
     modules:
-      - name: dm_thin_pool
-      - name: dm-snapshot
+      - name: zfs
 {% if __nvidia_vm_pci_devices == vm_pci_devices %}
-      # https://www.talos.dev/v1.9/talos-guides/configuration/nvidia-gpu/#enabling-the-nvidia-oss-modules
+      # https://www.talos.dev/v1.11/talos-guides/configuration/nvidia-gpu/#enabling-the-nvidia-oss-modules
       - name: nvidia
       - name: nvidia_uvm
       - name: nvidia_drm
@@ -42,7 +41,7 @@ cluster:
   etcd:
     advertisedSubnets:
       - "{{ all_net[host_net].cidr }}"
-  # https://www.talos.dev/v1.7/reference/configuration/v1alpha1/config/#Config.cluster.apiServer
+  # https://www.talos.dev/v1.11/reference/configuration/v1alpha1/config/#Config.cluster.apiServer
   apiServer:
     extraArgs:
       v: "2"  # INFO level https://github.com/kubernetes/community/blob/master/contributors/devel/sig-instrumentation/logging.md

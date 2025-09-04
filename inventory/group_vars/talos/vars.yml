@@ -6,7 +6,7 @@ __host_ips_3:
   san: "{{ subnets.san.talos | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
 
 # https://github.com/siderolabs/talos/releases
-talos_version: "1.10.6"
+talos_version: "1.11.0"
 # https://kubernetes.io/releases/
 kube_version: "1.33.4"
 
@@ -18,31 +18,35 @@ kube_proxy_enabled: false
 kube_api_server: "{{ domain }}"
 kube_ingress_domain: "{{ domain }}"
 
-# https://www.talos.dev/v1.9/talos-guides/install/boot-assets/#image-factory
+# https://www.talos.dev/v1.11/talos-guides/install/boot-assets/#image-factory
+# curl -X POST --data-binary @schematic.yml https://factory.talos.dev/schematics
 # customization:
 #   extraKernelArgs:
 #     - console=ttyS0
 #   systemExtensions:
 #     officialExtensions:
 #       - siderolabs/qemu-guest-agent
-__basic_talos_schematic: 6d4f69d1202eef52ebc4476239fb6366ffbe4d0efc22983a34f21c401a38a0fc
+#       - siderolabs/zfs
+__basic_talos_schematic: 54ce56c26a6ff61064b025503a07349972f26927780f809a4a7812ad34000226
 # customization:
 #   extraKernelArgs:
 #     - console=ttyS0
 #   systemExtensions:
 #     officialExtensions:
 #       - siderolabs/qemu-guest-agent
+#       - siderolabs/zfs
 #       - siderolabs/i915
-__igpu_talos_schematic: 2ef6d3a39f4f5eb2782fcf5f398b406ff676dc0e026810eb11f7f7c756f7e28c
+__igpu_talos_schematic: 4bcf050fc47fe673b1fcd6376b47e72fbe02db5b48c97ba84f97cf8c29818d88
 # customization:
 #   extraKernelArgs:
 #     - console=ttyS0
 #   systemExtensions:
 #     officialExtensions:
 #       - siderolabs/qemu-guest-agent
+#       - siderolabs/zfs
 #       - siderolabs/nvidia-container-toolkit-production
 #       - siderolabs/nvidia-open-gpu-kernel-modules-production
-__nvidia_talos_schematic: b9495ca70e959bf5f5336a9ac70d9b46e468dbde7b53599c45b6d51d2c79920e
+__nvidia_talos_schematic: 8863ebeedd0a553d9455b165e72a97afb12da0d0346304a845fed5f748f27167
 talos_schematic: >-
   {%- if __igpu_vm_pci_devices == vm_pci_devices -%}
   {{ __igpu_talos_schematic }}
@@ -55,9 +59,7 @@ talos_schematic: >-
 talos_image: "factory.talos.dev/installer/{{ talos_schematic }}:v{{ talos_version }}"
 
 talos_kubectl_context: "admin@{{ kube_api_server }}"
-
-# Keep disabled for security, I guess
-enable_admin_pods: false
+enable_admin_pods: true
 
 node_labels: >-
   {%- set tmp = {

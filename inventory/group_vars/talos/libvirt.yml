@@ -43,3 +43,14 @@ vm_extra_disks:
     target: "vdb"
     device: "cdrom"
     format: "raw"
+
+  # Used by OpenEBS ZFS provisioner
+  - type: block
+    device: disk
+    format: raw
+    dev: "/dev/vg01/k8s"
+    serial: "raw01"
+    target: "vdc"
+    driver_options:
+      discard: "unmap"
+      cache: "none"
