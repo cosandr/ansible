@@ -39,3 +39,6 @@ machine:
     kubePrism:
       enabled: {{ talos_kubeprism_enabled }}
       port: 7445
+    hostDNS:
+      enabled: true
+      forwardKubeDNSToHost: true

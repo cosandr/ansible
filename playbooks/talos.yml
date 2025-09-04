@@ -335,14 +335,6 @@
       tags: ["certs"]
 
   tasks:
-    - name: Configure CoreDNS
-      delegate_to: localhost
-      kubernetes.core.k8s:
-        template: "{{ repo_base_dir }}/files/talos/coredns-cm.yml.j2"
-        state: present
-      notify: Restart CoreDNS
-      tags: ["coredns"]
-
     - name: Install Gateway API CRDs
       delegate_to: localhost
       kubernetes.core.k8s:
@@ -404,11 +396,6 @@
         # true blocks for ever if DS has 0 desired pods
         wait: "{{ enable_admin_pods | bool }}"
       tags: ["admin"]
-  handlers:
-    - name: Restart CoreDNS  # noqa no-changed-when
-      delegate_to: localhost
-      ansible.builtin.command:
-        cmd: "kubectl --context {{ talos_kubectl_context }} -n kube-system rollout restart deployments/coredns"
 
 - name: Setup Kubernetes from all nodes
   hosts: talos
