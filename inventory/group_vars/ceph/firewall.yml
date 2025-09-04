@@ -41,6 +41,10 @@ __firewall_rules_3:
     zone: public
     sources: "{{ node_exporter_allow_ips }}"
 
+  - port: "{{ ceph_metrics_port }}"
+    zone: public
+    sources: "{{ node_exporter_allow_ips }}"
+
   - port: "{{ rgw_frontend_port }}"
     zone: san
     sources: "{{ subnets.san.localgw }}"

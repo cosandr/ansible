@@ -306,6 +306,14 @@
       loop: "{{ cephfs_snap_schedules }}"
       tags: ["cephfs", "snapshot"]
 
+    # Cannot use ceph.automation.ceph_orch_apply
+    # The error was: KeyError: 'service_id'
+    - name: Deploy ceph-exporter service  # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: ceph orch apply -i -
+        stdin: "{{ lookup('template', repo_base_dir + '/files/ceph/ceph-exporter.yml.j2') }}"
+      tags: ["ceph-exporter"]
+
     - name: Deploy RGW service
       ceph.automation.ceph_orch_apply:
         spec: "{{ lookup('template', repo_base_dir + '/files/ceph/rgw-main.yml.j2') }}"

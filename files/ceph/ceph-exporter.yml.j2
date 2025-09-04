@@ -1,0 +1,5 @@
+# https://github.com/ceph/ceph/blob/squid/src/common/options/ceph-exporter.yaml.in
+service_type: ceph-exporter
+service_name: ceph-exporter
+placement:
+  count: {{ groups['ceph'] | length }}
