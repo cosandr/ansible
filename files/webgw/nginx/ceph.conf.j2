@@ -34,24 +34,23 @@ server {
 }
 {% endif %}
 {% if nginx_upstreams | selectattr('name', 'search', 'ceph-rgw') %}
-{% set domain = domains['hb'] %}
 server {
     {{ nginx_listen_http | indent(4) }}
-    server_name rgw.{{ domain }};
+    server_name {{ rgw_domain }};
     return 301 https://$host$request_uri;
 }
 
 server {
     {{ nginx_listen_https | indent(4) }}
     http2 on;
-    server_name rgw.{{ domain }};
+    server_name {{ rgw_domain }};
 
-    ssl_certificate /etc/lego/certificates/{{ domain }}.crt;
-    ssl_certificate_key /etc/lego/certificates/{{ domain }}.key;
+    ssl_certificate /etc/lego/certificates/{{ rgw_domain | community.dns.get_registrable_domain }}.crt;
+    ssl_certificate_key /etc/lego/certificates/{{ rgw_domain | community.dns.get_registrable_domain }}.key;
 
     client_max_body_size 0;
-    access_log {{ nginx_sites_logs }}/access-rgw.{{ domain }}.log {{ nginx_access_log_options }};
-    error_log {{ nginx_sites_logs }}/error-rgw.{{ domain }}.log {{ nginx_error_log_options }};
+    access_log {{ nginx_sites_logs }}/access-{{ rgw_domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-{{ rgw_domain }}.log {{ nginx_error_log_options }};
 
     location / {
         proxy_set_header Host $host;

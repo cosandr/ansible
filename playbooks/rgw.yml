@@ -1,0 +1,58 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Configure RGW
+  hosts: ceph
+  gather_facts: false
+  run_once: true
+  pre_tasks:
+    - name: Set facts
+      ansible.builtin.set_fact:
+        rgw_account_id: "{{ rgw_account_id }}"
+        root_access_key: "{{ lookup('community.general.passwordstore', 'rgw/root_access_key') }}"
+        root_secret_key: "{{ lookup('community.general.passwordstore', 'rgw/root_secret_key') }}"
+      tags: ["always"]
+  tasks:
+    # https://docs.ceph.com/en/squid/radosgw/account/
+    - name: Configure RGW account and root user
+      tags: ["rgw-config"]
+      block:
+        - name: Get RGW accounts
+          check_mode: false
+          changed_when: false
+          ansible.builtin.command:
+            cmd: radosgw-admin --format=json account list
+          register: __rgw_accounts
+
+        - name: Get RGW users
+          check_mode: false
+          changed_when: false
+          ansible.builtin.command:
+            cmd: radosgw-admin --format=json user list
+          register: __rgw_users
+
+        - name: Parse output
+          ansible.builtin.set_fact:
+            rgw_accounts: "{{ __rgw_accounts.stdout | from_json }}"
+            rgw_users: "{{ __rgw_users.stdout | from_json }}"
+
+        # TODO: Write module? Only creates, modifications have to be done manually
+        - name: Create RGW accounts
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: >-
+              radosgw-admin account create
+                --account-name=main
+                --account-id={{ rgw_account_id }}
+          when: rgw_account_id not in rgw_accounts
+
+        - name: Create RGW root user
+          ansible.builtin.command:  # noqa no-changed-when
+            cmd: >-
+              radosgw-admin user create
+                --uid=root
+                --display-name=root
+                --account-id={{ rgw_account_id }}
+                --account-root
+                --access-key={{ root_access_key }}
+                --secret-key={{ root_secret_key }}
+          when: "'root' not in rgw_users"

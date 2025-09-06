@@ -58,7 +58,7 @@ __mt_dns_entries_once:
     cname: "{{ localgw_dns_name }}"
     ttl: 5m
     type: CNAME
-  - name: "rgw.{{ domains['hb'] }}"
+  - name: "{{ rgw_domain }}"
     cname: "{{ localgw_dns_name }}"
     ttl: 5m
     type: CNAME

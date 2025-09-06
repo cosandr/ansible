@@ -6,3 +6,6 @@ ceph_exporter_port: 9926
 ceph_metrics_port: 9283
 ceph_version: squid
 ceph_config_fetch_host: "{{ groups['ceph'][0] }}"
+rgw_account_id: "{{ lookup('community.general.passwordstore', 'rgw/account_id') }}"
+rgw_domain: "rgw.{{ domains['hb'] }}"
+rgw_endpoint_url: "https://{{ rgw_domain }}"
