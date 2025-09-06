@@ -29,9 +29,10 @@ sanoid_backup_modules:
     autosnap: true
     autoprune: true
 
+  # TODO: Remove once I manage to destroy these datasets
   "tank/backup/theia":
     recursive: true
-    use_template: "prune_lts"
+    use_template: "ignore"
 
   "tank/backup/temp":
     use_template: "ignore"
