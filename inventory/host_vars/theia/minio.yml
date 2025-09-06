@@ -36,3 +36,9 @@ minio_client_config:
       secretKey: "{{ minio_root_password }}"
       api: "S3v4"
       path: "auto"
+    rgw:
+      url: "{{ rgw_endpoint_url }}"
+      accessKey: "{{ lookup('community.general.passwordstore', 'rgw/minio_access_key') }}"
+      secretKey: "{{ lookup('community.general.passwordstore', 'rgw/minio_secret_key') }}"
+      api: "S3v4"
+      path: "auto"
