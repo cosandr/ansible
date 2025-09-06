@@ -63,15 +63,15 @@ ceph_pools:
     ec_overwrites: true
 
   # RGW
-  - name: default.rgw.index
+  - name: default.rgw.buckets.index
     application: rgw
     pool_type: replicated
     rule_name: replicated_host_ssd
-  - name: default.rgw.non-ec
+  - name: default.rgw.buckets.non-ec
     application: rgw
     pool_type: replicated
     rule_name: replicated_host_ssd
-  - name: default.rgw.data
+  - name: default.rgw.buckets.data
     application: rgw
     pool_type: erasure
     erasure_profile: ec_host_ssd32

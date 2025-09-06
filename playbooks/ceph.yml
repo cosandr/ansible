@@ -356,9 +356,9 @@
           radosgw-admin zone placement add
           --rgw-zone default
           --placement-id ssd
-          --data-pool default.rgw.data
-          --index-pool default.rgw.index
-          --data-extra-pool default.rgw.non-ec
+          --data-pool default.rgw.buckets.data
+          --index-pool default.rgw.buckets.index
+          --data-extra-pool default.rgw.buckets.non-ec
           --compression zstd
       when: "'ssd' not in zone_info"
       tags: ["rgw"]
