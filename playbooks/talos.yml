@@ -520,6 +520,16 @@
         release_namespace: flux-system
         create_namespace: false
         update_repo_cache: true
+        # https://github.com/fluxcd-community/helm-charts/blob/main/charts/flux2/values.yaml
+        release_values:
+          kustomizeController:
+            container:
+              additionalArgs:
+                - --concurrent=20
+          helmController:
+            container:
+              additionalArgs:
+                - --concurrent=20
       tags: ["flux"]
 
     - name: Get GitLab host keys
