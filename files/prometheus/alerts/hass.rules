@@ -3,7 +3,7 @@ groups:
   rules:
   - alert: HassBatteryLow
     expr: hass_sensor_battery_percent < 20
-    for: 10m
+    for: 6h
     labels:
       severity: warning
     annotations:
