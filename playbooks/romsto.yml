@@ -78,12 +78,12 @@
           fi
       tags: ["datassd", "userscripts"]
 
-    - name: Configure mlocate
-      tags: ["mlocate"]
+    - name: Configure plocate
+      tags: ["plocate"]
       block:
-        - name: Create mlocate db dir
+        - name: Create plocate db dir
           ansible.builtin.file:
-            path: "{{ persistent_disk.path }}/mlocate"
+            path: "{{ persistent_disk.path }}/plocate"
             state: directory
             owner: root
             group: slocate
@@ -96,19 +96,19 @@
             group: root
             mode: "0644"
             content: |
-              PRUNE_BIND_MOUNTS = "yes"
-              PRUNEFS = "9p afs anon_inodefs auto autofs bdev binfmt_misc cgroup cifs coda configfs cpuset debugfs devpts ecryptfs exofs fuse fuse.sshfs fusectl gfs gfs2 gpfs hugetlbfs inotifyfs iso9660 jffs2 lustre mqueue ncpfs nfs nfs4 nfsd pipefs proc ramfs rootfs rpc_pipefs securityfs selinuxfs sfs sockfs sysfs tmpfs ubifs udf usbfs ceph fuse.ceph"
+              PRUNE_BIND_MOUNTS = "no"
+              PRUNEFS = "cgroup2 debugfs devpts devtmpfs efivarfs fusectl hugetlbfs nfsd proc sysfs fuse fuse.shfs"
               PRUNENAMES = ".git .hg .svn .bzr .arch-ids {arch} CVS"
-              PRUNEPATHS = "/afs /dev /media /mnt /net /proc /sys /tmp /usr/tmp /var/cache/ccache /var/lib/ceph /var/spool/cups /var/tmp /var/lib/docker {{ data_disk.path }}/docker/data /mnt/disk*"
+              PRUNEPATHS = "/dev /hugetlbfs /proc /sys /tmp /run /var/run /usr/tmp /var/cache /var/spool/cups /var/tmp /var/lib/docker {{ data_disk.path }}/docker"
 
-        - name: Configure mlocate on boot
+        - name: Configure plocate on boot
           ansible.builtin.blockinfile:
             path: /boot/config/go
-            marker: "# {mark} mlocate"
+            marker: "# {mark} plocate"
             block: |
               ln -sf {{ persistent_disk.path }}/updatedb.conf /etc/updatedb.conf
-              [ -d /var/lib/mlocate ] && rm -rf /var/lib/mlocate
-              ln -s {{ persistent_disk.path }}/mlocate /var/lib/
+              [ -d /var/lib/plocate ] && rm -rf /var/lib/plocate
+              ln -s {{ persistent_disk.path }}/plocate /var/lib/
           tags: ["go"]
 
     - name: Ensure user script dir exists
