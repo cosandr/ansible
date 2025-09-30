@@ -42,7 +42,6 @@ dnf_sway_packages:
   - waybar
   - wdisplays
   - wl-clipboard
-  - wofi
   - xdg-desktop-portal-wlr
 
 dnf_packages:
