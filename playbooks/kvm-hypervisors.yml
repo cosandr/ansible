@@ -224,5 +224,25 @@
         exclusive: true
       tags: ["user", "ssh"]
 
+    - name: Configure plocate  # noqa line-length
+      ansible.builtin.copy:
+        dest: "/etc/updatedb.conf"
+        owner: root
+        group: root
+        mode: "0644"
+        content: |
+          PRUNE_BIND_MOUNTS="no"
+          PRUNENAMES=".git .bzr .hg .svn"
+          PRUNEPATHS="/tmp /var/spool /media /var/lib/os-prober /var/lib/ceph /home/.ecryptfs /var/lib/schroot /.snapshots {{ btrfs_root }} /var/lib/containers"
+          PRUNEFS="NFS afs autofs binfmt_misc ceph cgroup cgroup2 cifs coda configfs curlftpfs debugfs devfs devpts devtmpfs ecryptfs ftpfs fuse.ceph fuse.cryfs fuse.encfs fuse.glusterfs fuse.gocryptfs fuse.gvfsd-fuse fuse.mfs fuse.rclone fuse.rozofs fuse.sshfs fusectl fusesmb hugetlbfs iso9660 lustre lustre_lite mfs mqueue ncpfs nfs nfs4 ocfs ocfs2 proc pstore rpc_pipefs securityfs shfs smbfs sysfs tmpfs tracefs udev udf usbfs"
+      notify: Restart plocate
+      tags: ["plocate"]
+
+  handlers:
+    - name: Restart plocate
+      ansible.builtin.systemd:
+        name: plocate-updatedb.service
+        state: restarted
+
 - name: Import Theia playbook
   ansible.builtin.import_playbook: theia.yml
