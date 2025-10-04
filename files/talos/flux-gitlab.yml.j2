@@ -1,27 +1,49 @@
 ---
-apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
+apiVersion: fluxcd.controlplane.io/v1
+kind: FluxInstance
 metadata:
-  name: flux-system
+  name: flux
   namespace: flux-system
 spec:
-  interval: 15m
-  url: "ssh://git@gitlab.{{ domains['dv'] }}/flux/infra"
-  ref:
-    branch: master
-  secretRef:
-    name: gitlab-ssh-credentials
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: flux-system
-  namespace: flux-system
-spec:
-  interval: 15m
-  retryInterval: 5m
-  path: ./flux
-  prune: true
-  sourceRef:
-    kind: GitRepository
+  distribution:
+    version: "{{ flux_version }}"
+    registry: "ghcr.io/fluxcd"
+  components:
+    - source-controller
+    - kustomize-controller
+    - helm-controller
+    - notification-controller
+    - image-reflector-controller
+    - image-automation-controller
+  cluster:
+    size: medium
+  sync:
     name: flux-system
+    kind: GitRepository
+    url: "ssh://git@gitlab.{{ domains['dv'] }}/flux/infra"
+    ref: "refs/heads/master"
+    path: "./flux"
+    pullSecret: "gitlab-ssh-credentials"
+    interval: 1h
+  kustomize:
+    patches:
+      - patch: |
+          - op: add
+            path: /spec/template/spec/containers/0/args/-
+            value: --concurrent=20
+        target:
+          kind: Deployment
+          name: "(kustomize-controller|helm-controller)"
+      - patch: |
+          - op: replace
+            path: /spec/interval
+            value: 1h
+          - op: replace
+            path: /spec/retryInterval
+            value: 5m
+          - op: replace
+            path: /spec/prune
+            value: true
+        target:
+          kind: Kustomization
+          name: "flux-system"
