@@ -1,0 +1,17 @@
+---
+
+groups:
+  - name: Kubernetes Alerts
+    rules:
+      - alert: MissedVolsyncBackup
+        # Compares apps which ran backups in the last 7 days with the last 2 days,
+        # whatever is missing fires an alert. Removing an app will likely trigger an alert.
+        expr: >-
+          (sum by (app) (count_over_time({pod=~"volsync-src-.*"} |= "Restic completed" [7d])) > 0)
+          unless
+          (sum by (app) (count_over_time({pod=~"volsync-src-.*"} |= "Restic completed" [2d])) > 0)
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: '{{ $labels.app }} possibly missed backup'
