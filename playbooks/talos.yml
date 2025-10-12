@@ -496,12 +496,8 @@
       delegate_to: localhost
       kubernetes.core.k8s:
         state: present
-        resource_definition:
-          apiVersion: v1
-          kind: Namespace
-          metadata:
-            name: flux-system
-            labels: "{{ pss_privileged_labels }}"
+        kind: Namespace
+        name: flux-system
       tags: ["flux"]
 
     - name: Deploy Flux operator
