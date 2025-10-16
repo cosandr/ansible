@@ -126,7 +126,7 @@
       delegate_to: localhost
       ansible.builtin.command:
         chdir: "{{ tmp_dir }}"
-        creates: "{{ force | bool | ternary(omit, '{{ tmp_dir }}/{{ inventory_hostname }}.yaml') }}"
+        creates: "{{ force | bool | ternary(omit, tmp_dir + '/' + inventory_hostname + '.yaml') }}"
         cmd: >-
           talosctl machineconfig patch {{ src_file }}.yaml
             --patch @{{ inventory_hostname }}-patch.yaml
@@ -357,7 +357,7 @@
         chart_version: "{{ cilium_version }}"
         release_namespace: kube-system
         update_repo_cache: true
-        release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/talos/cilium-values.yml.j2') | from_yaml }}"
+        release_values: "{{ lookup('template', repo_base_dir + '/files/talos/cilium-values.yml.j2') | from_yaml }}"
       tags: ["cilium"]
 
     - name: Wait until Cilium Operator is ready
@@ -528,7 +528,7 @@
       delegate_to: localhost
       kubernetes.core.k8s:
         state: present
-        resource_definition: "{{ lookup('template', '{{ repo_base_dir }}/files/talos/{{ item }}') | from_yaml_all }}"
+        resource_definition: "{{ lookup('template', repo_base_dir + '/files/talos/' + item) | from_yaml_all }}"
       loop:
         - flux-gitlab-secret_vault.yml
         - flux-gitlab.yml.j2

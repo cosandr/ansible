@@ -22,7 +22,8 @@
       ansible.builtin.set_fact:
         __mkinitcpio_efibootmgr: "{{ __mkinitcpio_efibootmgr | default([]) + [tmp_dict] }}"
       vars:
-        filename: "{{ (item.filename is defined) | ternary(item.filename, '{{ mkinitcpio_uefi_prefix }}-{{ item.name }}.efi') }}"
+        auto_filename: "{{ mkinitcpio_uefi_prefix }}-{{ item.name }}.efi"
+        filename: "{{ (item.filename is defined) | ternary(item.filename, auto_filename) }}"
         tmp_dict:
           disk: "{{ esp_disk }}"
           part: "{{ esp_part }}"
@@ -36,7 +37,8 @@
       ansible.builtin.set_fact:
         __mkinitcpio_efibootmgr: "{{ __mkinitcpio_efibootmgr | default([]) + [tmp_dict] }}"
       vars:
-        filename: "{{ (item.fallback_filename is defined) | ternary(item.fallback_filename, '{{ mkinitcpio_uefi_prefix }}-{{ item.name }}-fallback.efi') }}"
+        auto_filename: "{{ mkinitcpio_uefi_prefix }}-{{ item.name }}-fallback.efi"
+        filename: "{{ (item.fallback_filename is defined) | ternary(item.fallback_filename, auto_filename) }}"
         tmp_dict:
           disk: "{{ esp_disk }}"
           part: "{{ esp_part }}"
@@ -61,7 +63,8 @@
       ansible.builtin.set_fact:
         __mkinitcpio_sign_files: "{{ __mkinitcpio_sign_files | default([]) + [tmp] }}"
       vars:
-        filename: "{{ (item.filename is defined) | ternary(item.filename, '{{ mkinitcpio_uefi_prefix }}-{{ item.name }}.efi') }}"
+        auto_filename: "{{ mkinitcpio_uefi_prefix }}-{{ item.name }}.efi"
+        filename: "{{ (item.filename is defined) | ternary(item.filename, auto_filename) }}"
         tmp: "{{ mkinitcpio_uefi_path }}/{{ filename }}"
       loop: "{{ mkinitcpio_kernels }}"
       loop_control:
@@ -71,7 +74,8 @@
       ansible.builtin.set_fact:
         __mkinitcpio_sign_files: "{{ __mkinitcpio_sign_files | default([]) + [tmp] }}"
       vars:
-        filename: "{{ (item.fallback_filename is defined) | ternary(item.fallback_filename, '{{ mkinitcpio_uefi_prefix }}-{{ item.name }}-fallback.efi') }}"
+        auto_filename: "{{ mkinitcpio_uefi_prefix }}-{{ item.name }}-fallback.efi"
+        filename: "{{ (item.fallback_filename is defined) | ternary(item.fallback_filename, auto_filename) }}"
         tmp: "{{ mkinitcpio_uefi_path }}/{{ filename }}"
       loop: "{{ mkinitcpio_kernels }}"
       loop_control:

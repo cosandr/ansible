@@ -43,7 +43,7 @@
     release_namespace: monitoring
     create_namespace: false
     update_repo_cache: true
-    release_values: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/prom.yml.j2') | from_yaml }}"
+    release_values: "{{ lookup('template', repo_base_dir + '/files/k8s/prom.yml.j2') | from_yaml }}"
   tags: ["helm", "prometheus"]
 
 - name: Cert-manager tasks
@@ -93,6 +93,6 @@
     - name: Create cluster issuers
       kubernetes.core.k8s:
         state: present
-        resource_definition: "{{ lookup('template', '{{ repo_base_dir }}/files/k8s/cluster-issuer.yml.j2') | from_yaml }}"
+        resource_definition: "{{ lookup('template', repo_base_dir + '/files/k8s/cluster-issuer.yml.j2') | from_yaml }}"
       loop: "{{ certmanager_cluster_issuers }}"
       tags: ["issuer"]
