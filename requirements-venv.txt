@@ -1,2 +1,4 @@
-ansible<11
+ansible<12
 ansible-lint<26
+molecule<26 # https://github.com/ansible/molecule/releases
+molecule-plugins[podman]<26 # https://github.com/ansible-community/molecule-plugins/releases

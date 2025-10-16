@@ -1,5 +1,17 @@
 # Ansible
 
+## Venv setup
+
+This repo doesn't support Ansible 12 or later, using a venv is recommended.
+
+```sh
+pyenv install 3.12.12
+pyenv virtualenv 3.12.12 ansible-11
+pyenv activate ansible-11
+pip install -U pip wheel setuptools
+pip install -U -r requirements.txt -r requirements-venv.txt
+```
+
 ## Network changes
 
 Change general network stuff (VLANs, changing CIDRs) using the [templates](./files/inventory).
@@ -26,57 +38,12 @@ wg genpsk
 gopass edit -c network/<inventory_hostname>_wg_psk
 ```
 
-## sshjail
-
-```sh
-mkdir -p ~/.ansible/plugins/connection
-# use fork until PR is merged
-# wget -O ~/.ansible/plugins/connection/sshjail.py https://raw.githubusercontent.com/austinhyde/ansible-sshjail/master/sshjail.py
-wget -O ~/.ansible/plugins/connection/sshjail.py https://raw.githubusercontent.com/nerzhul/ansible-sshjail/patch-1/sshjail.py
-```
-
-## iocage
-
-```sh
-wget -O library/iocage.py https://raw.githubusercontent.com/fractalcells/ansible-iocage/master/iocage.py
-```
-
-## S3
-
-```sh
-sudo pacman -S python-botocore python-boto3
-```
-
 ## ansible-pylibssh
 
 On MacOS, install `libssh` with Homebrew then
 
 ```sh
 CFLAGS="-I $(brew --prefix)/include -I ext -L $(brew --prefix)/lib -lssh" pip install ansible-pylibssh
-```
-
-## GCP
-
-See [Ansible guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html) for more details.
-Requires `requests google-auth` to be installed for the Python interpreter.
-
-Create service account with DNS Administrator role.
-
-## Running
-
-```sh
-# If playbook needs vault, ask
-ansible-playbook <playbook> --ask-vault-pass
-# from file
-ansible-playbook <playbook> --vault-password-file .vault_key
-# Run only on server host (if hosts is all in playbook)
-ansible-playbook -l server playbook.yml
-# Run only one tag in playbook
-ansible-playbook playbook.yml --tags grafana
-# Run in vscode docker
-ansible-playbook -i hosts_local server.yml --tags nginx
-# Run with sudo remote user
-ansible-playbook -i hosts -K -e 'ansible_user=andrei' playbooks/laptop.yml --diff --check --tags laptop
 ```
 
 ## MikroTik
