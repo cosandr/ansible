@@ -177,9 +177,6 @@
       tags: ["datassd", "userscripts"]
 
   roles:
-    - role: nginx_site
-      tags: ["nginx_site"]
-
     - role: promtail
       tags: ["promtail"]
   post_tasks:

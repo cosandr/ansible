@@ -39,10 +39,3 @@ __nginx_vhosts_3:
   - filename: nextcloud.conf
     server_name: nextcloud
     template: "{{ repo_base_dir }}/files/webgw/nginx/nextcloud.conf.j2"
-
-__nginx_vhosts_2:
-  - filename: nextcloud_ta.conf
-    server_name: nextcloud_ta
-    upstream_name: nextcloud_ta
-    domain: "{{ domains['ti'] }}"
-    template: "{{ repo_base_dir }}/files/webgw/nginx/nextcloud.conf.j2"

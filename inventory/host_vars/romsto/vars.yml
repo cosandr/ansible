@@ -5,14 +5,11 @@ domain: "{{ vault_domain }}"
 ssh_port: "{{ vault_ssh_port }}"
 syncthing_port: "{{ vault_syncthing_port }}"
 cadvisor_port: "9101"
-nextcloud_port: "25683"
 # Running in Docker
 node_exporter_installed: false
 nfs_idmapping_configure: false
 postfix_main_config: []
 
-prometheus_blackbox_http_targets:
-  - "https://cloud.{{ domain }}/index.php/login"
 prometheus_blackbox_icmp_targets:
   - "{{ ansible_host }}"
   - "{{ wireguard_ip }}"
@@ -20,9 +17,6 @@ prometheus_smartctl_targets: ["{{ smartctl_exporter_listen_address }}"]
 prometheus_node_targets: ["{{ ansible_host + ':' + node_exporter_port | string }}"]
 prometheus_node_labels:
   instance: "RomeoTV"
-
-prometheus_nextcloud_targets:
-  - "{{ wireguard_ip }}:9205"
 
 prometheus_cadvisor_targets: ["{{ ansible_host }}:{{ cadvisor_port }}"]
 

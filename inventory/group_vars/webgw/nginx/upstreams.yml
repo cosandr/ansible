@@ -32,8 +32,3 @@ __nginx_upstreams_3:
 
   - name: mrbot_web
     servers: ["mrbot-web.{{ all_net.talos.domain }}"]
-
-__nginx_upstreams_2:
-  - name: nextcloud_ta
-    servers: ["{{ hostvars['romsto'].wireguard_ip }}:{{ hostvars['romsto'].nextcloud_port }}"]
-    keepalive: 16
