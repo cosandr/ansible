@@ -1,8 +1,0 @@
----
-
-vmware_exporter_port: 9272
-vmware_exporter_listen_address: "0.0.0.0"
-vmware_exporter_log_level: "warning"
-vmware_exporter_config_file: "/etc/vmware_exporter.yml"
-vmware_exporter_venv_path: "/opt/vmware_exporter"
-vmware_exporter_config: {}

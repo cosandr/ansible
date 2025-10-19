@@ -1,9 +1,0 @@
-{{ ansible_managed | comment }}
-[Unit]
-Description=Upgrade certbot
-Requires=network-online.target
-After=network-online.target
-
-[Service]
-ExecStartPre={{ __certbot_venv_update_pre }}
-ExecStart={{ __certbot_venv_update }}

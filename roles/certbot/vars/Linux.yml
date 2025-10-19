@@ -1,5 +1,0 @@
----
-
-__certbot_bin_path: /usr/bin/certbot
-__python_bin_path: /usr/bin/python3.9
-__root_group: root

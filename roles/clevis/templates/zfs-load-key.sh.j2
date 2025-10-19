@@ -1,8 +1,0 @@
-if [ -x /usr/bin/clevis ] && [ -f {{ clevis_keyfile }} ]; then
-    if clevis decrypt < {{ clevis_keyfile }} | zfs load-key "${ENCRYPTIONROOT}"; then
-        echo "Clevis unlocked ${ENCRYPTIONROOT}"
-        return
-    else
-        warn "Clevis failed to unlock ${ENCRYPTIONROOT}"
-    fi
-fi

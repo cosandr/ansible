@@ -1,3 +1,0 @@
----
-
-__filebeat_package_name: "https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{ filebeat_version }}-x86_64.rpm"

@@ -1,3 +1,0 @@
-{% for k in dracut_ssh_authorized_keys %}
-no-port-forwarding,no-agent-forwarding,no-X11-forwarding{% if dracut_ssh_command %},command="{{ dracut_ssh_command }}"{% endif %} {{ k }}
-{% endfor %}

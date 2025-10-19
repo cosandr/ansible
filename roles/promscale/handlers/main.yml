@@ -1,6 +1,0 @@
----
-
-- name: restart promscale
-  systemd:
-    name: promscale
-    state: restarted

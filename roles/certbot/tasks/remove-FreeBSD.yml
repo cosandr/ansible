@@ -1,9 +1,0 @@
----
-
-- name: Remove cronjobs
-  ansible.builtin.cron:
-    name: "{{ item }}"
-    state: absent
-  loop:
-    - certbot auto-update
-    - certbot auto-renew
