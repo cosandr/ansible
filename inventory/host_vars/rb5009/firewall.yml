@@ -62,9 +62,9 @@ __mt_firewall_subnet_lists:
   - "{{ subnets.mgmt.unifios | andrei.utils.items2dictlist('address', list='unifi-os-server', comment='unifi-os-server') }}"
 
 __mt_firewall_address_lists_manual:
-  - address: "{{ hostvars['p7'].wireguard_ip }}"
+  - address: "{{ hostvars['p9p'].wireguard_ip }}"
     list: roaming-general
-    comment: p7
+    comment: p9p
 
 __mt_firewall_address_lists_auto: >-
   {%- set tmp = [] -%}
