@@ -22,7 +22,6 @@ desktop      ansible_host="10.0.50.64"
 laptop       ansible_host="10.0.50.65"   wireguard_ip="10.4.20.65"
 m3bp         ansible_host="10.0.50.66"   wireguard_ip="10.4.20.66"
 drepi        ansible_host="10.0.50.128"
-ax56u        ansible_host="10.0.50.133"
 ha           ansible_host="10.0.50.134"
 ipad         ansible_host="10.0.50.138"  wireguard_ip="10.4.20.138"
 p7           ansible_host="10.0.50.139"  wireguard_ip="10.4.20.139"
@@ -258,7 +257,6 @@ talos05 vm_host=rhea
 host_subnet=worker
 
 [unmanaged_hosts]
-ax56u        host_num=5
 ha           host_num=6
 ipad         host_num=10 host_wg_num=10
 p7           host_num=11 host_wg_num=11
