@@ -1,6 +1,6 @@
 ---
 
-loki_allow_zone: "internal"
+loki_config_firewall: false
 
 loki_alertmanager_url: "http://{{ hostvars['prom01'].ansible_host }}:{{ hostvars['prom01'].alertmanager_port }}/"
 loki_alert_rules_files:

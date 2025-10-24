@@ -7,14 +7,12 @@ firewalld_zones:
     interfaces: "{{ host_nic_names }}"
 
   - name: internal
-    sources: "{{ home_net | json_query('*.cidr') }}"
-
-  - name: internal
-    sources: ["{{ wg_net.mt.cidr }}"]
-
-  - name: internal
-    # Allow prometheus
-    sources: "{{ node_exporter_allow_ips }}"
+    sources:
+      - "{{ all_net.vm.cidr }}"
+      - "{{ all_net.mt.cidr }}"
+      - "{{ all_net.mgmt.cidr }}"
+      - "{{ hostvars['drepi'].ansible_host }}"
+      - "{{ hostvars['ha'].ansible_host }}"
 
   - name: internal
     sources: "{{ subnets.talos.mon | ansible.utils.ipv4 }}"
