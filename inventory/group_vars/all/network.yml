@@ -78,6 +78,7 @@ internal_net:
     mt_lists:
       - LAN
       - SEC
+      - ALLOW_MAC
     dhcp_range: 10.0.100.128-10.0.100.254
     domain: man.{{ domains['hb'] }}
   san:

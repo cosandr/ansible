@@ -112,3 +112,12 @@ __mt_ipv6_addresses_auto: >-
 
 mt_ip_addresses: "{{ (__mt_ip_addresses_manual | default([])) + __mt_ip_addresses_auto }}"
 mt_ipv6_addresses: "{{ (__mt_ipv6_addresses_manual | default([])) + __mt_ipv6_addresses_auto }}"
+
+mt_ip_neighbor_discovery:
+  - discover-interface-list: LAN
+
+mt_mac_server:
+  - allowed-interface-list: ALLOW_MAC
+
+mt_mac_winbox:
+  - allowed-interface-list: ALLOW_MAC
