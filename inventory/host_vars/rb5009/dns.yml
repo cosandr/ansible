@@ -52,4 +52,10 @@ mt_dns_entries: >-
     "ttl": "1h"
   }) -}}
   {%- endfor -%}
+  {{- tmp.append({
+    "name": inventory_hostname + "." + all_net[host_net].domain,
+    "address": ansible_host,
+    "comment": mt_dns_managed_comment,
+    "ttl": "1h"
+  }) -}}
   {{ tmp }}
