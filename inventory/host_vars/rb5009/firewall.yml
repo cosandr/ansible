@@ -62,9 +62,6 @@ __mt_firewall_subnet_lists:
   - "{{ subnets.mgmt.unifios | andrei.utils.items2dictlist('address', list='unifi-os-server', comment='unifi-os-server') }}"
 
 __mt_firewall_address_lists_manual:
-  - address: "{{ wireguard_endpoint.split(':', 1)[0] }}"
-    list: WANs
-    comment: WAN
   - address: "{{ hostvars['p7'].wireguard_ip }}"
     list: roaming-general
     comment: p7
@@ -92,7 +89,7 @@ mt_firewall_mangle_ipv6:
   - action: change-mss
     chain: forward
     new-mss: clamp-to-pmtu
-    out-interface: "{{ mt_wan_port }}"
+    out-interface-list: WAN
     passthrough: true
     protocol: tcp
     tcp-flags: syn
@@ -155,9 +152,6 @@ __mt_firewall_address_lists_ipv6_manual:
   - address: fc00::/7
     comment: 'defconf: RFC6890 Unique-Local'
     list: not_global_ipv6
-  - address: "{{ wireguard_endpoint.split(':', 1)[0] }}"
-    list: WANs
-    comment: WAN
 
 __mt_firewall_address_lists_ipv6_auto: >-
   {%- set tmp = [] -%}
