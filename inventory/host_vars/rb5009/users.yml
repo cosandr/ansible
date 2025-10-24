@@ -1,0 +1,14 @@
+---
+
+mt_groups_host:
+  - name: "external-dns"
+    args:
+      # Somehow the rest-api policy isn't needed and doesn't work
+      - "policy=api,read,write"
+
+mt_users_host:
+  - name: "external-dns"
+    args:
+      - "password={{ lookup('community.general.passwordstore', 'network/mt_external_dns_pass') }}"
+      - "group=external-dns"
+      - "address={{ subnets.vm.localgw | join(',') }}"
