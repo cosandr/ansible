@@ -33,6 +33,9 @@ deltaco_plug ansible_host="10.0.55.74"
 rb5009       ansible_host="10.0.100.1"   wireguard_ip="10.4.20.1"
 crs226       ansible_host="10.0.100.2"
 crs309       ansible_host="10.0.100.3"
+crs305       ansible_host="10.0.100.4"
+750gl        ansible_host="10.0.100.5"
+u7pro        ansible_host="10.0.100.6"
 theia        ansible_host="10.0.100.16"
 aegir        ansible_host="10.0.100.17"
 gerd         ansible_host="10.0.100.18"
@@ -133,6 +136,8 @@ host_subnet=pg
 rb5009 host_num=1 host_wg_num=1
 crs226 host_num=2
 crs309 host_num=3
+crs305 host_num=4
+750gl  host_num=5
 
 [mikrotik:vars]
 host_net=mgmt
@@ -140,6 +145,13 @@ host_subnet=switches
 host_num6_offset=false
 host_wg_num6_offset=false
 host_wg_subnet=switches
+
+[unifi]
+u7pro host_num=6
+
+[unifi:vars]
+host_net=mgmt
+host_subnet=switches
 
 [gitlab]
 gitlab01 host_num=0

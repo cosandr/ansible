@@ -19,4 +19,5 @@ mt_networks: >-
   {%- for name, config in all_net.items() if name not in host_exclude_nets -%}
   {{- tmp.update({name: config}) -}}
   {%- endfor -%}
+  {{- tmp.update(mt_networks_extra | default({})) -}}
   {{ tmp }}

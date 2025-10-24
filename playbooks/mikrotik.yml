@@ -268,6 +268,15 @@
         - mt_bridge_ports | default([])
         - mt_vlan_legacy | default(false)
 
+    - name: Configure ethernet  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: interface ethernet
+        data: "{{ mt_interface_ethernet }}"
+      tags: ["interfaces", "ethernet"]
+      when:
+        - mt_interface_ethernet | default([])
+
     - name: Enable VLAN filtering [modern]  # noqa args[module]
       delegate_to: localhost
       community.routeros.api_modify:

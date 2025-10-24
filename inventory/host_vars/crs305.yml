@@ -1,0 +1,33 @@
+---
+
+mt_networks_extra:
+  inet:
+    vlan: 102
+
+mt_trunk_ports:
+  - sfp-sfpplus1
+  - sfp-sfpplus4
+  - vlan: GENERAL
+    ports: [sfp-sfpplus2]
+  - vlan: PUBLIC
+    ports: [sfp-sfpplus2]
+  - vlan: MGMT
+    ports: [sfp-sfpplus2]
+  - vlan: INET
+    ports: [sfp-sfpplus3]
+
+mt_access_ports:
+  - vlan: MGMT
+    ports:
+      - ether1
+
+mt_bridge_ports:
+  - ether1
+  - sfp-sfpplus1 # RB5009
+  - sfp-sfpplus2 # AP
+  - sfp-sfpplus3 # Internet
+  - sfp-sfpplus4 # CRS309
+
+mt_interface_ethernet:
+  - default-name: sfp-sfpplus3
+    mac-address: "{{ lookup('community.general.passwordstore', 'network/inet_mac_address') }}"

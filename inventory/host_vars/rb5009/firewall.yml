@@ -4,24 +4,6 @@ __mt_interface_members_manual:
   - interface: "{{ mt_wan_port }}"
     list: WAN
 
-__mt_interface_members_auto: >-
-  {%- set tmp = [] -%}
-  {%- for name, config in all_net.items() if 'mt_lists' in config -%}
-  {%- for list in config.mt_lists -%}
-  {{- tmp.append({'interface': name | upper, 'list': list}) -}}
-  {%- endfor -%}
-  {%- endfor -%}
-  {{ tmp }}
-
-mt_interface_members: "{{ __mt_interface_members_manual + __mt_interface_members_auto }}"
-
-mt_interface_list: >-
-  {%- set tmp = [] -%}
-  {%- for name in mt_interface_members | map(attribute='list') | unique -%}
-  {{- tmp.append({"name": name}) -}}
-  {%- endfor -%}
-  {{ tmp }}
-
 mt_firewall_rules: "{{ lookup('template', repo_base_dir + '/files/mikrotik/firewall_vault.yml.j2', template_vars={'ipv4': true}) | from_yaml }}"
 mt_firewall_nat: "{{ vault_mt_firewall_nat }}"
 

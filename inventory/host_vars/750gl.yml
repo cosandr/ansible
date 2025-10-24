@@ -1,0 +1,25 @@
+---
+
+mt_networks:
+  general: "{{ all_net.general }}"
+  mgmt: "{{ all_net.mgmt }}"
+
+mt_trunk_ports:
+  - ether1
+
+mt_access_ports:
+  - vlan: GENERAL
+    ports:
+      - ether2
+      - ether3
+      - ether4
+  - vlan: MGMT
+    ports:
+      - ether5
+
+mt_bridge_ports:
+  - ether1 # RB5009
+  - ether2 # PS5
+  - ether3
+  - ether4
+  - ether5 # syno
