@@ -64,10 +64,14 @@ __subnet_extensions:
 
 {% set __subnet_map = {
   "ipmi": 27,
-  "_r10": 27,
+  "_r10": 28,
+  "unifios": 31,
+  "_r15": 31,
+  "_r20": 30,
+  "_r25": 29,
   "clients": 25,
 } %}
-  mgmt: {{ all_net.mgmt | andrei.utils.subnets_from_map(__subnet_map, v4_start=32, v6_prefix_skip=3, v6_size=80) }}
+  mgmt: {{ all_net.mgmt | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80) }}
 
 {% set __subnet_map = {
   "localgw": 28,

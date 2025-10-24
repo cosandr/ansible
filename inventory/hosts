@@ -38,6 +38,7 @@ aegir        ansible_host="10.0.100.17"
 gerd         ansible_host="10.0.100.18"
 ymir         ansible_host="10.0.100.19"
 rhea         ansible_host="10.0.100.20"
+unifios      ansible_host="10.0.100.112"
 syno         ansible_host="10.0.100.128"
 webgw01      wireguard_ip="10.4.20.80"
 romsto       wireguard_ip="10.4.20.96"
@@ -99,6 +100,9 @@ ansible_group_priority=1
 
 [kvm_hv:vars]
 ansible_group_priority=2
+
+[libvirt]
+unifios host_net=mgmt host_subnet=unifios host_num=0
 
 [libvirt:children]
 pg

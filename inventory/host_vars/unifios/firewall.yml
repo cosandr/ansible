@@ -1,0 +1,13 @@
+---
+
+# https://help.ui.com/hc/en-us/articles/218506997-Required-Ports-Reference
+firewall_rules:
+  - port: 8080 # UniFi adoption
+  - port: 11443 # UniFi OS Server
+    sources: "{{ firewall_trusted_sources }}"
+  - port: 3478 # STUN
+    protocol: udp
+    sources: "{{ subnets.mgmt.switches }}"
+  - port: 5514 # Remote syslog capture
+    protocol: udp
+    sources: "{{ subnets.mgmt.switches }}"

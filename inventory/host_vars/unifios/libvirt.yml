@@ -1,0 +1,8 @@
+---
+
+vm_template: "debian13_packer.{{ vm_disk_format }}"
+vm_cpus: 2
+vm_mem: 2048
+
+vm_rbd_root_enabled: true
+vm_root_size: "20G"
