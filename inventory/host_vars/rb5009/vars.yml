@@ -57,3 +57,22 @@ mt_graphing_interfaces:
   - allow-address: "{{ all_net.general.cidr }}"
     interface: WG1
     store-on-disk: false
+
+mt_queue_type:
+  - name: WAN-tx
+    cake-flowmode: dual-srchost
+    cake-nat: true
+    cake-rtt-scheme: internet
+    kind: cake
+  - name: WAN-rx
+    cake-diffserv: besteffort
+    cake-flowmode: dual-dsthost
+    cake-nat: true
+    cake-rtt-scheme: internet
+    kind: cake
+
+mt_queue_simple:
+  - max-limit: "{{ 900e6 | int }}/{{ 900e6 | int }}" # 900Mbit, API returns int in bytes
+    name: WAN
+    queue: WAN-rx/WAN-tx
+    target: "{{ mt_wan_port }}"

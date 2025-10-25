@@ -665,6 +665,26 @@
       when: mt_logging | default([])
       tags: ["logging"]
 
+    - name: Configure queue types  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: queue type
+        data: "{{ mt_queue_type }}"
+        handle_absent_entries: ignore # Don't remove defaults
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_queue_type is defined
+      tags: ["queue"]
+
+    - name: Configure simple queues  # noqa args[module]
+      delegate_to: localhost
+      community.routeros.api_modify:
+        path: queue simple
+        data: "{{ mt_queue_simple }}"
+        handle_absent_entries: remove
+        handle_entries_content: remove_as_much_as_possible
+      when: mt_queue_simple is defined
+      tags: ["queue"]
+
     - name: Configure IPv4 DNS settings  # noqa args[module]
       delegate_to: localhost
       community.routeros.api_modify:

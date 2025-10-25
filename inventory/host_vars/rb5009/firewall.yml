@@ -1,9 +1,5 @@
 ---
 
-__mt_interface_members_manual:
-  - interface: "{{ mt_wan_port }}"
-    list: WAN
-
 mt_firewall_rules: "{{ lookup('template', repo_base_dir + '/files/mikrotik/firewall_vault.yml.j2', template_vars={'ipv4': true}) | from_yaml }}"
 mt_firewall_nat: "{{ vault_mt_firewall_nat }}"
 

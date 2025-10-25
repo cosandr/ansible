@@ -1,22 +1,23 @@
 ---
 
+mt_networks_extra:
+  inet:
+    vlan: 102
+    mt_lists: [WAN]
+
 mt_trunk_ports:
-  - vlan: VM
-    ports: [sfp-sfpplus1]
-  - vlan: TALOS
-    ports: [sfp-sfpplus1]
+  - sfp-sfpplus1
   - vlan: GENERAL
-    ports: [sfp-sfpplus1, ether1, ether4]
+    ports: [ether1, ether4]
   - vlan: PUBLIC
     ports: [ether4]
   - vlan: MGMT
-    ports: [sfp-sfpplus1, ether4]
-  - vlan: SAN
-    ports: [sfp-sfpplus1]
+    ports: [ether4]
 
 mt_access_ports:
   - vlan: GENERAL
     ports:
+      - ether2
       - ether3
       - ether5
       - ether6
@@ -30,11 +31,11 @@ mt_access_ports:
     ports:
       - ether1
 
-# !!! Do NOT add to bridge !!!
-mt_wan_port: ether2
+mt_wan_port: INET
 mt_bridge_ports:
-  - sfp-sfpplus1
+  - sfp-sfpplus1 # CRS305
   - ether1 # desktop
+  - ether2
   - ether3
   - ether4 # 750gl
   - ether5 # HA
