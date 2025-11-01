@@ -60,3 +60,5 @@ gitlab_gc_oncalendar: "Tue,Fri 02:00:00"
 
 prometheus_blackbox_http_targets:
   - "{{ gitlab_external_url }}"
+
+swapfile_size: 4G
