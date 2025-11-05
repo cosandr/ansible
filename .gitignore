@@ -4,8 +4,9 @@ __pycache__
 *.retry
 *.pyc
 .cache/
-.vscode/
-!.vscode/settings.json
+.vscode/*
+.vscode/.*
+!.vscode/settings.*.json
 files/k8s/credentials/*
 ansible_collections/*
 !ansible_collections/andrei

@@ -12,6 +12,12 @@ pip install -U pip wheel setuptools
 pip install -U -r requirements.txt -r requirements-venv.txt
 ```
 
+## Update VS Code settings.json
+
+```sh
+jq -s add .vscode/settings.{common,$(uname -s)}.json > .vscode/settings.json
+```
+
 ## Network changes
 
 Change general network stuff (VLANs, changing CIDRs) using the [templates](./files/inventory).
