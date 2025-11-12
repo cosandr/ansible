@@ -21,7 +21,7 @@ groups:
     expr: |
       (sum_over_time(hass_sensor_power_w[6h]) / 720 == hass_sensor_power_w)
       and
-      (hass_sensor_power_w{entity!="sensor.pc_power"} != 0)
+      (hass_sensor_power_w{entity!~"sensor\\.(pc|heat_pump|router|ventilation)_power"} != 0)
     for: 15m
     labels:
       severity: warning
