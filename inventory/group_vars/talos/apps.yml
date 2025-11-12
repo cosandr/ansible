@@ -2,15 +2,15 @@
 
 # TODO: Renovate?
 # https://cert-manager.io/docs/releases/
-certmanager_version: "1.18.2"
+certmanager_version: "1.19.1"
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
-prometheus_version: "76.5.1"
+prometheus_version: "79.5.0"
 # https://github.com/cilium/cilium/releases
-cilium_version: "1.18.1"
+cilium_version: "1.18.4"
 # https://github.com/fluxcd/flux2/releases
 flux_version: "2.7.x"
 # https://github.com/controlplaneio-fluxcd/flux-operator/releases
-flux_operator_version: "0.32.0"
+flux_operator_version: "0.33.0"
 # https://github.com/kubernetes-sigs/gateway-api/releases
 # https://docs.cilium.io/en/v1.18/network/servicemesh/gateway-api/gateway-api/#prerequisites
 gateway_api_version: "1.3.0"
