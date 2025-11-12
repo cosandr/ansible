@@ -22,8 +22,10 @@ firewalld_services:
 firewall_rules:
   # Reverse proxies
   - port: "{{ grafana_port }}"
-    sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
+    sources: "{{ subnets.vm.localgw }}"
   # Group ports
+  - port: "{{ grafana_port }}"
+    zone: cluster
   - port: "{{ node_exporter_port }}"
     zone: cluster
   - port: "{{ alertmanager_port }}"
