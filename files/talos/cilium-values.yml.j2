@@ -63,16 +63,15 @@ hubble:
   ui:
     enabled: true
 
+# Cannot use proxy-protocol selectively
+# https://github.com/cilium/cilium/issues/41876
 gatewayAPI:
-  enabled: true
-
-ingressController:
-# https://github.com/cilium/cilium/issues/29967
   enabled: false
-#   loadbalancerMode: shared
-#   service:
-#     # Local isn't being advertised (and doesn't preserve client IPs anyway)
-#     externalTrafficPolicy: Cluster
+
+# Buggy
+# https://github.com/cilium/cilium/issues/29967
+ingressController:
+  enabled: false
 
 # Talos specific
 # https://www.talos.dev/v1.11/kubernetes-guides/network/deploying-cilium/
