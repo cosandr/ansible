@@ -5,5 +5,5 @@ mt_dns_entries:
     address: "{{ ansible_host }}"
 
 mt_dns_settings:
-  - servers: "{{ hostvars['rb5009'].host_ips.mgmt }},1.1.1.1,8.8.8.8"
+  - servers: "{{ hostvars['rb5009'].host_ips.mgmt }}"
     cache-size: 2048  # default, but module provides 2048KiB

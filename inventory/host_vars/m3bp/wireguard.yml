@@ -10,8 +10,6 @@ wireguard_addresses:
 
 wireguard_dns_list:
   - "{{ hostvars['rb5009'].wireguard_ip }}"
-  - "1.1.1.1"
-  - "8.8.8.8"
   - "{{ domains['hb'] }}"
   - "vm.{{ domains['hb'] }}"
 
