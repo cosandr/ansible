@@ -7,8 +7,6 @@ wireguard_addresses:
 
 wireguard_dns_list:
   - "{{ hostvars['rb5009'].wireguard_ip }}"
-  - "1.1.1.1"
-  - "8.8.8.8"
 
 wireguard_mt_allowed_ips:
   - "{{ hostvars['rb5009'].wireguard_ip }}/32"

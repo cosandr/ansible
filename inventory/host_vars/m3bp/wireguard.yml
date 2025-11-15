@@ -11,7 +11,9 @@ wireguard_addresses:
 wireguard_dns_list:
   - "{{ hostvars['rb5009'].wireguard_ip }}"
   - "{{ domains['hb'] }}"
-  - "vm.{{ domains['hb'] }}"
+  - "{{ all_net.vm.domain }}"
+  - "{{ all_net.mgmt.domain }}"
+  - "{{ all_net.talos.domain }}"
 
 wireguard_mt_allowed_ips:
   - "{{ all_net | json_query('*.cidr') }}"
