@@ -6,3 +6,5 @@ vm_mem: 2048
 
 vm_rbd_root_enabled: true
 vm_root_size: "20G"
+
+swapfile_size: 2G
