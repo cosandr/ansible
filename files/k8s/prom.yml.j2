@@ -5,18 +5,49 @@ crds:
   upgradeJob:
     enabled: true
 
+extraManifests:
+  - apiVersion: gateway.envoyproxy.io/v1alpha1
+    kind: SecurityPolicy
+    metadata:
+      name: alertmanager-allowlist
+    spec:
+      targetRefs:
+      - group: gateway.networking.k8s.io
+        kind: HTTPRoute
+        name: prometheus-kube-prometheus-alertmanager
+      authorization:
+        defaultAction: Deny
+        rules:
+        - action: Allow
+          principal:
+            clientCIDRs: {{ firewall_trusted_sources | to_json }}
+
+  - apiVersion: gateway.envoyproxy.io/v1alpha1
+    kind: SecurityPolicy
+    metadata:
+      name: prometheus-allowlist
+    spec:
+      targetRefs:
+      - group: gateway.networking.k8s.io
+        kind: HTTPRoute
+        name: prometheus-kube-prometheus-prometheus
+      authorization:
+        defaultAction: Deny
+        rules:
+        - action: Allow
+          principal:
+            clientCIDRs: {{ (firewall_trusted_sources + node_exporter_allow_ips) | to_json }}
+
 alertmanager:
   enabled: true
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - "am.{{ kube_ingress_domain }}"
-    paths:
-      - /
-    pathType: ImplementationSpecific
-    annotations:
-      nginx.ingress.kubernetes.io/whitelist-source-range: "{{ firewall_trusted_sources | join(',') }}"
+  route:
+    main:
+      enabled: true
+      hostnames:
+        - "am.{{ kube_ingress_domain }}"
+      parentRefs:
+        - name: envoy
+          namespace: envoy-gateway-system
 
   alertmanagerSpec:
     externalUrl: "http://am.{{ kube_ingress_domain }}"
@@ -90,16 +121,14 @@ prometheusOperator:
       limits:
         memory: 64Mi
 prometheus:
-  ingress:
-    enabled: true
-    ingressClassName: nginx
-    hosts:
-      - "prom.{{ kube_ingress_domain }}"
-    paths:
-      - /
-    pathType: ImplementationSpecific
-    annotations:
-      nginx.ingress.kubernetes.io/whitelist-source-range: "{{ (firewall_trusted_sources + node_exporter_allow_ips) | join(',') }}"
+  route:
+    main:
+      enabled: true
+      hostnames:
+        - "prom.{{ kube_ingress_domain }}"
+      parentRefs:
+        - name: envoy
+          namespace: envoy-gateway-system
 
   prometheusSpec:
     podMonitorSelectorNilUsesHelmValues: false

@@ -4,7 +4,7 @@
 # https://cert-manager.io/docs/releases/
 certmanager_version: "1.19.1"
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
-prometheus_version: "79.5.0"
+prometheus_version: "79.7.1"
 # https://github.com/cilium/cilium/releases
 cilium_version: "1.18.4"
 # https://github.com/fluxcd/flux2/releases
