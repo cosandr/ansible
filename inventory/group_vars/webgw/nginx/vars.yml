@@ -40,7 +40,7 @@ nginx_extra_conf_options: |
       listen [{{ pip_k8s_v6 }}]:80;
       listen [{{ pip_k8s_v6 }}]:443;
   {% endif %}
-      proxy_pass {{ k8s_nginx_public_address }}:$server_port;
+      proxy_pass {{ k8s_ingress_public_address }}:$server_port;
       proxy_protocol on;
     }
   {% endif %}
