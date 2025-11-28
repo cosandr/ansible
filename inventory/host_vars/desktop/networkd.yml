@@ -30,8 +30,6 @@ networkd_config:
     [Network]
     Address={{ host_ips_with_prefix[host_net] }}
     DNS={{ hostvars['rb5009'].host_ips[host_net] }}
-    DNS=1.1.1.1
-    DNS=8.8.8.8
     IPForward=yes
     IPv6PrivacyExtensions=yes
     IPv6AcceptRA=yes

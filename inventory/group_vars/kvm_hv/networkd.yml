@@ -9,8 +9,6 @@ host_exclude_nets:
 
 resolv_config: |
   nameserver {{ hostvars['rb5009'].host_ips[host_net] }}
-  nameserver 1.1.1.1
-  nameserver 8.8.8.8
   search {{ domains['hb'] }}{% for net in host_ips.keys() if all_net[net].domain is defined %} {{ all_net[net].domain }}{% endfor %}
 
 host_bridge_config:

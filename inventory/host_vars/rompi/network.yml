@@ -5,4 +5,4 @@ dhcpcd_config: |
   interface eth0
   static ip_address={{ ansible_host }}/24
   static routers=10.1.0.1
-  static domain_name_servers=10.1.0.1 1.1.1.1 8.8.8.8
+  static domain_name_servers=10.1.0.1
