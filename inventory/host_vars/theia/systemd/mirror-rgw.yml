@@ -1,0 +1,31 @@
+---
+
+__sd_mirror_rgw:
+  name: mirror-rgw
+  service:
+    content: |
+      [Unit]
+      Description=Mirror RGW to MinIO
+      After=network-online.target ceph.target minio.service
+      Requires=network-online.target ceph.target minio.service
+
+      [Service]
+      ExecStart=/usr/local/bin/mc mirror --overwrite --remove --summary rgw/ local/rgw/
+
+      [Install]
+      WantedBy=multi-user.target
+
+  # Daily at 05:00
+  timer:
+    enabled: true
+    state: started
+    content: |
+      [Unit]
+      Description=Scheduled RGW mirror
+
+      [Timer]
+      Persistent=yes
+      OnCalendar=*-*-* 05:00:00
+
+      [Install]
+      WantedBy=timers.target
