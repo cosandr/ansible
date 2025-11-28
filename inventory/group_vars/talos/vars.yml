@@ -6,9 +6,9 @@ __host_ips_3:
   san: "{{ subnets.san.talos | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(groups['talos'] | ansible.utils.index_of('eq', inventory_hostname)) }}"
 
 # https://github.com/siderolabs/talos/releases
-talos_version: "1.11.0"
+talos_version: "1.11.5"
 # https://kubernetes.io/releases/
-kube_version: "1.33.4"
+kube_version: "1.34.2"
 
 talos_schedule_on_control_plane: true
 talos_kubeprism_enabled: true
