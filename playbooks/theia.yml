@@ -17,6 +17,7 @@
             owner: root
             group: root
             mode: "0644"
+          when: ansible_distribution_version | int < 13
           tags: ["apt", "install"]
 
         - name: Install ZFS requirements

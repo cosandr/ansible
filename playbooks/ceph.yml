@@ -15,6 +15,7 @@
         group: root
         mode: "0644"
       diff: false
+      when: ansible_distribution_version | int < 13
       tags: ["apt"]
 
     - name: Add Ceph repo
@@ -22,13 +23,37 @@
         repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/ceph-keyring.gpg] https://eu.ceph.com/debian-{{ ceph_version }} {{ ansible_distribution_release | lower }} main"
         state: present
         filename: ceph
+      when: ansible_distribution_version | int < 13
+      tags: ["apt"]
+
+    - name: Download Proxmox GPG key
+      ansible.builtin.get_url:
+        url: "https://enterprise.proxmox.com/debian/proxmox-archive-keyring-{{ ansible_distribution_release | lower }}.gpg"
+        dest: /etc/apt/keyrings/proxmox-archive-keyring.gpg
+        owner: root
+        group: root
+        mode: "0644"
+      diff: false
+      when: ansible_distribution_version | int >= 13
+      tags: ["apt"]
+
+    - name: Add Proxmox Ceph repo
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/proxmox-archive-keyring.gpg] http://download.proxmox.com/debian/ceph-{{ ceph_version }} {{ ansible_distribution_release | lower }} no-subscription"
+        state: present
+        filename: ceph
+      when: ansible_distribution_version | int >= 13
       tags: ["apt"]
 
     - name: Prefer repo packages
       ansible.builtin.copy:
         content: |
           Package: *
+          {% if ansible_distribution_version | int < 13 %}
           Pin: origin ceph.com
+          {% else %}
+          Pin: origin proxmox.com
+          {% endif %}
           Pin-Priority: 900
         dest: "/etc/apt/preferences.d/99ceph"
         owner: root
