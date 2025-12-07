@@ -3,6 +3,14 @@
 vm_cpus: 2
 vm_mem: 6144
 
+# Allows for live migrations between Theia and Rhea
+vm_cpu_model_name: "EPYC-Rome"
+# If started from Rhea, fails with
+# error: operation failed: guest CPU doesn't match specification: missing features: xsaves
+vm_cpu_features:
+  - name: xsaves
+    policy: disable
+vm_rbd_root_enabled: true
 vm_root_size: "20G"
-vm_data_disks:
+vm_rbd_data_disks:
   - "100G"
