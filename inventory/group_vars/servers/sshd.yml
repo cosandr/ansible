@@ -1,6 +1,7 @@
 ---
 
-sshd_permit_root: "prohibit-password"
+sshd_allowed_root: []
+sshd_permit_root: "no"
 
 sshd_config_group:
   - regexp: "^#?StrictModes"
@@ -25,3 +26,7 @@ sshd_config_group:
     line: "ClientAliveCountMax 3"
 
 sshd_config: "{{ (sshd_config_group | default([])) + (sshd_config_host | default([])) }}"
+
+sshd_extra_config: |
+  Match Address {{ firewall_trusted_sources | join(',') }}
+    PermitRootLogin prohibit-password

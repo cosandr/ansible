@@ -10,3 +10,7 @@ ssh_custom_host_names:
   - "{{ inventory_hostname }}.vm.{{ domain }}"
   - "{{ host_ips.san }}"
   - "{{ inventory_hostname }}.san.{{ domain }}"
+
+sshd_extra_config: |
+  Match Address {{ (firewall_trusted_sources + (subnets | json_query('*.hosts') | flatten)) | join(',') }}
+    PermitRootLogin prohibit-password

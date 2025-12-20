@@ -1,6 +1,7 @@
 ---
 
 sshd_permit_root: "no"
+sshd_extra_config: ""
 sshd_config_host:
   - regexp: "^#?AddressFamily"
     line: "AddressFamily inet"

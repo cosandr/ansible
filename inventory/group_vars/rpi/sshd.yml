@@ -1,5 +1,6 @@
 ---
 
+sshd_extra_config: ""
 sshd_config:
   - regexp: "^#?StrictModes"
     line: "StrictModes yes"
