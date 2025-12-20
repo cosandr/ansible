@@ -34,6 +34,15 @@ machine:
           - "{{ host_ips_with_prefix.san }}"
         mtu: {{ all_net.san.mtu }}
   nodeLabels: {{ node_labels | to_json }}
+{% if 'talos_cp' in group_names %}
+  features:
+    kubernetesTalosAPIAccess:
+      enabled: true
+      allowedRoles:
+      - os:etcd:backup
+      allowedKubernetesNamespaces:
+      - kube-system
+{% endif %}
 
 {% if 'talos_cp' in group_names %}
 cluster:
