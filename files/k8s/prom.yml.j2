@@ -116,6 +116,8 @@ alertmanager:
 grafana:
   enabled: false
 prometheusOperator:
+  kubeletEndpointsEnabled: false
+  kubeletEndpointSliceEnabled: true
   resources:
     requests:
       cpu: 50m
@@ -144,6 +146,7 @@ prometheus:
     ruleSelectorNilUsesHelmValues: false
     serviceMonitorSelectorNilUsesHelmValues: false
     probeSelectorNilUsesHelmValues: false
+    serviceDiscoveryRole: EndpointSlice
     externalLabels: {}
     externalUrl: "http://prom.{{ kube_ingress_domain }}"
     retention: 1y
