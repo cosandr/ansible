@@ -91,6 +91,9 @@ alertmanager:
           repeat_interval: 1m
           matchers:
             - alertname = "Watchdog"
+        - receiver: 'discord_no_resolved'
+          matchers:
+            - alertname =~ "^(KubePodOOMKilled)$"
     receivers:
       - name: 'null'
       - name: watchdog
@@ -100,6 +103,12 @@ alertmanager:
       - name: discord
         discord_configs:
           - send_resolved: true
+            webhook_url: "{{ vault_alertmanager_discord_webhook_url }}"
+            title: '{% raw %}{{ template "discord.andrei.title" . }}{% endraw %}'
+            message: '{% raw %}{{ template "discord.andrei.message" . }}{% endraw %}'
+      - name: discord_no_resolved
+        discord_configs:
+          - send_resolved: false
             webhook_url: "{{ vault_alertmanager_discord_webhook_url }}"
             title: '{% raw %}{{ template "discord.andrei.title" . }}{% endraw %}'
             message: '{% raw %}{{ template "discord.andrei.message" . }}{% endraw %}'
