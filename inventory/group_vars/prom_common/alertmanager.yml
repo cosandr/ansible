@@ -18,6 +18,9 @@ alertmanager_template_files:
 # https://github.com/prometheus/alertmanager/blob/main/template/default.tmpl
 alertmanager_receivers:
   - name: 'null'
+  - name: watchdog
+    webhook_configs:
+      - url: "{{ vault_alertmanager_watchdog_url }}"
   - name: discord
     discord_configs:
       - send_resolved: true
@@ -32,6 +35,12 @@ alertmanager_route:
   repeat_interval: 168h
   receiver: discord
   routes:
+    - receiver: 'watchdog'
+      group_interval: 30s
+      repeat_interval: 1m
+      matchers:
+        - alertname = "Watchdog"
+
     - receiver: 'null'
       matchers:
         - alertname=~"BlackboxSslCertificate.+"
