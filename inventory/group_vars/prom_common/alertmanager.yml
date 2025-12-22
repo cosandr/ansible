@@ -28,6 +28,9 @@ alertmanager_receivers:
         title: '{% raw %}{{ template "discord.andrei.title" . }}{% endraw %}'
         message: '{% raw %}{{ template "discord.andrei.message" . }}{% endraw %}'
 
+alertmanager_config_flags_extra:
+  data.retention: 192h
+
 alertmanager_route:
   group_by: ['instance', 'job']
   group_wait: 30s
