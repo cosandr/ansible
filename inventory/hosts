@@ -44,7 +44,6 @@ unifios      ansible_host="10.0.100.112"
 syno         ansible_host="10.0.100.128"
 webgw01      wireguard_ip="10.4.20.80"
 romsto       wireguard_ip="10.4.20.96"
-rompi        wireguard_ip="10.4.20.97"
 udr7         wireguard_ip="10.4.20.98"
 # END AUTO GENERATED VARIABLES
 
@@ -124,7 +123,6 @@ ansible_group_priority=2
 
 [rpi]
 drepi   ansible_user=andrei host_num=0
-rompi   ansible_user=andrei
 
 [pg]
 pg01 host_num=0 vm_host=gerd
@@ -230,7 +228,6 @@ rhea
 
 [rom]
 romsto  ansible_host=10.1.0.6  host_wg_subnet=rom host_wg_num=0
-rompi   ansible_host=10.1.0.3  host_wg_subnet=rom host_wg_num=1
 udr7    ansible_host=10.1.0.1  host_wg_subnet=rom host_wg_num=2
 
 [rom:vars]
