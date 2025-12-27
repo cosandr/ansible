@@ -43,7 +43,6 @@ rhea         ansible_host="10.0.100.20"
 unifios      ansible_host="10.0.100.112"
 syno         ansible_host="10.0.100.128"
 webgw01      wireguard_ip="10.4.20.80"
-romsto       wireguard_ip="10.4.20.96"
 udr7         wireguard_ip="10.4.20.98"
 # END AUTO GENERATED VARIABLES
 
@@ -227,7 +226,7 @@ aegir
 rhea
 
 [rom]
-romsto  ansible_host=10.1.0.6  host_wg_subnet=rom host_wg_num=0
+romsto  ansible_host=10.1.0.6
 udr7    ansible_host=10.1.0.1  host_wg_subnet=rom host_wg_num=2
 
 [rom:vars]

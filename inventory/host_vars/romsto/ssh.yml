@@ -1,4 +1,0 @@
----
-
-ssh_custom_host_names:
-  - "{{ wireguard_ip }}"

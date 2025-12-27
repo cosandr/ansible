@@ -41,7 +41,6 @@ __mt_firewall_subnet_lists:
   - "{{ subnets.mt.trusted | andrei.utils.items2dictlist('address', list='allow-lan', comment='wg-trusted') }}"
   - "{{ subnets.mt.webgw | andrei.utils.items2dictlist('address', list='allow-www', comment='wg-webgw') }}"
   - "{{ subnets.mt.webgw | andrei.utils.items2dictlist('address', list='allow-smtp', comment='wg-smtp-webgw') }}"
-  - "{{ subnets.mt.rom | andrei.utils.items2dictlist('address', list='allow-smtp', comment='wg-smtp-rom') }}"
   - "{{ subnets.vm.gitlab | andrei.utils.items2dictlist('address', list='www', comment='vm-gitlab') }}"
   - "{{ subnets.vm.localgw | andrei.utils.items2dictlist('address', list='allow-www', comment='vm-localgw') }}"
   - "{{ subnets.vm.loki | andrei.utils.items2dictlist('address', list='loki', comment='vm-loki') }}"

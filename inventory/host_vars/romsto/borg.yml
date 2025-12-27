@@ -5,7 +5,7 @@ borg_group: "users"
 borg_pool: "/mnt/user/backup/borg"
 borg_server: true
 
-borg_ssh_check: "{{ borg_user }}@{{ wireguard_ip }}"
+borg_ssh_check: "{{ borg_user }}@{{ ansible_host }}"
 borg_remote_repo: "ssh://{{ borg_ssh_check }}/."
 
 borg_backups:

@@ -23,8 +23,3 @@ wireguard_unmanaged_peers:
     allowed_ips: "{{ wireguard_mt_allowed_ips | flatten | join(', ') }}"
     public_key: "{{ hostvars['rb5009'].wireguard_public_key }}"
     preshared_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_psk_mt') }}"
-  romsto:
-    endpoint: "{{ hostvars['romsto'].ddns_domain }}:{{ hostvars['romsto'].wireguard_port }}"
-    allowed_ips: "{{ hostvars['romsto'].wireguard_ip }}/32"
-    public_key: "{{ hostvars['romsto'].wireguard_public_key }}"
-    preshared_key: "{{ lookup('community.general.passwordstore', 'network/webgw01_wg_psk_romsto') }}"
