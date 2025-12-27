@@ -7,3 +7,4 @@ mt_wg_fetch_psk: true
 
 mt_wg_allowed_addresses:
   - "{{ wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') }}"
+  - "10.1.0.0/24"

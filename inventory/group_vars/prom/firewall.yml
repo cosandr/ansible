@@ -51,6 +51,13 @@ firewall_rules:
   - port: 514
     protocol: udp
     sources: "{{ all_net.mgmt | json_query('[cidr, cidr6]') | flatten }}"
+  # rsyslog from UDR7
+  - port: 514
+    protocol: tcp
+    sources: ["{{ hostvars['udr7'].ansible_host }}", "{{ hostvars['udr7'].wireguard_ip }}"]
+  - port: 514
+    protocol: udp
+    sources: ["{{ hostvars['udr7'].ansible_host }}", "{{ hostvars['udr7'].wireguard_ip }}"]
   # Loki sends alerts too
   - port: "{{ alertmanager_port }}"
     sources: "{{ subnets.vm.loki }}"

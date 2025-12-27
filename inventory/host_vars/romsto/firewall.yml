@@ -1,5 +1,9 @@
 ---
 
 mt_firewall_address_lists:
+  - address: "{{ ansible_host }}"
+    list: allow-backup
+  - address: "{{ ansible_host }}"
+    list: allow-smtp
   - address: "{{ wireguard_ip }}"
     list: allow-backup

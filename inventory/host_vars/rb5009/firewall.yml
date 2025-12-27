@@ -48,6 +48,7 @@ __mt_firewall_subnet_lists:
   - "{{ subnets.vm.nextcloud | andrei.utils.items2dictlist('address', list='www', comment='vm-nextcloud') }}"
   - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='allow-lan', comment='vm-prom') }}"
   - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='www', comment='vm-prom') }}"
+  - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='rsyslog', comment='vm-prom') }}"
   - "{{ __kube_cidr_map.talos | andrei.utils.items2dictlist('address', list='talos', comment='talos') }}"
   - "{{ vips.vm | dict2items | selectattr('key', 'match', 'localgw\\d+') | map(attribute='value') | flatten
     | andrei.utils.items2dictlist('address', list='allow-www', comment='vm-localgw-vips') }}"
@@ -56,6 +57,8 @@ __mt_firewall_subnet_lists:
   - "{{ [hostvars['theia'].host_ips.general] | andrei.utils.items2dictlist('address', list='samba', comment='theia-samba') }}"
   - "{{ [hostvars['desktop'].host_ips.public] | andrei.utils.items2dictlist('address', list='allow-samba', comment='desktop-samba-public') }}"
   - "{{ subnets.mgmt.unifios | andrei.utils.items2dictlist('address', list='unifi-os-server', comment='unifi-os-server') }}"
+  - "{{ [all_net.mt.cidr] | andrei.utils.items2dictlist('address', list='wg-no-nat', comment='WG') }}"
+  - "{{ ['10.1.0.0/24'] | andrei.utils.items2dictlist('address', list='wg-no-nat', comment='rom-lan') }}"
 
 # https://help.mikrotik.com/docs/spaces/ROS/pages/328513/Building+Advanced+Firewall
 __mt_firewall_address_lists_manual:
