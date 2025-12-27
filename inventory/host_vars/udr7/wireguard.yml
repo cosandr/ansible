@@ -1,0 +1,9 @@
+---
+
+wireguard_public_key: "{{ vault_wireguard_public_key }}"
+wireguard_addresses:
+  - "{{ wireguard_ip }}/{{ wg_net[host_wg_net].cidr | ansible.utils.ipaddr('prefix') | string }}"
+mt_wg_fetch_psk: true
+
+mt_wg_allowed_addresses:
+  - "{{ wireguard_addresses | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') }}"

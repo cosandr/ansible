@@ -1,3 +1,3 @@
 ---
 
-proxy_hosts: "{{ groups['webgw'] | intersect(groups['rom']) | map('extract', hostvars, 'ansible_host') }}"
+mt_dns_entries: []

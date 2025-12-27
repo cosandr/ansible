@@ -2,7 +2,7 @@
 ---
 
 - name: Upgrade OS with dnf or apt
-  hosts: servers, !romsto, !syno, !talos
+  hosts: servers, !romsto, !syno, !talos, !udr7
   gather_facts: true
   become: true
   strategy: free
