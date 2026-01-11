@@ -54,3 +54,19 @@ groups:
       severity: warning
     annotations:
       summary: Boiler has not turned on for more than 12 hours
+
+  - alert: HassLowHumidity
+    expr: hass_sensor_humidity_percent{job="hass", entity!~"sensor\\.(outside|bathroom|storage)_.*"} < 30
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.friendly_name }} is low ({{ $value }}%)"
+
+  - alert: HassHighHumidity
+    expr: hass_sensor_humidity_percent{job="hass", entity!="sensor.outside_humidity"} > 70
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "{{ $labels.friendly_name }} is high ({{ $value }}%)"
