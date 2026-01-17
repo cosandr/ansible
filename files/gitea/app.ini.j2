@@ -11,8 +11,7 @@ SECRET_KEY = {{ gitea_secret_key }}
 INTERNAL_TOKEN = {{ gitea_internal_token }}
 
 [oauth2]
-ENABLED = false
-# Crashes on startup if missing, even though it's disabled
+ENABLED = true
 JWT_SECRET = {{ gitea_oauth2_jwt_secret }}
 
 [ui]

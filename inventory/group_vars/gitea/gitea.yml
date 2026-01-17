@@ -5,7 +5,7 @@
 # sudo -u git gitea --config /etc/gitea/app.ini admin user create --admin --username andrei --password asecurepassword --must-change-password --email <email>
 
 gitea_port: 3000
-gitea_version: "1.24.4"
+gitea_version: "1.25.3"
 gitea_uid: "990"
 gitea_gid: "990"
 gitea_secret_key: "{{ vault_gitea_secret_key }}"
