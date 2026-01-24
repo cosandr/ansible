@@ -20,7 +20,7 @@ sddm_dpi: 144
 
 host_nic_names:
   - wlan0
-  - enp42s0
+  - enp11s0
 
 wol_host: "rb5009"
 wol_address: "{{ lookup('community.general.passwordstore', 'wol/' + inventory_hostname) }}"
