@@ -5,6 +5,7 @@ sbctl_enroll_microsoft: true
 
 esp_src: "UUID=538E-A9BF"
 esp_disk: "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_500GB_S466NB0K423668X"
+esp_mount: "/efi"
 extra_kernel_params: "nowatchdog nvidia-drm.modeset=1"
 kernel_params: "root=/dev/mapper/root rootflags=subvol=@ {{ extra_kernel_params }}"
 
