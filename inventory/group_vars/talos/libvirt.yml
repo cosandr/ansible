@@ -36,6 +36,11 @@ __nvidia_vm_pci_devices:
       bus: "0x01"
       slot: "0x00"
       function: "0x0"
+  - address:
+      domain: "0x0000"
+      bus: "0x01"
+      slot: "0x00"
+      function: "0x1"
 
 vm_extra_disks:
   - name: "talos-boot.iso"
