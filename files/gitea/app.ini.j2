@@ -89,3 +89,6 @@ INTERVAL = 60
 MODE      = file
 LEVEL     = Warn
 ROOT_PATH = /var/log/gitea
+
+[webhook]
+ALLOWED_HOST_LIST = *.{{ domains['dv'] }}, *.{{ domains['hb'] }}, *.{{ all_net.talos.domain }}
