@@ -4,8 +4,8 @@ sbctl_enroll: false
 sbctl_enroll_microsoft: true
 
 esp_src: "UUID=538E-A9BF"
-esp_disk: "/dev/nvme1n1"
-extra_kernel_params: "nmi_watchdog=0 nvidia-drm.modeset=1"
+esp_disk: "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_500GB_S466NB0K423668X"
+extra_kernel_params: "nowatchdog nvidia-drm.modeset=1"
 kernel_params: "root=/dev/mapper/root rootflags=subvol=@ {{ extra_kernel_params }}"
 
 network_manager: "systemd-networkd"
@@ -15,7 +15,7 @@ boot_loader: "refind"
 sbctl_sign_files:
   - "/boot/vmlinuz-linux"
   - "/boot/vmlinuz-linux-lts"
-  - "/boot/EFI/Boot/bootx64.efi"
+  - "{{ esp_mount }}/EFI/Boot/bootx64.efi"
 
 pacman_packages: "{{ base_pacman_packages + host_pacman_packages }}"
 aur_packages: "{{ base_aur_packages + host_aur_packages }}"

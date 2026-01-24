@@ -49,7 +49,7 @@ esp_src: "LABEL=ESP"
 esp_mount: "{{ '/boot' if desktop_environment in ['i3', 'sway'] else '/boot/efi' }}"
 mkinitcpio_uefi_prefix: "arch_{{ desktop_environment }}"
 
-extra_kernel_params: "intel_iommu=on nmi_watchdog=0 console=tty7"
+extra_kernel_params: "intel_iommu=on nowatchdog console=tty7"
 kernel_params: "root=/dev/mapper/root rw rootflags=subvol=arch_{{ desktop_environment }}/@ resume=/dev/mapper/root resume_offset=2893056 {{ extra_kernel_params }}"
 
 crypttab_initramfs: |

@@ -10,7 +10,7 @@ kernel_params: ""
 mkinitcpio_modules: ""
 mkinitcpio_binaries: ""
 mkinitcpio_files: ""
-mkinitcpio_hooks: "base systemd autodetect microcode keyboard sd-vconsole modconf block sd-encrypt filesystems fsck"
+mkinitcpio_hooks: "base systemd autodetect microcode modconf kms keyboard sd-vconsole block sd-encrypt filesystems fsck"
 
 mkinitcpio_kernel_presets:
   - default
