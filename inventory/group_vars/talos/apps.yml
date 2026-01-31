@@ -4,13 +4,13 @@
 # https://cert-manager.io/docs/releases/
 certmanager_version: "1.19.2"
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
-prometheus_version: "80.6.0"
+prometheus_version: "81.2.2"
 # https://github.com/cilium/cilium/releases
 cilium_version: "1.18.4"
 # https://github.com/fluxcd/flux2/releases
 flux_version: "2.7.x"
 # https://github.com/controlplaneio-fluxcd/flux-operator/releases
-flux_operator_version: "0.37.1"
+flux_operator_version: "0.40.0"
 
 alertmanager_template_files: >-
   {%- set tmp = {} -%}
