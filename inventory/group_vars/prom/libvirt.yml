@@ -6,4 +6,4 @@ vm_mem: 4096
 vm_rbd_root_enabled: true
 vm_root_size: "10G"
 vm_rbd_data_disks:
-  - "600G"
+  - "700G"
