@@ -37,6 +37,11 @@ __firewall_rules_1:
     zone: internal
     sources: "{{ node_exporter_allow_ips }}"
 
+  # https://doc.crowdsec.net/docs/next/observability/prometheus
+  - port: "6060"
+    zone: internal
+    sources: "{{ node_exporter_allow_ips }}"
+
 firewalld_rich_rules:
   - zone: public
     rich_rule: 'rule service name="dns" accept limit value="30/s"'

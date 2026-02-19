@@ -242,6 +242,12 @@ __extra_prometheus_scrape_configs:
       - targets: ["{{ hostvars['gitea01'].ansible_host }}:{{ hostvars['gitea01'].elastic_exporter_port }}"]
         labels: "{{ hostvars['gitea01'].prometheus_node_labels }}"
 
+  - job_name: 'crowdsec'
+    scrape_interval: 1m
+    static_configs:
+      - targets: ["{{ hostvars['webgw01'].wireguard_ip }}:6060"]
+        labels: "{{ hostvars['webgw01'].prometheus_node_labels }}"
+
   - job_name: 'nginx'
     scrape_interval: 60s
     static_configs: "{{ __prom_nginx_configs }}"
