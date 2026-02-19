@@ -19,10 +19,6 @@ __nginx_upstreams_3:
     servers: ["{{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_registry_nginx_listen_port }}"]
     keepalive: 16
 
-  - name: grafana
-    servers: ["{{ hostvars['prom01'].ansible_host }}:{{ hostvars['prom01'].grafana_port }}"]
-    keepalive: 16
-
   - name: nextcloud
     servers: ["{{ hostvars['nextcloud01'].ansible_host }}:{{ hostvars['nextcloud01'].nextcloud_port }}"]
     keepalive: 16

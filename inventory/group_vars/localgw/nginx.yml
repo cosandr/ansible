@@ -16,6 +16,10 @@ __nginx_upstreams_1:
     servers: "{{ groups['ceph'] | map('extract', hostvars, 'host_ips') | map(attribute='san') |
       map('regex_replace', '$', ':' + (rgw_frontend_port | string)) | list }}"
 
+  - name: grafana
+    servers: ["{{ hostvars['prom01'].ansible_host }}:{{ hostvars['prom01'].grafana_port }}"]
+    keepalive: 16
+
 __nginx_vhosts_1:
   - filename: external-dns.conf
     server_name: external-dns
@@ -31,3 +35,7 @@ __nginx_vhosts_1:
   - filename: ceph.conf
     server_name: ceph
     template: "{{ repo_base_dir }}/files/webgw/nginx/ceph.conf.j2"
+
+  - filename: grafana.conf
+    server_name: grafana
+    template: "{{ repo_base_dir }}/files/webgw/nginx/grafana.conf.j2"
