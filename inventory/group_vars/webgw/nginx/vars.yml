@@ -17,6 +17,11 @@ nginx_listen_https: |-
 
 nginx_extra_conf_options: |
   stream {
+    log_format main '$remote_addr [$time_local] '
+                    '$protocol $status $bytes_sent $bytes_received '
+                    '$session_time "$upstream_addr" '
+                    '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
+
     upstream gitlab-ssh {
   {% for h in groups['gitlab'] %}
       server {{ hostvars[h].ansible_host }}:{{ hostvars[h].gitlab_sshd_port }};
@@ -28,6 +33,8 @@ nginx_extra_conf_options: |
       listen [{{ nginx_listen_v6 }}]:22;
       proxy_pass gitlab-ssh;
       proxy_protocol on;
+
+      access_log {{ nginx_sites_logs }}/stream-gitlab-ssh.log {{ nginx_access_log_options }};
     }
 
   {% if pip_k8s_v4 is defined or pip_k8s_v6 is defined %}
@@ -42,6 +49,8 @@ nginx_extra_conf_options: |
   {% endif %}
       proxy_pass {{ k8s_ingress_public_address }}:$server_port;
       proxy_protocol on;
+
+      access_log {{ nginx_sites_logs }}/stream-k8s.log {{ nginx_access_log_options }};
     }
   {% endif %}
   }
