@@ -2,11 +2,11 @@
 
 # TODO: Renovate?
 # https://cert-manager.io/docs/releases/
-certmanager_version: "1.19.2"
+certmanager_version: "1.19.4"
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 prometheus_version: "82.4.3"
 # https://github.com/cilium/cilium/releases
-cilium_version: "1.18.4"
+cilium_version: "1.19.1"
 # https://github.com/fluxcd/flux2/releases
 flux_version: "2.7.x"
 # https://github.com/controlplaneio-fluxcd/flux-operator/releases
