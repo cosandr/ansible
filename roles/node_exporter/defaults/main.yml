@@ -8,6 +8,7 @@ node_exporter_skip_install: false
 
 node_exporter_collectors: []
 node_exporter_no_collectors: []
+node_exporter_extra_args: []
 
 node_exporter_web_listen_address: "0.0.0.0:9100"
 
