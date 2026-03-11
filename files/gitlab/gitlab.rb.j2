@@ -125,6 +125,9 @@ registry_nginx['real_ip_trusted_addresses'] = {{ gitlab_registry_nginx_trusted_a
 
 {% if node_exporter_web_listen_address is defined %}
 node_exporter['listen_address'] = '{{ node_exporter_web_listen_address }}'
+node_exporter['flags'] = {
+  'collector.systemd' => true,
+}
 {% endif %}
 
 {% if gitlab_extra_settings is defined %}

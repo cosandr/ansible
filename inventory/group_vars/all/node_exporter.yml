@@ -1,6 +1,9 @@
 ---
 
 node_exporter_version: 1.10.2
+node_exporter_collectors:
+  - systemd
+
 node_exporter_no_collectors:
   - mdadm
   - zfs
