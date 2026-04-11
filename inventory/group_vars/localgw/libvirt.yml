@@ -1,5 +1,7 @@
 ---
 
+# This VM isn't migratable
+vm_cpu_model_name: ""
 vm_cpus: 1
 vm_mem: 1024
 
