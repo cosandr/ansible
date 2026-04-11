@@ -4,3 +4,4 @@ vm_cpus: 4
 vm_mem: 2048
 
 vm_root_size: "100G"
+vm_rbd_root_enabled: true
