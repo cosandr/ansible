@@ -202,9 +202,12 @@ aur_i3_packages:
   - xvkbd
 
 pacman_sway_packages:
+  - cliphist
   - gammastep
   - grim
+  - hyprlock
   - kanshi
+  - nwg-displays
   - qt5-wayland
   - slurp
   - sway
@@ -214,10 +217,9 @@ pacman_sway_packages:
   - waybar
   - wl-clipboard
   - wtype
+  - xdg-desktop-portal-gtk
   - xdg-desktop-portal-wlr
   - xorg-xwayland
 
 aur_sway_packages:
-  - clipman
-  - wdisplays
   - wev
