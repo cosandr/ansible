@@ -1,6 +1,6 @@
 ---
 
-postgres_exporter_version: 0.8.0
+postgres_exporter_version: 0.19.1
 postgres_exporter_required_services: []
 postgres_exporter_host: "/run/postgresql"
 postgres_exporter_ssl: "disable"

@@ -1,7 +1,11 @@
 ---
-- block:
+
+- name: Set exporter version
+  when:
+    - postgres_exporter_version == "latest"
+  block:
     - name: Get latest release
-      uri:
+      ansible.builtin.uri:
         url: "https://api.github.com/repos/prometheus-community/postgres_exporter/releases/latest"
         method: GET
         return_content: true
@@ -17,21 +21,19 @@
       check_mode: false
 
     - name: "Set postgres_exporter version to {{ _latest_release.json.tag_name[1:] }}"
-      set_fact:
+      ansible.builtin.set_fact:
         postgres_exporter_version: "{{ _latest_release.json.tag_name[1:] }}"
-  when:
-    - postgres_exporter_version == "latest"
 
 - name: "Get checksum list"
-  set_fact:
+  ansible.builtin.set_fact:
     __postgres_exporter_checksums: "{{ lookup('url', 'https://github.com/prometheus-community/postgres_exporter/releases/download/v' + postgres_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
   run_once: true
   check_mode: false
   delegate_to: localhost
 
-- name: download postgres_exporter binary to local folder
+- name: Download postgres_exporter binary to local folder
   become: false
-  get_url:
+  ansible.builtin.get_url:
     url: "https://github.com/prometheus-community/postgres_exporter/releases/download/v{{ postgres_exporter_version }}/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
     dest: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
     checksum: "sha256:{{ (__postgres_exporter_checksums | select('search', 'linux-' + go_arch + '.tar.gz') | first).split()[0] }}"
@@ -43,21 +45,21 @@
   delegate_to: localhost
   check_mode: false
 
-- name: unpack postgres_exporter binaries
+- name: Unpack postgres_exporter binaries
   become: false
-  unarchive:
+  ansible.builtin.unarchive:
     src: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
     dest: "/tmp"
     creates: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}/postgres_exporter"
   delegate_to: localhost
   check_mode: false
 
-- name: propagate official postgres_exporter binary
-  copy:
+- name: Propagate official postgres_exporter binary
+  ansible.builtin.copy:
     src: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}/postgres_exporter"
     dest: "{{ _postgres_exporter_binary_install_dir }}/postgres_exporter"
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
   notify:
-    - restart postgres_exporter
+    - Restart postgres_exporter
