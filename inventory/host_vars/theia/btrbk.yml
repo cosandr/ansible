@@ -6,3 +6,8 @@ btrbk_volumes_host:
       - path: "@home"
         options:
           snapshot_name: "home"
+
+      - path: "@{{ hostvars['loki01'].nspawn_machine_root_dir }}"
+        options:
+          snapshot_name: "loki01"
+          snapshot_preserve: "3d"

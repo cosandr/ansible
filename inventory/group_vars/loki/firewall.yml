@@ -37,3 +37,6 @@ firewalld_services:
 firewall_rules:
   - port: "{{ node_exporter_port }}"
     zone: internal
+
+  - port: 3100
+    zone: internal

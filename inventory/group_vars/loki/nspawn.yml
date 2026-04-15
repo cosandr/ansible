@@ -1,0 +1,7 @@
+---
+
+nspawn_cpus: 4
+nspawn_mem: 2048
+
+nspawn_bind_mounts:
+  - /mnt/tank/nspawn/loki:/var/lib/loki:idmap

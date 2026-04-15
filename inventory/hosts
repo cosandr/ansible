@@ -108,7 +108,6 @@ unifios host_net=mgmt host_subnet=unifios host_num=0
 gitlab
 gitrun
 localgw
-loki
 nextcloud
 prom
 talos
@@ -116,6 +115,9 @@ talos
 [libvirt:vars]
 host_net=vm
 ansible_group_priority=2
+
+[nspawn:children]
+loki
 
 [nspawn:vars]
 host_net=vm
