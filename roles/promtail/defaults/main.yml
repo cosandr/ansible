@@ -1,6 +1,7 @@
 ---
 
-promtail_version: "latest"
+# 3.7+ removed promtail packages
+promtail_version: "3.6.10"
 promtail_log_level: "warn"
 # Run as root so we can actually read log files
 promtail_user: "root"
