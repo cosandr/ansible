@@ -12,7 +12,8 @@ __group_deb_packages:
   - netcat-openbsd
   - openssl
   - p7zip-full
-  - "postgresql-client-{{ hostvars['pg01'].postgresql_version }}"
+  - "postgresql-client-{{ hostvars['theia'].postgresql_version }}"
+  - python3-debian
   - python3-venv
   - shellcheck
   - ssh

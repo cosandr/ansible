@@ -12,3 +12,5 @@ __mt_dns_entries_host:
     address: "{{ host_ips.vm }}"
   - name: "{{ inventory_hostname }}.ipmi.{{ domains['hb'] }}"
     address: "{{ host_ips.ipmi }}"
+  - name: "{{ pg_host }}"
+    address: "{{ host_ips.vm }}"

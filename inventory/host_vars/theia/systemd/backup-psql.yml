@@ -50,17 +50,14 @@ __sd_backup_psql:
         mkdir -p "${DIR}" "${TMPDIR}"
 
         cleanup() {
-            rm -rf "${TMPDIR}"
+          rm -rf "${TMPDIR}"
         }
 
         trap cleanup EXIT
 
         set -e -o pipefail
 
-        env PGHOST="{{ hostvars['pg01'].ansible_host }}" \
-            PGUSER="postgres" \
-            PGPASSWORD="{{ hostvars['pg01'].vault_postgresql_passwords.postgres }}" \
-            pg_dumpall -c | gzip > "${TMPDIR}/${FILENAME}"
+        sudo -u postgres pg_dumpall -c | gzip > "${TMPDIR}/${FILENAME}"
 
         # remove all backups except the $KEEP latests
         BACKUPS=$(find "${DIR}" -name "*.gz" | wc -l | sed 's/\ //g')

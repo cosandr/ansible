@@ -2,7 +2,7 @@
 
 pg_cert_installed: true
 pg_cert_pg_user: "certs_pusher"
-pg_cert_pg_password: "{{ hostvars['pg01'].vault_postgresql_passwords.certs_pusher }}"
+pg_cert_pg_password: "{{ hostvars['theia'].vault_postgresql_passwords.certs_pusher }}"
 
 pg_cert_default_owner: "lego"
 pg_cert_default_group: "lego"

@@ -15,6 +15,7 @@ prometheus_node_targets: ["{{ host_ips.vm + ':' + node_exporter_port | string }}
 __unattended_package_blacklist_4:
   - ".*zfs.*"
   - ".*zpool.*"
+  - ".*postgresql.*"
 
 grub_cmdline_group: "vfio-pci.ids=10de:2204,10de:1aef amd_pstate=passive"
 

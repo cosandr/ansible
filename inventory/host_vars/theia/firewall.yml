@@ -20,6 +20,12 @@ __firewalld_services_1:
     zone: public
     sources: "{{ firewall_trusted_sources + node_exporter_allow_ips }}"
 
+  - name: postgresql
+    zone: public
+
+  - name: postgresql
+    zone: internal
+
 __firewall_rules_1:
   - port: "{{ nginx_ports['www'] }}"
     zone: public
@@ -44,6 +50,9 @@ __firewall_rules_1:
 
   # NUT exporter
   - port: 9199
+    sources: "{{ node_exporter_allow_ips }}"
+
+  - port: "{{ postgres_exporter_port }}"
     sources: "{{ node_exporter_allow_ips }}"
 
 mt_firewall_address_lists:

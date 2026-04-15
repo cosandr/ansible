@@ -36,6 +36,7 @@ btrfs_scrub_from_email: "{{ smartd_from_address }}"
 gitlab_registry_basename: "registry.{{ domains['dv'] }}"
 gitlab_external_url: "https://gitlab.{{ domains['dv'] }}"
 gitlab_registry_external_url: "https://{{ gitlab_registry_basename }}"
+pg_host: "pg.{{ domains['hb'] }}"
 
 my_user_pass: "{{ vault_my_user_pass }}"
 

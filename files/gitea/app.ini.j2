@@ -19,10 +19,10 @@ DEFAULT_THEME = gitea-auto
 
 [database]
 DB_TYPE  = postgres
-HOST = {{ hostvars['pg01'].ansible_host }}
+HOST = {{ pg_host }}
 NAME = gitea
 USER = gitea
-PASSWD = {{ hostvars['pg01'].vault_postgresql_passwords.gitea }}
+PASSWD = {{ hostvars['theia'].vault_postgresql_passwords.gitea }}
 SSL_MODE = require
 
 [indexer]

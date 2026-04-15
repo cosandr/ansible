@@ -229,8 +229,8 @@ __extra_prometheus_scrape_configs:
   - job_name: 'postgres'
     scrape_interval: 60s
     static_configs:
-      - targets: ["{{ hostvars['pg01'].ansible_host }}:{{ hostvars['pg01'].postgres_exporter_port }}"]
-        labels: "{{ hostvars['pg01'].prometheus_node_labels }}"
+      - targets: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].postgres_exporter_port }}"]
+        labels: "{{ hostvars['theia'].prometheus_node_labels }}"
 
   - job_name: 'loki'
     static_configs:

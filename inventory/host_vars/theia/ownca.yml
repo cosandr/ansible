@@ -24,3 +24,19 @@ ownca_cert_list:
     ca_passphrase: "{{ ca_passphrase }}"
     ca_publickey_path: "{{ ca_publickey_path }}"
     ca_privatekey_path: "{{ ca_privatekey_path }}"
+
+  - privatekey_path: "{{ postgresql_ssl_key_path }}"
+    publickey_path: "{{ postgresql_ssl_cert_path }}"
+    cn: "{{ inventory_hostname }}-pg"
+    subject_alt_name: >-
+      {%- set tmp = [] -%}
+      {%- for item in mt_dns_entries -%}
+      {{- tmp.append("DNS:" + item.name) -}}
+      {%- endfor -%}
+      {%- for item in host_ips.values() -%}
+      {{- tmp.append("IP:" + item) -}}
+      {%- endfor -%}
+      {{ tmp | unique }}
+    ca_passphrase: "{{ ca_passphrase }}"
+    ca_publickey_path: "{{ ca_publickey_path }}"
+    ca_privatekey_path: "{{ ca_privatekey_path }}"

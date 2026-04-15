@@ -1,28 +1,22 @@
 ---
 
-domain: "{{ domains['hb'] }}"
-provisioned_disks:
-  - dev: "/dev/disk/by-id/virtio-data01"
-    vols:
-      - name: pgsql
-        path: "/var/lib/pgsql"
-        shrink: false
-        size: "100%FREE"
-        mode: "0700"
-
-node_exporter_config_firewall: false
-
-postgresql_version: 16
-postgresql_daemon: "postgresql-{{ postgresql_version }}"
-postgresql_bin_path: "/usr/pgsql-{{ postgresql_version }}/bin"
-postgresql_data_dir: "/var/lib/pgsql/{{ postgresql_version }}/data"
-postgresql_config_path: "/var/lib/pgsql/{{ postgresql_version }}/data"
+postgresql_version: 18
+postgresql_daemon: "postgresql@{{ postgresql_version }}-main"
+postgresql_data_dir: "/var/lib/postgresql/{{ postgresql_version }}/main"
+postgresql_bin_path: "/usr/lib/postgresql/{{ postgresql_version }}/bin"
+postgresql_config_path: "/etc/postgresql/{{ postgresql_version }}/main"
 postgresql_packages:
-  - postgresql16
-  - postgresql16-server
-  - postgresql16-contrib
-postgresql_log_timezone: "Europe/Oslo"
+  - postgresql-18
+  - postgresql-18-pgvector
+  - libpq-dev
+postgresql_log_timezone: "{{ sys_timezone }}"
+postgresql_ssl_ca_path: "{{ ca_publickey_path }}"
+postgresql_ssl_cert_path: "{{ repo_base_dir }}/files/theia/pg.crt"
+postgresql_ssl_key_path: "{{ repo_base_dir }}/files/theia/pg.key"
+postgresql_configure_logrotate: false
 
+pg_base_mem: 4096
+pg_base_cpu: 4
 postgresql_global_config_options:
   - option: listen_addresses
     value: '*'
@@ -34,20 +28,20 @@ postgresql_global_config_options:
     quoted: true
   # Memory
   - option: shared_buffers
-    value: "{{ (vm_mem / 4) | int }}MB"
+    value: "{{ (pg_base_mem / 4) | int }}MB"
   - option: effective_cache_size
-    value: "{{ (vm_mem * 0.75) | int }}MB"
+    value: "{{ (pg_base_mem * 0.75) | int }}MB"
   - option: maintenance_work_mem
-    value: "{{ (vm_mem / 8) | int }}MB"
+    value: "{{ (pg_base_mem / 8) | int }}MB"
   - option: work_mem
-    value: "{{ (vm_mem / 800) | int }}MB"
+    value: "{{ (pg_base_mem / 800) | int }}MB"
   # Parallelism
   - option: max_worker_processes
-    value: "{{ ((vm_cpus * 4) - 1) | int }}"
+    value: "{{ ((pg_base_cpu * 4) - 1) | int }}"
   - option: max_parallel_workers_per_gather
-    value: "{{ (vm_cpus / 2) | int }}"
+    value: "{{ (pg_base_cpu / 2) | int }}"
   - option: max_parallel_workers
-    value: "{{ vm_cpus }}"
+    value: "{{ pg_base_cpu }}"
   # WAL
   - option: wal_buffers
     value: "16MB"

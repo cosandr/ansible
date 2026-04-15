@@ -148,6 +148,17 @@
 
     - role: nut_exporter
       tags: ["nut_exporter"]
+
+    - role: pgbackrest
+      tags: ["pgbackrest"]
+
+    - role: postgresql
+      tags: ["pg"]
+
+    - role: postgres_exporter
+      vars:
+        postgres_service_name: "{{ postgresql_daemon }}"
+      tags: ["prometheus-stack", "postgres_exporter"]
   post_tasks:
     - name: Create .mc dir
       ansible.builtin.file:

@@ -1,10 +1,11 @@
 ---
 
 pgbackrest_async_archive: true
+pgbackrest_local_postgresql: true
 pgbackrest_stanzas:
   - name: main
     pg_config:
-      - path: "/var/lib/pgsql/{{ postgresql_version }}/data"
+      - path: "{{ postgresql_data_dir }}"
     schedules:
       - backup_type: full
         oncalendar: 'Weekly'
@@ -14,6 +15,6 @@ pgbackrest_stanzas:
         oncalendar: 'hourly'
 
 pgbackrest_repos:
-  - path: /var/lib/pgbackrest
+  - path: /mnt/tank/backup/pgbackrest
     retention-full: "7"
     retention-diff: "3"
