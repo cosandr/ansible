@@ -70,6 +70,7 @@ base_pacman_packages:
   - kubectl
   - kubectx
   - kubeseal
+  - libfido2
   - libpulse
   - libtool
   - libva-utils
@@ -139,6 +140,7 @@ base_pacman_packages:
   - wget
   - which
   - yamllint
+  - yubikey-manager
   - zed
   - zsh
   - zsh-completions
