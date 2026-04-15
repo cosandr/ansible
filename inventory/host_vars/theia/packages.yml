@@ -30,6 +30,8 @@ __host_common_packages:
   - php-xml
 
 __host_deb_packages:
+  - arch-install-scripts
+  - debootstrap
   - libsodium-dev
   - libxml2-dev
   - libxslt-dev

@@ -1,0 +1,19 @@
+[Exec]
+Boot=yes
+PrivateUsers={{ nspawn_private_users | andrei.utils.bool_to_yes }}
+Hostname={{ inventory_hostname }}
+LinkJournal=no
+PrivateUsers={{ 'pick' if nspawn_unprivileged else 'no' }}
+
+{% if nspawn_bind_mounts | length > 0 %}
+[Files]
+{% if nspawn_unprivileged %}
+PrivateUsersOwnership={{ nspawn_private_ownership }}
+{% endif %}
+{% for item in nspawn_bind_mounts %}
+Bind={{ item }}
+{% endfor %}
+{% endif %}
+
+[Network]
+Bridge={{ host_net | upper }}

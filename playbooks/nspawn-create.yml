@@ -1,0 +1,125 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+# debootstrap \
+# --exclude=ifupdown \
+# --include=dbus,libpam-systemd,libnss-systemd,bash-completion,ca-certificates,locales,vim,sudo,openssh-server,chrony,firewalld \
+# stable /var/lib/machines/deb13-template
+- name: Create nspawn machines
+  hosts: nspawn
+  gather_facts: false
+  strategy: free
+  vars:
+    chroot_path: "{{ nspawn_machine_root_dir }}"
+  pre_tasks:
+    # https://github.com/ansible-collections/community.general/issues/7098
+    - name: Check if machine dir already exists
+      delegate_to: "{{ nspawn_host }}"
+      ansible.builtin.stat:
+        path: "{{ nspawn_machine_root_dir }}/etc/fstab"
+      register: __machine_check
+      tags: ["btrfs"]
+
+    - name: Create snapshot of template for machine # noqa no-changed-when
+      delegate_to: "{{ nspawn_host }}"
+      ansible.builtin.command:
+        cmd: "btrfs subvolume snapshot {{ nspawn_root_dir }}/{{ nspawn_template }} {{ nspawn_machine_root_dir }}"
+      when: not __machine_check.stat.exists
+      tags: ["btrfs"]
+
+    - name: Create machine template
+      delegate_to: "{{ nspawn_host }}"
+      ansible.builtin.template:
+        src: "{{ repo_base_dir }}/files/nspawn/machine.nspawn.j2"
+        dest: "/etc/systemd/nspawn/{{ inventory_hostname }}.nspawn"
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["nspawn"]
+
+    - name: Get current systemd properties # noqa command-instead-of-module
+      delegate_to: "{{ nspawn_host }}"
+      changed_when: false
+      check_mode: false
+      ansible.builtin.command:
+        cmd: "systemctl show systemd-nspawn@{{ inventory_hostname }}.service"
+      register: systemd_props
+      tags: ["nspawn"]
+
+    - name: Construct props needing updates
+      ansible.builtin.set_fact:
+        systemd_set_props: >-
+          {%- set tmp = [] -%}
+          {%- if curr_mem != conf_mem -%}
+          {{- tmp.append(set_mem) -}}
+          {%- endif -%}
+          {%- if curr_cpu != conf_cpu -%}
+          {{- tmp.append(set_cpu) -}}
+          {%- endif -%}
+          {{ tmp }}
+      vars:
+        curr_mem: "{{ systemd_props.stdout_lines | select('match', '^MemoryHigh=') | first }}"
+        curr_cpu: "{{ systemd_props.stdout_lines | select('match', '^CPUQuotaPerSecUSec=') | first }}"
+        conf_mem: "MemoryHigh={{ nspawn_mem * 1024 * 1024 }}"
+        conf_cpu: "CPUQuotaPerSecUSec={{ nspawn_cpus }}s"
+        set_mem: "MemoryHigh={{ nspawn_mem }}M"
+        set_cpu: "CPUQuota={{ nspawn_cpus * 100 }}%"
+      tags: ["nspawn"]
+
+    - name: Set systemd props # noqa no-changed-when
+      delegate_to: "{{ nspawn_host }}"
+      ansible.builtin.command:
+        cmd: "systemctl set-property systemd-nspawn@{{ inventory_hostname }}.service {{ item }}"
+      loop: "{{ systemd_set_props }}"
+      tags: ["nspawn"]
+
+    - name: Configure root SSH keys
+      delegate_to: "{{ nspawn_host }}"
+      ansible.posix.authorized_key:
+        user: "root"
+        path: "{{ chroot_path }}/root/.ssh/authorized_keys"
+        key: "{{ ssh_authorized_keys | join('\n') }}"
+        state: present
+        exclusive: true
+      tags: ["ssh"]
+
+    - name: Configure /etc/resolv.conf
+      delegate_to: "{{ nspawn_host }}"
+      ansible.builtin.copy:
+        content: "{{ resolv_config }}"
+        dest: "{{ chroot_path }}/etc/resolv.conf"
+        owner: root
+        group: root
+        mode: "0644"
+        follow: false
+      tags: ["resolv"]
+
+  roles:
+    - role: systemd_networkd
+      delegate_to: "{{ nspawn_host }}"
+      tags: ["networkd"]
+
+    - role: locale_conf
+      delegate_to: "{{ nspawn_host }}"
+      tags: ["locale"]
+
+    - role: sudo
+      delegate_to: "{{ nspawn_host }}"
+      tags: ["sudo"]
+
+    - role: sshd
+      delegate_to: "{{ nspawn_host }}"
+      tags: ["sshd"]
+
+    - role: hostname
+      delegate_to: "{{ nspawn_host }}"
+      tags: ["hostname"]
+
+  post_tasks:
+    - name: Configure machine state
+      delegate_to: "{{ nspawn_host }}"
+      ansible.builtin.systemd:
+        name: "systemd-nspawn@{{ inventory_hostname }}.service"
+        state: "{{ 'started' if nspawn_started | bool else 'stopped' }}"
+        enabled: "{{ nspawn_autostart | bool }}"
+      tags: ["machine"]

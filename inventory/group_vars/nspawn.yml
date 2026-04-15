@@ -1,0 +1,46 @@
+---
+
+# https://www.freedesktop.org/software/systemd/man/257/systemd.nspawn.html
+# https://www.freedesktop.org/software/systemd/man/257/systemd-nspawn.html#
+
+nspawn_host: theia
+nspawn_root_dir: "/var/lib/machines"
+nspawn_machine_root_dir: "{{ nspawn_root_dir }}/{{ inventory_hostname }}"
+nspawn_private_users: false
+# NOTE: Need idmap if using bind mounts
+nspawn_bind_mounts: []
+nspawn_template: "deb13-template"
+nspawn_started: true
+nspawn_autostart: "{{ nspawn_started }}"
+nspawn_unprivileged: true
+nspawn_private_ownership: 'auto'
+
+# NOTE: Multiple bridges must be done manually.
+# https://github.com/systemd/systemd/issues/11087
+networkd_config:
+  50-host: |
+    [Match]
+    Name=host0
+
+    [Network]
+    Address={{ host_ips_with_prefix[host_net] }}
+    DNS={{ hostvars['rb5009'].host_ips[host_net] }}
+
+    [Link]
+    MTUBytes={{ all_net[host_net].mtu | default(1500) }}
+
+    [Route]
+    Gateway={{ hostvars['rb5009'].host_ips[host_net] }}
+    Scope=global
+
+resolv_config: |
+  nameserver {{ hostvars['rb5009'].host_ips[host_net] }}
+  search {{ domains['hb'] }} {{ all_net[host_net].domain }}
+
+host_nic_names: ["host0"]
+firewalld_zones:
+  - name: public
+    interfaces: "{{ host_nic_names }}"
+
+nspawn_cpus: 4
+nspawn_mem: 4096

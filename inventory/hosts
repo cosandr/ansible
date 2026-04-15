@@ -93,6 +93,7 @@ libvirt
 rom
 rpi
 webgw
+nspawn
 
 [servers:vars]
 ansible_group_priority=1
@@ -115,6 +116,9 @@ talos
 [libvirt:vars]
 host_net=vm
 ansible_group_priority=2
+
+[nspawn:vars]
+host_net=vm
 
 [rpi]
 drepi   ansible_user=andrei host_num=0
