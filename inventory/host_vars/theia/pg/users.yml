@@ -30,3 +30,6 @@ postgresql_users:
 
   - name: web
     password: "{{ vault_postgresql_passwords.web }}"
+
+  - name: immich
+    password: "{{ vault_postgresql_passwords.immich }}"

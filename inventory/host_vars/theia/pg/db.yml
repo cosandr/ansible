@@ -21,3 +21,16 @@ postgresql_databases:
 
   - name: web
     owner: postgres
+
+  - name: immich
+    owner: immich
+
+# https://docs.immich.app/administration/postgres-standalone/#without-superuser-permission
+postgresql_extensions:
+  - name: vchord
+    db: immich
+    cascade: true
+
+  - name: earthdistance
+    db: immich
+    cascade: true
