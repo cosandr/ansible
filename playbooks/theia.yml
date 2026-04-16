@@ -114,6 +114,11 @@
           notify: Dracut regenerate
           tags: ["arc"]
 
+    - name: Install vectorchord
+      ansible.builtin.apt:
+        deb: "https://github.com/tensorchord/VectorChord/releases/download/{{ postgresql_vectorchord_version }}/postgresql-{{ postgresql_version }}-vchord_{{ postgresql_vectorchord_version }}-1_amd64.deb"
+      tags: ["pg", "vectorchord"]
+
   roles:
     - role: ownca
       tags: ["ownca"]

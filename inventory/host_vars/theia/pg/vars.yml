@@ -14,6 +14,7 @@ postgresql_ssl_ca_path: "{{ ca_publickey_path }}"
 postgresql_ssl_cert_path: "{{ repo_base_dir }}/files/theia/pg.crt"
 postgresql_ssl_key_path: "{{ repo_base_dir }}/files/theia/pg.key"
 postgresql_configure_logrotate: false
+postgresql_vectorchord_version: "1.1.1"
 
 pg_base_mem: 4096
 pg_base_cpu: 4
@@ -72,6 +73,10 @@ postgresql_global_config_options:
     value: "3"
   - option: wal_level
     value: "replica"
+  # vectorchord
+  - option: shared_preload_libraries
+    value: "vchord"
+    quoted: true
 
 postgres_exporter_port: "9187"
 postgres_exporter_version: "latest"
