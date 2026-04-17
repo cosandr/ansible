@@ -34,8 +34,6 @@ firewall_rules:
     zone: cluster
   - port: "{{ ipmi_exporter_port }}"
     zone: cluster
-  - port: "{{ pushgateway_port }}"
-    zone: cluster
   - port: "{{ mktxp_port }}"
     zone: cluster
   - port: "{{ alertmanager_peer_port }}"
