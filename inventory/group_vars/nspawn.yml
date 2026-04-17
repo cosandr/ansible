@@ -6,7 +6,6 @@
 nspawn_host: theia
 nspawn_root_dir: "/var/lib/machines"
 nspawn_machine_root_dir: "{{ nspawn_root_dir }}/{{ inventory_hostname }}"
-nspawn_private_users: false
 # NOTE: Need idmap if using bind mounts
 nspawn_bind_mounts: []
 nspawn_template: "deb13-template"

@@ -1,6 +1,5 @@
 [Exec]
 Boot=yes
-PrivateUsers={{ nspawn_private_users | andrei.utils.bool_to_yes }}
 Hostname={{ inventory_hostname }}
 LinkJournal=no
 PrivateUsers={{ 'pick' if nspawn_unprivileged else 'no' }}
