@@ -109,7 +109,6 @@ gitlab
 gitrun
 localgw
 nextcloud
-prom
 talos
 
 [libvirt:vars]
@@ -118,6 +117,7 @@ ansible_group_priority=2
 
 [nspawn:children]
 loki
+prom
 
 [nspawn:vars]
 host_net=vm

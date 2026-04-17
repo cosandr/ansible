@@ -22,7 +22,7 @@
       tags: ["rsyslog"]
       block:
         - name: Install rsyslog
-          ansible.builtin.dnf:
+          ansible.builtin.package:
             name: rsyslog
             state: present
 
@@ -65,12 +65,26 @@
     - name: Copy Mikrotik CA
       ansible.builtin.copy:
         src: "{{ repo_base_dir }}/files/mikrotik/ca.crt"
-        dest: /etc/pki/ca-trust/source/anchors/mt-ca.crt
+        dest: "{{ __path }}/mt-ca.crt"
         owner: root
         group: root
         mode: "0644"
+      vars:
+        __path_deb: "/usr/local/share/ca-certificates"
+        __path_el: "/etc/pki/ca-trust/source/anchors"
+        __path: "{{ __path_el if ansible_os_family == 'RedHat' else __path_deb }}"
       notify: Update CA trust
       tags: ["mktxp"]
+
+    - name: Install mktxp deps
+      ansible.builtin.apt:
+        name:
+          - python3-packaging
+          - python3-setuptools
+          - python3-venv
+        state: present
+      tags: ["mktxp"]
+      when: ansible_os_family == 'Debian'
 
   roles:
     - role: ipmi_exporter
@@ -84,9 +98,16 @@
 
   handlers:
     - name: Restart rsyslog
-      ansible.builtin.service:
+      ansible.builtin.systemd_service:
         name: rsyslog
         state: restarted
 
-    - name: Update CA trust  # noqa no-changed-when
+    - name: Update CA trust EL # noqa no-changed-when
+      listen: Update CA trust
       ansible.builtin.command: /usr/bin/update-ca-trust
+      when: ansible_os_family == 'RedHat'
+
+    - name: Update CA trust Debian # noqa no-changed-when
+      listen: Update CA trust
+      ansible.builtin.command: /usr/sbin/update-ca-certificates
+      when: ansible_os_family == 'Debian'

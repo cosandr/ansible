@@ -16,9 +16,6 @@
 - name: Import Nextcloud playbook
   ansible.builtin.import_playbook: nextcloud.yml
 
-- name: Import Prometheus playbook
-  ansible.builtin.import_playbook: prom.yml
-
 - name: Setup Loki
   hosts: loki
   roles:

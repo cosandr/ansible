@@ -2,14 +2,6 @@
 
 domain: "{{ domains['hb'] }}"
 
-provisioned_disks:
-  - dev: "/dev/disk/by-id/virtio-data01"
-    vols:
-      - name: prometheus
-        path: "/var/lib/prometheus"
-        shrink: false
-        size: "100%FREE"
-
 prometheus_blackbox_icmp_targets:
   - "{{ wireguard_ip | default(ansible_host) }}"
   - "google.com"
