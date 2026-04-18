@@ -35,7 +35,7 @@ roles:
   - name: cosandr.nextcloud
     src: https://github.com/cosandr/ansible-role-nextcloud.git
     scm: git
-    version: v1.6.0
+    version: v2.0.1
 
   - name: elastic.elasticsearch
     src: https://github.com/bdeetz/ansible-elasticsearch

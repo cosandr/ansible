@@ -108,7 +108,6 @@ unifios host_net=mgmt host_subnet=unifios host_num=0
 gitlab
 gitrun
 localgw
-nextcloud
 talos
 
 [libvirt:vars]
@@ -117,6 +116,7 @@ ansible_group_priority=2
 
 [nspawn:children]
 loki
+nextcloud
 prom
 
 [nspawn:vars]
@@ -199,7 +199,7 @@ host_wg_subnet=webgw
 ansible_group_priority=3
 
 [nextcloud]
-nextcloud01 host_num=0 vm_host=rhea
+nextcloud01 host_num=0
 
 [nextcloud:vars]
 host_subnet=nextcloud

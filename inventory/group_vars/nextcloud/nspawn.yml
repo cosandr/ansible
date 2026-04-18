@@ -1,0 +1,7 @@
+---
+
+nspawn_cpus: 2
+nspawn_mem: 6144
+
+nspawn_bind_mounts:
+  - /mnt/tank/nspawn/nextcloud:/var/www/html/nextcloud:idmap

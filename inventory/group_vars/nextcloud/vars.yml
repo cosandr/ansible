@@ -1,13 +1,5 @@
 ---
 
-provisioned_disks:
-  - dev: "/dev/disk/by-id/virtio-data01"
-    vols:
-      - name: nextcloud
-        path: "/var/www/html/nextcloud"
-        shrink: false
-        size: "100%FREE"
-
 nextcloud_port: 443
 nextcloud_proxies: "{{ proxy_hosts }}"
 nextcloud_domain: "cloud.{{ domains['dv'] }}"
@@ -31,7 +23,5 @@ nextcloud_exporter_auth_token: "{{ vault_nextcloud_exporter_auth_token }}"
 prometheus_nextcloud_targets:
   - "{{ nextcloud_exporter_listen_address }}"
 
-swapfile_size: 4G
-# Use vm_mem instead of ansible_memtotal which can change
-nextcloud_memory_mb: "{{ vm_mem }}"
+nextcloud_memory_mb: "{{ nspawn_mem }}"
 nextcloud_opcache_interned_strings_buffer: 16

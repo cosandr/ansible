@@ -1,9 +1,0 @@
----
-
-vm_cpus: 2
-vm_mem: 6144
-
-vm_rbd_root_enabled: true
-vm_root_size: "20G"
-vm_rbd_data_disks:
-  - "100G"
