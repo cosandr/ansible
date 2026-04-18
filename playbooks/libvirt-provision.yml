@@ -12,9 +12,3 @@
 
 - name: Import Gitlab playbook
   ansible.builtin.import_playbook: gitlab.yml
-
-- name: Setup Loki
-  hosts: loki
-  roles:
-    - role: loki
-      tags: ["loki"]

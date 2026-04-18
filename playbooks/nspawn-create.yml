@@ -73,6 +73,13 @@
       loop: "{{ systemd_set_props }}"
       tags: ["nspawn"]
 
+    # Continuing would mess up file permissions
+    - name: Stop if unprivileged container already exists
+      ansible.builtin.meta: end_host
+      when:
+        - __machine_check.stat.exists
+        - nspawn_unprivileged
+
     - name: Configure root SSH keys
       delegate_to: "{{ nspawn_host }}"
       ansible.posix.authorized_key:
