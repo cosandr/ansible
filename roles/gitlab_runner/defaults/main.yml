@@ -2,17 +2,18 @@
 
 gitlab_runner_token: ''
 gitlab_external_url: "https://gitlab.com"
+# Must be created manually in the UI
 gitlab_runners:
   - name: "Docker Runner"
     executor: docker
-    tags: ["docker"]
-    args: '--run-untagged --locked=false --docker-image "alpine:latest"'
+    args: '--docker-image "alpine:latest"'
 
   - name: "Docker Runner DIND"
     executor: docker
-    tags: ["docker-dind"]
-    args: '--docker-privileged --locked=false --docker-image "docker:latest" --docker-volumes /certs/client'
+    args: '--docker-privileged --docker-image "docker:latest" --docker-volumes /certs/client'
 
-gitlab_runner_concurrent: "{{ gitlab_runners | length }}"
+# Default limit per runner
+gitlab_runner_limit: 1
+gitlab_runner_concurrent: "{{ (gitlab_runners | length) * gitlab_runner_limit }}"
 
 __gitlab_runner_names: "{{ gitlab_runners | map(attribute='name') | list }}"

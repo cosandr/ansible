@@ -9,7 +9,7 @@
   when: ansible_selinux.status == "enabled"
   tags: ["selinux"]
 
-- name: Install gitlab-runner repo
+- name: Install gitlab-runner repo (EL)
   ansible.builtin.get_url:
     dest: /etc/yum.repos.d/gitlab-runner.repo
     url: "https://packages.gitlab.com/install/repositories/runner/gitlab-runner/config_file.repo?os=centos&dist={{ ansible_distribution_major_version }}"
@@ -21,11 +21,29 @@
     - ansible_distribution != 'Fedora'
   tags: ["install"]
 
+# https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh
+- name: Download APT key
+  ansible.builtin.get_url:
+    url: https://packages.gitlab.com/gpgkey/gpg.key
+    dest: /etc/apt/keyrings/runner_gitlab-runner-archive-keyring.gpg
+    owner: root
+    group: root
+    mode: "0644"
+  when: ansible_os_family == 'Debian'
+  tags: ["install"]
+
+- name: Add runner repo
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/runner_gitlab-runner-archive-keyring.gpg] https://packages.gitlab.com/runner/gitlab-runner/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main"
+    state: present
+    filename: ceph
+  when: ansible_os_family == 'Debian'
+  tags: ["install"]
+
 - name: Install Gitlab Runner
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     name: "gitlab-runner"
     state: present
-  when: ansible_os_family == 'RedHat'
   tags: ["install"]
 
 - name: Get configured runners
@@ -53,17 +71,16 @@
   loop: "{{ __runner_output.stderr_lines }}"
   when: "'Executor' in tmp_dict"
 
-- name: Configure runners
+- name: Configure runners # noqa no-changed-when
   throttle: 1
   ansible.builtin.command: >
     /usr/bin/gitlab-runner register
       --non-interactive
       --url {{ gitlab_external_url | quote }}
-      --registration-token {{ item.token | default(gitlab_runner_token) | quote }}
       --description {{ item.name | quote }}
+      --token {{ item.token | default(gitlab_runner_token) | quote }}
       --executor {{ item.executor | quote }}
-      --limit {{ item.limit | default(1) }}
-      --tag-list {{ item.tags | join(',') | quote }}
+      --limit {{ item.limit | default(gitlab_runner_limit) }}
       {{ item.args | default('') }}
   loop: "{{ gitlab_runners }}"
   loop_control:
