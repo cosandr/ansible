@@ -1,4 +1,25 @@
 ---
 
 docker_compose_install: false
-gitlab_runner_token: "{{ vault_gitlab_runner_token }}"
+
+gitlab_runner_limit: 2
+# Create runners in the UI manually; /admin/runners
+gitlab_runners:
+  # Tags: docker
+  # run untagged
+  - name: "Docker Runner"
+    executor: docker
+    token: "{{ vault_runner_tokens.docker }}"
+    args: '--docker-image "alpine:latest"'
+
+  # Tags: docker-socket
+  - name: "Docker Runner Socket"
+    executor: docker
+    token: "{{ vault_runner_tokens.socket }}"
+    args: '--docker-image "docker:latest" --docker-volumes /run/docker.sock:/var/run/docker.sock'
+
+  # Tags: podman
+  - name: "Podman Runner"
+    executor: docker
+    token: "{{ vault_runner_tokens.podman }}"
+    args: '--docker-privileged --docker-image "quay.io/podman/stable" --docker-host "{{ podman_user_socket }}"'

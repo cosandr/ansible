@@ -116,13 +116,18 @@
             - "/etc/subgid"
 
         - name: Install packages
-          ansible.builtin.dnf:
+          ansible.builtin.package:
             name:
               - fuse-overlayfs
               - podman
               - python3-podman
-              - podman-plugins
             state: present
+
+        - name: Install podman-plugins
+          ansible.builtin.dnf:
+            name: podman-plugins
+            state: present
+          when: ansible_os_family == 'RedHat'
 
         - name: Get user status
           ansible.builtin.command:

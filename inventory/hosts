@@ -7,7 +7,6 @@ localgw04   ansible_host="10.0.10.67"
 localgw05   ansible_host="10.0.10.68"
 gitlab01    ansible_host="10.0.10.90"
 gitrun01    ansible_host="10.0.10.92"
-gitrun02    ansible_host="10.0.10.93"
 loki01      ansible_host="10.0.10.96"
 nextcloud01 ansible_host="10.0.10.104"
 prom01      ansible_host="10.0.10.108"
@@ -153,8 +152,7 @@ gitlab01 host_num=0
 host_subnet=gitlab
 
 [gitrun]
-gitrun01 host_num=0 vm_host=aegir
-gitrun02 host_num=1 vm_host=rhea
+gitrun01 host_num=0
 
 [gitrun:vars]
 host_subnet=gitrun
