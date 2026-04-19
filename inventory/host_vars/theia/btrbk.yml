@@ -14,10 +14,15 @@ btrbk_volumes_host:
 
       - path: "@{{ hostvars['nextcloud01'].nspawn_machine_root_dir }}"
         options:
-          snapshot_name: "loki01"
+          snapshot_name: "nextcloud01"
           snapshot_preserve: "3d"
 
       - path: "@{{ hostvars['prom01'].nspawn_machine_root_dir }}"
         options:
-          snapshot_name: "loki01"
+          snapshot_name: "prom01"
+          snapshot_preserve: "3d"
+
+      - path: "@/opt/vm/gitlab"
+        options:
+          snapshot_name: "gitlab"
           snapshot_preserve: "3d"

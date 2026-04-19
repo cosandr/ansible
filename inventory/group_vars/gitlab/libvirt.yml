@@ -3,7 +3,11 @@
 vm_cpus: 4
 vm_mem: 8192
 
-vm_rbd_root_enabled: true
 vm_root_size: "20G"
-vm_rbd_data_disks:
-  - "50G"
+vm_virtiofs_mounts:
+  - source: "/opt/vm/gitlab"
+    target: "gitlab-data"
+    path: "/var/opt/gitlab"
+  - source: "/mnt/tank/backup/gitlab"
+    target: "gitlab-backup"
+    path: "{{ gitlab_backup_upload_connection.local_root }}"

@@ -1,13 +1,5 @@
 ---
 
-provisioned_disks:
-  - dev: "/dev/disk/by-id/virtio-data01"
-    vols:
-      - name: gitlab
-        path: "/var/opt/gitlab"
-        shrink: false
-        size: "100%FREE"
-
 node_exporter_web_listen_address: '0.0.0.0:9100'
 node_exporter_port: "{{ node_exporter_web_listen_address.split(':')[1] }}"
 # Using gitlab's embedded node exporter

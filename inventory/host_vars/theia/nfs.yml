@@ -2,10 +2,6 @@
 
 # MacOS needs to mount with -o resvport or share needs insecure option
 host_nfs_shares:
-  # Backup shares
-  - path: /mnt/tank/backup/gitlab
-    options: "rw,no_root_squash,no_subtree_check"
-    sources: "{{ subnets.vm.gitlab }}"
   # HA shares
   - path: /mnt/tank/backup/ha
     options: "rw,no_root_squash,no_subtree_check"

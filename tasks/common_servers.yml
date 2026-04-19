@@ -96,6 +96,28 @@
       tags: ["disk"]
   tags: ["disk"]
 
+- name: Create virtiofs mountpoints
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default(omit) }}"
+    group: "{{ item.group | default(omit) }}"
+    mode: "{{ item.mode | default(omit) }}"
+  loop: "{{ vm_virtiofs_mounts }}"
+  when: item.path is defined
+  tags: ["disk", "virtiofs"]
+
+- name: Mount virtiofs directories
+  ansible.posix.mount:
+    path: "{{ item.path }}"
+    src: "{{ item.target }}"
+    fstype: "virtiofs"
+    opts: "{{ item.opts | default(omit) }}"
+    state: mounted
+  loop: "{{ vm_virtiofs_mounts }}"
+  when: item.path is defined
+  tags: ["disk", "virtiofs"]
+
 - name: Setup btrfs
   ansible.builtin.include_role:
     name: btrfs

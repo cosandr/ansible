@@ -17,6 +17,7 @@ __group_deb_packages:
   - python3-venv
   - shellcheck
   - ssh
+  - virtiofsd
 
 deb_block_packages:
   - ifupdown
