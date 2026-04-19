@@ -37,21 +37,9 @@ __basic_talos_schematic: 54ce56c26a6ff61064b025503a07349972f26927780f809a4a7812a
 #       - siderolabs/zfs
 #       - siderolabs/i915
 __igpu_talos_schematic: 4bcf050fc47fe673b1fcd6376b47e72fbe02db5b48c97ba84f97cf8c29818d88
-# customization:
-#   extraKernelArgs:
-#     - console=ttyS0
-#   systemExtensions:
-#     officialExtensions:
-#       - siderolabs/qemu-guest-agent
-#       - siderolabs/zfs
-#       - siderolabs/nvidia-container-toolkit-production
-#       - siderolabs/nvidia-open-gpu-kernel-modules-production
-__nvidia_talos_schematic: 8863ebeedd0a553d9455b165e72a97afb12da0d0346304a845fed5f748f27167
 talos_schematic: >-
   {%- if __igpu_vm_pci_devices == vm_pci_devices -%}
   {{ __igpu_talos_schematic }}
-  {%- elif __nvidia_vm_pci_devices == vm_pci_devices -%}
-  {{ __nvidia_talos_schematic }}
   {%- else -%}
   {{ __basic_talos_schematic }}
   {%- endif -%}
@@ -72,9 +60,6 @@ node_labels: >-
   {%- endif -%}
   {%- if __igpu_vm_pci_devices == vm_pci_devices -%}
   {{- tmp.update({"intel.feature.node.kubernetes.io/gpu": "true"}) -}}
-  {%- endif -%}
-  {%- if __nvidia_vm_pci_devices == vm_pci_devices -%}
-  {{- tmp.update({"nvidia.com/gpu.present": "true"}) -}}
   {%- endif -%}
   {{ tmp }}
 

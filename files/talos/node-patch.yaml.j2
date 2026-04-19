@@ -2,15 +2,6 @@ machine:
   kernel:
     modules:
       - name: zfs
-{% if __nvidia_vm_pci_devices == vm_pci_devices %}
-      # https://www.talos.dev/v1.11/talos-guides/configuration/nvidia-gpu/#enabling-the-nvidia-oss-modules
-      - name: nvidia
-      - name: nvidia_uvm
-      - name: nvidia_drm
-      - name: nvidia_modeset
-  sysctls:
-    net.core.bpf_jit_harden: 1
-{% endif %}
   certSANs: {{ __mt_dns_entries_common | map(attribute='name') | to_json }}
   network:
     hostname: "{{ inventory_hostname }}"
