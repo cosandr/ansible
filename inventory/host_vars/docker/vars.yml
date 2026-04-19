@@ -1,0 +1,25 @@
+---
+
+domain: "{{ domains['hb'] }}"
+
+__unattended_package_blacklist_3:
+  - "docker.*"
+  - "container.*"
+
+docker_registries:
+  - url: "{{ gitlab_registry_external_url | regex_replace('^https?://', '') }}"
+    username: "{{ vault_gitlab_token_name }}"
+    password: "{{ vault_gitlab_token_value }}"
+
+swapfile_size: 4G
+
+cadvisor_port: 9101
+cadvisor_listen_ip: "{{ ansible_host }}"
+prometheus_cadvisor_targets: ["{{ ansible_host }}:{{ cadvisor_port }}"]
+
+nvidia_exporter_port: 9401
+nvidia_exporter_listen_address: "{{ ansible_host }}:{{ nvidia_exporter_port }}"
+nvidia_exporter_args:
+  - "-nvidia.per-process"
+  - "-nvidia.strip-process-args"
+  - "-nvidia.strip-process-path"

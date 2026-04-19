@@ -1,0 +1,8 @@
+---
+
+firewall_rules:
+  - port: "{{ cadvisor_port }}"
+    sources: "{{ node_exporter_allow_ips }}"
+
+  - port: "{{ nvidia_exporter_port }}"
+    sources: "{{ node_exporter_allow_ips }}"

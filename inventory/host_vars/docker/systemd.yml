@@ -1,0 +1,52 @@
+---
+
+systemd_units:
+  - name: nvidia-power-limit
+    service:
+      content: |
+        [Unit]
+        Description=Set Nvidia GPU power limit
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        ExecStart=/usr/bin/nvidia-smi -pl 250
+
+        [Install]
+        WantedBy=multi-user.target
+
+  - name: docker-auto-update
+    service:
+      content: |
+        [Unit]
+        Description=Update all Docker containers
+        After=network-online.target docker.service
+        Requires=network-online.target docker.service
+
+        [Service]
+        Type=simple
+        User={{ my_user }}
+        Group={{ my_user }}
+        WorkingDirectory=/mnt/containers
+        Environment=BUSY=1
+        Environment=BUILD=0
+        Environment=PULL=1
+        Environment=HOSTNAME={{ inventory_hostname }}
+        ExecStartPre=/usr/bin/git pull --rebase --prune
+        ExecStart=/usr/bin/bash run.sh up
+
+    # Every day at 05:00
+    timer:
+      enabled: true
+      state: started
+      content: |
+        [Unit]
+        Description=Update Docker containers daily
+
+        [Timer]
+        Persistent=yes
+        OnBootSec=2m
+        OnCalendar=*-*-* 05:00:00
+
+        [Install]
+        WantedBy=timers.target

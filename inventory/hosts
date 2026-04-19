@@ -5,6 +5,7 @@ localgw02   ansible_host="10.0.10.65"
 localgw03   ansible_host="10.0.10.66"
 localgw04   ansible_host="10.0.10.67"
 localgw05   ansible_host="10.0.10.68"
+docker      ansible_host="10.0.10.88"
 gitlab01    ansible_host="10.0.10.90"
 gitrun01    ansible_host="10.0.10.92"
 loki01      ansible_host="10.0.10.96"
@@ -101,6 +102,7 @@ ansible_group_priority=1
 ansible_group_priority=2
 
 [libvirt]
+docker host_subnet=docker host_num=0
 unifios host_net=mgmt host_subnet=unifios host_num=0
 
 [libvirt:children]

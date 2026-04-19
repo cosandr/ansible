@@ -1,0 +1,186 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Setup Docker nodes
+  hosts: docker
+  pre_tasks:
+    # https://wiki.debian.org/NvidiaGraphicsDrivers#Prerequisites
+    - name: Copy apt sources
+      ansible.builtin.copy:
+        content: |
+          deb http://deb.debian.org/debian/ {{ ansible_distribution_release | lower }} main contrib non-free non-free-firmware
+          deb http://deb.debian.org/debian/ {{ ansible_distribution_release | lower }}-updates main contrib non-free non-free-firmware
+          deb http://security.debian.org/debian-security/ {{ ansible_distribution_release | lower }}-security main contrib non-free non-free-firmware
+        dest: "/etc/apt/sources.list"
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["apt", "sources", "nvidia"]
+
+  roles:
+    - role: geerlingguy.docker
+      tags: ["docker"]
+
+    - role: cadvisor
+      tags: ["cadvisor"]
+
+    - role: nvidia_exporter
+      tags: ["nvidia-exporter"]
+
+    - role: systemd
+      tags: ["systemd"]
+  tasks:
+    - name: Install Nvidia driver deps
+      ansible.builtin.apt:
+        name: linux-headers-generic
+        state: present
+      tags: ["nvidia"]
+
+    # https://docs.nvidia.com/datacenter/tesla/driver-installation-guide/latest/debian.html#network-repository-enablement-amd64
+    - name: Install cuda-keyring
+      ansible.builtin.apt:
+        deb: "https://developer.download.nvidia.com/compute/cuda/repos/debian{{ ansible_facts.distribution_major_version }}/x86_64/cuda-keyring_1.1-1_all.deb"
+        state: present
+      tags: ["nvidia"]
+
+    - name: Add CUDA repo
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/cuda-archive-keyring.gpg] https://developer.download.nvidia.com/compute/cuda/repos/debian{{ ansible_facts.distribution_major_version }}/x86_64/ /"
+        state: present
+        filename: cuda
+        update_cache: true
+      tags: ["nvidia"]
+
+    - name: Pin nvidia driver
+      ansible.builtin.apt:
+        name: nvidia-driver-pinning-595
+        state: present
+      tags: ["nvidia"]
+
+    - name: Install nvidia driver
+      ansible.builtin.apt:
+        name:
+          - nvidia-driver-cuda
+          - nvidia-kernel-open-dkms
+        state: present
+      tags: ["nvidia"]
+
+    - name: Install container toolkit GPG key
+      ansible.builtin.get_url:
+        url: "https://nvidia.github.io/libnvidia-container/gpgkey"
+        dest: /etc/apt/keyrings/nvidia-container-toolkit-keyring.asc
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["nvidia"]
+
+    - name: Add container toolkit repo
+      ansible.builtin.apt_repository:
+        repo: "deb [signed-by=/etc/apt/keyrings/nvidia-container-toolkit-keyring.asc] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /"
+        state: present
+        filename: cuda
+        update_cache: true
+      tags: ["nvidia"]
+
+    - name: Install nvidia container toolkit
+      ansible.builtin.apt:
+        name:
+          - nvidia-container-toolkit
+          - nvidia-container-toolkit-base
+          - libnvidia-container-tools
+          - libnvidia-container1
+        state: present
+      tags: ["nvidia"]
+
+    - name: Ensure docker is configured
+      ansible.builtin.command:
+        cmd: "nvidia-ctk runtime configure --runtime=docker"
+        creates: /etc/docker/daemon.json
+      tags: ["nvidia"]
+
+  post_tasks:
+    - name: Ensure override dir exists
+      ansible.builtin.file:
+        path: /etc/systemd/system/docker.service.d
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      tags: ["docker"]
+
+    - name: Setup Docker service overrides
+      ansible.builtin.copy:
+        content: |
+          [Unit]
+          After=mnt-containers.mount mnt-media.mount mnt-downloads.mount
+          Requires=mnt-containers.mount mnt-media.mount mnt-downloads.mount
+        dest: "/etc/systemd/system/docker.service.d/override.conf"
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload systemd
+      tags: ["docker"]
+
+    - name: Create my user
+      ansible.builtin.user:
+        name: "{{ my_user }}"
+        password: "{{ my_user_pass }}"
+        create_home: true
+        groups:
+          - sudo
+          - docker
+        append: true
+        uid: 1000
+      tags: ["user"]
+
+    - name: Configure user SSH keys
+      ansible.posix.authorized_key:
+        user: "{{ my_user }}"
+        key: "{{ ssh_authorized_keys | join('\n') }}"
+        state: present
+        exclusive: true
+      tags: ["user", "ssh"]
+
+    - name: Configure user to pull through HTTPS
+      ansible.builtin.copy:
+        dest: "/home/{{ my_user }}/.gitconfig"
+        owner: "{{ my_user }}"
+        group: "{{ my_user }}"
+        mode: "0644"
+        content: |
+          [credential]
+            helper = store
+          [url "https://gitlab.{{ domains['dv'] }}/"]
+            insteadOf = git@gitlab.{{ domains['dv'] }}:
+      tags: ["user"]
+
+    - name: Write git credentials
+      ansible.builtin.copy:
+        dest: "/home/{{ my_user }}/.git-credentials"
+        owner: "{{ my_user }}"
+        group: "{{ my_user }}"
+        mode: "0640"
+        content: |
+          https://{{ vault_gitlab_git_user }}:{{ vault_gitlab_git_pass }}@gitlab.{{ domains['dv'] }}
+      tags: ["user"]
+
+    - name: Install python3-docker
+      ansible.builtin.package:
+        name: python3-docker
+        state: present
+      tags: ["registry"]
+
+    - name: Login to registries
+      community.docker.docker_login:
+        registry_url: "{{ item.url }}"
+        username: "{{ item.username }}"
+        password: "{{ item.password }}"
+      loop: "{{ docker_registries }}"
+      loop_control:
+        label: "{{ item.url }} [{{ item.username }}]"
+      tags: ["registry"]
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd:
+        daemon_reload: true

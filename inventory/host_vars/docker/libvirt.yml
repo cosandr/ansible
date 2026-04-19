@@ -1,0 +1,30 @@
+---
+
+vm_template: "debian13_packer.{{ vm_disk_format }}"
+vm_cpus: 16
+vm_mem: 16384
+
+vm_root_size: "50G"
+
+vm_pci_devices:
+  - address:
+      domain: "0x0000"
+      bus: "0x01"
+      slot: "0x00"
+      function: "0x0"
+  - address:
+      domain: "0x0000"
+      bus: "0x01"
+      slot: "0x00"
+      function: "0x1"
+
+vm_virtiofs_mounts:
+  - source: "/opt/vm/docker"
+    target: "docker-data"
+    path: "/mnt/containers"
+  - source: "/mnt/tank/media"
+    target: "tank-media"
+    path: "/mnt/media"
+  - source: "/mnt/tank/downloads"
+    target: "tank-downloads"
+    path: "/mnt/downloads"
