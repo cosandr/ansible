@@ -1,24 +1,22 @@
 {{ ansible_managed | comment }}
-{% if nginx_upstreams | selectattr('name', 'search', 'photoprism') %}
+{% if nginx_upstreams | selectattr('name', 'search', 'abs') %}
 {% set domain = item.domain | default(domains['dv']) %}
 server {
     {{ nginx_listen_http | indent(4) }}
-    server_name photoprism.{{ domain }};
+    server_name abs.{{ domain }};
     return 301 https://$host$request_uri;
 }
 
 server {
     {{ nginx_listen_https | indent(4) }}
     http2 on;
-    server_name photoprism.{{ domain }};
-
-    client_max_body_size 500M;
+    server_name abs.{{ domain }};
 
     ssl_certificate /etc/lego/certificates/{{ domain }}.crt;
     ssl_certificate_key /etc/lego/certificates/{{ domain }}.key;
 
-    access_log {{ nginx_sites_logs }}/access-photoprism.{{ domain }}.log {{ nginx_access_log_options }};
-    error_log {{ nginx_sites_logs }}/error-photoprism.{{ domain }}.log {{ nginx_error_log_options }};
+    access_log {{ nginx_sites_logs }}/access-abs.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-abs.{{ domain }}.log {{ nginx_error_log_options }};
 
     location / {
         client_max_body_size 500M;
@@ -33,7 +31,8 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
 
-        proxy_pass http://{{ item.upstream_name | default('photoprism') }}/;
+        proxy_read_timeout 86400;
+        proxy_pass http://{{ item.upstream_name | default('abs') }}/;
     }
 }
 {% endif %}
