@@ -1,0 +1,6 @@
+---
+
+- name: Restart nvidia exporter
+  ansible.builtin.systemd:
+    name: nvidia-exporter.service
+    state: restarted

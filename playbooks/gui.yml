@@ -363,6 +363,11 @@
       become: true
       tags: ["prometheus-stack", "node_exporter"]
 
+    - role: nvidia_exporter
+      become: true
+      when: "'desktops' in group_names"
+      tags: ["nvidia-exporter"]
+
   post_tasks:
     - name: Configure user groups
       become: true

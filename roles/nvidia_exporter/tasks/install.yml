@@ -1,0 +1,61 @@
+---
+
+
+- name: Fetch latest release
+  when: nvidia_exporter_version == "latest"
+  block:
+    - name: Get latest release
+      ansible.builtin.uri:
+        url: "https://api.github.com/repos/cosandr/nvidia-exporter/releases/latest"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      register: _latest_release
+      until: _latest_release.status == 200
+      retries: 5
+      check_mode: false
+
+    - name: "Set nvidia_exporter version to {{ _latest_release.json.tag_name[1:] }}"
+      ansible.builtin.set_fact:
+        nvidia_exporter_version: "{{ _latest_release.json.tag_name[1:] }}"
+
+- name: Get checksum list  # noqa yaml[line-length]
+  ansible.builtin.set_fact:
+    __nvidia_exporter_checksums: "{{ lookup('url', 'https://github.com/cosandr/nvidia-exporter/releases/download/v' + nvidia_exporter_version + '/sha256sums.txt', wantlist=True) | list }}"
+  run_once: true
+  check_mode: false
+  delegate_to: localhost
+
+- name: Download nvidia_exporter binary to local folder  # noqa risky-file-permissions
+  become: false
+  ansible.builtin.get_url:
+    url: "https://github.com/cosandr/nvidia-exporter/releases/download/v{{ nvidia_exporter_version }}/{{ __nvidia_exporter_archive_name }}.tar.gz"
+    dest: "/tmp/{{ __nvidia_exporter_archive_name }}.tar.gz"
+    checksum: "sha256:{{ (__nvidia_exporter_checksums | select('search', __nvidia_exporter_archive_name + '.tar.gz') | first).split()[0] }}"
+  register: _download_archive
+  until: _download_archive is succeeded
+  retries: 5
+  delay: 2
+  # run_once: true # <-- this cannot be set due to multi-arch support
+  delegate_to: localhost
+  check_mode: false
+
+- name: Unpack nvidia_exporter binary
+  become: false
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ __nvidia_exporter_archive_name }}.tar.gz"
+    dest: "/tmp"
+    creates: "/tmp/{{ __nvidia_exporter_archive_name }}/nvidia-exporter"
+  delegate_to: localhost
+  check_mode: false
+
+- name: Propagate nvidia-exporter binary
+  ansible.builtin.copy:
+    src: "/tmp/{{ __nvidia_exporter_archive_name }}/nvidia-exporter"
+    dest: "/usr/local/bin/nvidia-exporter"
+    mode: "0755"
+    owner: root
+    group: root
+  notify: Restart nvidia exporter

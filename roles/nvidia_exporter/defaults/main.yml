@@ -1,0 +1,9 @@
+---
+
+nvidia_exporter_version: latest
+nvidia_exporter_listen_address: "0.0.0.0:9401"
+nvidia_exporter_args: []
+# nvidia_exporter_args:
+#   - "-nvidia.per-process"
+#   - "-nvidia.strip-process-args"
+#   - "-nvidia.strip-process-path"

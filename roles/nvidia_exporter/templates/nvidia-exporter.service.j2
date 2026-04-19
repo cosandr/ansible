@@ -1,0 +1,19 @@
+[Unit]
+Description=Nvidia Exporter
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/nvidia-exporter \
+{% for arg in nvidia_exporter_args %}
+  {{ arg }} \
+{% endfor %}
+  -web.listen-address {{ nvidia_exporter_listen_address }}
+Restart=always
+NoNewPrivileges=true
+ProtectHome=true
+ProtectSystem=strict
+
+[Install]
+WantedBy=multi-user.target
