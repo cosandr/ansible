@@ -46,6 +46,39 @@
     state: present
   tags: ["install"]
 
+- name: Ensure override dir exists
+  ansible.builtin.file:
+    path: /etc/systemd/system/gitlab-runner.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: gitlab_runner_systemd_override | length > 0
+  tags: ["systemd"]
+
+- name: Setup runner service override
+  ansible.builtin.copy:
+    content: "{{ gitlab_runner_systemd_override }}"
+    dest: "/etc/systemd/system/gitlab-runner.service.d/override.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart gitlab-runner
+  when: gitlab_runner_systemd_override | length > 0
+  tags: ["systemd"]
+
+- name: Remove systemd override
+  ansible.builtin.file:
+    path: /etc/systemd/system/gitlab-runner.service.d
+    state: absent
+  notify:
+    - Reload systemd
+    - Restart gitlab-runner
+  when: gitlab_runner_systemd_override | length == 0
+  tags: ["systemd"]
+
 - name: Get configured runners
   ansible.builtin.command: /usr/bin/gitlab-runner --log-format=json list
   changed_when: false
@@ -93,4 +126,4 @@
     path: "/etc/gitlab-runner/config.toml"
     regexp: '^concurrent ='
     line: "concurrent = {{ gitlab_runner_concurrent }}"
-  notify: restart gitlab-runner
+  notify: Restart gitlab-runner

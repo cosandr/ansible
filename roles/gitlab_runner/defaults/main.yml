@@ -16,4 +16,6 @@ gitlab_runners:
 gitlab_runner_limit: 1
 gitlab_runner_concurrent: "{{ (gitlab_runners | length) * gitlab_runner_limit }}"
 
+gitlab_runner_systemd_override: ""
+
 __gitlab_runner_names: "{{ gitlab_runners | map(attribute='name') | list }}"

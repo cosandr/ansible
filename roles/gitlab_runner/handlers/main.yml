@@ -1,6 +1,10 @@
 ---
 
-- name: restart gitlab-runner
-  systemd:
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart gitlab-runner
+  ansible.builtin.systemd_service:
     name: gitlab-runner
     state: restarted
