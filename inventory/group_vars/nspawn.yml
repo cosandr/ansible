@@ -43,3 +43,33 @@ firewalld_zones:
 
 nspawn_cpus: 4
 nspawn_mem: 4096
+
+node_exporter_no_collectors:
+  - bcache
+  - bonding
+  - btrfs
+  - cpu
+  - cpufreq
+  - diskstats
+  - dmi
+  - edac
+  - entropy
+  - filefd
+  - filesystem
+  - hwmon
+  - ipvs
+  - loadavg
+  - mdadm
+  - meminfo
+  - nfs
+  - nfsd
+  - nvme
+  - powersupplyclass
+  - rapl
+  - schedstat
+  - stat
+  - textfile
+  - thermal_zone
+  - watchdog
+  - xfs
+  - zfs
