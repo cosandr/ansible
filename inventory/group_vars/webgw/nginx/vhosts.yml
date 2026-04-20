@@ -35,3 +35,11 @@ __nginx_vhosts_3:
   - filename: abs.conf
     server_name: abs
     template: "{{ repo_base_dir }}/files/webgw/nginx/abs.conf.j2"
+
+  - filename: plex.conf
+    server_name: plex
+    template: "{{ repo_base_dir }}/files/webgw/nginx/plex.conf.j2"
+
+  - filename: jellyfin.conf
+    server_name: jellyfin
+    template: "{{ repo_base_dir }}/files/webgw/nginx/jellyfin.conf.j2"
