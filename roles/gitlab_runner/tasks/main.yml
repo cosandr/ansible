@@ -36,7 +36,7 @@
   ansible.builtin.apt_repository:
     repo: "deb [signed-by=/etc/apt/keyrings/runner_gitlab-runner-archive-keyring.gpg] https://packages.gitlab.com/runner/gitlab-runner/{{ ansible_distribution | lower }} {{ ansible_distribution_release | lower }} main"
     state: present
-    filename: ceph
+    filename: gitlab-runner
   when: ansible_os_family == 'Debian'
   tags: ["install"]
 
