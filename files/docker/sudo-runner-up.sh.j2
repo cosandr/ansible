@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cd /mnt/containers || exit 1
+
+name="$1"
+
+if [[ -z $name ]]; then
+    echo "Name is required"
+    exit 1
+fi
+
+if ! [[ -d "$name" ]]; then
+  echo "$name not found"
+  exit 1
+fi
+
+exec sudo -u {{ my_user }} CI=true ./run.sh up --no-build --select "$name"

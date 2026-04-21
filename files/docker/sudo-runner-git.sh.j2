@@ -1,0 +1,21 @@
+#!/bin/bash
+
+cd /mnt/containers || exit 1
+
+cmd="$1"
+shift
+
+if [[ -z $cmd ]]; then
+    echo "Git command is required"
+    exit 1
+fi
+
+case "$cmd" in
+    pull|fetch|checkout)
+        exec sudo -u {{ my_user }} git "$cmd" "$@"
+        ;;
+    *)
+        echo "Unknown command $cmd"
+        exit 1
+        ;;
+esac

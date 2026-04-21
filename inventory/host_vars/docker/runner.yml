@@ -1,0 +1,34 @@
+---
+
+gitlab_runner_limit: 10
+# Create runners in the UI manually; /admin/runners
+# Add to runner config file:
+# request_concurrency = 4
+gitlab_runners:
+  # Tags: docker-vm-shell
+  # protected only
+  - name: "Docker VM Runner"
+    executor: shell
+    token: "{{ vault_runner_token }}"
+
+# Cannot use NoNewPrivileges=true with sudo
+# Even with sudo, /mnt is not accessible
+# Doesn't seem possible to do this securely enough,
+# use SSH from gitlab runner. Can store keys in secrets, set them up with before_script
+# Force ssh key command, check with $SSH_ORIGINAL_COMMAND
+gitlab_runner_systemd_override: |
+  [Service]
+  InaccessiblePaths=/mnt
+  MemoryDenyWriteExecute=true
+  PrivateTmp=true
+  ProtectClock=true
+  ProtectControlGroups=true
+  ProtectHostname=true
+  ProtectKernelLogs=true
+  ProtectKernelModules=true
+  ProtectKernelTunables=true
+  ProtectProc=invisible
+  ProtectSystem=strict
+  ReadOnlyPaths=/etc/gitlab-runner
+  ReadWritePaths=/home/gitlab-runner
+  SystemCallArchitectures=native

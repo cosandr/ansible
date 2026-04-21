@@ -1,0 +1,5 @@
+---
+
+sudoers_files:
+  - dest: "10-runner"
+    content: "gitlab-runner ALL=(root) NOPASSWD: /usr/local/bin/sudo-runner-*"

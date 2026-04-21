@@ -78,6 +78,32 @@ sed -i -E "/^  (log|disabled): false.*/d;/^  log-prefix: ''/d;/^-.*/i\\ " /tmp/r
 sed -i 's/^ $//g' /tmp/rb5009.yml
 ```
 
+## Docker
+
+Generate SSH key for Gitlab CI to use:
+
+```sh
+ssh-keygen -C "runner@gitrun" -N "" -t ed25519 -f files/gitlab/runner_ssh
+```
+
+Create masked variable `SSH_KEY` in gitlab with b64 encoding of private key as value.
+
+```sh
+base64 < files/gitlab/runner_ssh
+```
+
+Delete private key:
+
+```sh
+rm -fv files/gitlab/runner_ssh
+```
+
+Also add Docker's host key to a `DOCKER_SSH_HOST_KEYS` var
+
+```sh
+ssh-keyscan -q <ip/hostname> | base64
+```
+
 ## Kubernetes
 
 ### Remove Intel GPU stuff

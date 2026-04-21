@@ -98,6 +98,40 @@
         creates: /etc/docker/daemon.json
       tags: ["nvidia"]
 
+    - name: Setup runner access
+      tags: ["runner"]
+      block:
+        - name: Create gitlab-runner user
+          ansible.builtin.user:
+            name: gitlab-runner
+            state: present
+            create_home: true
+
+        - name: Copy entrypoint
+          ansible.builtin.copy:
+            src: "{{ repo_base_dir }}/files/docker/runner-entrypoint.sh"
+            dest: "/home/gitlab-runner/entrypoint"
+            owner: root
+            group: root
+            mode: "0755"
+
+        - name: Copy SSH key
+          ansible.posix.authorized_key:
+            user: gitlab-runner
+            key: "{{ lookup('file', repo_base_dir + '/files/gitlab/runner_ssh.pub') }}"
+            key_options: 'command="/home/gitlab-runner/entrypoint",restrict'
+
+        - name: Copy sudo scripts
+          ansible.builtin.template:
+            src: "{{ repo_base_dir }}/files/docker/sudo-runner-{{ item }}.sh.j2"
+            dest: "/usr/local/bin/sudo-runner-{{ item }}"
+            owner: root
+            group: root
+            mode: "0755"
+          loop:
+            - git
+            - up
+
   post_tasks:
     - name: Ensure override dir exists
       ansible.builtin.file:
