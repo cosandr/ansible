@@ -39,3 +39,7 @@ __nginx_vhosts_1:
   - filename: grafana.conf
     server_name: grafana
     template: "{{ repo_base_dir }}/files/webgw/nginx/grafana.conf.j2"
+
+  - filename: vpn.conf
+    server_name: vpn
+    template: "{{ repo_base_dir }}/files/webgw/nginx/vpn.conf.j2"

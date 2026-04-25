@@ -1,5 +1,4 @@
 {{ ansible_managed | comment }}
-{% if nginx_upstreams | selectattr('name', 'search', 'abs') %}
 {% set domain = item.domain | default(domains['dv']) %}
 server {
     {{ nginx_listen_http | indent(4) }}
@@ -32,7 +31,6 @@ server {
         proxy_set_header Connection "upgrade";
 
         proxy_read_timeout 86400;
-        proxy_pass http://{{ item.upstream_name | default('abs') }}/;
+        proxy_pass http://{{ hostvars['docker'].ansible_host }}:13378/;
     }
 }
-{% endif %}

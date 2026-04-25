@@ -25,12 +25,3 @@ __nginx_upstreams_3:
 
   - name: mrbot_web
     servers: ["mrbot-web.{{ all_net.talos.domain }}"]
-
-  - name: abs
-    servers: ["{{ hostvars['docker'].ansible_host }}:13378"]
-
-  - name: plex
-    servers: ["{{ hostvars['docker'].ansible_host }}:32400"]
-
-  - name: jellyfin
-    servers: ["{{ hostvars['docker'].ansible_host }}:8096"]

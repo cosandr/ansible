@@ -1,0 +1,57 @@
+{{ ansible_managed | comment }}
+{% set domain = item.domain | default(domains['hb']) %}
+server {
+    {{ nginx_listen_http | indent(4) }}
+    server_name vpn.{{ domain }};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    {{ nginx_listen_https | indent(4) }}
+    http2 on;
+    server_name vpn.{{ domain }};
+
+    ssl_certificate /etc/lego/certificates/{{ domain }}.crt;
+    ssl_certificate_key /etc/lego/certificates/{{ domain }}.key;
+
+    access_log {{ nginx_sites_logs }}/access-vpn.{{ domain }}.log {{ nginx_access_log_options }};
+    error_log {{ nginx_sites_logs }}/error-vpn.{{ domain }}.log {{ nginx_error_log_options }};
+
+    allow {{ all_net.general.cidr }};
+    allow {{ all_net.mt.cidr }};
+    deny all;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_buffering off;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+
+    location /transmission {
+        proxy_pass http://{{ hostvars['docker'].ansible_host }}:9091;
+    }
+
+    location /lidarr {
+        proxy_pass http://{{ hostvars['docker'].ansible_host }}:8686;
+    }
+
+    location /radarr {
+        proxy_pass http://{{ hostvars['docker'].ansible_host }}:7878;
+    }
+
+    location /sonarr {
+        proxy_pass http://{{ hostvars['docker'].ansible_host }}:8989;
+    }
+
+    location /prowlarr {
+        proxy_pass http://{{ hostvars['docker'].ansible_host }}:9696;
+    }
+
+    location /nzbget {
+        proxy_pass http://{{ hostvars['docker'].ansible_host }}:6789;
+    }
+}
