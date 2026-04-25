@@ -24,4 +24,4 @@ __nginx_upstreams_3:
     servers: ["{{ hostvars['theia'].host_ips.vm }}:{{ hostvars['theia'].nginx_ports['www'] }}"]
 
   - name: mrbot_web
-    servers: ["mrbot-web.{{ all_net.talos.domain }}"]
+    servers: ["{{ hostvars['docker'].ansible_host }}:8001"]

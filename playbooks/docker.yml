@@ -204,7 +204,7 @@
         state: present
       tags: ["registry"]
 
-    - name: Login to registries
+    - name: Login to registries as root
       community.docker.docker_login:
         registry_url: "{{ item.url }}"
         username: "{{ item.username }}"
@@ -213,6 +213,18 @@
       loop_control:
         label: "{{ item.url }} [{{ item.username }}]"
       tags: ["registry"]
+
+    - name: Login to registries as my user
+      become: true
+      become_user: "{{ my_user }}"
+      community.docker.docker_login:
+        registry_url: "{{ item.url }}"
+        username: "{{ item.username }}"
+        password: "{{ item.password }}"
+      loop: "{{ docker_registries }}"
+      loop_control:
+        label: "{{ item.url }} [{{ item.username }}]"
+      tags: ["user", "registry"]
 
   handlers:
     - name: Reload systemd
