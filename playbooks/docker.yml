@@ -130,6 +130,7 @@
             mode: "0755"
           loop:
             - git
+            - script
             - up
 
   post_tasks:

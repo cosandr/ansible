@@ -11,7 +11,7 @@ if [[ -z $cmd ]]; then
 fi
 
 case "$cmd" in
-    pull|fetch|checkout)
+    pull|fetch|switch)
         exec sudo -u {{ my_user }} git "$cmd" "$@"
         ;;
     *)

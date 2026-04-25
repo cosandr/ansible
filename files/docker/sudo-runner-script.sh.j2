@@ -1,0 +1,19 @@
+#!/bin/bash
+
+cd /mnt/containers || exit 1
+
+if [[ $# -ne 2 ]]; then
+    echo "Usage: $0 <name> <script>"
+    exit 1
+fi
+
+name="$(basename "$1")"
+script="$(basename "$2")"
+script_path="$name/$script"
+
+if ! [[ -f "$script_path" ]]; then
+  echo "$script_path not found"
+  exit 1
+fi
+
+exec sudo -u {{ my_user }} CI=true "$script_path"
