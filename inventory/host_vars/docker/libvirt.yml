@@ -28,3 +28,6 @@ vm_virtiofs_mounts:
   - source: "/mnt/tank/downloads"
     target: "tank-downloads"
     path: "/mnt/downloads"
+  - source: "/mnt/tank/docker"
+    target: "tank-data"
+    path: "/mnt/tank-data"
