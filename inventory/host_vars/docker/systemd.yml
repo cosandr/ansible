@@ -3,6 +3,8 @@
 systemd_units:
   - name: nvidia-power-limit
     service:
+      state: "{{ omit }}"
+      enabled: true
       content: |
         [Unit]
         Description=Set Nvidia GPU power limit
@@ -11,6 +13,30 @@ systemd_units:
         Type=oneshot
         RemainAfterExit=true
         ExecStart=/usr/bin/nvidia-smi -pl 250
+
+        [Install]
+        WantedBy=multi-user.target
+
+  - name: docker-auto-start
+    service:
+      state: "{{ omit }}"
+      enabled: true
+      content: |
+        [Unit]
+        Description=Start all Docker containers
+        After=network-online.target docker.service
+        Requires=network-online.target docker.service
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        User={{ my_user }}
+        Group={{ my_user }}
+        WorkingDirectory=/mnt/containers
+        Environment=BUILD=0
+        Environment=PULL=1
+        Environment=CI=true
+        ExecStart=/mnt/containers/run.sh up
 
         [Install]
         WantedBy=multi-user.target
