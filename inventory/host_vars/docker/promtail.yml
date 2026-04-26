@@ -1,6 +1,14 @@
 ---
 
 __promtail_scrape_configs_2:
+  - job_name: traefik
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: traefik
+          __path__: "/mnt/containers/traefik/data/log/access.log"
+
   - job_name: mrbot
     static_configs:
       - targets:
