@@ -2,12 +2,6 @@
 {% if nginx_upstreams | selectattr('name', 'search', 'ha') %}
 {% set domain = item.domain | default(domains['hb']) %}
 server {
-    {{ nginx_listen_http | indent(4) }}
-    server_name ha.{{ domain }};
-    return 301 https://$host$request_uri;
-}
-
-server {
     {{ nginx_listen_https | indent(4) }}
     http2 on;
     server_name ha.{{ domain }};

@@ -1,12 +1,6 @@
 {{ ansible_managed | comment }}
 {% set domain = item.domain | default(domains['dv']) %}
 server {
-    {{ nginx_listen_http | indent(4) }}
-    server_name abs.{{ domain }};
-    return 301 https://$host$request_uri;
-}
-
-server {
     {{ nginx_listen_https | indent(4) }}
     http2 on;
     server_name abs.{{ domain }};

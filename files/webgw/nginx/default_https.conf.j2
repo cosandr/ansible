@@ -1,0 +1,8 @@
+{{ ansible_managed | comment }}
+server {
+    {{ nginx_listen_http | indent(4) }}
+    server_name {{ domains['hb'] }} *.{{ domains['hb'] }}
+                {{ domains['dv'] }} *.{{ domains['dv'] }}
+                ;
+    return 301 https://$host$request_uri;
+}

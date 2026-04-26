@@ -12,6 +12,10 @@ __nginx_vhosts_3:
     server_name: default_reject
     template: "{{ repo_base_dir }}/files/webgw/nginx/default_reject.conf.j2"
 
+  - filename: default_https.conf
+    server_name: default_https
+    template: "{{ repo_base_dir }}/files/webgw/nginx/default_https.conf.j2"
+
   - filename: status.conf
     server_name: status
     template: "{{ repo_base_dir }}/roles/nginx_exporter/templates/status.conf.j2"

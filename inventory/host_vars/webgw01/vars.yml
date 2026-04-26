@@ -34,7 +34,6 @@ networkd_config:
     DHCP=ipv4
     Address={{ ansible_host6 }}/64
     Address={{ vault_rfc2136_aaaa_record }}/64
-    Address={{ vault_pip_k8s_v4 }}/32
     {% for k, v in pip_v6_map.items() %}
     # {{ k }}
     Address={{ v }}/64
