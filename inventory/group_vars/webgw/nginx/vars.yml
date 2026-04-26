@@ -42,15 +42,15 @@ nginx_extra_conf_options: |
       access_log {{ nginx_sites_logs }}/stream-gitlab-ssh.log {{ nginx_access_log_options }};
     }
 
-  {% if pip_k8s_v4 is defined or pip_k8s_v6 is defined %}
+  {% if vault_pip_k8s_v4 is defined or pip_v6_map.k8s is defined %}
     server {
-  {% if pip_k8s_v4 is defined %}
-      listen {{ pip_k8s_v4 }}:80;
-      listen {{ pip_k8s_v4 }}:443;
+  {% if vault_pip_k8s_v4 is defined %}
+      listen {{ vault_pip_k8s_v4 }}:80;
+      listen {{ vault_pip_k8s_v4 }}:443;
   {% endif %}
-  {% if pip_k8s_v6 is defined %}
-      listen [{{ pip_k8s_v6 }}]:80;
-      listen [{{ pip_k8s_v6 }}]:443;
+  {% if pip_v6_map.k8s is defined %}
+      listen [{{ pip_v6_map.k8s }}]:80;
+      listen [{{ pip_v6_map.k8s }}]:443;
   {% endif %}
       proxy_pass {{ k8s_ingress_public_address }}:$server_port;
       proxy_protocol on;

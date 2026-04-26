@@ -11,17 +11,10 @@ ansible_become: true
 sys_timezone: "Etc/UTC"
 
 lego_rfc2136_nameserver: "127.0.0.1"
-rfc2136_aaaa_record: "{{ vault_rfc2136_aaaa_record }}"
 
 nginx_listen_v4: "{{ ansible_host }}"
-nginx_listen_v6: "{{ ansible_host6 }}"
-pip_k8s_v4: "{{ vault_pip_k8s_v4 }}"
-pip_k8s_v6: "{{ vault_pip_k8s_v6 }}"
-
-extra_host_ip_addresses:
-  - "{{ rfc2136_aaaa_record }}"
-  - "{{ pip_k8s_v4 }}"
-  - "{{ pip_k8s_v6 }}"
+nginx_listen_v6: "{{ pip_v6_map.nginx }}"
+pip_v6_map: "{{ vault_pip_v6_map }}"
 
 fail2ban_extra_conf: |
   [named-refused]
@@ -40,8 +33,11 @@ networkd_config:
     [Network]
     DHCP=ipv4
     Address={{ ansible_host6 }}/64
-    {% for ip in extra_host_ip_addresses %}
-    Address={{ ip }}/{{ '64' if ip is ansible.utils.ipv6 else '32' }}
+    Address={{ vault_rfc2136_aaaa_record }}/64
+    Address={{ vault_pip_k8s_v4 }}/32
+    {% for k, v in pip_v6_map.items() %}
+    # {{ k }}
+    Address={{ v }}/64
     {% endfor %}
     Gateway=fe80::1
 
