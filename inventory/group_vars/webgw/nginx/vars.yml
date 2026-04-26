@@ -32,6 +32,8 @@ nginx_extra_conf_options: |
       registry.{{ domains['dv'] }} gitlab_registry;
   {% if pip_v6_map.docker is defined %}
       abs.{{ domains['dv'] }} docker_traefik;
+      jellyfin.{{ domains['dv'] }} docker_traefik;
+      plex.{{ domains['dv'] }} docker_traefik;
   {% endif %}
       default nginx_local;
     }
