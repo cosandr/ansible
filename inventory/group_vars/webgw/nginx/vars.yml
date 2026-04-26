@@ -30,6 +30,9 @@ nginx_extra_conf_options: |
   {% endif %}
       gitlab.{{ domains['dv'] }} gitlab_main;
       registry.{{ domains['dv'] }} gitlab_registry;
+  {% if pip_v6_map.docker is defined %}
+      abs.{{ domains['dv'] }} docker_traefik;
+  {% endif %}
       default nginx_local;
     }
 
@@ -39,6 +42,10 @@ nginx_extra_conf_options: |
 
     upstream k8s_ingress {
       server {{ k8s_ingress_public_address }}:443;
+    }
+
+    upstream docker_traefik {
+      server {{ hostvars['docker'].ansible_host }}:443;
     }
 
     upstream gitlab_main {
@@ -74,6 +81,14 @@ nginx_extra_conf_options: |
     server {
       listen [{{ pip_v6_map.k8s }}]:443;
       proxy_pass k8s_ingress;
+      proxy_protocol on;
+    }
+  {% endif %}
+
+  {% if pip_v6_map.docker is defined %}
+    server {
+      listen [{{ pip_v6_map.docker }}]:443;
+      proxy_pass docker_traefik;
       proxy_protocol on;
     }
   {% endif %}

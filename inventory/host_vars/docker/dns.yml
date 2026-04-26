@@ -1,0 +1,14 @@
+---
+
+docker_dns_name: "{{ inventory_hostname }}.{{ domain }}"
+mt_dns_entries:
+  - name: "{{ docker_dns_name }}"
+    address: "{{ ansible_host }}"
+  - name: "traefik.{{ domains['hb'] }}"
+    cname: "{{ docker_dns_name }}"
+    ttl: 5m
+    type: CNAME
+  - name: "abs.{{ domains['dv'] }}"
+    cname: "{{ docker_dns_name }}"
+    ttl: 5m
+    type: CNAME
