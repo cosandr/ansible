@@ -1,0 +1,14 @@
+---
+
+pg_cert_pull_hooks:
+  - name: reload-traefik
+    content: |
+      #!/bin/sh
+
+      touch /mnt/containers/traefik/dynamic
+
+pg_cert_default_cert_path: /mnt/containers/traefik/data/certs
+pg_cert_default_key_path: "{{ pg_cert_default_cert_path }}"
+pg_cert_pull:
+  - name: "{{ domains['hb'] }}"
+  - name: "{{ domains['dv'] }}"
