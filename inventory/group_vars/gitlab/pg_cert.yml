@@ -1,0 +1,14 @@
+---
+
+pg_cert_pull_hooks:
+  - name: reload-gitlab
+    content: |
+      #!/bin/sh
+
+      gitlab-ctl hup nginx
+      gitlab-ctl hup registry
+
+pg_cert_pull:
+  - name: "{{ domain }}"
+    cert_path: "{{ gitlab_ssl_certificate }}"
+    key_path: "{{ gitlab_ssl_certificate_key }}"

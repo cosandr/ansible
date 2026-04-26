@@ -4,22 +4,25 @@ external_url "{{ gitlab_external_url }}"
 # gitlab.yml configuration
 gitlab_rails['time_zone'] = "{{ gitlab_time_zone }}"
 gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
-gitlab_rails['gitlab_email_enabled'] = {{ gitlab_email_enabled }}
-{% if gitlab_email_enabled == "true" %}
-gitlab_rails['gitlab_email_from'] = "{{ gitlab_email_from }}"
-gitlab_rails['gitlab_email_display_name'] = "{{ gitlab_email_display_name }}"
-gitlab_rails['gitlab_email_reply_to'] = "{{ gitlab_email_reply_to }}"
-{% endif %}
+gitlab_rails['gitlab_email_enabled'] = true
+gitlab_rails['gitlab_email_from'] = "gitlab@{{ domain }}"
+gitlab_rails['gitlab_email_display_name'] = "Gitlab"
+gitlab_rails['gitlab_email_reply_to'] = "no-reply@{{ domain }}"
 
 # Default Theme
 gitlab_rails['gitlab_default_theme'] = "{{ gitlab_default_theme }}"
 
-# Whether to redirect http to https.
-nginx['redirect_http_to_https'] = {{ gitlab_redirect_http_to_https }}
+# GitLab Nginx
+## See https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/settings/nginx.md
+nginx['listen_port'] = "{{ gitlab_nginx_listen_port }}"
+nginx['listen_https'] = true
+nginx['proxy_protocol'] = true
+nginx['real_ip_trusted_addresses'] = {{ gitlab_nginx_trusted_addresses | to_json }}
+nginx['redirect_http_to_https'] = false
 nginx['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
 nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
 
-letsencrypt['enable'] = {{ gitlab_letsencrypt_enable }}
+letsencrypt['enable'] = false
 
 # The directory where Git repositories will be stored.
 gitaly['configuration'] = {
@@ -36,70 +39,24 @@ gitlab_rails['backup_path'] = "{{ gitlab_backup_path }}"
 
 # These settings are documented in more detail at
 # https://gitlab.com/gitlab-org/gitlab-ce/blob/master/config/gitlab.yml.example#L118
-gitlab_rails['ldap_enabled'] = {{ gitlab_ldap_enabled }}
-{% if gitlab_ldap_enabled == "true" %}
-gitlab_rails['ldap_host'] = '{{ gitlab_ldap_host }}'
-gitlab_rails['ldap_port'] = {{ gitlab_ldap_port }}
-gitlab_rails['ldap_uid'] = '{{ gitlab_ldap_uid }}'
-gitlab_rails['ldap_method'] = '{{ gitlab_ldap_method}}' # 'ssl' or 'plain'
-gitlab_rails['ldap_bind_dn'] = '{{ gitlab_ldap_bind_dn }}'
-gitlab_rails['ldap_password'] = '{{ gitlab_ldap_password }}'
-gitlab_rails['ldap_allow_username_or_email_login'] = true
-gitlab_rails['ldap_base'] = '{{ gitlab_ldap_base }}'
-{% endif %}
+gitlab_rails['ldap_enabled'] = false
 
 # Gitlab sshd
 # https://docs.gitlab.com/ee/administration/operations/gitlab_sshd.html
 gitlab_sshd['enable'] = true
-gitlab_sshd['listen_address'] = '[::]:{{ gitlab_sshd_port }}'
+gitlab_sshd['listen_address'] = '0.0.0.0:{{ gitlab_sshd_port }}'
 gitlab_sshd['proxy_protocol'] = true
 gitlab_sshd['proxy_policy'] = "require"
-
-# GitLab Nginx
-## See https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/settings/nginx.md
-{% if gitlab_nginx_listen_port is defined %}
-nginx['listen_port'] = "{{ gitlab_nginx_listen_port }}"
-{% endif %}
-{% if gitlab_nginx_listen_https is defined %}
-nginx['listen_https'] = {{ gitlab_nginx_listen_https }}
-{% endif %}
-nginx['real_ip_header'] = 'X-Forwarded-For'
-nginx['real_ip_recursive'] = 'on'
-nginx['real_ip_trusted_addresses'] = {{ gitlab_nginx_trusted_addresses | to_json }}
 
 # Use smtp instead of sendmail/postfix
 # More details and example configuration at
 # https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/settings/smtp.md
-gitlab_rails['smtp_enable'] = {{ gitlab_smtp_enable }}
-{% if gitlab_smtp_enable == "true" %}
-gitlab_rails['smtp_address'] = '{{ gitlab_smtp_address }}'
-gitlab_rails['smtp_port'] = {{ gitlab_smtp_port }}
-gitlab_rails['smtp_domain'] = '{{ gitlab_smtp_domain }}'
-{% if gitlab_smtp_authentication | default('') %}
-gitlab_rails['smtp_authentication'] = '{{ gitlab_smtp_authentication }}'
-{% if gitlab_smtp_user_name | default('') %}
-gitlab_rails['smtp_user_name'] = '{{ gitlab_smtp_user_name }}'
-{% endif %}
-{% if gitlab_smtp_password | default('') %}
-gitlab_rails['smtp_password'] = '{{ gitlab_smtp_password }}'
-{% endif %}
-{% endif %}
-{% if gitlab_smtp_tls | default('') %}
-gitlab_rails['smtp_tls'] = {{ gitlab_smtp_tls }}
-{% endif %}
-{% if gitlab_smtp_ssl | default('') %}
-gitlab_rails['smtp_ssl'] = {{ gitlab_smtp_ssl }}
-{% endif %}
-{% if gitlab_smtp_force_ssl | default('') %}
-gitlab_rails['smtp_force_ssl'] = {{ gitlab_smtp_force_ssl }}
-{% endif %}
-{% if gitlab_smtp_enable_starttls_auto | default('') %}
-gitlab_rails['smtp_enable_starttls_auto'] = {{ gitlab_smtp_enable_starttls_auto }}
-{% endif %}
-{% if gitlab_smtp_openssl_verify_mode | default('') %}
-gitlab_rails['smtp_openssl_verify_mode'] = '{{ gitlab_smtp_openssl_verify_mode }}'
-{% endif %}
-{% endif %}
+gitlab_rails['smtp_enable'] = true
+gitlab_rails['smtp_address'] = "{{ postfix_relay_hostname }}"
+gitlab_rails['smtp_port'] = 587
+gitlab_rails['smtp_domain'] = "{{ domain }}"
+gitlab_rails['smtp_enable_starttls_auto'] = true
+gitlab_rails['smtp_openssl_verify_mode'] = "peer"
 
 gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
 gitlab_rails['backup_upload_connection'] = {
@@ -112,39 +69,18 @@ gitlab_rails['backup_upload_connection'] = {
 gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_backup_upload_remote_directory }}'
 
 # GitLab registry.
-registry['enable'] = {{ gitlab_registry_enable }}
-{% if gitlab_registry_enable == "true" %}
-registry['registry_http_addr'] = "localhost:{{ gitlab_registry_port }}"
+registry['enable'] = true
+registry['registry_http_addr'] = "127.0.0.1:5005"
 registry_external_url "{{ gitlab_registry_external_url }}"
-registry_nginx['listen_https'] = {{ gitlab_registry_nginx_listen_https }}
 registry_nginx['listen_port'] = {{ gitlab_registry_nginx_listen_port }}
-registry_nginx['real_ip_header'] = 'X-Forwarded-For'
-registry_nginx['real_ip_recursive'] = 'on'
-registry_nginx['real_ip_trusted_addresses'] = {{ gitlab_registry_nginx_trusted_addresses | to_json }}
-{% endif %}
+registry_nginx['listen_https'] = true
+registry_nginx['proxy_protocol'] = true
+registry_nginx['real_ip_trusted_addresses'] = {{ gitlab_nginx_trusted_addresses | to_json }}
+registry_nginx['redirect_http_to_https'] = false
+registry_nginx['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
+registry_nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
 
-{% if node_exporter_web_listen_address is defined %}
 node_exporter['listen_address'] = '{{ node_exporter_web_listen_address }}'
 node_exporter['flags'] = {
   'collector.systemd' => true,
 }
-{% endif %}
-
-{% if gitlab_extra_settings is defined %}
-# Extra configuration
-{% for extra in gitlab_extra_settings %}
-{% for setting in extra %}
-{% for kv in extra[setting] %}
-{% if (kv.type is defined and kv.type == 'plain') or (kv.value is not string) %}
-{{ setting }}['{{ kv.key }}'] = {{ kv.value }}
-{% else %}
-{{ setting }}['{{ kv.key }}'] = '{{ kv.value }}'
-{% endif %}
-{% endfor %}
-{% endfor %}
-
-{% endfor %}
-{% endif %}
-
-# To change other settings, see:
-# https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/README.md#changing-gitlab-yml-settings

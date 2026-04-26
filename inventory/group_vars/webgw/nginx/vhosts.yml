@@ -20,14 +20,6 @@ __nginx_vhosts_3:
     server_name: status
     template: "{{ repo_base_dir }}/roles/nginx_exporter/templates/status.conf.j2"
 
-  - filename: gitlab.conf
-    server_name: gitlab
-    template: "{{ repo_base_dir }}/files/webgw/nginx/gitlab.conf.j2"
-
-  - filename: registry.conf
-    server_name: registry
-    template: "{{ repo_base_dir }}/files/webgw/nginx/registry.conf.j2"
-
   - filename: dv-main.conf
     server_name: www
     template: "{{ repo_base_dir }}/files/webgw/nginx/dv-main.conf.j2"

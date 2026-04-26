@@ -28,6 +28,8 @@ nginx_extra_conf_options: |
   {% if pip_v6_map.k8s is defined %}
       immich.{{ domains['dv'] }} k8s_ingress;
   {% endif %}
+      gitlab.{{ domains['dv'] }} gitlab_main;
+      registry.{{ domains['dv'] }} gitlab_registry;
       default nginx_local;
     }
 
@@ -37,6 +39,14 @@ nginx_extra_conf_options: |
 
     upstream k8s_ingress {
       server {{ k8s_ingress_public_address }}:443;
+    }
+
+    upstream gitlab_main {
+      server {{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_nginx_listen_port }};
+    }
+
+    upstream gitlab_registry {
+      server {{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_registry_nginx_listen_port }};
     }
 
     upstream gitlab-ssh {
@@ -53,25 +63,39 @@ nginx_extra_conf_options: |
     }
 
   {% if nginx_listen_v6 is defined %}
-  server {
-    listen [{{ nginx_listen_v6 }}]:443;
-    proxy_pass nginx_local;
-    proxy_protocol on;
-  }
+    server {
+      listen [{{ nginx_listen_v6 }}]:443;
+      proxy_pass nginx_local;
+      proxy_protocol on;
+    }
   {% endif %}
 
   {% if pip_v6_map.k8s is defined %}
-  server {
-    listen [{{ pip_v6_map.k8s }}]:443;
-    proxy_pass k8s_ingress;
-    proxy_protocol on;
-  }
+    server {
+      listen [{{ pip_v6_map.k8s }}]:443;
+      proxy_pass k8s_ingress;
+      proxy_protocol on;
+    }
+  {% endif %}
+
+  {% if pip_v6_map.gitlab is defined %}
+    map $ssl_preread_server_name $gitlab_pool {
+      gitlab.{{ domains['dv'] }} gitlab_main;
+      registry.{{ domains['dv'] }} gitlab_registry;
+    }
+
+    server {
+      listen [{{ pip_v6_map.gitlab }}]:443;
+      ssl_preread on;
+      proxy_pass $gitlab_pool;
+      proxy_protocol on;
+    }
   {% endif %}
 
     server {
       listen {% if nginx_listen_v4 is defined %}{{ nginx_listen_v4 }}:{% endif %}22;
-  {% if nginx_listen_v6 is defined %}
-      listen [{{ nginx_listen_v6 }}]:22;
+  {% if pip_v6_map.gitlab is defined %}
+      listen [{{ pip_v6_map.gitlab }}]:22;
   {% endif %}
       proxy_pass gitlab-ssh;
       proxy_protocol on;

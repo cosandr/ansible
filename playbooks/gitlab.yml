@@ -11,6 +11,16 @@
     - role: systemd
       tags: ["systemd"]
 
+  tasks:
+    - name: Ensure gitlab SSL dir exists
+      ansible.builtin.file:
+        path: /etc/gitlab/ssl
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+      tags: ["pg_cert", "ssl"]
+
   post_tasks:
     # Required for gitlab backup to work
     - name: Ensure tar is installed

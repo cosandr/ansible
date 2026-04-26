@@ -8,3 +8,86 @@ __promtail_scrape_configs_2:
         labels:
           job: gitlab
           __path__: /var/log/gitlab/gitlab-rails/production_json.log
+
+  - job_name: nginx
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          nginx_type: error
+          __path__: "/var/log/gitlab/nginx/gitlab_*error.log"
+
+      - targets:
+          - localhost
+        labels:
+          job: nginx
+          nginx_type: access
+          __path__: "/var/log/gitlab/nginx/gitlab_*access.log"
+
+    pipeline_stages:
+      - match:
+          selector: '{job="nginx", nginx_type="error"}'
+          stages:
+            - regex:
+                # Same as my nginx
+                expression: '^(?P<timestamp>\w{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2}) \[(?P<level>\w+)\] (?P<pid>\d+)#(?P<tid>\d+): (?P<message>.*)'
+
+            - labels:
+                level: ""
+                pid: ""
+                tid: ""
+
+            - timestamp:
+                source: timestamp
+                format: "2006/01/02 15:04:05"
+                location: "{{ sys_timezone }}"
+
+            - output:
+                source: message
+
+      - match:
+          selector: '{job="nginx", nginx_type="access"}'
+          stages:
+            - regex:
+                # /opt/gitlab/embedded/sbin/nginx -p /var/opt/gitlab/nginx -T | grep log_format
+                # log_format gitlab_access escape=default '$remote_addr - $remote_user [$time_local] "$request_method $filtered_request_uri $server_protocol" $status $body_bytes_sent "$filtered_http_referer" "$http_user_agent" $gzip_ratio';
+                # 10.1.1.1 - - [26/Apr/2026:13:33:28 +0200] "GET /v2/andrei/mrbot-brains/tags/list?n=10000 HTTP/1.1" 200 159 "" "Renovate/43.141.6 (https://github.com/renovatebot/renovate)" 1.23
+                expression: '(?P<remote_addr>\S+) - (?P<remote_user>\S+) \[(?P<timestamp>\w{2}/\w{3}/\d{4}:\d{2}:\d{2}:\d{2} [+-]\d{4})\] "(?P<method>[A-Z]+) (?P<request>.*?)" (?P<status>\d+) (?P<body_bytes_sent>\d+) "(?P<http_referer>.*?)" "(?P<http_user_agent>.*?)" (?P<gzip_ratio>.*)'
+
+            - drop:
+                source: "http_user_agent"
+                expression: "^gitlab-runner.*"
+
+            - drop:
+                source: "http_user_agent"
+                # Prometheus exporters and renovate
+                expression: "(?i).*(prometheus|exporter|renovate).*"
+
+            - labels:
+                remote_addr: ""
+                method: ""
+                status: ""
+
+            - static_labels:
+                level: debug
+
+            - metrics:
+                body_bytes_sent:
+                  type: Gauge
+                  description: "Bytes sent in body"
+                  source: body_bytes_sent
+                  config:
+                    action: set
+
+            - timestamp:
+                source: timestamp
+                format: "02/Jan/2006:15:04:05 -0700"
+                location: "{{ sys_timezone }}"
+
+            - template:
+                source: message
+                template: '{% raw %}user="{{ .remote_user }}" request="{{ .request }}" referer="{{ .http_referer }}" user_agent="{{ .http_user_agent }}"{% endraw %}'
+
+            - output:
+                source: message
