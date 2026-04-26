@@ -48,22 +48,20 @@ server {
         proxy_set_header X-Forwarded-Ssl on;
         proxy_set_header X-Real-IP $remote_addr;
 
-        set $upstream_app {{ item.upstream_name | default('nextcloud') }};
-        set $upstream_proto https;
-        proxy_pass $upstream_proto://$upstream_app;
+        proxy_pass https://{{ item.upstream_name | default('nextcloud') }};
 
         proxy_max_temp_file_size 2048m;
     }
 
     # https://help.nextcloud.com/t/frequent-nextcloud-29-hub-8-update-issues/189897#well-known-issue-4
     location = /.well-known/carddav {
-        return 301 $scheme://$host:$server_port/remote.php/dav/;
+        return 301 https://$host/remote.php/dav/;
     }
     location = /.well-known/caldav {
-        return 301 $scheme://$host:$server_port/remote.php/dav/;
+        return 301 https://$host/remote.php/dav/;
     }
     location = /ocm-provider/ {
-        return 301 $scheme://$host:$server_port/index.php/ocm-provider;
+        return 301 https://$host/index.php/ocm-provider;
     }
 }
 {% endif %}
