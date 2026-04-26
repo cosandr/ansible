@@ -6,14 +6,17 @@ nginx_provisioning_synced_excludes:
   - "manual-*.conf"
   - "private-*.conf"
 
-nginx_listen_v6: "::"
 nginx_listen_http: |-
   listen {% if nginx_listen_v4 is defined %}{{ nginx_listen_v4 }}:{% endif %}80;
+  {% if nginx_listen_v6 is defined %}
   listen [{{ nginx_listen_v6 }}]:80;
+  {% endif %}
 
 nginx_listen_https: |-
   listen {% if nginx_listen_v4 is defined %}{{ nginx_listen_v4 }}:{% endif %}443 ssl;
+  {% if nginx_listen_v6 is defined %}
   listen [{{ nginx_listen_v6 }}]:443 ssl;
+  {% endif %}
 
 nginx_extra_conf_options: |
   stream {
@@ -30,7 +33,9 @@ nginx_extra_conf_options: |
 
     server {
       listen {% if nginx_listen_v4 is defined %}{{ nginx_listen_v4 }}:{% endif %}22;
+  {% if nginx_listen_v6 is defined %}
       listen [{{ nginx_listen_v6 }}]:22;
+  {% endif %}
       proxy_pass gitlab-ssh;
       proxy_protocol on;
 
