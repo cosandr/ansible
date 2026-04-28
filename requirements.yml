@@ -12,8 +12,9 @@ collections:
     version: ">=2.10"
   - name: community.libvirt
     version: ">=1.3"
+  # https://github.com/hifis-net/ansible-collection-toolkit
   - name: hifis.toolkit
-    version: '>4.0,<5.0'
+    version: '>6.0,<7.0'
   - name: https://github.com/ceph/ceph.automation.git
     type: git
     version: main
@@ -22,7 +23,7 @@ roles:
   # https://www.jeffgeerling.com/blog/2023/ansible-galaxy-error-unable-compare-role-versions
   - name: geerlingguy.docker
     src: https://github.com/geerlingguy/ansible-role-docker.git
-    version: 7.2.0
+    version: 8.0.0
 
   - name: geerlingguy.gitlab
     src: https://github.com/geerlingguy/ansible-role-gitlab.git
