@@ -12,15 +12,15 @@ firewall_rules:
 
   - port: "{{ mediamtx_rtsp_port }}"
     protocol: tcp
-    sources: "{{ subnets.talos.pod }}"
+    sources: "{{ subnets.vm.docker }}"
 
   - port: "{{ mediamtx_rtp_port }}"
     protocol: udp
-    sources: "{{ subnets.talos.pod }}"
+    sources: "{{ subnets.vm.docker }}"
 
   - port: "{{ mediamtx_rtcp_port }}"
     protocol: udp
-    sources: "{{ subnets.talos.pod }}"
+    sources: "{{ subnets.vm.docker }}"
 
   # RouterOS neighbour discovery
   - port: 5678
