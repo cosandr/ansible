@@ -4,7 +4,7 @@ vm_template: "debian13_packer.{{ vm_disk_format }}"
 vm_cpus: 16
 vm_mem: 16384
 
-vm_root_size: "50G"
+vm_root_size: "100G"
 
 vm_pci_devices:
   - address:
