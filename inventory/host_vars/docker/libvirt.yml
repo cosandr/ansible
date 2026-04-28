@@ -31,3 +31,6 @@ vm_virtiofs_mounts:
   - source: "/mnt/tank/docker"
     target: "tank-data"
     path: "/mnt/tank-data"
+  - source: "/mnt/tank/yes"
+    target: "tank-yes"
+    path: "/mnt/yes"
