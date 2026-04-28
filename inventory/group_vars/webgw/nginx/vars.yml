@@ -25,13 +25,11 @@ nginx_extra_conf_options: |
                     '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
 
     map $ssl_preread_server_name $backend_pool {
-  {% if pip_v6_map.k8s is defined %}
-      immich.{{ domains['dv'] }} k8s_ingress;
-  {% endif %}
       gitlab.{{ domains['dv'] }} gitlab_main;
       registry.{{ domains['dv'] }} gitlab_registry;
   {% if pip_v6_map.docker is defined %}
       abs.{{ domains['dv'] }} docker_traefik;
+      immich.{{ domains['dv'] }} docker_traefik;
       jellyfin.{{ domains['dv'] }} docker_traefik;
       plex.{{ domains['dv'] }} docker_traefik;
   {% endif %}
@@ -40,10 +38,6 @@ nginx_extra_conf_options: |
 
     upstream nginx_local {
       server 127.0.0.1:8443;
-    }
-
-    upstream k8s_ingress {
-      server {{ k8s_ingress_public_address }}:443;
     }
 
     upstream docker_traefik {
@@ -75,14 +69,6 @@ nginx_extra_conf_options: |
     server {
       listen [{{ nginx_listen_v6 }}]:443;
       proxy_pass nginx_local;
-      proxy_protocol on;
-    }
-  {% endif %}
-
-  {% if pip_v6_map.k8s is defined %}
-    server {
-      listen [{{ pip_v6_map.k8s }}]:443;
-      proxy_pass k8s_ingress;
       proxy_protocol on;
     }
   {% endif %}
