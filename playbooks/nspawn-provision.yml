@@ -10,6 +10,13 @@
         file: ../tasks/common_servers.yml
       tags: ["always"]
 
+    - name: Disable chrony-wait
+      ansible.builtin.systemd:
+        name: "chrony-wait.service"
+        state: stopped
+        enabled: false
+      tags: ["chrony"]
+
 - name: Setup Loki
   hosts: loki
   roles:
