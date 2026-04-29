@@ -1,12 +1,12 @@
 ---
 - name: Ensure logind.conf.d exists
   become: true
-  file:
+  ansible.builtin.file:
     path: "/etc/systemd/logind.conf.d"
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   when:
     - logind_config | length > 0
     - install_logind_config | bool
@@ -14,12 +14,12 @@
 
 - name: Copy logind config
   become: true
-  template:
+  ansible.builtin.template:
     src: "logind.conf.j2"
     dest: "/etc/systemd/logind.conf.d/override.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when:
     - logind_config | length > 0
     - install_logind_config | bool
@@ -28,12 +28,12 @@
 
 - name: Ensure sleep.conf.d exists
   become: true
-  file:
+  ansible.builtin.file:
     path: "/etc/systemd/sleep.conf.d"
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   when:
     - systemd_sleep_config | length > 0
     - install_sleep_config | bool
@@ -41,12 +41,12 @@
 
 - name: Copy systemd sleep config
   become: true
-  template:
+  ansible.builtin.template:
     src: "sleep.conf.j2"
     dest: "/etc/systemd/sleep.conf.d/override.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when:
     - systemd_sleep_config | length > 0
     - install_sleep_config | bool
@@ -56,90 +56,111 @@
 # https://wiki.archlinux.org/title/Power_management#Sleep_hooks
 - name: Copy user suspend hook
   become: true
-  template:
+  ansible.builtin.template:
     src: "user-suspend@.service.j2"
     dest: "/etc/systemd/system/user-suspend@.service"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     # validate: 'systemd-analyze verify %s'
   notify:
     - reload systemd
-    - enable user suspend
+    - Enable user suspend
   when:
     - install_suspend_hooks
     - user_suspend | length > 0
 
 - name: Copy root suspend hook
   become: true
-  template:
+  ansible.builtin.template:
     src: "root-suspend.service.j2"
     dest: "/etc/systemd/system/root-suspend.service"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     # validate: 'systemd-analyze verify %s'
   notify:
     - reload systemd
-    - enable root suspend
+    - Enable root suspend
   when:
     - install_suspend_hooks
     - root_suspend | length > 0
 
 - name: Copy user resume hook
   become: true
-  template:
+  ansible.builtin.template:
     src: "user-resume@.service.j2"
     dest: "/etc/systemd/system/user-resume@.service"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     # validate: 'systemd-analyze verify %s'
   notify:
     - reload systemd
-    - enable user resume
+    - Enable user resume
   when:
     - install_suspend_hooks
     - user_resume | length > 0
 
 - name: Copy root resume hook
   become: true
-  template:
+  ansible.builtin.template:
     src: "root-resume.service.j2"
     dest: "/etc/systemd/system/root-resume.service"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
     # validate: 'systemd-analyze verify %s'
   notify:
     - reload systemd
-    - enable root resume
+    - Enable root resume
   when:
     - install_suspend_hooks
     - root_resume | length > 0
 
-- block:
+- name: Install battery threshold service
+  when: install_battery_charge_threshold | bool
+  block:
     - name: Copy battery charge threshold service
-      template:
+      ansible.builtin.template:
         src: battery-charge-threshold.service.j2
         dest: /etc/systemd/system/battery-charge-threshold.service
         owner: root
         group: root
-        mode: 0644
-      notify: restart battery charge threshold service
+        mode: "0644"
+      notify: Restart battery charge threshold service
 
     - name: Enable and start battery charge threshold service
-      systemd:
+      ansible.builtin.systemd:
         name: battery-charge-threshold.service
         state: started
         enabled: true
         daemon_reload: true
 
-  when: install_battery_charge_threshold | bool
+- name: Include auto-cpufreq role
+  ansible.builtin.include_role:
+    name: auto_cpufreq
+  when: install_auto_cpufreq | bool
+  tags: ["auto-cpufreq"]
+
+- name: Install PPD
+  community.general.pacman:
+    name: "power-profiles-daemon"
+    state: present
+  when: install_ppd | bool
+  tags: ["ppd"]
+
+- name: Set PDD state
+  ansible.builtin.systemd:
+    name: power-profiles-daemon
+    state: started
+    enabled: true
+  when: install_ppd | bool
+  tags: ["ppd"]
 
 # https://old.reddit.com/r/linux/comments/u7zxa0/psa_for_intel_tiger_lake_dynamic_tuning_laptops/
 - name: Configure i915.perf_stream_paranoid
-  sysctl:
+  ansible.posix.sysctl:
     name: dev.i915.perf_stream_paranoid
     value: "{{ i915_perf_stream_paranoid }}"
     state: present

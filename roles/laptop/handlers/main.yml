@@ -1,32 +1,32 @@
 ---
 
-- name: enable user suspend
+- name: Enable user suspend
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: "user-suspend@{{ item }}.service"
     enabled: true
   loop: "{{ user_suspend_users }}"
 
-- name: enable user resume
+- name: Enable user resume
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: "user-resume@{{ item }}.service"
     enabled: true
   loop: "{{ user_suspend_users }}"
 
-- name: enable root suspend
+- name: Enable root suspend
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: "root-suspend.service"
     enabled: true
 
-- name: enable root resume
+- name: Enable root resume
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: "root-resume.service"
     enabled: true
 
-- name: restart battery charge threshold service
-  systemd:
+- name: Restart battery charge threshold service
+  ansible.builtin.systemd:
     name: battery-charge-threshold.service
     state: restarted
