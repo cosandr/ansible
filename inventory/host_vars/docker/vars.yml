@@ -3,8 +3,10 @@
 domain: "{{ domains['hb'] }}"
 
 __unattended_package_blacklist_3:
-  - "docker.*"
+  - ".*cuda.*"
+  - ".*nvidia.*"
   - "container.*"
+  - "docker.*"
 
 docker_registries:
   - url: "{{ gitlab_registry_external_url | regex_replace('^https?://', '') }}"
