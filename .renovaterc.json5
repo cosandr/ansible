@@ -1,19 +1,17 @@
 {
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
-    "config:recommended",
-    ":reviewer(cosandr)",
-    ":separateMultipleMajorReleases",
-    ":timezone(Europe/Oslo)",
+    'config:recommended',
+    ':reviewer(cosandr)',
+    ':separateMultipleMajorReleases',
+    ':timezone(Europe/Oslo)',
   ],
   customManagers: [
     {
       customType: 'regex',
-      fileMatch: [
-        '/(group_vars|host_vars|defaults|vars)/.*\\.ya?ml$',
+      managerFilePatterns: [
+        '//(group_vars|host_vars|defaults|vars)/.*\\.ya?ml$/',
       ],
-      // Match the `# renovate: datasource=... depName=...` comment
-      // and capture the variable on the very next line
       matchStrings: [
         '#\\s*renovate:\\s*datasource=(?<datasource>[a-z-]+)\\s+depName=(?<depName>[^\\s]+)(?:\\s+versioning=(?<versioning>[a-z-]+))?\\n\\s*[a-zA-Z0-9_]+:\\s*"?(?<currentValue>[^\\s"]+)"?',
       ],
