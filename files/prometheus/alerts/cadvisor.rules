@@ -51,3 +51,11 @@ groups:
       severity: warning
     annotations:
       summary: '{{ $labels.name }} container on {{ $labels.instance }} unhealthy'
+
+  - alert: ContainerOOMKilled
+    expr: increase(container_oom_events_total{name!=""}[5m]) > 0
+    for: 1m
+    labels:
+      severity: critical
+    annotations:
+      summary: "{{ $labels.name }} container on {{ $labels.instance }} got OOM killed"
