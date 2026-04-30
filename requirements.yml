@@ -6,8 +6,6 @@ collections:
   - name: community.docker
   - name: community.general
     version: '>=7.5'
-  - name: kubernetes.core
-    version: '>=2.4'
   - name: community.routeros
     version: ">=2.10"
   - name: community.libvirt
@@ -15,9 +13,6 @@ collections:
   # https://github.com/hifis-net/ansible-collection-toolkit
   - name: hifis.toolkit
     version: '>6.0,<7.0'
-  - name: https://github.com/ceph/ceph.automation.git
-    type: git
-    version: main
 
 roles:
   # https://www.jeffgeerling.com/blog/2023/ansible-galaxy-error-unable-compare-role-versions

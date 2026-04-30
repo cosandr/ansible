@@ -1,4 +1,0 @@
----
-
-rgw_networks:
-  - "{{ all_net.san.cidr }}"

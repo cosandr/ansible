@@ -1,5 +1,6 @@
 ---
 
+# TODO: Delete once backups are no longer needed
 restic_server_user: restic
 restic_server_group: restic
 restic_server_uid: 1004

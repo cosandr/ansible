@@ -26,7 +26,6 @@ base_pacman_packages:
   - bluez
   - bluez-utils
   - btrfs-progs
-  - cilium-cli
   - deluge-gtk
   - docker
   - docker-buildx
@@ -69,7 +68,6 @@ base_pacman_packages:
   - krew
   - kubectl
   - kubectx
-  - kubeseal
   - libfido2
   - libpulse
   - libtool

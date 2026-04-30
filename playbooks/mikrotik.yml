@@ -309,25 +309,6 @@
       when: mt_graphing_resources | default([])
       tags: ["graphing"]
 
-    - name: Configure routing IDs  # noqa args[module]
-      community.routeros.api_modify:
-        path: routing id
-        handle_absent_entries: remove
-        handle_entries_content: remove_as_much_as_possible
-        data: "{{ mt_routing_ids }}"
-      when: mt_routing_ids | default([])
-      tags: ["routing"]
-
-    - name: Configure BGP peers  # noqa args[module]
-      delegate_to: localhost
-      community.routeros.api_modify:
-        path: routing bgp connection
-        data: "{{ mt_bgp_peers }}"
-        handle_absent_entries: remove
-        handle_entries_content: remove_as_much_as_possible
-      when: mt_bgp_peers | default([])
-      tags: ["bgp"]
-
     - name: Configure services  # noqa args[module]
       delegate_to: localhost
       community.routeros.api_modify:

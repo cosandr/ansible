@@ -1,21 +1,12 @@
 [all]
 # BEGIN AUTO GENERATED VARIABLES
 localgw01   ansible_host="10.0.10.64"
-localgw02   ansible_host="10.0.10.65"
-localgw03   ansible_host="10.0.10.66"
-localgw04   ansible_host="10.0.10.67"
-localgw05   ansible_host="10.0.10.68"
 docker      ansible_host="10.0.10.88"
 gitlab01    ansible_host="10.0.10.90"
 gitrun01    ansible_host="10.0.10.92"
 loki01      ansible_host="10.0.10.96"
 nextcloud01 ansible_host="10.0.10.104"
 prom01      ansible_host="10.0.10.108"
-talos01     ansible_host="10.0.28.64"
-talos02     ansible_host="10.0.28.65"
-talos03     ansible_host="10.0.28.66"
-talos04     ansible_host="10.0.28.80"
-talos05     ansible_host="10.0.28.81"
 desktop     ansible_host="10.0.50.64"
 laptop      ansible_host="10.0.50.65"   wireguard_ip="10.4.20.65"
 m3bp        ansible_host="10.0.50.66"   wireguard_ip="10.4.20.66"
@@ -29,15 +20,10 @@ deck        ansible_host="10.0.50.150"
 haze        ansible_host="10.0.55.75"
 rb5009      ansible_host="10.0.100.1"   wireguard_ip="10.4.20.1"
 crs226      ansible_host="10.0.100.2"
-crs309      ansible_host="10.0.100.3"
 crs305      ansible_host="10.0.100.4"
 750gl       ansible_host="10.0.100.5"
 u7pro       ansible_host="10.0.100.6"
 theia       ansible_host="10.0.100.16"
-aegir       ansible_host="10.0.100.17"
-gerd        ansible_host="10.0.100.18"
-ymir        ansible_host="10.0.100.19"
-rhea        ansible_host="10.0.100.20"
 unifios     ansible_host="10.0.100.112"
 syno        ansible_host="10.0.100.128"
 webgw01     wireguard_ip="10.4.20.80"
@@ -66,19 +52,7 @@ laptop  host_num=1 host_wg_num=1
 m3bp    host_num=2 host_wg_num=2
 
 [kvm_hv]
-theia cpu_tier=2 host_num=0
-rhea  cpu_tier=1 host_num=4
-
-[kvm_hv:children]
-ms01
-
-[ms01]
-aegir  host_num=1
-gerd   host_num=2
-ymir   host_num=3
-
-[ms01:vars]
-cpu_tier=1
+theia host_num=0
 
 [kvm_hv:vars]
 host_net=mgmt
@@ -109,7 +83,6 @@ unifios host_net=mgmt host_subnet=unifios host_num=0
 gitlab
 gitrun
 localgw
-talos
 
 [libvirt:vars]
 host_net=vm
@@ -129,7 +102,6 @@ drepi   ansible_user=andrei host_num=0
 [mikrotik]
 rb5009 host_num=1 host_wg_num=1
 crs226 host_num=2
-crs309 host_num=3
 crs305 host_num=4
 750gl  host_num=5
 
@@ -173,17 +145,13 @@ host_subnet=prom
 ansible_group_priority=10
 
 [loki]
-loki01 host_num=0 vm_host=ymir
+loki01 host_num=0
 
 [loki:vars]
 host_subnet=loki
 
 [localgw]
-localgw01 vm_host=theia
-localgw02 vm_host=aegir
-localgw03 vm_host=gerd
-localgw04 vm_host=ymir
-localgw05 vm_host=rhea
+localgw01 host_num=0
 
 [localgw:vars]
 host_subnet=localgw
@@ -204,45 +172,12 @@ nextcloud01 host_num=0
 [nextcloud:vars]
 host_subnet=nextcloud
 
-[ceph:children]
-kvm_hv
-
-[ceph:vars]
-ansible_group_priority=3
-
-[ceph_mon]
-theia
-aegir
-rhea
-
 [rom]
 romsto  ansible_host=10.1.0.6
 udr7    ansible_host=10.1.0.1  host_wg_subnet=rom host_wg_num=2
 
 [rom:vars]
 ansible_group_priority=10
-
-[talos:children]
-talos_cp
-talos_worker
-
-[talos:vars]
-host_net=talos
-
-[talos_cp]
-talos01 vm_host=theia vm_cpus=6 # TODO: Give more resources once Theia is freed up a bit.
-talos02 vm_host=aegir
-talos03 vm_host=gerd
-
-[talos_cp:vars]
-host_subnet=control_plane
-
-[talos_worker]
-talos04 vm_host=ymir
-talos05 vm_host=rhea
-
-[talos_worker:vars]
-host_subnet=worker
 
 [unmanaged_hosts]
 ha           host_num=6

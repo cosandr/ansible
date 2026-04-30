@@ -2,7 +2,7 @@
 ---
 
 - name: Enable serial console output
-  hosts: libvirt,!talos
+  hosts: libvirt
   gather_facts: false
   roles:
     - role: grub

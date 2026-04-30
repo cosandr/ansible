@@ -13,11 +13,6 @@ __postgresql_hba_entries_auto: >-
     { 'type': 'host', 'database': 'all', 'user': 'all', 'address': net, 'auth_method': 'scram-sha-256' }
   ) -}}
   {%- endfor -%}
-  {%- for net in subnets.talos.pod -%}
-  {{- tmp.append(
-    { 'type': 'host', 'database': 'all', 'user': 'all', 'address': net, 'auth_method': 'scram-sha-256' }
-  ) -}}
-  {%- endfor -%}
   {{ tmp }}
 
 postgresql_hba_entries: "{{ __postgresql_hba_entries_manual + __postgresql_hba_entries_auto }}"

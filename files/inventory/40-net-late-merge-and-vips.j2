@@ -3,10 +3,6 @@
     "dhcp_range": subnets.vm.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "vm.{{ domains['hb'] }}",
   },
-  "talos": {
-    "dhcp_range": subnets.talos.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
-    "domain": "talos.{{ domains['hb'] }}",
-  },
   "general": {
     "dhcp_range": subnets.general.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "gen.{{ domains['hb'] }}",
@@ -22,10 +18,6 @@
     "dhcp_range": subnets.mgmt.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
     "domain": "man.{{ domains['hb'] }}",
   },
-  "san": {
-    "dhcp_range": subnets.san.clients | ansible.utils.ipv4 | last | andrei.utils.routeros_dhcp_range(skip_last=1),
-    "domain": "san.{{ domains['hb'] }}",
-  },
 } %}
 
 {% set __wg_net_late_merge = {
@@ -37,18 +29,3 @@
 home_net: {{ home_net | combine(__home_net_late_merge, recursive=true) }}
 internal_net: {{ internal_net | combine(__internal_net_late_merge, recursive=true) }}
 wg_net: {{ wg_net | combine(__wg_net_late_merge, recursive=true) }}
-
-vips:
-  # Consider using list and ansible.utils.reduce_on_network instead?
-  vm:
-    localgw01: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
-    localgw02: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(2, wantlist=true) }}
-    localgw03: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(3, wantlist=true) }}
-    ceph_nfs: {{ subnets.vm.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
-  general:
-    smb: {{ subnets.general.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}
-    ceph_nfs: {{ subnets.general.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
-  san:
-    ceph_nfs: {{ subnets.san.vips | andrei.utils.ipaddr_concat(4, wantlist=true) }}
-  talos:
-    control_plane: {{ subnets.talos.vips | andrei.utils.ipaddr_concat(1, wantlist=true) }}

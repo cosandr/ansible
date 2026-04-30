@@ -20,10 +20,6 @@ borg_remote_repo_ip: "ssh://{{ borg_ssh_check_ip }}/."
 borg_ssh_check_general: "{{ borg_user }}@{{ inventory_hostname }}.{{ domain }}"
 borg_remote_repo_general: "ssh://{{ borg_ssh_check_general }}/."
 
-__borg_rbd_vars:
-  pools: ["rbd.libvirt"]
-  temp_dir: "/mnt/tank/backup/temp"
-
 borg_backups:
   - name: "root-tank"
     timer_description: "Backup root to tank every 7 days"
@@ -89,50 +85,3 @@ borg_backups:
     prune_args:
       - "--keep-monthly 3"
       - "--keep-yearly 2"
-
-  - name: "cephfs"
-    timer_description: "Backup CephFS to tank every 7 days"
-    oncalendar: "*-*-01/7 01:21:00"
-    passphrase: "{{ vault_borg_cephfs_tank_passphrase }}"
-    archive_name: "cephfs"
-    repo: "{{ borg_pool }}/cephfs"
-    pre_run: |
-      mountpoint -q /mnt/ceph || exit 1
-      snap_dir="/mnt/ceph/.snap/borg_tmp.$(date +%Y%m%dT%H%M)"
-      mkdir -p "$snap_dir"
-      cd "$snap_dir" || exit 1
-    post_run: |
-      cd /
-      rmdir "$snap_dir"
-    paths:
-      - "."
-    create_args:
-      - "--exclude '**/.snap'"
-    prune_args:
-      - "--keep-weekly 2"
-      - "--keep-monthly 3"
-      - "--keep-yearly 1"
-
-  - name: "rbd-tank"
-    timer_description: "Backup RBD to tank every 7 days"
-    oncalendar: "*-*-03,10,17,24 02:00:00"
-    random_delay: "2h"
-    passphrase: "{{ vault_borg_rbd_passphrase }}"
-    archive_name: "rbd"
-    repo: "{{ borg_pool }}/rbd"
-    pre_run: |
-      {{ lookup('template', repo_base_dir + '/files/theia/pre_run_rbd.sh.j2', template_vars=__borg_rbd_vars) }}
-    post_run: |
-      cd /
-      for p in "${pools[@]}"; do
-        echo "Deleting temporary dir for pool $p"
-        rm -rf "${temp_export_dir:?}/$p"
-      done
-    paths:
-      - "."
-    create_args:
-      - "--list"
-      - "--filter=AME"
-    prune_args:
-      - "--keep-weekly 3"
-      - "--keep-monthly 2"

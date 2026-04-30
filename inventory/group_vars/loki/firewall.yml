@@ -14,9 +14,6 @@ firewalld_zones:
       - "{{ hostvars['drepi'].ansible_host }}"
       - "{{ hostvars['ha'].ansible_host }}"
 
-  - name: internal
-    sources: "{{ subnets.talos.mon | ansible.utils.ipv4 }}"
-
 firewalld_services:
   - name: cockpit
     zone: public

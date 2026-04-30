@@ -6,8 +6,6 @@ __mt_dns_entries_host:
     address: "{{ host_ips.general }}"
   - name: "{{ inventory_hostname }}.{{ all_net.mgmt.domain }}"
     address: "{{ host_ips.mgmt }}"
-  - name: "{{ inventory_hostname }}.{{ all_net.san.domain }}"
-    address: "{{ host_ips.san }}"
   - name: "{{ inventory_hostname }}.{{ all_net.vm.domain }}"
     address: "{{ host_ips.vm }}"
   - name: "{{ inventory_hostname }}.ipmi.{{ domains['hb'] }}"

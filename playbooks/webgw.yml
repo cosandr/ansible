@@ -121,30 +121,6 @@
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
       tags: ["always"]
-
-    - name: Copy master check script
-      ansible.builtin.template:
-        src: "{{ repo_base_dir }}/files/webgw/check_is_master.sh.j2"
-        dest: /usr/local/bin/check-is-master
-        owner: root
-        group: root
-        # setuid bit to allow all users to run it
-        mode: "04755"
-      when:
-        - lego_pre_script is defined
-        - keepalived_instances is defined
-        - keepalived_instances | length > 0
-      tags: ["lego", "pg_cert"]
-
-    - name: Copy MikroTik CA
-      ansible.builtin.copy:
-        src: "{{ repo_base_dir }}/files/mikrotik/ca.crt"
-        dest: /etc/pki/tls/certs/mt-ca.crt
-        owner: root
-        group: root
-        mode: "0644"
-      when: nginx_vhosts | selectattr('server_name', 'search', 'external-dns')
-      tags: ["nginx"]
   roles:
     - role: wireguard
       when: wireguard_addresses is defined
@@ -162,12 +138,6 @@
       when:
         - lego_domains is defined
         - lego_domains | length > 0
-
-    - role: keepalived
-      tags: ["keepalived"]
-      when:
-        - keepalived_instances is defined
-        - keepalived_instances | length > 0
 
     - role: nginx_pre
       tags: ["nginx"]

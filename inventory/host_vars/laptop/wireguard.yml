@@ -9,11 +9,9 @@ wireguard_dns_list:
   - "{{ domains['hb'] }}"
   - "{{ all_net.vm.domain }}"
   - "{{ all_net.mgmt.domain }}"
-  - "{{ all_net.talos.domain }}"
 
 wireguard_mt_allowed_ips:
   - "{{ all_net | json_query('*.cidr') }}"
-  - "{{ subnets.talos.lb }}"
 
 wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"

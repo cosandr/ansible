@@ -6,6 +6,9 @@ __firewalld_rules_2: []
 __firewall_ssh_public: "present"
 __firewall_cockpit_zone: "public"
 __firewalld_services_1:
+  - name: nfs3
+    zone: public
+
   - name: samba
     zone: public
 
@@ -30,23 +33,6 @@ __firewall_rules_1:
   - port: "{{ nginx_ports['www'] }}"
     zone: public
     sources: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
-
-  - port: "{{ minio_console_port }}"
-    zone: public
-    sources: "{{ subnets.vm.localgw }}"
-
-  - port: "{{ minio_server_port }}"
-    zone: public
-    sources: "{{ subnets.vm.localgw + node_exporter_allow_ips }}"
-
-  - port: "{{ restic_server_port }}"
-    zone: public
-    sources: "{{ [all_net.talos.cidr_internal] + node_exporter_allow_ips }}"
-
-  # NUT
-  - port: 3493
-    zone: internal
-    sources: "{{ subnets[host_net].hosts }}"
 
   # NUT exporter
   - port: 9199

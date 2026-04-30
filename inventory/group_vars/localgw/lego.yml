@@ -1,11 +1,5 @@
 ---
 
-lego_pre_script: |
-  if [[ ${FORCE:-0} -eq 0 ]] && ! /usr/local/bin/check-is-master; then
-    echo "Not master node, skip fetching certs"
-    exit 0
-  fi
-
 __host_lego_renew_hooks:
   - name: push-certs
     content: |

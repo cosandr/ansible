@@ -14,7 +14,7 @@ mt_bridge_ports: [
 
 mt_trunk_ports: [
   sfp-sfpplus1, sfpplus2,
-  ether12, ether13, ether14, ether15, ether16,
+  ether12,
 ]
 
 mt_access_ports:
@@ -28,8 +28,5 @@ mt_access_ports:
   - vlan: MGMT
     ports:
       - ether9   # Theia IPMI
-      - ether10  # Rhea IPMI
+      - ether10  # MGMT
       - ether11  # MGMT
-      - ether21  # Aegir vPro
-      - ether22  # Gerd vPro
-      - ether23  # Ymir vPro

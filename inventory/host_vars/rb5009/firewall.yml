@@ -28,13 +28,6 @@ __mt_firewall_raw_auto: >-
 
 mt_firewall_raw: "{{ __mt_firewall_raw_auto + vault_mt_firewall_raw_ipv4 }}"
 
-__kube_cidr_map: >-
-  {%- set tmp = {} -%}
-  {%- for name, config in all_net.items() if name in ['talos'] -%}
-  {{- tmp.update({name: ([config.get('cidr_internal')] + [config.get('cidr6_internal')]) | select }) -}}
-  {%- endfor -%}
-  {{ tmp }}
-
 __mt_firewall_subnet_lists:
   - "{{ subnets.general.noinet | andrei.utils.items2dictlist('address', list='no-inet', comment='general-no-inet') }}"
   - "{{ subnets.general.trusted | andrei.utils.items2dictlist('address', list='allow-lan', comment='general-trusted') }}"
@@ -49,11 +42,6 @@ __mt_firewall_subnet_lists:
   - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='allow-lan', comment='vm-prom') }}"
   - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='www', comment='vm-prom') }}"
   - "{{ subnets.vm.prom | andrei.utils.items2dictlist('address', list='rsyslog', comment='vm-prom') }}"
-  - "{{ __kube_cidr_map.talos | andrei.utils.items2dictlist('address', list='talos', comment='talos') }}"
-  - "{{ vips.vm | dict2items | selectattr('key', 'match', 'localgw\\d+') | map(attribute='value') | flatten
-    | andrei.utils.items2dictlist('address', list='allow-www', comment='vm-localgw-vips') }}"
-  - "{{ subnets.talos.lb | andrei.utils.items2dictlist('address', list='talos-lb', comment='talos-lb') }}"
-  - "{{ [hostvars['ha'].ansible_host] | andrei.utils.items2dictlist('address', list='allow-talos-lb', comment='ha-talos-lb') }}"
   - "{{ [hostvars['theia'].host_ips.general] | andrei.utils.items2dictlist('address', list='samba', comment='theia-samba') }}"
   - "{{ [hostvars['desktop'].host_ips.public] | andrei.utils.items2dictlist('address', list='allow-samba', comment='desktop-samba-public') }}"
   - "{{ subnets.mgmt.unifios | andrei.utils.items2dictlist('address', list='unifi-os-server', comment='unifi-os-server') }}"

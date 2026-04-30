@@ -3,9 +3,6 @@
 # gitlab-ssh is on 22, consider adding second IP for consistency with webgw01?
 ansible_port: 5622
 
-__host_ips_3:
-  san: "{{ subnets.san[host_subnet] | ansible.utils.ipv4 | andrei.utils.ipaddr_concat(host_num) }}"
-
 nginx_exporter_web_listen_address: "{{ ansible_host }}:{{ nginx_exporter_port }}"
 
 group_prometheus_node_labels:

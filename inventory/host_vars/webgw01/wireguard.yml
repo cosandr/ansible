@@ -9,7 +9,6 @@ wireguard_dns_list:
 
 wireguard_mt_allowed_ips:
   - "{{ all_net | json_query('*.cidr') }}"
-  - "{{ all_net.talos.cidr_internal }}"
 
 wireguard_dns: "{{ wireguard_dns_list | join(', ') }}"
 wireguard_private_key: "{{ lookup('community.general.passwordstore', 'network/' + inventory_hostname + '_wg_pk') }}"

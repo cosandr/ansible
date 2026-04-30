@@ -31,9 +31,6 @@
 [submodule "roles/libvirt_vm"]
 	path = roles/libvirt_vm
 	url = git@github.com:cosandr/ansible-role-libvirt-vm.git
-[submodule "roles/minio"]
-	path = roles/minio
-	url = https://github.com/minio/ansible-minio.git
 [submodule "roles/epel"]
 	path = roles/epel
 	url = git@github.com:cosandr/ansible-role-epel.git
@@ -55,15 +52,9 @@
 [submodule "roles/postfix_exporter"]
 	path = roles/postfix_exporter
 	url = git@github.com:cosandr/ansible-role-postfix_exporter.git
-[submodule "roles/keepalived"]
-	path = roles/keepalived
-	url = git@github.com:cosandr/ansible-keepalived.git
 [submodule "roles/nvme_exporter"]
 	path = roles/nvme_exporter
 	url = git@github.com:cosandr/ansible-role-nvme_exporter.git
-[submodule "roles/ceph_nfs"]
-	path = roles/ceph_nfs
-	url = git@github.com:cosandr/ansible-role-ceph_nfs.git
 [submodule "roles/nextcloud_exporter"]
 	path = roles/nextcloud_exporter
 	url = git@github.com:cosandr/ansible-role-nextcloud_exporter.git

@@ -2,7 +2,7 @@
 ---
 
 - name: Run common tasks
-  hosts: libvirt,!talos
+  hosts: libvirt
   gather_facts: true
   pre_tasks:
     - name: Include common tasks

@@ -31,18 +31,10 @@ vm_extra_disks: []
 vm_started: true
 vm_autostart: "{{ vm_started }}"
 vm_customize: true
-vm_cpu_mode: "{{ 'custom' if vm_cpu_model_name else 'host-passthrough' }}"
+vm_cpu_mode: "host-passthrough"
 # Find available models using: virsh cpu-models x86_64
-# Allow live-migration between Theia and Rhea
-vm_cpu_model_name: "{{ 'EPYC-Milan' if vm_host in ['theia', 'rhea'] else '' }}"
-__zen3_consumer_features:
-  - name: pcid
-    policy: disable
-vm_cpu_features: "{{ __zen3_consumer_features if vm_cpu_model_name == 'EPYC-Milan' else [] }}"
-# vm_cpu_features:
-#   - ssbd
-#   - name: mpx
-#     policy: disable
+vm_cpu_model_name: ""
+vm_cpu_features: []
 vm_qemu_args: []
 vm_mdev_uuids: []
 vm_virtiofs_mounts: []
@@ -54,16 +46,6 @@ vm_seclabel_options:
 
 vm_data_disks: []
 # vm_data_disks: ["200G", "150G"]
-
-vm_rbd_auth:
-  username: libvirt
-  type: ceph
-  usage: "client.libvirt secret"
-
-vm_rbd_root_enabled: false
-vm_rbd_pool: "rbd.libvirt"
-vm_rbd_hosts_list: "{{ groups['ceph_mon'] | map('extract', hostvars, 'host_ips') | map(attribute='san') | list }}"
-vm_rbd_data_disks: []
 
 vm_root_size: "20G"
 vm_root_disk:
@@ -77,22 +59,6 @@ vm_root_disk:
   create_volume: true
   # https://bugs.launchpad.net/ubuntu/+source/libvirt/+bug/1677398
   type: file
-  driver_options:
-    discard: "unmap"
-
-vm_root_disk_rbd:
-  name: '{{ inventory_hostname }}-root01'
-  type: network
-  format: "raw"
-  capacity: "{{ vm_root_size }}"
-  copy_image: "{{ vm_rbd_pool }}/{{ (vm_template | split('.'))[0] }}"
-  serial: "root01"
-  auth: "{{ vm_rbd_auth }}"
-  source:
-    protocol: rbd
-    port: 3300
-    name: "{{ vm_rbd_pool }}/{{ inventory_hostname }}-root01"
-    hosts_list: "{{ vm_rbd_hosts_list }}"
   driver_options:
     discard: "unmap"
 
@@ -127,7 +93,7 @@ vm_default_definition:
   vcpus: "{{ vm_cpus }}"
   boot_firmware: efi
   os_id: "{{ vm_os_id }}"
-  volumes: "{{ [vm_root_disk_rbd if vm_rbd_root_enabled else vm_root_disk] + vm_extra_disks }}"
+  volumes: "{{ [vm_root_disk] + vm_extra_disks }}"
   interfaces: "{{ vm_nics }}"
   mdev_uuids: "{{ vm_mdev_uuids }}"
   pci_devices: "{{ vm_pci_devices }}"

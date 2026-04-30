@@ -11,20 +11,6 @@ ownca_ca_list:
     privatekey_path: "{{ ca_privatekey_path }}"
 
 ownca_cert_list:
-  - privatekey_path: "{{ restic_server_tls_key }}"
-    publickey_path: "{{ restic_server_tls_cert }}"
-    cn: "{{ inventory_hostname }}-restic"
-    subject_alt_name: >-
-      {%- set tmp = [] -%}
-      {%- for item in mt_dns_entries -%}
-      {{- tmp.append("IP:" + item.address) -}}
-      {{- tmp.append("DNS:" + item.name) -}}
-      {%- endfor -%}
-      {{ tmp }}
-    ca_passphrase: "{{ ca_passphrase }}"
-    ca_publickey_path: "{{ ca_publickey_path }}"
-    ca_privatekey_path: "{{ ca_privatekey_path }}"
-
   - privatekey_path: "{{ postgresql_ssl_key_path }}"
     publickey_path: "{{ postgresql_ssl_cert_path }}"
     cn: "{{ inventory_hostname }}-pg"

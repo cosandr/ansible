@@ -36,24 +36,6 @@ __subnet_extensions:
 } %}
   vm: {{ all_net.vm | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80) }}
 
-{% set __subnet_map_kube_internal = {
-  "svc": 18,
-  "pod": 18,
-  "lb": 26,
-  "mon": 24,
-} %}
-{% set __subnet_map = {
-  "control_plane": 28,
-  "worker": 28,
-  "_r10": 27,
-  "_r20": 26,
-  "_r30": 27,
-  "_r40": 28,
-  "clients": -28,
-} %}
-  talos: {{ all_net.talos | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80)
-    | combine(all_net.talos | andrei.utils.subnets_from_map(__subnet_map_kube_internal, v4_name="cidr_internal", v6_name="cidr6_internal", v6_size=64)) }}
-
 {% set __subnet_map = {
   "trusted": 28,
   "noinet": 28,
@@ -72,11 +54,3 @@ __subnet_extensions:
   "clients": 25,
 } %}
   mgmt: {{ all_net.mgmt | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80) }}
-
-{% set __subnet_map = {
-  "localgw": 28,
-  "_r20": 28,
-  "talos": 27,
-  "clients": -25,
-} %}
-  san: {{ all_net.san | andrei.utils.subnets_from_map(__subnet_map, v4_start=63, v6_prefix_skip=3, v6_size=80) }}
