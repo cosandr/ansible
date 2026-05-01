@@ -33,7 +33,6 @@
             name:
               - zfs-dkms
               - zfsutils-linux
-              - zfs-dracut
             state: present
           tags: ["install"]
   tasks:
@@ -113,6 +112,34 @@
               options zfs zfs_arc_max={{ zfs_arc_max_gb * 2**30 }}
           notify: Dracut regenerate
           tags: ["arc"]
+
+        - name: Install zfs-load-key service
+          ansible.builtin.copy:
+            dest: /etc/systemd/system/zfs-load-key@.service
+            owner: root
+            group: root
+            mode: "0644"
+            content: |
+              [Unit]
+              Description=Load %I encryption keys
+              Before=systemd-user-sessions.service zfs-mount.service
+              After=zfs-import.target
+              Requires=zfs-import.target
+              DefaultDependencies=no
+
+              [Service]
+              Type=oneshot
+              RemainAfterExit=yes
+              ExecStart=/usr/bin/bash -c 'cat /etc/zfs-%I.key | zfs load-key %I'
+
+              [Install]
+              WantedBy=zfs-mount.service
+
+        - name: Enable loading ZFS keys on boot
+          ansible.builtin.systemd_service:
+            name: zfs-load-key@nvme.service
+            enabled: true
+            daemon_reload: true
 
     - name: Install vectorchord
       ansible.builtin.apt:
