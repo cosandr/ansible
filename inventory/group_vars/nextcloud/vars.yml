@@ -15,6 +15,8 @@ nextcloud_certificate_alt_name:
 prometheus_blackbox_http_targets:
   - "https://{{ nextcloud_domain }}/index.php/login"
 
+# renovate: datasource=github-releases depName=xperimental/nextcloud-exporter
+nextcloud_exporter_version: "0.9.1"
 nextcloud_exporter_port: 9205
 nextcloud_exporter_listen_address: "{{ ansible_host }}:{{ nextcloud_exporter_port }}"
 nextcloud_exporter_server: "https://{{ nextcloud_server_name }}"

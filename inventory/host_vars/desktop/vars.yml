@@ -1,6 +1,8 @@
 ---
 
 aquaero_exporter_port: 2782
+# renovate: datasource=github-releases depName=cosandr/nvidia-exporter
+nvidia_exporter_version: "1.2.0"
 nvidia_exporter_port: 9401
 nvidia_exporter_listen_address: "0.0.0.0:{{ nvidia_exporter_port }}"
 nvidia_exporter_args:

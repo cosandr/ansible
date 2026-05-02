@@ -1,5 +1,7 @@
 ---
 
+# renovate: datasource=github-releases depName=prometheus-community/ipmi_exporter
+ipmi_exporter_version: "1.10.1"
 ipmi_exporter_port: 9290
 ipmi_exporter_web_listen_address: "0.0.0.0:{{ ipmi_exporter_port }}"
 ipmi_exporter_modules:

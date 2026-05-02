@@ -26,6 +26,8 @@ nut_upsd_users:
   - name: "exporter"
     password: "{{ vault_nut_upsd_passwords.exporter }}"
 
+# renovate: datasource=github-releases depName=DRuggeri/nut_exporter
+nut_exporter_version: "3.2.5"
 nut_exporter_env:
   NUT_EXPORTER_USERNAME: "exporter"
   NUT_EXPORTER_PASSWORD: "{{ vault_nut_upsd_passwords.exporter }}"

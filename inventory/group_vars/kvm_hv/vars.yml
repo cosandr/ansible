@@ -8,10 +8,14 @@ fstrim_timer_enabled: true
 cpupower_start_governor: "{{ 'powersave' if inventory_hostname in groups['ms01'] else 'schedutil' }}"
 cpupower_stop_governor: "{{ cpupower_start_governor }}"
 
+# renovate: datasource=github-releases depName=google/cadvisor
+cadvisor_version: "0.56.2"
 cadvisor_port: 9101
 cadvisor_listen_ip: "{{ host_ips.vm }}"
 prometheus_cadvisor_targets: ["{{ cadvisor_listen_ip }}:{{ cadvisor_port }}"]
 
+# renovate: datasource=github-releases depName=cosandr/nvme_exporter
+nvme_exporter_version: "1.0.2"
 nvme_exporter_port: 9998
 nvme_exporter_listen_address: "{{ host_ips.vm }}:{{ nvme_exporter_port }}"
 

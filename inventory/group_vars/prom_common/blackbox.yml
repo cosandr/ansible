@@ -1,5 +1,6 @@
 ---
-
+# renovate: datasource=github-releases depName=prometheus/blackbox_exporter
+blackbox_exporter_version: "0.28.0"
 blackbox_exporter_port: 9115
 blackbox_exporter_web_listen_address: "127.0.0.1:{{ blackbox_exporter_port }}"
 

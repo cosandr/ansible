@@ -80,4 +80,5 @@ postgresql_global_config_options:
     quoted: true
 
 postgres_exporter_port: "9187"
-postgres_exporter_version: "latest"
+# renovate: datasource=github-releases depName=prometheus-community/postgres_exporter
+postgres_exporter_version: "0.19.1"
