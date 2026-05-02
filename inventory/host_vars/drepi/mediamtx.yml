@@ -10,14 +10,12 @@ mediamtx_metrics_port: 9998
 mediamtx_paths:
   cam:
     source: rpiCamera
-    rpiCameraWidth: 1920
-    rpiCameraHeight: 1080
-    # rpiCameraWidth: 2304
-    # rpiCameraHeight: 1296
-    # rpiCameraCodec: softwareH264  # hardware maxes out at 1080p
+    rpiCameraWidth: 2304
+    rpiCameraHeight: 1296
+    rpiCameraHDR: true
+    rpiCameraDenoise: cdn_hq
+    rpiCameraCodec: softwareH264  # hardware maxes out at 1080p
     rpiCameraFPS: 15
-    rpiCameraHFlip: true
-    rpiCameraVFlip: true
     rpiCameraAfMode: manual
     rpiCameraLensPosition: 0.0
     rpiCameraTextOverlayEnable: true
