@@ -4,7 +4,21 @@ sanoid_version: master
 
 sanoid_timer_minutes: 30
 
+syncoid_timers:
+  - name: nvme
+    src: nvme
+    dest: tank/backup/theia/nvme
+    oncalendar: "Mon,Wed,Sat *-*-* 04:00:00"
+    options:
+      - "--recursive"
+      - "--no-sync-snap"
+
 sanoid_backup_modules:
+  "nvme":
+    recursive: true
+    process_children_only: true
+    use_template: "main"
+
   "tank":
     recursive: true
     process_children_only: true
