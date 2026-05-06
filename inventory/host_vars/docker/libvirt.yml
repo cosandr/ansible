@@ -19,7 +19,7 @@ vm_pci_devices:
       function: "0x1"
 
 vm_virtiofs_mounts:
-  - source: "/opt/vm/docker"
+  - source: "/mnt/nvme/docker"
     target: "docker-data"
     path: "/mnt/containers"
   - source: "/mnt/tank/media"

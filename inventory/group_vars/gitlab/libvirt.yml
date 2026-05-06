@@ -5,7 +5,7 @@ vm_mem: 8192
 
 vm_root_size: "20G"
 vm_virtiofs_mounts:
-  - source: "/opt/vm/gitlab"
+  - source: "/mnt/nvme/gitlab"
     target: "gitlab-data"
     path: "/var/opt/gitlab"
   - source: "/mnt/tank/backup/gitlab"
