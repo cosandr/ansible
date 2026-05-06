@@ -46,11 +46,10 @@ borg_backups:
     archive_name: "tank"
     archive_path: "tank"
     pre_ssh_check: "{{ lookup('template', repo_base_dir + '/files/borg/pre_ssh_check_syno.sh.j2') }}"
-    # TODO: ZFS snapshot, need to bind mount/symlink each dataset
     pre_run: |
-      mountpoint -q /mnt/tank || exit 1
-      cd /mnt/tank
+      {{ lookup('template', repo_base_dir + '/files/borg/pre_run_zfs.sh.j2', template_vars={"pool": "tank"}) }}
     post_run: |
+      {{ lookup('file', repo_base_dir + '/files/borg/post_run_zfs.sh') }}
       {{ lookup('file', repo_base_dir + '/files/borg/post_run_syno.sh') }}
     paths:
       - "."
@@ -73,10 +72,10 @@ borg_backups:
     ssh_dest_dir: "/home/andrei"
     archive_name: "tank"
     archive_path: "tank"
-    # TODO: ZFS snapshot, need to bind mount/symlink each dataset
     pre_run: |
-      mountpoint -q /mnt/tank || exit 1
-      cd /mnt/tank
+      {{ lookup('template', repo_base_dir + '/files/borg/pre_run_zfs.sh.j2', template_vars={"pool": "tank"}) }}
+    post_run: |
+      {{ lookup('file', repo_base_dir + '/files/borg/post_run_zfs.sh') }}
     paths:
       - "."
     create_args:

@@ -1,0 +1,21 @@
+# shellcheck shell=bash
+
+POOL="{{ pool }}"
+SNAP_NAME="borg_tmp.$(date +%Y%m%dT%H%M)"
+TMP_ROOT="/tmp/borg_tmp_$POOL"
+
+zfs snapshot -rv "$POOL@$SNAP_NAME"
+mkdir -p "$TMP_ROOT"
+
+while read -r mntpt; do
+    if [[ "$mntpt" == "none" || "$mntpt" == "legacy" ]]; then
+        continue
+    fi
+
+    snap_dir="${mntpt}/.zfs/snapshot/${SNAP_NAME}"
+    target_dir="${TMP_ROOT}${mntpt}"
+    mkdir -p "$target_dir"
+    mount --bind "$snap_dir" "$target_dir"
+done < <(zfs list -H -o mountpoint -t filesystem -r "$POOL")
+
+cd "${TMP_ROOT}$(zfs get -H -o value mountpoint "$POOL")" || exit 1
