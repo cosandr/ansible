@@ -12,6 +12,8 @@ syncoid_timers:
     options:
       - "--recursive"
       - "--no-sync-snap"
+      - "--delete-target-snapshots"
+      - "--skip-parent"
 
 sanoid_backup_modules:
   "nvme":
@@ -44,6 +46,9 @@ sanoid_backup_modules:
     autoprune: true
 
   "tank/backup/temp":
+    use_template: "ignore"
+
+  "tank/backup/theia":
     use_template: "ignore"
 
 sanoid_backup_templates:
