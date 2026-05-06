@@ -1,7 +1,7 @@
 ---
 
 # MacOS needs to mount with -o resvport or share needs insecure option
-host_nfs_shares:
+nfs_shares:
   # HA shares
   - path: /mnt/tank/backup/ha
     options: "rw,no_root_squash,no_subtree_check"
@@ -20,9 +20,6 @@ host_nfs_shares:
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
   - path: /mnt/tank/borg
-    options: "rw,no_root_squash,no_subtree_check"
-    sources: "{{ firewall_trusted_sources }}"
-  - path: /mnt/tank/downloads
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
   - path: /mnt/tank/games

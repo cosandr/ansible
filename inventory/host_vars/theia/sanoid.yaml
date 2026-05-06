@@ -21,6 +21,9 @@ sanoid_backup_modules:
     process_children_only: true
     use_template: "main"
 
+  "nvme/downloads":
+    use_template: "ignore"
+
   "tank":
     recursive: true
     process_children_only: true
@@ -31,9 +34,6 @@ sanoid_backup_modules:
     use_template: "rare"
 
   "tank/media/motion":
-    use_template: "ignore"
-
-  "tank/downloads":
     use_template: "ignore"
 
   "tank/games":
