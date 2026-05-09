@@ -22,7 +22,9 @@ sanoid_backup_modules:
     use_template: "main"
 
   "nvme/downloads":
-    use_template: "ignore"
+    hourly: 0
+    daily: 5
+    monthly: 0
 
   "tank":
     recursive: true
@@ -34,21 +36,27 @@ sanoid_backup_modules:
     use_template: "rare"
 
   "tank/media/motion":
-    use_template: "ignore"
+    hourly: 0
+    daily: 2
+    monthly: 0
+    yearly: 0
 
   "tank/games":
-    use_template: "ignore"
+    hourly: 0
+    daily: 2
+    monthly: 0
 
   "tank/yes":
+    hourly: 0
     daily: 3
     monthly: 1
-    autosnap: true
-    autoprune: true
 
   "tank/backup/temp":
+    recursive: true
     use_template: "ignore"
 
   "tank/backup/theia":
+    recursive: true
     use_template: "ignore"
 
 sanoid_backup_templates:
@@ -74,12 +82,3 @@ sanoid_backup_templates:
     autoprune: false
     autosnap: false
     monitor: false
-
-  "prune_lts":
-    autoprune: true
-    autosnap: false
-    frequently: 0
-    hourly: 3
-    daily: 10
-    monthly: 3
-    yearly: 0
