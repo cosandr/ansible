@@ -46,7 +46,7 @@ fi
 {% endif %}
 {% if conf.post_run is defined %}
 post_run() {
-    {{ conf.post_run }}
+    {{ conf.post_run | indent(4) }}
 }
 trap post_run EXIT
 {% endif %}
@@ -84,7 +84,6 @@ fi
 echo "Starting backup"
 # shellcheck disable=SC2086
 {% endraw %}
-
 
 borg create \
 {% for a in borg_default_create_args + (conf.create_args | default([])) %}

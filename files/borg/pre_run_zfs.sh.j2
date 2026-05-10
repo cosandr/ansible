@@ -1,11 +1,12 @@
 # shellcheck shell=bash
-
+set -e
 POOL="{{ pool }}"
 SNAP_NAME="borg_tmp.$(date +%Y%m%dT%H%M)"
 TMP_ROOT="/tmp/borg_tmp_$POOL"
 
-zfs snapshot -rv "$POOL@$SNAP_NAME"
-mkdir -p "$TMP_ROOT"
+echo "Create snap $POOL@$SNAP_NAME"
+zfs snapshot -r "$POOL@$SNAP_NAME"
+mkdir -v -p "$TMP_ROOT"
 
 while read -r mntpt; do
     if [[ "$mntpt" == "none" || "$mntpt" == "legacy" ]]; then
@@ -14,8 +15,9 @@ while read -r mntpt; do
 
     snap_dir="${mntpt}/.zfs/snapshot/${SNAP_NAME}"
     target_dir="${TMP_ROOT}${mntpt}"
-    mkdir -p "$target_dir"
-    mount --bind "$snap_dir" "$target_dir"
+    mkdir -v -p "$target_dir"
+    mount -v --bind "$snap_dir" "$target_dir"
 done < <(zfs list -H -o mountpoint -t filesystem -r "$POOL")
-
-cd "${TMP_ROOT}$(zfs get -H -o value mountpoint "$POOL")" || exit 1
+set -x
+cd "${TMP_ROOT}$(zfs get -H -o value mountpoint "$POOL")"
+set +e +x
