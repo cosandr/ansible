@@ -190,6 +190,28 @@
       notify: Reload systemd
       tags: ["docker", "prune"]
 
+    - name: Add automatic podman prune job
+      ansible.builtin.copy:
+        src: "{{ repo_base_dir }}/files/gitlab/podman-auto-prune.timer"
+        dest: "/etc/systemd/system/podman-auto-prune.timer"
+        owner: root
+        group: root
+        mode: "0644"
+      notify:
+        - Reload systemd
+        - Enable and start automatic podman prune
+      tags: ["podman", "prune"]
+
+    - name: Copy automatic podman prune service
+      ansible.builtin.copy:
+        src: "{{ repo_base_dir }}/files/gitlab/podman-auto-prune.service"
+        dest: "/etc/systemd/system/podman-auto-prune.service"
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload systemd
+      tags: ["podman", "prune"]
+
   handlers:
     - name: Reload systemd
       ansible.builtin.systemd:
@@ -198,6 +220,12 @@
     - name: Enable and start automatic docker prune
       ansible.builtin.systemd:
         name: docker-auto-prune.timer
+        state: started
+        enabled: true
+
+    - name: Enable and start automatic podman prune
+      ansible.builtin.systemd:
+        name: podman-auto-prune.timer
         state: started
         enabled: true
 

@@ -1,0 +1,7 @@
+[Unit]
+Description=Prune Podman for gitlab-runner
+
+[Service]
+User=gitlab-runner
+Group=gitlab-runner
+ExecStart=/usr/bin/podman system prune -af

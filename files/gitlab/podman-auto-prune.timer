@@ -1,0 +1,10 @@
+[Unit]
+Description=Automatically prune Podman for gitlab-runner every week
+
+[Timer]
+OnCalendar=*-*-02,15 02:00:00
+RandomizedDelaySec=15m
+Persistent=true
+
+[Install]
+WantedBy=timers.target
