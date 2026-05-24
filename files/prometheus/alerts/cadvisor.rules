@@ -10,22 +10,14 @@ groups:
     annotations:
       summary: '{{ $labels.name }} container on {{ $labels.instance }} dead'
 
-  # This rule can be very noisy in dynamic infra with legitimate container start/stop/deployment.
-  - alert: ContainerAbsent
-    expr: absent(container_last_seen{name!=""})
-    for: 5m
-    labels:
-      severity: warning
-    annotations:
-      summary: 'Container {{ $value }} absent on {{ $labels.instance }}'
-
-  - alert: ContainerCpuUsage
-    expr: (sum(rate(container_cpu_usage_seconds_total{name!=""}[3m])) BY (instance, name) * 100) > 80
+  # Only fires for containers with explicit CPU limits. Containers without limits have cpu_quota=0, which is filtered out by the guard.
+  - alert: ContainerHighCPUUtilization
+    expr: (sum(rate(container_cpu_usage_seconds_total{name!=""}[5m])) by (instance, name) / sum(container_spec_cpu_quota{name!=""}/container_spec_cpu_period{name!=""}) by (instance, name) * 100) > 80 and sum(container_spec_cpu_quota{name!=""}/container_spec_cpu_period{name!=""}) by (instance, name) > 0
     for: 2m
     labels:
       severity: warning
     annotations:
-      summary: '{{ $labels.name }} container on {{ $labels.instance }} CPU usage high: {{ $value }}%'
+      summary: '{{ $labels.name }} container on {{ $labels.instance }} high CPU usage: {{ $value | printf "%.2f" }}%'
 
   # See https://medium.com/faun/how-much-is-too-much-the-linux-oomkiller-and-used-memory-d32186f29c9d
   - alert: ContainerMemoryUsage
@@ -37,12 +29,12 @@ groups:
       summary: '{{ $labels.name }} container on {{ $labels.instance }} memory usage high: {{ $value }}%'
 
   - alert: ContainerHighThrottleRate
-    expr: rate(container_cpu_cfs_throttled_seconds_total{name!=""}[3m]) > 1
-    for: 2m
+    expr: sum(rate(container_cpu_cfs_throttled_periods_total{name!=""}[5m])) by (instance, name) / sum(rate(container_cpu_cfs_periods_total{name!=""}[5m])) by (instance, name) > 0.25
+    for: 5m
     labels:
       severity: warning
     annotations:
-      summary: '{{ $labels.name }} container on {{ $labels.instance }} throttling rate high: {{ $value }}'
+      summary: '{{ $labels.name }} container on {{ $labels.instance }} is being throttled {{ $value | humanizePercentage }} '
 
   - alert: ContainerUnhealthy
     expr: container_health_state == 0
@@ -59,3 +51,19 @@ groups:
       severity: critical
     annotations:
       summary: "{{ $labels.name }} container on {{ $labels.instance }} got OOM killed"
+
+  - alert: ContainerRestartLoop
+    expr: increase(container_start_time_seconds{name!=""}[15m]) > 3
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: '{{ $labels.name }} container on {{ $labels.instance }} is crash looping'
+
+  - alert: ContainerHighDiskWrite
+    expr: sum(rate(container_fs_writes_bytes_total{name!=""}[5m])) BY (instance, name) > 50000000 # 50 MB/s
+    for: 3m
+    labels:
+      severity: warning
+    annotations:
+      summary: '{{ $labels.name }} container on {{ $labels.instance }} has high disk write throughput'
