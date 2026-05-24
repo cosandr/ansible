@@ -73,7 +73,7 @@ borg_backups:
 
       trap cleanup EXIT
     paths:
-      - "/win_c/Users/Andrei"
+      - "/win_c/Users/andrc"
       - "/win_d/Drivers"
       - "/win_d/Games/Switch"
       - "/win_d/Other"
@@ -81,9 +81,9 @@ borg_backups:
       - "/win_d/src"
     create_args:
       - "--noflags"
-      - "--exclude '/win_c/Users/Andrei/AppData/Local/Packages/Spotify*'"
-      - "--exclude '/win_c/Users/Andrei/AppData/Local/Packages/CanonicalGroupLimited*'"
-      - "--exclude '/win_c/Users/Andrei/Downloads'"
+      - "--exclude '/win_c/Users/andrc/AppData/Local/Packages/Spotify*'"
+      - "--exclude '/win_c/Users/andrc/AppData/Local/Packages/CanonicalGroupLimited*'"
+      - "--exclude '/win_c/Users/andrc/Downloads'"
       - "--exclude '/win_d/src/valve-leak'"
       - "--exclude '/win_d/Games/Switch/Dumps'"
       - "--exclude '/win_d/Games/Switch/Games'"
