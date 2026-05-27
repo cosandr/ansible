@@ -372,7 +372,7 @@
         debootstrap --arch amd64
           --exclude={{ debootstrap_exclude | join(',') }}
           --include={{ debootstrap_include | join(',') }}
-          {{ ansible_distribution_release | lower }} {{ chroot_path }} http://ftp.no.debian.org/debian
+          {{ ansible_distribution_release | lower }} {{ chroot_path }} http://deb.debian.org/debian
       args:
         creates: "{{ chroot_path }}/etc/fstab"
       tags: ["bootstrap"]
@@ -396,13 +396,13 @@
     - name: Copy apt sources
       ansible.builtin.copy:
         content: |
-          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }} main contrib non-free non-free-firmware
+          deb http://deb.debian.org/debian {{ ansible_distribution_release | lower }} main contrib non-free non-free-firmware
 
-          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }}-updates main contrib non-free non-free-firmware
+          deb http://deb.debian.org/debian {{ ansible_distribution_release | lower }}-updates main contrib non-free non-free-firmware
 
           deb http://deb.debian.org/debian-security {{ ansible_distribution_release | lower }}-security main contrib non-free non-free-firmware
 
-          deb http://ftp.no.debian.org/debian {{ ansible_distribution_release | lower }}-backports main contrib non-free non-free-firmware
+          deb http://deb.debian.org/debian {{ ansible_distribution_release | lower }}-backports main contrib non-free non-free-firmware
         dest: "{{ chroot_path }}/etc/apt/sources.list"
         owner: root
         group: root
