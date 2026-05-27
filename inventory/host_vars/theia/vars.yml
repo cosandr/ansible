@@ -17,7 +17,7 @@ __unattended_package_blacklist_4:
   - ".*zpool.*"
   - ".*postgresql.*"
 
-grub_cmdline_group: "vfio-pci.ids=10de:2204,10de:1aef amd_pstate=passive"
+grub_cmdline_group: "vfio-pci.ids=10de:2504,10de:228e amd_pstate=passive"
 
 ssh_conf_hosts: false
 
