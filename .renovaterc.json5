@@ -18,4 +18,16 @@
       ],
     },
   ],
+  packageRules: [
+    {
+      matchUpdateTypes: ["minor", "patch"],
+      // Wait a couple days for minors and patches
+      minimumReleaseAge: "3 days",
+    },
+    {
+      matchUpdateTypes: ["major"],
+      // Wait a week for majors
+      minimumReleaseAge: "7 days",
+    },
+  ],
 }
