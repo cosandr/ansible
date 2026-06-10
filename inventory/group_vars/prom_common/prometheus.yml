@@ -8,7 +8,7 @@ __prom_node_ips: >-
   {{ tmp }}
 
 # renovate: datasource=github-releases depName=prometheus/prometheus
-prometheus_version: 3.11.3
+prometheus_version: 3.12.0
 prometheus_port: 9090
 prometheus_storage_retention: "5y"
 prometheus_web_listen_address: "{{ wireguard_ip | default('0.0.0.0') }}:{{ prometheus_port }}"
