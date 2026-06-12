@@ -25,6 +25,9 @@ postgresql_databases:
   - name: immich
     owner: immich
 
+  - name: dawarich
+    owner: dawarich
+
 # https://docs.immich.app/administration/postgres-standalone/#without-superuser-permission
 postgresql_extensions:
   - name: vchord
@@ -34,3 +37,9 @@ postgresql_extensions:
   - name: earthdistance
     db: immich
     cascade: true
+
+  - name: postgis
+    db: dawarich
+
+  - name: postgis_topology
+    db: dawarich

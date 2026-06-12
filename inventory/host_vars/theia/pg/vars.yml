@@ -8,6 +8,7 @@ postgresql_config_path: "/etc/postgresql/{{ postgresql_version }}/main"
 postgresql_packages:
   - postgresql-18
   - postgresql-18-pgvector
+  - postgresql-18-postgis-3
   - libpq-dev
 postgresql_log_timezone: "{{ sys_timezone }}"
 postgresql_ssl_ca_path: "{{ ca_publickey_path }}"

@@ -36,3 +36,7 @@ mt_dns_entries:
     cname: "{{ docker_dns_name }}"
     ttl: 5m
     type: CNAME
+  - name: "dawarich.{{ domains['dv'] }}"
+    cname: "{{ docker_dns_name }}"
+    ttl: 5m
+    type: CNAME

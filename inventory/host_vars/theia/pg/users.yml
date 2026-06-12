@@ -33,3 +33,6 @@ postgresql_users:
 
   - name: immich
     password: "{{ vault_postgresql_passwords.immich }}"
+
+  - name: dawarich
+    password: "{{ vault_postgresql_passwords.dawarich }}"
