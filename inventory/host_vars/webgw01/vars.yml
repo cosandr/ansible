@@ -10,8 +10,6 @@ ansible_become: true
 
 sys_timezone: "Etc/UTC"
 
-lego_rfc2136_nameserver: "127.0.0.1"
-
 nginx_listen_v4: "{{ ansible_host }}"
 nginx_listen_v6: "{{ pip_v6_map.nginx }}"
 pip_v6_map: "{{ vault_pip_v6_map }}"
@@ -33,7 +31,6 @@ networkd_config:
     [Network]
     DHCP=ipv4
     Address={{ ansible_host6 }}/64
-    Address={{ vault_rfc2136_aaaa_record }}/64
     {% for k, v in pip_v6_map.items() %}
     # {{ k }}
     Address={{ v }}/64

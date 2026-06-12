@@ -1,6 +1,16 @@
 ---
 
+# renovate: datasource=github-releases depName=go-acme/lego
+lego_version: "v4.35.2"
 lego_domain_keys: "{{ domains.keys() }}"
+lego_desec_token: "{{ (lookup('community.general.passwordstore', 'desec_tokens') | from_yaml).lego_webgw }}"
+lego_domains: >-
+  {%- set tmp = [] -%}
+  {%- for key in lego_domain_keys -%}
+  {{- tmp.append(lookup('template', repo_base_dir + '/files/lego_desec.yml.j2', template_vars={'key': key}) | from_yaml) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
 __group_lego_renew_hooks:
   - name: sudo-restart-nginx
     content: |
