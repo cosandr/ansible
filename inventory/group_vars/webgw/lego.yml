@@ -1,7 +1,7 @@
 ---
 
 # renovate: datasource=github-releases depName=go-acme/lego
-lego_version: "v4.35.2"
+lego_version: "v5.2.2"
 lego_domain_keys: "{{ domains.keys() }}"
 lego_desec_token: "{{ (lookup('community.general.passwordstore', 'desec_tokens') | from_yaml).lego_webgw }}"
 lego_domains: >-
