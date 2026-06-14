@@ -1,7 +1,7 @@
 ---
 
 # renovate: datasource=github-releases depName=bluenviron/mediamtx
-mediamtx_version: "1.19.0"
+mediamtx_version: "1.19.1"
 mediamtx_metrics_ips: "{{ node_exporter_allow_ips }}"
 mediamtx_rtsp_port: 8554
 mediamtx_rtp_port: 8000
