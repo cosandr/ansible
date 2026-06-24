@@ -70,3 +70,19 @@ groups:
       severity: warning
     annotations:
       summary: "{{ $labels.friendly_name }} is high ({{ $value }}%)"
+
+  - alert: ServerCabinetWarm
+    expr: hass_sensor_temperature_celsius{job="hass", entity="sensor.server_cabinet_temperature"} > 30
+    for: 1h
+    labels:
+      severity: warning
+    annotations:
+      summary: "Server cabinet is warm ({{ $value }}°C)"
+
+  - alert: ServerCabinetHot
+    expr: hass_sensor_temperature_celsius{job="hass", entity="sensor.server_cabinet_temperature"} > 40
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Server cabinet is hot ({{ $value }}°C)"

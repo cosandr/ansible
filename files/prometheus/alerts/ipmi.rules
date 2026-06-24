@@ -2,7 +2,7 @@ groups:
 - name: IPMI Exporter
   rules:
   - alert: IpmiCpuTempHigh
-    expr: ipmi_temperature_celsius{name="CPU Temp"} > 80
+    expr: ipmi_temperature_celsius{name="CPU Temp"} > 85
     for: 5m
     labels:
       severity: warning
@@ -18,9 +18,17 @@ groups:
       summary: '{{ $labels.name }} temperature high [{{ $value }}C] on {{ $labels.instance }}'
 
   - alert: IpmiDimmTempHigh
-    expr: ipmi_temperature_celsius{name=~"DIMM.*"} > 60
+    expr: ipmi_temperature_celsius{name=~"(DIMM|DDR4).*"} > 60
     for: 5m
     labels:
       severity: warning
     annotations:
       summary: '{{ $labels.name }} temperature high [{{ $value }}C] on {{ $labels.instance }}'
+
+  - alert: ServerCabinetFanError
+    expr: ipmi_fan_speed_rpm{instance="theia", name="FAN6"} < 200 or absent(ipmi_fan_speed_rpm{instance="theia", name="FAN6"})
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: 'Server cabinet fans have stopped or are too slow'
