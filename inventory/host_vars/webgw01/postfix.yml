@@ -1,7 +1,7 @@
 ---
 
 # renovate: datasource=github-releases depName=sergeymakinen/postfix_exporter
-postfix_exporter_version: "2.1.0"
+postfix_exporter_version: "2.1.1"
 postfix_exporter_port: 9907
 postfix_exporter_listen_address: "0.0.0.0:{{ postfix_exporter_port }}"
 postfix_exporter_args:
