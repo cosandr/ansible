@@ -10,7 +10,7 @@ nfs_shares:
   - path: /mnt/tank
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
-  - path: /mnt/tank/archive
+  - path: /mnt/nvme/archive
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
   - path: /mnt/tank/backup
@@ -22,13 +22,10 @@ nfs_shares:
   - path: /mnt/tank/games
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
-  - path: /mnt/tank/media
+  - path: /mnt/nvme/media
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
-  - path: /mnt/tank/media/motion
-    options: "rw,no_root_squash,no_subtree_check"
-    sources: "{{ firewall_trusted_sources }}"
-  - path: /mnt/tank/media/photo
+  - path: /mnt/nvme/media/photo
     options: "rw,no_root_squash,no_subtree_check"
     sources: "{{ firewall_trusted_sources }}"
   - path: /mnt/tank/yes
