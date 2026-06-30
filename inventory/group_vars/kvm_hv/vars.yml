@@ -42,8 +42,6 @@ __unattended_package_blacklist_3:
   - "libvirt.*"
   - "qemu.*"
 
-intel_gvt_enabled: false
-
 common_packages: "{{ __group_common_packages + (__host_common_packages | default([])) }}"
 __group_common_packages:
   - bash-completion

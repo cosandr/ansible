@@ -1,3 +1,0 @@
----
-
-intel_gvt_state: "{{ intel_gvt_enabled | bool | ternary('present', 'absent') }}"
