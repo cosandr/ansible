@@ -1,6 +1,17 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
+- name: Configure user
+  hosts: kvm_hv
+  gather_facts: false
+  tasks:
+    - name: Include user tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/configure_ssh_user.yml
+      vars:
+        user_groups: ["sudo"]
+      tags: ["user"]
+
 - name: Configure KVM hypervisors
   hosts: kvm_hv
   pre_tasks:

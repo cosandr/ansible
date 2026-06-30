@@ -1,5 +1,9 @@
 ---
 
+ansible_user: "{{ vault_ansible_user }}"
+ansible_user_password: "{{ vault_ansible_user_password }}"
+ansible_become: true
+ansible_become_password: "{{ ansible_user_password }}"
 domain: "{{ domains['hb'] }}"
 
 fstrim_timer_enabled: true
