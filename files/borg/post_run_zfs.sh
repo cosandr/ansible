@@ -1,4 +1,5 @@
 # shellcheck shell=bash
+cd /tmp
 while read -r mntpt; do
     if [[ "$mntpt" == "none" || "$mntpt" == "legacy" ]]; then
         continue

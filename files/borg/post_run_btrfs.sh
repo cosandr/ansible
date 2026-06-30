@@ -1,4 +1,4 @@
-cd /
+cd /tmp
 # Set snapshots RW so we can delete nested ones
 for p in "${snap_subvols[@]}"; do
     btrfs property set -ts "$snap_dir/$p" ro false
