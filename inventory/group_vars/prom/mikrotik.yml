@@ -1,7 +1,7 @@
 ---
 
 # renovate: datasource=pypi depName=mktxp
-mktxp_version: "1.2.17"
+mktxp_version: "1.2.18"
 mktxp_port: 49090
 mktxp_listen_address: "127.0.0.1:{{ mktxp_port }}"
 mktxp_system_config:
