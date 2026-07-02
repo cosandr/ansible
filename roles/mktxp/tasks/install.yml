@@ -44,6 +44,6 @@
   become: true
   become_user: "{{ mktxp_user }}"
   ansible.builtin.pip:
-    name: "{{ (mktxp_version == 'latest') | ternary('mktxp', 'mktxp' + mktxp_version) }}"
+    name: "{{ (mktxp_version == 'latest') | ternary('mktxp', 'mktxp==' + mktxp_version) }}"
     state: "{{ (mktxp_version == 'latest') | ternary('latest', 'present') }}"
     virtualenv: "{{ mktxp_home }}"
