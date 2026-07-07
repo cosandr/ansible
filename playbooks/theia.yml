@@ -137,9 +137,12 @@
 
         - name: Enable loading ZFS keys on boot
           ansible.builtin.systemd_service:
-            name: zfs-load-key@nvme.service
+            name: "zfs-load-key@{{ item }}.service"
             enabled: true
             daemon_reload: true
+          loop:
+            - nvme
+            - tank
 
     - name: Install vectorchord
       ansible.builtin.apt:
