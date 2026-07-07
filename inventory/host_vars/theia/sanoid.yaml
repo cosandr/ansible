@@ -35,14 +35,6 @@ sanoid_backup_modules:
     process_children_only: true
     use_template: "main"
 
-  # TODO: Remove once destroyed
-  "tank/archive":
-    use_template: "ignore"
-
-  "tank/media":
-    recursive: true
-    use_template: "ignore"
-
   "tank/games":
     hourly: 0
     daily: 2
