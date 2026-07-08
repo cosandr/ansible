@@ -4,3 +4,7 @@ domain: "{{ domains['hb'] }}"
 hostname_configure_etc_hosts: true
 
 firewall_frontend: "ufw"
+
+mt_dhcp_leases:
+  - address: "{{ ansible_host }}"
+    mac_address: "{{ vault_mac_address }}"

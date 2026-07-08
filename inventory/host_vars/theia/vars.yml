@@ -22,3 +22,9 @@ grub_cmdline_group: "vfio-pci.ids=10de:2504,10de:228e amd_pstate=passive"
 ssh_conf_hosts: false
 
 syncthing_gui_listen_address: "{{ host_ips.general }}:8384"
+
+mt_dhcp_leases:
+  - address: "{{ host_ips.ipmi }}"
+    comment: theia.ipmi
+    mac_address: "{{ vault_ipmi_mac_address }}"
+    server: dhcp-mgmt

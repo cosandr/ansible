@@ -18,6 +18,7 @@ lgtv        ansible_host="10.0.50.148"
 ps5         ansible_host="10.0.50.149"
 deck        ansible_host="10.0.50.150"
 haze        ansible_host="10.0.55.75"
+tapo-lr     ansible_host="10.0.55.76"
 rb5009      ansible_host="10.0.100.1"   wireguard_ip="10.4.20.1"
 crs226      ansible_host="10.0.100.2"
 crs305      ansible_host="10.0.100.4"
@@ -187,6 +188,7 @@ lgtv         host_num=20
 ps5          host_num=21
 deck         host_num=22
 haze         host_num=11  host_net=public
+tapo-lr      host_num=12  host_net=public
 
 [unmanaged_hosts:vars]
 host_net=general

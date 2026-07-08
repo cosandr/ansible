@@ -13,3 +13,7 @@ prometheus_smartctl_targets: ["{{ smartctl_exporter_listen_address }}"]
 
 wol_host: "rb5009"
 wol_address: "{{ lookup('community.general.passwordstore', 'wol/' + inventory_hostname) }}"
+
+mt_dhcp_leases:
+  - address: "{{ ansible_host }}"
+    mac_address: "{{ wol_address }}"
