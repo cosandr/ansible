@@ -1,7 +1,7 @@
 ---
 
 # renovate: datasource=github-releases depName=prometheus/alertmanager
-alertmanager_version: "0.33.0"
+alertmanager_version: "0.33.1"
 alertmanager_port: 9093
 alertmanager_peer_port: 9094
 alertmanager_web_listen_address: "{{ wireguard_ip | default('0.0.0.0') }}:{{ alertmanager_port }}"
