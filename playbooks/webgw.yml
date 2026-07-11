@@ -86,8 +86,8 @@
     - role: lego
       tags: ["lego"]
       when:
-        - lego_domains is defined
-        - lego_domains | length > 0
+        - lego_certificates is defined
+        - lego_certificates | length > 0
 
     - role: nginx_pre
       tags: ["nginx"]

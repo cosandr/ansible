@@ -1,20 +1,39 @@
 ---
 
 # renovate: datasource=github-releases depName=go-acme/lego
-lego_version: "v4.35.2"
-lego_domain_keys: "{{ domains.keys() }}"
-lego_desec_token: "{{ (lookup('community.general.passwordstore', 'desec_tokens') | from_yaml).lego_webgw }}"
-lego_domains: >-
-  {%- set tmp = [] -%}
-  {%- for key in lego_domain_keys -%}
-  {{- tmp.append(lookup('template', repo_base_dir + '/files/lego_desec.yml.j2', template_vars={'key': key}) | from_yaml) -}}
+lego_version: "v5.2.2"
+lego_certificates: >-
+  {%- set tmp = {} -%}
+  {%- for k, v in domains.items() -%}
+  {{- tmp.update({
+    v: {
+      "challenge": "desec",
+      "account": "main",
+      "domains": [v, "*." + v],
+    }
+  }) -}}
   {%- endfor -%}
   {{ tmp }}
 
-__group_lego_renew_hooks:
+lego_challenges:
+  desec:
+    dns:
+      provider: "desec"
+      envFile: "/etc/lego/env.d/desec"
+
+lego_accounts:
+  main:
+    email: "{{ email | default(my_email_alt) }}"
+    acceptsTermsOfService: true
+
+lego_env:
+  desec:
+    DESEC_TOKEN: "{{ (lookup('community.general.passwordstore', 'desec_tokens') | from_yaml).lego_webgw }}"
+
+__group_lego_deploy_hooks:
   - name: sudo-restart-nginx
     content: |
       #!/bin/sh
       systemctl restart nginx
 
-lego_renew_hooks: "{{ (__group_lego_renew_hooks | default([])) + (__host_lego_renew_hooks | default([])) }}"
+lego_deploy_hooks: "{{ (__group_lego_deploy_hooks | default([])) + (__host_lego_deploy_hooks | default([])) }}"

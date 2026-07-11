@@ -11,12 +11,13 @@ First with `--skip-tags pg_cert,nginx,nginx_exporter` followed by `-t pg_cert,ng
 Need to request certificates manually the first time.
 
 ```sh
-sudo -u lego env FORCE=1 /usr/local/bin/lego-wrapper run
+cd /etc/lego
+sudo -u lego env LEGO_PATH=/etc/lego /usr/local/bin/lego
 
 ```
 Push certs if needed
 ```sh
-ansible localgw01 -m shell -a "{% for d in lego_domain_keys %}/usr/local/bin/pg-cert-push --name {{ domains[d] }} --public-key /etc/lego/certificates/{{ domains[d] }}.crt --private-key /etc/lego/certificates/{{ domains[d] }}.key --chain /etc/lego/certificates/{{ domains[d] }}.issuer.crt; {% endfor %}"
+ansible localgw01 -m shell -a "{% for d in lego_certificates.keys() %}echo /usr/local/bin/pg-cert-push --name {{ d }} --public-key /etc/lego/certificates/{{ d }}.crt --private-key /etc/lego/certificates/{{ d }}.key --chain /etc/lego/certificates/{{ d }}.issuer.crt; {% endfor %}"
 ```
 
 Pull on other nodes and fix services
