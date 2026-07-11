@@ -82,4 +82,4 @@ postgresql_global_config_options:
 
 postgres_exporter_port: "9187"
 # renovate: datasource=github-releases depName=prometheus-community/postgres_exporter
-postgres_exporter_version: "0.20.0"
+postgres_exporter_version: "0.20.1"
