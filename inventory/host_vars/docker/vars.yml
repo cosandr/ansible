@@ -16,7 +16,7 @@ docker_registries:
 swapfile_size: 4G
 
 # renovate: datasource=github-releases depName=google/cadvisor
-cadvisor_version: "0.60.3"
+cadvisor_version: "0.60.5"
 cadvisor_port: 9101
 cadvisor_listen_ip: "{{ ansible_host }}"
 prometheus_cadvisor_targets: ["{{ ansible_host }}:{{ cadvisor_port }}"]
