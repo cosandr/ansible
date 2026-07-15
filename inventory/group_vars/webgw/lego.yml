@@ -20,6 +20,9 @@ lego_challenges:
     dns:
       provider: "desec"
       envFile: "/etc/lego/env.d/desec"
+      resolvers:
+        - ns1.desec.io:53
+        - ns2.desec.org:53
 
 lego_accounts:
   main:
@@ -29,6 +32,8 @@ lego_accounts:
 lego_env:
   desec:
     DESEC_TOKEN: "{{ (lookup('community.general.passwordstore', 'desec_tokens') | from_yaml).lego_webgw }}"
+    DESEC_POLLING_INTERVAL: "30"
+    DESEC_PROPAGATION_TIMEOUT: "600"
 
 __group_lego_deploy_hooks:
   - name: sudo-restart-nginx
@@ -37,3 +42,9 @@ __group_lego_deploy_hooks:
       systemctl restart nginx
 
 lego_deploy_hooks: "{{ (__group_lego_deploy_hooks | default([])) + (__host_lego_deploy_hooks | default([])) }}"
+
+lego_extra_config:
+  networkStack: ipv4only
+  log:
+    level: info
+    format: json
