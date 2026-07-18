@@ -1,4 +1,4 @@
-VENV_NAME := "ansible-2.17"
+VENV_NAME := "ansible-11"
 
 .PHONY: git-hooks inventory
 
