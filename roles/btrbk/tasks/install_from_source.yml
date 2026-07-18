@@ -1,22 +1,23 @@
+---
 - name: Set btrfs version
   when: btrbk_version == "latest"
   block:
-  - name: Get latest release
-    uri:
-      url: "https://api.github.com/repos/digint/btrbk/tags?page=1&per_page=1"
-      method: GET
-      return_content: true
-      status_code: 200
-      body_format: json
-      validate_certs: true
-    register: _latest_release
-    until: _latest_release.status == 200
-    retries: 5
-    check_mode: false
+    - name: Get latest release
+      ansible.builtin.uri:
+        url: "https://api.github.com/repos/digint/btrbk/tags?page=1&per_page=1"
+        method: GET
+        return_content: true
+        status_code: 200
+        body_format: json
+        validate_certs: true
+      register: _latest_release
+      until: _latest_release.status == 200
+      retries: 5
+      check_mode: false
 
-  - name: "Set btrbk version to {{ _latest_release.json[0].name }}"
-    ansible.builtin.set_fact:
-      btrbk_version: "{{ _latest_release.json[0].name }}"
+    - name: "Set btrbk version to {{ _latest_release.json[0].name }}"
+      ansible.builtin.set_fact:
+        btrbk_version: "{{ _latest_release.json[0].name }}"
 
 - name: Download btrbk binary to local folder
   ansible.builtin.get_url:
@@ -32,7 +33,7 @@
 - name: Create btrbk temp directory
   ansible.builtin.file:
     path: "/tmp/btrbk-{{ btrbk_version }}"
-    mode: 0755
+    mode: "0755"
     state: directory
   check_mode: false
 

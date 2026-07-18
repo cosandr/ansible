@@ -1,15 +1,15 @@
 ---
 - name: Ensure {{ systemd_script_install_path }} exists
-  file:
+  ansible.builtin.file:
     path: "{{ systemd_script_install_path }}"
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   tags: ["install"]
 
 - name: Install scripts
-  include_tasks: "script.yml"
+  ansible.builtin.include_tasks: "script.yml"
   loop: "{{ systemd_units }}"
   loop_control:
     loop_var: "unit_item"
@@ -19,15 +19,15 @@
   tags: ["install"]
 
 - name: Install units
-  copy:
+  ansible.builtin.copy:
     dest: "{{ systemd_unit_install_path }}/{{ item[0].name }}.{{ item[1] }}"
     owner: "{{ item[0][item[1]].owner | default('root') }}"
     group: "{{ item[0][item[1]].group | default('root') }}"
-    mode: 0644
+    mode: "0644"
     content: |
       {{ ansible_managed | comment }}
       {{ item[0][item[1]].content }}
-  notify: reload systemd
+  notify: Reload systemd
   loop: "{{ systemd_units | product(['service', 'timer']) | list }}"
   loop_control:
     label: "{{ item[0].name }}.{{ item[1] }}"
@@ -37,10 +37,9 @@
   tags: ["install"]
 
 - name: Flush handlers
-  meta: flush_handlers
-
+  ansible.builtin.meta: flush_handlers
 - name: Set unit state
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item[0].name }}.{{ item[1] }}"
     state: "{{ item[0][item[1]].state | default('stopped') }}"
     enabled: "{{ item[0][item[1]].enabled | default(false) }}"

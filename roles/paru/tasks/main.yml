@@ -1,7 +1,6 @@
 ---
-
 - name: Clone from AUR
-  git:
+  ansible.builtin.git:
     dest: /tmp/aur-{{ aur_name }}
     repo: "{{ aur_repo }}"
     version: "master"
@@ -21,7 +20,7 @@
 
 - name: Configure
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "/etc/paru.conf"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"

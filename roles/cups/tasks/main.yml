@@ -1,7 +1,6 @@
 ---
-
 - name: Install packages
-  pacman:
+  community.general.pacman:
     name:
       - avahi
       - cups
@@ -11,7 +10,7 @@
   tags: ["install"]
 
 - name: Check if systemd-resolved is active # noqa command-instead-of-module
-  command: systemctl is-active -q systemd-resolved.service
+  ansible.builtin.command: systemctl is-active -q systemd-resolved.service
   check_mode: false
   changed_when: false
   failed_when: false
@@ -20,30 +19,30 @@
 
 # https://man.archlinux.org/man/resolved.conf.5#OPTIONS
 - name: Disable mDNS in resolved
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "/etc/systemd/resolved.conf"
-    regexp: '^#?MulticastDNS'
-    line: 'MulticastDNS=no'
+    regexp: "^#?MulticastDNS"
+    line: "MulticastDNS=no"
   notify:
-    - restart systemd-resolved
-    - restart avahi
-    - restart cups
+    - Restart systemd-resolved
+    - Restart avahi
+    - Restart cups
   when: __resolved_active.rc == 0
   tags: ["resolved"]
 
 # https://wiki.archlinux.org/title/Avahi#Hostname_resolution
 - name: Configure nsswitch.conf
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/nsswitch.conf
-    regexp: '^hosts: mymachines'
-    line: 'hosts: mymachines mdns_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] files myhostname dns'
+    regexp: "^hosts: mymachines"
+    line: "hosts: mymachines mdns_minimal [NOTFOUND=return] resolve [!UNAVAIL=return] files myhostname dns"
   notify:
-    - restart avahi
-    - restart cups
+    - Restart avahi
+    - Restart cups
   tags: ["nsswitch"]
 
 - name: Enable and start services
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: started
     enabled: true
@@ -52,8 +51,8 @@
     - cups
   tags: ["services"]
 
-- name: Check if firewalld is active  # noqa command-instead-of-module
-  command: systemctl is-active -q firewalld.service
+- name: Check if firewalld is active # noqa command-instead-of-module
+  ansible.builtin.command: systemctl is-active -q firewalld.service
   check_mode: false
   changed_when: false
   failed_when: false
@@ -61,7 +60,7 @@
   tags: ["firewalld"]
 
 - name: Allow mdns through firewalld
-  firewalld:
+  ansible.posix.firewalld:
     service: mdns
     zone: public
     state: enabled

@@ -1,14 +1,13 @@
 ---
-
 - name: Get existing entries
-  command: "/usr/bin/efibootmgr --verbose"
+  ansible.builtin.command: "/usr/bin/efibootmgr --verbose"
   check_mode: false
   changed_when: false
   register: __efi_entries
 
 - name: Add entry if it doesn't exist already
   become: true
-  command: >
+  ansible.builtin.command: >
     /usr/bin/efibootmgr --create
     --disk {{ item.disk }}
     --part {{ item.part }}

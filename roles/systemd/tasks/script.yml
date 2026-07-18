@@ -1,7 +1,6 @@
 ---
-
 - name: Install scripts
-  copy:
+  ansible.builtin.copy:
     dest: "{{ item.dest }}"
     owner: "{{ item.owner | default('root') }}"
     group: "{{ item.group | default('root') }}"

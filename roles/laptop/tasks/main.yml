@@ -23,7 +23,7 @@
   when:
     - logind_config | length > 0
     - install_logind_config | bool
-  notify: reload systemd
+  notify: Reload systemd
   tags: ["logind"]
 
 - name: Ensure sleep.conf.d exists
@@ -50,7 +50,7 @@
   when:
     - systemd_sleep_config | length > 0
     - install_sleep_config | bool
-  notify: reload systemd
+  notify: Reload systemd
   tags: ["sleep"]
 
 # https://wiki.archlinux.org/title/Power_management#Sleep_hooks
@@ -64,7 +64,7 @@
     mode: "0644"
     # validate: 'systemd-analyze verify %s'
   notify:
-    - reload systemd
+    - Reload systemd
     - Enable user suspend
   when:
     - install_suspend_hooks
@@ -80,7 +80,7 @@
     mode: "0644"
     # validate: 'systemd-analyze verify %s'
   notify:
-    - reload systemd
+    - Reload systemd
     - Enable root suspend
   when:
     - install_suspend_hooks
@@ -96,7 +96,7 @@
     mode: "0644"
     # validate: 'systemd-analyze verify %s'
   notify:
-    - reload systemd
+    - Reload systemd
     - Enable user resume
   when:
     - install_suspend_hooks
@@ -112,7 +112,7 @@
     mode: "0644"
     # validate: 'systemd-analyze verify %s'
   notify:
-    - reload systemd
+    - Reload systemd
     - Enable root resume
   when:
     - install_suspend_hooks

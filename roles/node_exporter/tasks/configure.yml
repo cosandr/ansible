@@ -1,11 +1,10 @@
 ---
-
-- name: create or update systemd service unit
-  template:
+- name: Create or update systemd service unit
+  ansible.builtin.template:
     src: node_exporter.service.j2
     dest: /etc/systemd/system/node_exporter.service
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   notify:
-    - restart node_exporter
+    - Restart node_exporter

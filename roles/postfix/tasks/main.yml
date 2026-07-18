@@ -32,7 +32,7 @@
     dest: "/etc/mail.rc"
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when: postfix_mail_rc_config
 
 - name: Configure relayhosts
@@ -72,7 +72,7 @@
     path: /etc/postfix/virtual
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
     modification_time: preserve
     access_time: preserve
   when:
@@ -86,7 +86,7 @@
     dest: /etc/postfix/transport
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
     content: |
       {% for d in postfix_relay_domains %}
       .{{ d.name }}    smtp:[{{ d.relay_host }}]:{{ d.port | default(587) }}
@@ -103,7 +103,7 @@
     dest: /etc/postfix/relayhost_map
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
     content: |
       {% for d in postfix_relay_domains %}
       @{{ d.name }}    [{{ d.relay_host }}]:{{ d.port | default(587) }}
@@ -120,7 +120,7 @@
     dest: /etc/postfix/sasl_passwd
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
     content: |
       {% for d in postfix_relay_domains %}
       @{{ d.name }}    {{ d.user }}:{{ d.password }}
@@ -137,7 +137,7 @@
     dest: "/etc/postfix/{{ item.name }}"
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
     content: "{{ item.content }}"
   loop: "{{ postfix_custom_maps }}"
   loop_control:

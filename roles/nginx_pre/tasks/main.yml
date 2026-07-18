@@ -1,12 +1,11 @@
 ---
-
 - name: Ensure nginx directories exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
   loop:
     - "{{ nginx_dhparam | dirname }}"
     - "{{ nginx_sites_logs }}"
@@ -18,7 +17,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0750
+    mode: "0750"
   when: nginx_certs_dir
   tags: ["nginx"]
 
@@ -26,7 +25,7 @@
   ansible.builtin.get_url:
     url: https://ssl-config.mozilla.org/ffdhe2048.txt
     dest: "{{ nginx_dhparam }}"
-    mode: 0644
+    mode: "0644"
     owner: root
     group: root
   tags: ["nginx"]
@@ -37,7 +36,7 @@
     dest: /etc/yum.repos.d/nginx.repo
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   when:
     - ansible_os_family == 'RedHat'
     - ansible_distribution != 'Fedora'
@@ -70,5 +69,5 @@
     dest: /etc/logrotate.d/nginx_sites
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   tags: ["nginx", "logrotate"]

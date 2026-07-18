@@ -1,22 +1,21 @@
 ---
-
 - name: Install autorandr
-  package:
+  ansible.builtin.package:
     name: autorandr
     state: present
   tags: ["install"]
 
 - block:
     - name: Copy lid listener service
-      copy:
+      ansible.builtin.copy:
         src: autorandr-lid-listener.service
         dest: /etc/systemd/system/autorandr-lid-listener.service
         owner: root
         group: root
-        mode: 0644
+        mode: "0644"
 
     - name: Enable and start lid listener service
-      systemd:
+      ansible.builtin.systemd:
         name: autorandr-lid-listener.service
         enabled: true
         state: started

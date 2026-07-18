@@ -1,13 +1,12 @@
 ---
-
 - name: Install GNOME packages
-  pacman:
+  community.general.pacman:
     name: "{{ gnome_packages }}"
     state: present
   tags: ["install"]
 
 - name: Install GNOME AUR packages
-  include_role:
+  ansible.builtin.include_role:
     name: install_aur
     apply:
       tags: ["install", "aur"]
@@ -16,7 +15,7 @@
   tags: ["install", "aur"]
 
 - name: Ensure psutil library is installed
-  pacman:
+  community.general.pacman:
     name: python-psutil
     state: present
   tags: ["install", "dconf"]
@@ -32,7 +31,7 @@
   tags: ["dconf"]
 
 - name: Prepare key bindings commands
-  set_fact:
+  ansible.builtin.set_fact:
     __kb_list: "{{ __kb_list | default([]) + [tmp_dict] }}"
   vars:
     tmp_dict:
@@ -56,7 +55,7 @@
   tags: ["bindings"]
 
 - name: Prepare bindings list fact
-  set_fact:
+  ansible.builtin.set_fact:
     __kb_list_var: "{{ __kb_list_var | default([]) + [tmp] }}"
   vars:
     tmp: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom{{ my_idx }}/"
@@ -78,12 +77,12 @@
   tags: ["bindings"]
 
 - name: Sync monitor settings
-  copy:
+  ansible.builtin.copy:
     src: "/home/{{ my_user }}/.config/monitors.xml"
     dest: /var/lib/gdm/.config/monitors.xml
     owner: gdm
     group: gdm
-    mode: 0644
+    mode: "0644"
   tags: ["sync"]
 
 # - name: Get current keybindings

@@ -1,23 +1,22 @@
 ---
-
 - name: Install ddcutil
   become: true
-  package:
+  ansible.builtin.package:
     name: ddcutil
     state: present
 
 - name: Make sure i2c-dev is loaded at boot
   become: true
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/modules-load.d/i2c.conf"
     content: "i2c-dev\n"
     owner: root
     group: root
-    mode: 0644
-  notify: load i2c-dev
+    mode: "0644"
+  notify: Load i2c-dev
 
 - name: Allow wheel to control monitors
-  include_role:
+  ansible.builtin.include_role:
     name: udev
     apply:
       become: true

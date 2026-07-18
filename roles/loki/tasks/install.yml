@@ -1,24 +1,23 @@
 ---
-
 - name: Copy Loki sysusers file
-  copy:
+  ansible.builtin.copy:
     content: |
       u loki - "Grafana Loki user"
     dest: /usr/lib/sysusers.d/loki.conf
-    mode: 0644
+    mode: "0644"
     owner: root
     group: root
   register: __sysusers
 
-- name: Restart systemd-sysusers  # noqa no-handler
+- name: Restart systemd-sysusers # noqa no-handler
   become: true
-  command: systemd-sysusers
+  ansible.builtin.command: systemd-sysusers
   when: __sysusers.changed
 
 - name: Get latest release tag
   block:
     - name: Get latest release
-      uri:
+      ansible.builtin.uri:
         url: "https://api.github.com/repos/grafana/loki/releases/latest"
         method: GET
         return_content: true
@@ -32,20 +31,20 @@
       check_mode: false
 
     - name: "Set Loki version to {{ _latest_release.json.tag_name[1:] }}"
-      set_fact:
+      ansible.builtin.set_fact:
         loki_version: "{{ _latest_release.json.tag_name[1:] }}"
   when: loki_version == "latest"
 
 - name: Get checksum list
-  set_fact:
+  ansible.builtin.set_fact:
     __loki_checksums: "{{ lookup('url', 'https://github.com/grafana/loki/releases/download/v' + loki_version + '/SHA256SUMS', wantlist=True) | list }}"
   run_once: true
   check_mode: false
   delegate_to: localhost
 
-- name: Download Loki binary to local folder  # noqa risky-file-permissions
+- name: Download Loki binary to local folder # noqa risky-file-permissions
   become: false
-  get_url:
+  ansible.builtin.get_url:
     url: "https://github.com/grafana/loki/releases/download/v{{ loki_version }}/loki-linux-{{ go_arch }}.zip"
     dest: "/tmp/loki-linux-{{ go_arch }}.zip"
     checksum: "sha256:{{ (__loki_checksums | select('search', 'loki-linux-' + go_arch + '.zip') | first).split()[0] }}"
@@ -60,7 +59,7 @@
 - name: Unpack Loki binary
   become: false
   diff: false
-  unarchive:
+  ansible.builtin.unarchive:
     src: "/tmp/loki-linux-{{ go_arch }}.zip"
     dest: "/tmp"
     creates: "/tmp/loki-linux-{{ go_arch }}"
@@ -69,19 +68,19 @@
 
 - name: Install Loki binary
   diff: false
-  copy:
+  ansible.builtin.copy:
     src: "/tmp/loki-linux-{{ go_arch }}"
     dest: "/usr/local/bin/loki"
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
   notify: Restart loki
 
 - name: Install service
-  template:
+  ansible.builtin.template:
     src: loki.service.j2
     dest: /etc/systemd/system/loki.service
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   notify: Restart loki

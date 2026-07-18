@@ -1,12 +1,11 @@
 ---
-
 - name: Configure btrbk
   ansible.builtin.template:
     src: "btrbk.conf.j2"
     dest: "{{ btrbk_config_file }}"
     owner: "root"
     group: "root"
-    mode: 0644
+    mode: "0644"
 
 - name: Configure sudo
   ansible.builtin.include_role:
@@ -25,7 +24,7 @@
     state: directory
     owner: "root"
     group: "root"
-    mode: 0755
+    mode: "0755"
   when: btrbk_timer_oncalendar
 
 - name: Configure btrbk timer override
@@ -35,7 +34,7 @@
     dest: "/etc/systemd/system/btrbk.timer.d/override.conf"
     owner: "root"
     group: "root"
-    mode: 0644
+    mode: "0644"
   when: btrbk_timer_oncalendar
   notify: Reload systemd
 

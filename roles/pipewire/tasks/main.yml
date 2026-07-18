@@ -1,11 +1,9 @@
 ---
-
 - name: Include OS-specific variables.
-  include_vars: "{{ ansible_os_family }}.yml"
-
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
 - name: Install pipewire
   become: true
-  pacman:
+  community.general.pacman:
     name: "{{ __pipewire_packages }}"
     state: present
   when: ansible_distribution == 'Archlinux'
@@ -13,19 +11,19 @@
 - block:
     - name: Install repository
       become: true
-      apt_repository:
+      ansible.builtin.apt_repository:
         repo: ppa:pipewire-debian/pipewire-upstream
         state: present
 
     - name: Install pipewire
       become: true
-      apt:
+      ansible.builtin.apt:
         name: "{{ __pipewire_packages }}"
         update_cache: true
         state: present
       notify:
-        - disable pulseaudio
-        - mask pulseaudio
-        - enable and start pipewire
+        - Disable pulseaudio
+        - Mask pulseaudio
+        - Enable and start pipewire
 
   when: ansible_os_family == 'Debian'

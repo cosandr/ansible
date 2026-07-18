@@ -18,13 +18,13 @@
 
 # ansible_port can change throughout this role, keep a copy around
 - name: Set configured port fact
-  set_fact:
+  ansible.builtin.set_fact:
     configured_port: "{{ ansible_port }}"
 
 # From localhost, check if we're able to reach {{ inventory_hostname }} on
 # port 22
 - name: Check if we're using the default SSH port
-  wait_for:
+  ansible.builtin.wait_for:
     port: "22"
     state: "started"
     host: "{{ ansible_host }}"
@@ -37,59 +37,55 @@
 
 # If reachable, continue the following tasks with this port
 - name: Set inventory ansible_port to default
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_port: "22"
-  when: default_ssh is defined and
-        default_ssh.state == "started"
+  when: default_ssh is defined and default_ssh.state == "started"
   register: ssh_port_set
 
 # If unreachable on port 22, check if we're able to reach
 # {{ inventory_hostname }} on {{ ansible_port }} provided by the inventory
 # from localhost
 - name: Check if we're using the inventory-provided SSH port
-  wait_for:
+  ansible.builtin.wait_for:
     port: "{{ ansible_port }}"
     state: "started"
     host: "{{ ansible_host }}"
     connect_timeout: "5"
     timeout: "10"
   delegate_to: "localhost"
-  ignore_errors: "yes"
+  ignore_errors: true
   register: configured_ssh
-  when: default_ssh is defined and
-        default_ssh.state is undefined
+  when: default_ssh is defined and default_ssh.state is undefined
 
 # If {{ ansible_port }} is reachable, we don't need to do anything special
 - name: SSH port is configured properly
-  debug:
+  ansible.builtin.debug:
     msg: "SSH port is configured properly"
-  when: configured_ssh is defined and
-        configured_ssh.state is defined and
-        configured_ssh.state == "started"
+  when: configured_ssh is defined and configured_ssh.state is defined and configured_ssh.state == "started"
   register: ssh_port_set
 
 # If the SSH port is neither the default or the configured, give up.
 - name: Fail if SSH port was not auto-detected (unknown)
-  fail:
+  ansible.builtin.fail:
     msg: "The SSH port is neither 22 or {{ ansible_port }}."
   when: ssh_port_set is undefined
 
 # Sanity check, make sure Ansible is able to connect to the host
 - name: Confirm host connection works
-  ping:
+  ansible.builtin.ping:
 
 - name: Setup alternate SSH port
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: "/etc/ssh/sshd_config"
     regexp: "^#?Port"
     line: "Port {{ configured_port }}"
-  notify: "restart sshd and firewall"
+  notify: "Restart sshd and firewall"
 
 - name: Run deferred setup to gather facts
-  setup:
+  ansible.builtin.setup:
 
 - name: Setup selinux for alternate SSH port
-  seport:
+  community.general.seport:
     ports: "{{ configured_port }}"
     proto: "tcp"
     setype: "ssh_port_t"
@@ -97,18 +93,17 @@
   when: ansible_selinux.status == "enabled"
 
 - name: Change firewalld ssh service port
-  template:
+  ansible.builtin.template:
     src: ssh.xml.j2
     dest: /etc/firewalld/services/ssh.xml
     owner: root
     group: root
-    mode: 0644
-  notify: "restart sshd and firewall"
+    mode: "0644"
+  notify: "Restart sshd and firewall"
   when: firewall_frontend == 'firewalld'
 
 - name: Ensure SSH and/or firewalld are reloaded
-  meta: flush_handlers
-
+  ansible.builtin.meta: flush_handlers
 - name: Ensure we use the configured SSH port for the remainder of the role
-  set_fact:
+  ansible.builtin.set_fact:
     ansible_port: "{{ configured_port }}"

@@ -1,16 +1,15 @@
 ---
-
-- name: restart systemd-resolved
-  systemd:
+- name: Restart systemd-resolved
+  ansible.builtin.systemd:
     name: systemd-resolved
     state: restarted
 
-- name: restart avahi
-  systemd:
+- name: Restart avahi
+  ansible.builtin.systemd:
     name: avahi-daemon
     state: restarted
 
-- name: restart cups
-  systemd:
+- name: Restart cups
+  ansible.builtin.systemd:
     name: cups
     state: restarted

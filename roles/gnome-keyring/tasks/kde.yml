@@ -1,37 +1,36 @@
 ---
-
 - name: Ensure directories exist
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     owner: "{{ kde_user }}"
     group: "{{ kde_user }}"
-    mode: 0755
+    mode: "0755"
     state: directory
   loop:
     - "{{ plasma_startup_script_path }}"
     - "{{ autostart_path }}"
 
 - name: Copy keyring script
-  copy:
+  ansible.builtin.copy:
     src: gnome-keyring.sh
     dest: "{{ plasma_startup_script_path }}/gnome-keyring.sh"
     owner: "{{ kde_user }}"
     group: "{{ kde_user }}"
-    mode: 0755
+    mode: "0755"
 
 - name: Copy autostart desktop entries
-  copy:
+  ansible.builtin.copy:
     src: "/etc/xdg/autostart/{{ item }}"
     dest: "{{ autostart_path }}/{{ item }}"
     owner: "{{ kde_user }}"
     group: "{{ kde_user }}"
-    mode: 0644
+    mode: "0644"
     remote_src: true
     force: false
   loop: "{{ gnome_keyring_autostart_files }}"
 
 - name: Remove GNOME dependency
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ autostart_path }}/{{ item }}"
     regexp: '^OnlyShowIn=.*'
     state: absent

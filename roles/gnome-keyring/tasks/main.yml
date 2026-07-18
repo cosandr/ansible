@@ -1,8 +1,7 @@
 ---
-
 - name: Install gnome-keyring and seahorse
   become: true
-  package:
+  ansible.builtin.package:
     name:
       - gnome-keyring
       - seahorse
@@ -11,7 +10,7 @@
 
 - name: Install gnome-keyring-pam
   become: true
-  dnf:
+  ansible.builtin.dnf:
     name: gnome-keyring-pam
     state: present
   when: ansible_os_family == 'RedHat'
@@ -19,7 +18,7 @@
 
 - name: Setup PAM
   become: true
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "{{ pam_config }}"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
@@ -35,6 +34,6 @@
       after: '^session\s+include'
 
 - name: Configure KDE
-  include_tasks: kde.yml
+  ansible.builtin.include_tasks: kde.yml
   when: desktop_environment == 'kde'
   tags: ["kde"]

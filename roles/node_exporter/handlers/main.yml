@@ -1,12 +1,6 @@
 ---
-- name: restart node_exporter
+- name: Restart node_exporter
   become: true
-  systemd:
+  ansible.builtin.systemd:
     name: node_exporter
     state: restarted
-
-- name: reload node_exporter
-  become: true
-  systemd:
-    name: node_exporter
-    state: reloaded

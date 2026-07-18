@@ -1,21 +1,21 @@
 ---
-- include_tasks: install.yml
+- ansible.builtin.include_tasks: install.yml
   when:
     - not node_exporter_skip_install
   tags: ["install"]
 
-- include_tasks: configure.yml
+- ansible.builtin.include_tasks: configure.yml
   tags: ["configure"]
 
-- name: ensure node_exporter service is started and enabled
-  systemd:
+- name: Ensure node_exporter service is started and enabled
+  ansible.builtin.systemd:
     daemon_reload: true
     name: node_exporter
     state: started
     enabled: true
 
 - name: Configure firewall
-  include_role:
+  ansible.builtin.include_role:
     name: firewall_config
     apply:
       become: true

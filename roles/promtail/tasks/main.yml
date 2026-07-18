@@ -1,48 +1,46 @@
 ---
-
-- include_tasks: install.yml
+- ansible.builtin.include_tasks: install.yml
   tags: ["install"]
 
 - name: Ensure promtail directories exist
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ promtail_user }}"
     group: "{{ promtail_user }}"
-    mode: 0750
+    mode: "0750"
   loop:
     - "{{ promtail_conf_path | dirname }}"
     - "{{ promtail_workdir }}"
   tags: ["config"]
 
 - name: Copy config
-  template:
+  ansible.builtin.template:
     src: config.yml.j2
     dest: "{{ promtail_conf_path }}"
     owner: "{{ promtail_user }}"
     group: "{{ promtail_user }}"
-    mode: 0640
-  notify: restart promtail
+    mode: "0640"
+  notify: Restart promtail
   tags: ["config"]
 
 - name: Flush handlers
-  meta: flush_handlers
-
+  ansible.builtin.meta: flush_handlers
 - name: Enable and start promtail
-  service:
+  ansible.builtin.service:
     name: promtail
     enabled: true
     state: started
   when: ansible_os_family != 'Slackware'
 
 - name: Start promtail [Slackware]
-  command: /etc/rc.d/rc.promtail start
+  ansible.builtin.command: /etc/rc.d/rc.promtail start
   register: __sysv_start
   changed_when: "'already running' not in __sysv_start.stdout"
   when: ansible_os_family == 'Slackware'
 
 - name: Include firewall role
-  include_role:
+  ansible.builtin.include_role:
     name: firewall_config
     apply:
       become: true

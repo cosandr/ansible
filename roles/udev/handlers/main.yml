@@ -1,7 +1,5 @@
 ---
-
-- name: reload udev
-  command: "/usr/bin/udevadm control --reload"
-
-- name: trigger udev
-  command: "/usr/bin/udevadm trigger"
+- name: Reload udev
+  ansible.builtin.command: "/usr/bin/udevadm control --reload"
+- name: Trigger udev
+  ansible.builtin.command: "/usr/bin/udevadm trigger"

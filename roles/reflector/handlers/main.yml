@@ -1,11 +1,10 @@
 ---
-
-- name: reload systemd
-  systemd:
+- name: Reload systemd
+  ansible.builtin.systemd:
     daemon_reload: true
 
-- name: enable and start reflector timer
-  systemd:
+- name: Enable and start reflector timer
+  ansible.builtin.systemd:
     name: reflector.timer
     enabled: true
     state: started

@@ -1,5 +1,4 @@
 ---
-
 - name: Get latest release tag
   when: fzf_version == "latest"
   block:
@@ -23,13 +22,14 @@
 
 - name: Set checksum and filename facts
   ansible.builtin.set_fact:
-    __fzf_checksums: "{{ lookup('url', 'https://github.com/junegunn/fzf/releases/download/' + fzf_version + '/fzf_' + fzf_version + '_checksums.txt', wantlist=True) | list }}"
+    __fzf_checksums: "{{ lookup('url', 'https://github.com/junegunn/fzf/releases/download/' + fzf_version + '/fzf_' + fzf_version + '_checksums.txt', wantlist=True)
+      | list }}"
     __fzf_filename: "fzf-{{ fzf_version }}-linux_{{ go_arch }}.tar.gz"
   run_once: true
   check_mode: false
   delegate_to: localhost
 
-- name: Download fzf binary to local folder  # noqa risky-file-permissions
+- name: Download fzf binary to local folder # noqa risky-file-permissions
   become: false
   ansible.builtin.get_url:
     url: "https://github.com/junegunn/fzf/releases/download/{{ fzf_version }}/{{ __fzf_filename }}"
@@ -58,7 +58,7 @@
   ansible.builtin.copy:
     src: "/tmp/fzf"
     dest: "/usr/local/bin/fzf"
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
 
@@ -68,7 +68,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Download ZSH completion files
   diff: false
@@ -77,7 +77,7 @@
     dest: /usr/share/fzf/{{ item }}
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   loop:
     - key-bindings.zsh
     - completion.zsh

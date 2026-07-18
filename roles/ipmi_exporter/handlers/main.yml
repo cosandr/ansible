@@ -1,15 +1,15 @@
 ---
-- name: reload systemd
-  systemd:
+- name: Reload systemd
+  ansible.builtin.systemd:
     daemon_reload: true
 
-- name: enable and start ipmi_exporter
-  systemd:
+- name: Enable and start ipmi_exporter
+  ansible.builtin.systemd:
     name: ipmi_exporter
     state: started
     enabled: true
 
-- name: restart ipmi_exporter
-  systemd:
+- name: Restart ipmi_exporter
+  ansible.builtin.systemd:
     name: ipmi_exporter
     state: restarted

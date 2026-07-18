@@ -1,9 +1,8 @@
 ---
-
-- name: disable pulseaudio
+- name: Disable pulseaudio
   become: true
   become_user: "{{ my_user }}"
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: stopped
     enabled: false
@@ -12,18 +11,18 @@
     - pulseaudio.socket
     - pulseaudio.service
 
-- name: mask pulseaudio
+- name: Mask pulseaudio
   become: true
   become_user: "{{ my_user }}"
-  systemd:
+  ansible.builtin.systemd:
     name: "pulseaudio.service"
     masked: true
     scope: user
 
-- name: enable and start pipewire
+- name: Enable and start pipewire
   become: true
   become_user: "{{ my_user }}"
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     state: started
     enabled: true

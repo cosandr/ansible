@@ -1,7 +1,6 @@
 ---
-
-- name: load i2c-dev
+- name: Load i2c-dev
   become: true
-  modprobe:
+  community.general.modprobe:
     name: i2c-dev
     state: present

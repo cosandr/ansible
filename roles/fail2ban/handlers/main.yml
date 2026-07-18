@@ -1,12 +1,11 @@
 ---
-
-- name: enable and start fail2ban
-  service:
+- name: Enable and start fail2ban
+  ansible.builtin.service:
     name: fail2ban
     state: started
     enabled: true
 
-- name: restart fail2ban
-  service:
+- name: Restart fail2ban
+  ansible.builtin.service:
     name: fail2ban
     state: restarted
