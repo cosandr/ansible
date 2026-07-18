@@ -1,6 +1,0 @@
----
-- name: restart motion
-  become: true
-  service:
-    name: motion
-    state: restarted

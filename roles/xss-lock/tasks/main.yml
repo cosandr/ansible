@@ -1,9 +1,0 @@
----
-
-# Needed for the -s/--session flag
-- name: Install xss-lock-session
-  become: true
-  become_user: "{{ aur_build_user }}"
-  aur:
-    name: xss-lock-session
-    state: present
