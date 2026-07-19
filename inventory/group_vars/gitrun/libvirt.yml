@@ -1,6 +1,5 @@
 ---
 
-vm_template: "debian13_packer.{{ vm_disk_format }}"
 vm_cpus: 4
 vm_mem: 6144
 

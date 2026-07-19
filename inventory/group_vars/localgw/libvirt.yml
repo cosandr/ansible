@@ -1,5 +1,6 @@
 ---
 
+vm_template: "rocky9_packer.{{ vm_disk_format }}"
 vm_cpus: 1
 vm_mem: 1024
 
