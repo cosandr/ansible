@@ -5,7 +5,9 @@
     state: present
   tags: ["install"]
 
-- block:
+- name: Install and enable lid listener service
+  when: autorandr_install_lid_listener | bool
+  block:
     - name: Copy lid listener service
       ansible.builtin.copy:
         src: autorandr-lid-listener.service
@@ -19,4 +21,3 @@
         name: autorandr-lid-listener.service
         enabled: true
         state: started
-  when: autorandr_install_lid_listener | bool

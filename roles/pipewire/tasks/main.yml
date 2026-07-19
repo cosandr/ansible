@@ -8,7 +8,9 @@
     state: present
   when: ansible_distribution == 'Archlinux'
 
-- block:
+- name: Install pipewire on Debian
+  when: ansible_os_family == 'Debian'
+  block:
     - name: Install repository
       become: true
       ansible.builtin.apt_repository:
@@ -25,5 +27,3 @@
         - Disable pulseaudio
         - Mask pulseaudio
         - Enable and start pipewire
-
-  when: ansible_os_family == 'Debian'

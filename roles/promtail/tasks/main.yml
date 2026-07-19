@@ -1,5 +1,6 @@
 ---
-- ansible.builtin.include_tasks: install.yml
+- name: Install promtail
+  ansible.builtin.include_tasks: install.yml
   tags: ["install"]
 
 - name: Ensure promtail directories exist

@@ -9,7 +9,11 @@
   ansible.builtin.set_fact:
     node_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
 
-- block:
+- name: Configure sysusers for supported systemd versions
+  when:
+    - not node_exporter_no_sysusers
+    - node_exporter_systemd_version | int >= 215
+  block:
     - name: Copy node_exporter sysusers file
       ansible.builtin.template:
         src: node_exporter.sysusers.j2
@@ -19,16 +23,15 @@
         group: root
       register: __sysusers
 
-    - name: Restart systemd-sysusers
+    - name: Restart systemd-sysusers # noqa no-handler no-changed-when
       become: true
       ansible.builtin.command: systemd-sysusers
-      when: __sysusers.changed
+      when: __sysusers is changed
 
+- name: Create node_exporter user and group for unsupported systemd versions
   when:
-    - not node_exporter_no_sysusers
-    - node_exporter_systemd_version | int >= 215
-
-- block:
+    - (node_exporter_no_sysusers) or (node_exporter_systemd_version | int < 215)
+  block:
     - name: Create node_exporter system group
       ansible.builtin.group:
         name: node_exporter
@@ -43,9 +46,6 @@
         group: node_exporter
         createhome: false
         home: "{{ node_exporter_db_dir }}"
-
-  when:
-    - (node_exporter_no_sysusers) or (node_exporter_systemd_version | int < 215)
 
 - name: Create node_exporter data directory
   ansible.builtin.file:
@@ -64,7 +64,10 @@
     owner: node_exporter
     mode: "0660"
 
-- block:
+- name: Resolve latest node_exporter version
+  when:
+    - node_exporter_version == "latest"
+  block:
     - name: Get latest release
       ansible.builtin.uri:
         url: "https://api.github.com/repos/prometheus/node_exporter/releases/latest"
@@ -86,8 +89,6 @@
     - name: Set node_exporter_version on remote host
       ansible.builtin.set_fact:
         node_exporter_version: "{{ hostvars['localhost']['node_exporter_version'] }}"
-  when:
-    - node_exporter_version == "latest"
 
 - name: "Get checksum list"
   ansible.builtin.set_fact:
@@ -103,6 +104,7 @@
     url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
     dest: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ go_arch }}.tar.gz"
     checksum: "sha256:{{ (__node_exporter_checksums | select('search', 'linux-' + go_arch + '.tar.gz') | first).split()[0] }}"
+    mode: "0644"
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5

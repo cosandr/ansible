@@ -4,5 +4,5 @@
   ansible.builtin.systemd:
     daemon_reload: true
 
-- name: Restore borg SELinux context
+- name: Restore borg SELinux context # noqa: no-changed-when
   ansible.builtin.command: restorecon -r "{{ borg_home }}/.ssh"

@@ -1,6 +1,6 @@
 ---
 
-- name: Generate locales
+- name: Generate locales # noqa: no-changed-when
   become: true
   ansible.builtin.command: >-
     {% if chroot_path %}

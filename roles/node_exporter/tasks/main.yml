@@ -1,10 +1,12 @@
 ---
-- ansible.builtin.include_tasks: install.yml
+- name: Install node_exporter
+  ansible.builtin.include_tasks: install.yml
   when:
     - not node_exporter_skip_install
   tags: ["install"]
 
-- ansible.builtin.include_tasks: configure.yml
+- name: Configure node_exporter
+  ansible.builtin.include_tasks: configure.yml
   tags: ["configure"]
 
 - name: Ensure node_exporter service is started and enabled

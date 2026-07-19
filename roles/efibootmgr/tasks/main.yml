@@ -5,7 +5,7 @@
   changed_when: false
   register: __efi_entries
 
-- name: Add entry if it doesn't exist already
+- name: Add entry if it doesn't exist already # noqa: no-changed-when
   become: true
   ansible.builtin.command: >
     /usr/bin/efibootmgr --create

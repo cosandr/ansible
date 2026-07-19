@@ -1,4 +1,4 @@
 ---
 
-- name: Activate swapfile
+- name: Activate swapfile  # noqa: no-changed-when
   ansible.builtin.command: "swapon {{ swapfile_path }}"

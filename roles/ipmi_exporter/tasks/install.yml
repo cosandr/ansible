@@ -5,8 +5,7 @@
     state: present
 
 - name: Get systemd version
-  ansible.builtin.command: systemctl --version
-  changed_when: false
+  ansible.builtin.command: systemctl --version  # noqa: no-changed-when
   check_mode: false
   register: __systemd_version
 
@@ -14,7 +13,9 @@
   ansible.builtin.set_fact:
     ipmi_exporter_systemd_version: "{{ __systemd_version.stdout_lines[0].split(' ')[1] }}"
 
-- block:
+- name: Configure sysusers for supported systemd versions
+  when: ipmi_exporter_systemd_version | int >= 215
+  block:
     - name: Copy ipmi_exporter sysusers file
       ansible.builtin.copy:
         content: |
@@ -25,14 +26,14 @@
         group: root
       register: __sysusers
 
-    - name: Restart systemd-sysusers
+    - name: Restart systemd-sysusers # noqa no-handler no-changed-when
       become: true
       ansible.builtin.command: systemd-sysusers
-      when: __sysusers.changed
+      when: __sysusers is changed
 
-  when: ipmi_exporter_systemd_version | int >= 215
-
-- block:
+- name: Create ipmi_exporter user and group for unsupported systemd versions
+  when: ipmi_exporter_systemd_version | int < 215
+  block:
     - name: Create ipmi_exporter system group
       ansible.builtin.group:
         name: ipmi_exporter
@@ -48,9 +49,10 @@
         createhome: false
         home: "{{ ipmi_exporter_db_dir }}"
 
-  when: ipmi_exporter_systemd_version | int < 215
-
-- block:
+- name: Resolve latest ipmi_exporter version
+  when:
+    - ipmi_exporter_version == "latest"
+  block:
     - name: Get latest release
       ansible.builtin.uri:
         url: "https://api.github.com/repos/prometheus-community/ipmi_exporter/releases/latest"
@@ -72,8 +74,6 @@
     - name: Set ipmi_exporter_version on remote host
       ansible.builtin.set_fact:
         ipmi_exporter_version: "{{ hostvars['localhost']['ipmi_exporter_version'] }}"
-  when:
-    - ipmi_exporter_version == "latest"
 
 - name: Download ipmi_exporter binary to local folder
   become: false
@@ -81,6 +81,7 @@
     url: "https://github.com/prometheus-community/ipmi_exporter/releases/download/v{{ ipmi_exporter_version }}/ipmi_exporter-{{ ipmi_exporter_version }}.linux-{{
       go_arch }}.tar.gz"
     dest: "/tmp/ipmi_exporter-{{ ipmi_exporter_version }}.linux-{{ go_arch }}.tar.gz"
+    mode: "0644"
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5

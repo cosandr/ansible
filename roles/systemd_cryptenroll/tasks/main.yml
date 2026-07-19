@@ -36,12 +36,12 @@
       vars:
         __query: "contains(tokens.*.type, 'systemd-tpm2')"
 
-    - name: Wipe TPM2 slot
+    - name: Wipe TPM2 slot # noqa: no-changed-when
       ansible.builtin.command:
         cmd: "systemd-cryptenroll {{ luks_root_disk }} --wipe-slot=tpm2"
       when: cryptenroll_force | bool
 
-    - name: Enroll TPM2 slot
+    - name: Enroll TPM2 slot # noqa: no-changed-when
       ansible.builtin.command:
         cmd: "systemd-cryptenroll {{ luks_root_disk }} --tpm2-device={{ cryptenroll_tpm_device }} --tpm2-pcrs={{ cryptenroll_tpm_pcrs | join('+') }}"
       environment:

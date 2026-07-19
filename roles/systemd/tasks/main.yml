@@ -1,5 +1,5 @@
 ---
-- name: Ensure {{ systemd_script_install_path }} exists
+- name: Ensure script install path exists {{ systemd_script_install_path }}
   ansible.builtin.file:
     path: "{{ systemd_script_install_path }}"
     state: directory

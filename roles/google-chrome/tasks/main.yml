@@ -8,7 +8,9 @@
   when: ansible_distribution == 'Archlinux'
 
 # https://github.com/mlangry/ansible-role-google-chrome/blob/master/tasks/main.yml
-- block:
+- name: Install Google Chrome on Debian-based systems
+  when: ansible_os_family == 'Debian'
+  block:
     - name: Install key
       become: true
       ansible.builtin.apt_key:
@@ -28,5 +30,3 @@
         name: google-chrome-stable
         update_cache: true
         state: present
-
-  when: ansible_os_family == 'Debian'

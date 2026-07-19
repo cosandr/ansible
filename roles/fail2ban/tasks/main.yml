@@ -6,7 +6,9 @@
   notify: Enable and start fail2ban
   tags: ["install"]
 
-- block:
+- name: Configure bitwarden filter and jail
+  when: fail2ban_bitwarden_install
+  block:
     - name: Copy bitwarden filter
       ansible.builtin.copy:
         src: "files/filter.d/bitwarden.conf"
@@ -24,8 +26,6 @@
         group: root
         mode: "0644"
       notify: Restart fail2ban
-
-  when: fail2ban_bitwarden_install
 
 - name: Copy global jail
   ansible.builtin.template:

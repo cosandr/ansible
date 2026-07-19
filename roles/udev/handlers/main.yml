@@ -1,5 +1,6 @@
 ---
-- name: Reload udev
+- name: Reload udev # noqa: no-changed-when
   ansible.builtin.command: "/usr/bin/udevadm control --reload"
-- name: Trigger udev
+
+- name: Trigger udev # noqa: no-changed-when
   ansible.builtin.command: "/usr/bin/udevadm trigger"

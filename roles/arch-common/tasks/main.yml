@@ -81,7 +81,7 @@
   when: not chroot_path
   tags: ["mask"]
 
-- name: Mask services (chroot)
+- name: Mask services (chroot) # noqa: no-changed-when
   ansible.builtin.command: >-
     arch-chroot {{ chroot_path }} systemctl mask {{ item }}
   loop: "{{ masked_services }}"

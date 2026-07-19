@@ -31,7 +31,7 @@
     connect_timeout: "5"
     timeout: "10"
   delegate_to: "localhost"
-  ignore_errors: "yes"
+  ignore_errors: true
   check_mode: false
   register: default_ssh
 

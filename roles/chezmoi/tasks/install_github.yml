@@ -21,7 +21,7 @@
       ansible.builtin.set_fact:
         chezmoi_version: "{{ _latest_release.json.tag_name[1:] }}"
 
-- name: Set required facts
+- name: Set required facts # noqa jinja[spacing]
   ansible.builtin.set_fact:
     __chezmoi_checksums: "{{ lookup('url', __chezmoi_checksum_url, wantlist=True) | list }}"
     __chezmoi_filename: >-

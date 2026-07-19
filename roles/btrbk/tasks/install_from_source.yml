@@ -23,6 +23,7 @@
   ansible.builtin.get_url:
     url: "https://api.github.com/repos/digint/btrbk/tarball/refs/tags/{{ btrbk_version }}"
     dest: "/tmp/btrbk-{{ btrbk_version }}.tar.gz"
+    mode: "0644"
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5

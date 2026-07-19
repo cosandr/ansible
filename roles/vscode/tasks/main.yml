@@ -7,7 +7,9 @@
     state: present
   when: ansible_distribution == 'Archlinux'
 
-- block:
+- name: Install VS Code on Debian-based systems
+  when: ansible_os_family == 'Debian'
+  block:
     - name: Install key
       become: true
       ansible.builtin.apt_key:
@@ -27,5 +29,3 @@
         name: code
         update_cache: true
         state: present
-
-  when: ansible_os_family == 'Debian'

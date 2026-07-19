@@ -1,13 +1,13 @@
 ---
 
-- name: Regenerate grub [RedHat]
+- name: Regenerate grub [RedHat] # noqa: no-changed-when
   listen: Regenerate grub
   ansible.builtin.command: "grub2-mkconfig -o {{ grub_cfg_path }}"
   when:
     - "grub_cfg_path is defined"
     - ansible_os_family == 'RedHat'
 
-- name: Regenerate grub [Debian]
+- name: Regenerate grub [Debian] # noqa: no-changed-when
   listen: Regenerate grub
   ansible.builtin.command: "update-grub"
   when:

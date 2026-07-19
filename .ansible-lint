@@ -1,3 +1,4 @@
 skip_list:
     - 'run-once'
     - 'var-naming[no-role-prefix]'
+    - 'yaml[line-length]'

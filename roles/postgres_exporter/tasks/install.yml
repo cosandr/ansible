@@ -37,6 +37,7 @@
     url: "https://github.com/prometheus-community/postgres_exporter/releases/download/v{{ postgres_exporter_version }}/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
     dest: "/tmp/postgres_exporter-{{ postgres_exporter_version }}.linux-{{ go_arch }}.tar.gz"
     checksum: "sha256:{{ (__postgres_exporter_checksums | select('search', 'linux-' + go_arch + '.tar.gz') | first).split()[0] }}"
+    mode: "0644"
   register: _download_archive
   until: _download_archive is succeeded
   retries: 5

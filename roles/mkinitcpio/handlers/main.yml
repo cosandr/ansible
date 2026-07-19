@@ -1,6 +1,6 @@
 ---
 
-- name: Rebuild all mkinitcpio presets
+- name: Rebuild all mkinitcpio presets # noqa: no-changed-when
   ansible.builtin.command: >-
     {% if chroot_path %}
     arch-chroot {{ chroot_path }}

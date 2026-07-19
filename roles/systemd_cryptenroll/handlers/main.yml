@@ -1,6 +1,6 @@
 ---
 
-- name: Dracut regenerate
+- name: Dracut regenerate # noqa: no-changed-when
   listen: Regenerate initramfs
   ansible.builtin.command: dracut -f --regenerate-all
   when: not chroot_path | default('')

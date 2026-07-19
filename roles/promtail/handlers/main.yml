@@ -10,7 +10,7 @@
     state: restarted
   when: ansible_os_family != 'Slackware'
 
-- name: Restart promtail [Slackware]
+- name: Restart promtail [Slackware] # noqa: no-changed-when
   listen: Restart promtail
   ansible.builtin.command: /etc/rc.d/rc.promtail restart
   when: ansible_os_family == 'Slackware'

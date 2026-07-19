@@ -1,4 +1,4 @@
 ---
 # Need to restart both at the same time
-- name: Restart sshd and firewall # noqa command-instead-of-module
+- name: Restart sshd and firewall # noqa command-instead-of-module no-changed-when
   ansible.builtin.command: "systemctl restart sshd {{ firewall_frontend }}"

@@ -1,5 +1,6 @@
 ---
-- ansible.builtin.include_tasks: install.yml
+- name: Install ipmi_exporter
+  ansible.builtin.include_tasks: install.yml
   tags: ["install"]
 
 - name: Configure IPMI exporter
