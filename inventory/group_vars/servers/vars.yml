@@ -27,6 +27,7 @@ sys_timezone: "Europe/Oslo"
 ssh_authorized_keys:
   - "{{ hostvars['desktop'].ssh_keys.andrei }}"
   - "{{ hostvars['laptop'].ssh_keys.andrei }}"
+  - "{{ hostvars['m3bp'].ssh_keys.andrei }}"
 
 domain: "{{ all_net[host_net].domain | default(domains['hb']) }}"
 
