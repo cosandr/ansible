@@ -26,7 +26,6 @@ vm_mem: 4096
 vm_template: "debian13_packer.{{ vm_disk_format }}"
 vm_os_id: "http://rockylinux.org/rocky/9"
 vm_disk_pool: "default"
-vm_ignition_path: "/var/lib/libvirt/images"
 vm_extra_disks: []
 vm_started: true
 vm_autostart: "{{ vm_started }}"

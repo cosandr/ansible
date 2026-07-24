@@ -34,13 +34,6 @@
       register: __virsh
       when: "'virtual machine ' + inventory_hostname + ' not found' not in __destroy.msg | default('') | string"
 
-    - name: Remove ignition file
-      delegate_to: "{{ vm_host }}"
-      ansible.builtin.file:
-        path: "{{ vm_ignition_path }}/{{ inventory_hostname }}.ign"
-        state: absent
-      when: vm_ignition_path | default('')
-
     - name: Remove QEMU log file
       delegate_to: "{{ vm_host }}"
       ansible.builtin.file:
