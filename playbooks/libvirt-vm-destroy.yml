@@ -11,7 +11,7 @@
       run_once: true
       ansible.builtin.pause:
         prompt: "WARNING: No limit in use"
-      when: not ansible_limit | default(false)
+      when: ansible_limit | default(false) is falsy
 
   tasks:
     - name: Destroy VM

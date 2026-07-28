@@ -3,7 +3,7 @@
 - name: Set hostname
   ansible.builtin.hostname:
     name: "{{ hostname }}"
-  when: not chroot_path
+  when: chroot_path == ''
 
 - name: Configure /etc/hostname
   ansible.builtin.copy:

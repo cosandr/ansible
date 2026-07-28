@@ -20,7 +20,7 @@
   notify: Regenerate initramfs
 
 - name: Run LUKS tasks
-  when: luks_root_disk
+  when: luks_root_disk != ''
   tags: ["luks"]
   block:
     - name: Get LUKS2 metadata
@@ -47,5 +47,5 @@
       environment:
         PASSWORD: "{{ luks_root_disk_password }}"
       when:
-        - luks_root_disk_password
+        - luks_root_disk_password != ''
         - not cryptenroll_enrolled or cryptenroll_force | bool

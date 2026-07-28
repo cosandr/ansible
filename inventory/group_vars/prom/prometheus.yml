@@ -2,14 +2,14 @@
 
 __prom_blackbox_http_targets: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_http_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_http_targets | default([]) | length > 0 -%}
   {{- tmp.append(hostvars[h].prometheus_blackbox_http_targets) -}}
   {%- endfor -%}
   {{ tmp | flatten | unique | sort }}
 
 __prom_blackbox_tls_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_tls_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_tls_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_blackbox_tls_targets,
@@ -21,7 +21,7 @@ __prom_blackbox_tls_configs: >-
 
 __prom_blackbox_starttls_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_starttls_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_starttls_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_blackbox_starttls_targets,
@@ -33,7 +33,7 @@ __prom_blackbox_starttls_configs: >-
 
 __prom_cadvisor_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_cadvisor_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_cadvisor_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_cadvisor_targets,

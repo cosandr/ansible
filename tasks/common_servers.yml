@@ -9,7 +9,7 @@
         name: "{{ dnf_packages }}"
         state: present
       when:
-        - dnf_packages | default([])
+        - dnf_packages | default([]) | length > 0
         - ansible_facts.os_family == 'RedHat'
       tags: ["dnf"]
 
@@ -27,7 +27,7 @@
         group: root
         mode: "0644"
       when:
-        - deb_block_packages | default([])
+        - deb_block_packages | default([]) | length > 0
         - ansible_facts.os_family == 'Debian'
       tags: ["apt"]
 
@@ -36,7 +36,7 @@
         name: "{{ deb_packages }}"
         state: present
       when:
-        - deb_packages | default([])
+        - deb_packages | default([]) | length > 0
         - ansible_facts.os_family == 'Debian'
       tags: ["apt"]
 
@@ -44,7 +44,7 @@
   ansible.builtin.package:
     name: "{{ common_packages }}"
     state: present
-  when: common_packages | default([])
+  when: common_packages | default([]) | length > 0
   tags: ["pkg"]
 
 - name: Configure /etc/resolv.conf
@@ -55,7 +55,7 @@
     group: root
     mode: "0644"
     follow: false
-  when: resolv_config | default('')
+  when: resolv_config | default('') != ''
   tags: ["resolv"]
 
 - name: Install Rocky security repo
@@ -84,9 +84,9 @@
     name: systemd_networkd
     apply:
       tags: ["networkd"]
-  when: networkd_config | default(false) or
-        networkd_netdevs | default(false) or
-        networkd_links | default(false)
+  when: networkd_config | default({}) | length > 0 or
+        networkd_netdevs | default({}) | length > 0 or
+        networkd_links | default({}) | length > 0
   tags: ["networkd"]
 
 - name: Setup disks
@@ -123,7 +123,7 @@
     name: btrfs
     apply:
       tags: ["btrfs"]
-  when: btrfs_scrub_targets | default([])
+  when: btrfs_scrub_targets | default([]) | length > 0
   tags: ["btrfs"]
 
 - name: Setup swapfile
@@ -131,7 +131,7 @@
     name: swapfile
     apply:
       tags: ["swap"]
-  when: swapfile_path | default(false) or swapfile_size | default(false)
+  when: swapfile_path | default('') != '' or swapfile_size | default('') != ''
   tags: ["swap"]
 
 - name: Configure firewall
@@ -172,7 +172,7 @@
       tags: ["node_exporter"]
   when:
     - node_exporter_port is defined
-    - node_exporter_port
+    - node_exporter_port is truthy
     - node_exporter_installed | default(true)
   tags: ["node_exporter"]
 
@@ -191,7 +191,7 @@
     name: nvme_exporter
     apply:
       tags: ["nvme_exporter"]
-  when: nvme_exporter_port | default(false)
+  when: nvme_exporter_port | default('') is truthy
   tags: ["nvme_exporter"]
 
 - name: Setup promtail
@@ -201,7 +201,7 @@
       tags: ["promtail"]
   when:
     - promtail_installed | default(true)
-    - promtail_scrape_configs | default([])
+    - promtail_scrape_configs | default([]) | length > 0
   tags: ["promtail"]
 
 - name: Setup SSL cert sync
@@ -251,7 +251,7 @@
       tags: ["selinux", "selinux_modules"]
   when:
     - ansible_facts.os_family == 'RedHat'
-    - selinux_modules | default([])
+    - selinux_modules | default([]) | length > 0
   tags: ["selinux", "selinux_modules"]
 
 - name: Setup NUT
@@ -259,7 +259,7 @@
     name: nut
     apply:
       tags: ["nut"]
-  when: nut_upses | default([]) or nut_monitors | default([])
+  when: nut_upses | default([]) | length > 0 or nut_monitors | default([]) | length > 0
   tags: ["nut"]
 
 - name: Setup postfix

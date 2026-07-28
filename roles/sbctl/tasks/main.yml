@@ -4,7 +4,7 @@
   community.general.pacman:
     name: sbctl
     state: present
-  when: not chroot_path
+  when: chroot_path == ''
   tags: ["install"]
 
 - name: Create keys
@@ -21,7 +21,7 @@
     msg: "kernel_params is empty"
   when:
     - sbctl_bundles | length > 0
-    - not kernel_params
+    - kernel_params == ''
 
 - name: Write kernel parameters to file
   ansible.builtin.copy:

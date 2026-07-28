@@ -5,7 +5,7 @@
     name: systemd-networkd.service
     state: restarted
   when:
-    - not chroot_path
+    - chroot_path == ''
     - networkd_service_enabled
     - networkd_restart | bool
 
@@ -15,7 +15,7 @@
     state: restarted
   when:
     - resolved_service_enabled
-    - not chroot_path
+    - chroot_path == ''
 
 - name: Start WireGuard interface
   ansible.builtin.command: "wg-quick up {{ wireguard_interface }}"

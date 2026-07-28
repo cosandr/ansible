@@ -25,7 +25,7 @@ prometheus_alertmanager_config:
 
 __prom_am_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['prom_common'] | sort if hostvars[h].prometheus_alertmanager_targets | default([]) -%}
+  {%- for h in groups['prom_common'] | sort if hostvars[h].prometheus_alertmanager_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_alertmanager_targets,
@@ -37,7 +37,7 @@ __prom_am_configs: >-
 
 __prom_prom_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['prom_common'] | sort if hostvars[h].prometheus_prometheus_targets | default([]) -%}
+  {%- for h in groups['prom_common'] | sort if hostvars[h].prometheus_prometheus_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_prometheus_targets,
@@ -49,7 +49,7 @@ __prom_prom_configs: >-
 
 __prom_node_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_node_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_node_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_node_targets,
@@ -61,7 +61,7 @@ __prom_node_configs: >-
 
 __prom_nginx_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nginx_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nginx_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_nginx_targets,
@@ -73,7 +73,7 @@ __prom_nginx_configs: >-
 
 __prom_nvme_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nvme_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nvme_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_nvme_targets,
@@ -85,7 +85,7 @@ __prom_nvme_configs: >-
 
 __prom_nextcloud_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nextcloud_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] | sort if hostvars[h].prometheus_nextcloud_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_nextcloud_targets,
@@ -97,7 +97,7 @@ __prom_nextcloud_configs: >-
 
 __prom_blackbox_icmp_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_icmp_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_blackbox_icmp_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_blackbox_icmp_targets,
@@ -109,7 +109,7 @@ __prom_blackbox_icmp_configs: >-
 
 __prom_smartctl_configs: >-
   {%- set tmp = [] -%}
-  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_smartctl_targets | default([]) -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_smartctl_targets | default([]) | length > 0 -%}
   {{- tmp.append(
     {
       "targets": hostvars[h].prometheus_smartctl_targets,

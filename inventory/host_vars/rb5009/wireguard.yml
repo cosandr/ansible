@@ -16,7 +16,7 @@ __mt_wg_peers_manual: "{{ vault_mt_wg_peers_manual }}"
 
 __mt_wg_peers_auto: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].wireguard_public_key | default('')) -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].wireguard_public_key | default('') != '') -%}
   {%- set tmp_dict = {
       "comment": h,
       "public-key": hostvars[h].wireguard_public_key,
@@ -32,7 +32,7 @@ __mt_wg_peers_auto: >-
     "preshared-key": lookup('community.general.passwordstore', 'network/' + h + '_wg_psk_mt')
   }) -}}
   {%- endif -%}
-  {%- if hostvars[h].wireguard_endpoint | default('') -%}
+  {%- if hostvars[h].wireguard_endpoint | default('') != '' -%}
   {{- tmp_dict.update({
     "endpoint-address": hostvars[h].wireguard_endpoint.rsplit(':', 1)[0],
     "endpoint-port": hostvars[h].wireguard_endpoint.rsplit(':', 1)[1] | int,

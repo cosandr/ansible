@@ -10,7 +10,7 @@
   tasks:
     - name: End host if it's not managed by networkd
       ansible.builtin.meta: end_host
-      when: not networkd_config | default(false) or old_ansible_host is not defined
+      when: networkd_config | default({}) | length == 0 or old_ansible_host is not defined
       tags: ["always"]
 
     - name: Try to gather facts with old IP

@@ -550,7 +550,7 @@
         path: "{{ chroot_path }}/etc/shadow"
         regexp: '^root:'
         line: "root:{{ root_pass_hash }}:{{ lookup('pipe', 'date +%s') | int // 86400 }}:0:99999:7:::"
-      when: root_pass_hash | default('')
+      when: root_pass_hash | default('') != ''
       tags: ["root"]
 
   roles:

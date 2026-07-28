@@ -122,7 +122,7 @@ __mt_firewall_address_lists_manual:
 
 __mt_firewall_address_lists_auto: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_firewall_address_lists | default([])) -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_firewall_address_lists | default([]) | length > 0) -%}
   {%- for item in hostvars[h].mt_firewall_address_lists if item.address | ansible.utils.ipv4 -%}
   {{- tmp.append({
     "address": item.address,
@@ -203,7 +203,7 @@ __mt_firewall_address_lists_ipv6_manual:
 
 __mt_firewall_address_lists_ipv6_auto: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_firewall_address_lists | default([])) -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_firewall_address_lists | default([]) | length > 0) -%}
   {%- for item in hostvars[h].mt_firewall_address_lists if item.address | ansible.utils.ipv6 -%}
   {{- tmp.append({
     "address": item.address | ansible.utils.ipaddr('host'),

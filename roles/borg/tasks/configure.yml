@@ -4,7 +4,7 @@
   ansible.builtin.include_tasks:
     file: configure_target.yml
   when:
-    - conf.target_host | default('')
+    - conf.target_host | default('') != ''
   tags: ["target"]
 
 - name: Create user-script directory

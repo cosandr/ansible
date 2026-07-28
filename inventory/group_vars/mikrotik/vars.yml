@@ -84,7 +84,7 @@ __mt_ip_addresses_auto: >-
     'address': ip + '/' + all_net[name].cidr | ansible.utils.ipaddr('prefix') | string,
   }) -}}
   {%- endfor -%}
-  {%- if wireguard_addresses | default([]) | ansible.utils.ipv4 and mt_wg_interfaces | default([]) -%}
+  {%- if wireguard_addresses | default([]) | ansible.utils.ipv4 and mt_wg_interfaces | default([]) | length > 0 -%}
   {{- tmp.append({
     'interface': mt_wg_interfaces[0].name,
     'address': wireguard_addresses | ansible.utils.ipv4 | first,
@@ -101,7 +101,7 @@ __mt_ipv6_addresses_auto: >-
     'advertise': false,
   }) -}}
   {%- endfor -%}
-  {%- if wireguard_addresses | default([]) | ansible.utils.ipv6 and mt_wg_interfaces | default([]) -%}
+  {%- if wireguard_addresses | default([]) | ansible.utils.ipv6 and mt_wg_interfaces | default([]) | length > 0 -%}
   {{- tmp.append({
     'interface': mt_wg_interfaces[0].name,
     'address': wireguard_addresses | ansible.utils.ipv6 | first,

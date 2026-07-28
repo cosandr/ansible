@@ -8,7 +8,7 @@
       check_mode: false
       changed_when: false
       failed_when: false
-      when: wireguard_interface | default(false)
+      when: wireguard_interface | default(false) is truthy
       register: __resolv_mount
 
     - name: Stop WireGuard interface
@@ -35,7 +35,7 @@
     owner: root
     group: root
     mode: "0755"
-  when: resolved_config
+  when: resolved_config | length > 0
 
 - name: Copy resolved config
   ansible.builtin.template:
@@ -45,14 +45,14 @@
     group: root
     mode: "0644"
   notify: Restart systemd-resolved
-  when: resolved_config
+  when: resolved_config | length > 0
 
 - name: Remove resolved config
   ansible.builtin.file:
     path: "{{ chroot_path }}/etc/systemd/resolved.conf.d/00-ansible.conf"
     state: absent
   notify: Restart systemd-resolved
-  when: not resolved_config
+  when: resolved_config | length == 0
 
 - name: Configure systemd-resolved service state
   ansible.builtin.systemd:
@@ -63,9 +63,9 @@
   failed_when:
     - __svc.failed
     - "resolved_service_enabled or 'Could not find the requested service' not in __svc.msg"
-  when: not chroot_path
+  when: chroot_path == ''
 
 - name: Configure systemd-resolved service state (chroot)  # noqa no-changed-when
   ansible.builtin.command: >-
     arch-chroot {{ chroot_path }} systemctl {{ 'enable' if resolved_service_enabled else 'disable' }} systemd-resolved.service
-  when: chroot_path
+  when: chroot_path != ''

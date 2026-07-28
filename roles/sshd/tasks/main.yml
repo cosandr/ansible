@@ -3,7 +3,7 @@
 - name: Include OS-specific variables.
   ansible.builtin.include_vars: "{{ ansible_facts.os_family }}.yml"
   when:
-    - not chroot_path
+    - chroot_path == ''
 
 - name: Install OpenSSH server
   become: true
@@ -11,8 +11,8 @@
     name: "{{ _sshd_pkg }}"
     state: present
   when:
-    - not chroot_path
-    - _sshd_pkg | default('')
+    - chroot_path == ''
+    - _sshd_pkg | default('') != ''
   tags: ["install"]
 
 - name: Check if sshd_config.d exists

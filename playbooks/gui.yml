@@ -177,7 +177,7 @@
         group: root
         mode: "0644"
         follow: false
-      when: resolv_config | default('')
+      when: resolv_config | default('') != ''
       tags: ["resolv"]
 
     - name: Enable linux-modules-cleanup
@@ -350,7 +350,7 @@
 
     - role: btrbk
       become: true
-      when: btrbk_volumes | default([])
+      when: btrbk_volumes | default([]) | length > 0
       tags: ["btrbk"]
 
     - role: node_exporter

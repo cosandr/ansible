@@ -51,7 +51,7 @@ mt_dhcp_networks: >-
 
 __mt_dhcp_leases_auto: >-
   {%- set tmp = [] -%}
-  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_dhcp_leases | default([])) -%}
+  {%- for h in groups['all'] | sort | difference([inventory_hostname]) if (hostvars[h].mt_dhcp_leases | default([]) | length > 0) -%}
   {%- for item in hostvars[h].mt_dhcp_leases if item.address | ansible.utils.ipv4 -%}
   {{- tmp.append({
     "address": item.address,

@@ -25,7 +25,7 @@
     owner: "root"
     group: "root"
     mode: "0755"
-  when: btrbk_timer_oncalendar
+  when: btrbk_timer_oncalendar != ''
 
 - name: Configure btrbk timer override
   become: true
@@ -35,7 +35,7 @@
     owner: "root"
     group: "root"
     mode: "0644"
-  when: btrbk_timer_oncalendar
+  when: btrbk_timer_oncalendar != ''
   notify: Reload systemd
 
 - name: Enable btrbk timer

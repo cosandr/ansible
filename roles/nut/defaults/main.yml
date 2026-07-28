@@ -1,6 +1,6 @@
 ---
 
-nut_server: "{{ nut_upsd_config and nut_upses and nut_upsd_users }}"
+nut_server: "{{ (nut_upsd_config | length > 0) and (nut_upses | length > 0) and (nut_upsd_users | length > 0) }}"
 nut_client: "{{ nut_config['MODE'] != 'none' }}"
 
 nut_config:

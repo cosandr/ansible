@@ -80,7 +80,7 @@
       tags: ["fail2ban"]
 
     - role: auto_ssh
-      when: ssh_dest_hosts | default([])
+      when: ssh_dest_hosts | default([]) | length > 0
       tags: ["auto-ssh"]
 
     - role: lego

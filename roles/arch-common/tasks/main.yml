@@ -48,7 +48,7 @@
     group: root
     mode: "0600"
     content: "{{ crypttab }}\n"
-  when: crypttab | default('')
+  when: crypttab | default('') != ''
   tags: ["crypttab"]
 
 - name: Write crypttab.initramfs
@@ -58,7 +58,7 @@
     group: root
     mode: "0600"
     content: "{{ crypttab_initramfs }}\n"
-  when: crypttab_initramfs | default('')
+  when: crypttab_initramfs | default('') != ''
   tags: ["crypttab"]
 
 - name: Write modprobe configs
@@ -78,14 +78,14 @@
     name: "{{ item }}"
     masked: true
   loop: "{{ masked_services }}"
-  when: not chroot_path
+  when: chroot_path == ''
   tags: ["mask"]
 
 - name: Mask services (chroot) # noqa: no-changed-when
   ansible.builtin.command: >-
     arch-chroot {{ chroot_path }} systemctl mask {{ item }}
   loop: "{{ masked_services }}"
-  when: chroot_path
+  when: chroot_path != ''
   tags: ["mask"]
 
 - name: Enable and start systemd-timesyncd
@@ -93,5 +93,5 @@
     name: systemd-timesyncd.service
     state: started
     enabled: true
-  when: not chroot_path
+  when: chroot_path == ''
   tags: ["timesyncd"]

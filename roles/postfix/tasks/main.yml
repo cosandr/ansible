@@ -33,7 +33,7 @@
     owner: root
     group: root
     mode: "0644"
-  when: postfix_mail_rc_config
+  when: postfix_mail_rc_config != ''
 
 - name: Configure relayhosts
   ansible.builtin.lineinfile:
@@ -76,7 +76,7 @@
     modification_time: preserve
     access_time: preserve
   when:
-    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/virtual')
+    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/virtual') | list | length > 0
   notify:
     - Regenerate virtual.db
     - Restart postfix
@@ -92,8 +92,8 @@
       .{{ d.name }}    smtp:[{{ d.relay_host }}]:{{ d.port | default(587) }}
       {% endfor %}
   when:
-    - postfix_relay_domains
-    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/transport')
+    - postfix_relay_domains | length > 0
+    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/transport') | list | length > 0
   notify:
     - Regenerate transport.db
     - Restart postfix
@@ -109,8 +109,8 @@
       @{{ d.name }}    [{{ d.relay_host }}]:{{ d.port | default(587) }}
       {% endfor %}
   when:
-    - postfix_relay_domains
-    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/relayhost_map')
+    - postfix_relay_domains | length > 0
+    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/relayhost_map') | list | length > 0
   notify:
     - Regenerate relayhost_map.db
     - Restart postfix
@@ -126,8 +126,8 @@
       @{{ d.name }}    {{ d.user }}:{{ d.password }}
       {% endfor %}
   when:
-    - postfix_relay_domains
-    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/sasl_passwd')
+    - postfix_relay_domains | length > 0
+    - postfix_main_config | selectattr('line', 'search', '.*/etc/postfix/sasl_passwd') | list | length > 0
   notify:
     - Regenerate sasl_passwd.db
     - Restart postfix

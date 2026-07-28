@@ -13,7 +13,7 @@
     owner: root
     group: root
     mode: "0644"
-  when: cockpit_machines
+  when: cockpit_machines | length > 0
 
 - name: Disable cockpit MOTD
   ansible.builtin.file:

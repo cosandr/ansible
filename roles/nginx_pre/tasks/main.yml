@@ -18,7 +18,7 @@
     owner: root
     group: root
     mode: "0750"
-  when: nginx_certs_dir
+  when: nginx_certs_dir != ''
   tags: ["nginx"]
 
 - name: Download dhparam

@@ -3,7 +3,7 @@
     path: /etc/zfs/zed.d/zed.rc
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
-  when: zfs_zed_email_address
+  when: zfs_zed_email_address != ''
   loop:
     - regexp: '^#?ZED_EMAIL_PROG'
       line: 'ZED_EMAIL_PROG="mail"'
@@ -19,7 +19,7 @@
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
     backrefs: true
-  when: not zfs_zed_email_address
+  when: zfs_zed_email_address == ''
   loop:
     - regexp: '^#?ZED_EMAIL_PROG(.*)'
       line: '#ZED_EMAIL_PROG\1'

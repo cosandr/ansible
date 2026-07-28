@@ -46,7 +46,7 @@
 - name: Configure users
   ansible.builtin.include_tasks: users.yml
   when:
-    - samba_users
+    - samba_users | length > 0
     - (samba_clustering and samba_ctdb_node_address in samba_ctdb_nodes) or not samba_clustering
   tags: ["users"]
 

@@ -29,14 +29,14 @@
         msg: "{{ __dnf_result.results }}"
       when:
         - __dnf_result is defined
-        - __dnf_result.results | default([])
+        - __dnf_result.results | default([]) | length > 0
 
     - name: Print apt results
       ansible.builtin.debug:
         msg: "{{ __apt_result.stdout_lines }}"
       when:
         - __apt_result is defined
-        - __apt_result.stdout_lines | default([])
+        - __apt_result.stdout_lines | default([]) | length > 0
 
   handlers:
     - name: Reboot

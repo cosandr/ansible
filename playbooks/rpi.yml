@@ -58,7 +58,7 @@
         dest: /etc/dhcpcd.conf
       notify: Restart dhcpcd
       tags: ["dhcpcd"]
-      when: dhcpcd_config | default('')
+      when: dhcpcd_config | default('') != ''
 
     - name: Configure IPv6 sysctl
       ansible.posix.sysctl:
@@ -75,7 +75,7 @@
 
     - role: mediamtx
       tags: ["mediamtx"]
-      when: mediamtx_paths | default(false)
+      when: mediamtx_paths | default({}) | length > 0
 
     - role: wireguard
       when:
