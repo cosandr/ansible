@@ -5,11 +5,11 @@
   aur:
     name: "{{ chrome_aur_package_name }}"
     state: present
-  when: ansible_distribution == 'Archlinux'
+  when: ansible_facts.distribution == 'Archlinux'
 
 # https://github.com/mlangry/ansible-role-google-chrome/blob/master/tasks/main.yml
 - name: Install Google Chrome on Debian-based systems
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
   block:
     - name: Install key
       become: true

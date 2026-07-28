@@ -1,6 +1,6 @@
 ---
 
-borg_package_name: "{{ __borg_pkg_map[ansible_os_family] | default('borgbackup') }}"
+borg_package_name: "{{ __borg_pkg_map[ansible_facts.os_family] | default('borgbackup') }}"
 borg_systemd_install: true
 borg_configure_target: true
 borg_configure_ssh: true
@@ -26,8 +26,8 @@ borg_backups: []
 #   oncalendar: "*-*-* 03:00:00"
 #   persistent: no
 #   passphrase: "password"
-#   repo: "{{ borg_home }}/repos/{{ ansible_hostname }}"
-#   backup_name: "{{ ansible_hostname }}_root"
+#   repo: "{{ borg_home }}/repos/{{ ansible_facts.hostname }}"
+#   backup_name: "{{ ansible_facts.hostname }}_root"
 #   paths:
 #     - "/"
 #   create_args:

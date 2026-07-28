@@ -134,7 +134,7 @@
           openssl_csr:
             path: "{{ host_cert_path }}/{{ item.name }}.csr"
             privatekey_path: "{{ host_cert_path }}/{{ item.name }}.key"
-            common_name: "{{ ansible_hostname }}"
+            common_name: "{{ ansible_facts.hostname }}"
             subject_alt_name: "{{ item.subject_alt_name }}"
           loop: "{{ self_signed_ssl }}"
           loop_control:

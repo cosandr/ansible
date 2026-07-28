@@ -6,7 +6,7 @@ go_arch_map:
   armv7l: 'armv7'
   armv6l: 'armv6'
 
-go_arch: "{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}"
+go_arch: "{{ go_arch_map[ansible_facts.architecture] | default(ansible_facts.architecture) }}"
 _nginx_exporter_binary_install_dir: '/usr/local/bin'
 nginx_exporter_archive_name: "nginx-prometheus-exporter_{{ nginx_exporter_version }}_linux_{{ go_arch }}.tar.gz"
 nginx_exporter_checksums_name: "nginx-prometheus-exporter_{{ nginx_exporter_version }}_checksums.txt"

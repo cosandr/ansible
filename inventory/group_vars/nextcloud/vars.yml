@@ -9,7 +9,7 @@ nextcloud_generate_certificate: true
 nextcloud_certificate_cn: "{{ inventory_hostname }}.vm.{{ domains['dv'] }}"
 nextcloud_certificate_alt_name:
   - "DNS:{{ ansible_host }}"
-  - "DNS:{{ ansible_hostname }}"
+  - "DNS:{{ ansible_facts.hostname }}"
   - "DNS:{{ nextcloud_domain }}"
 
 prometheus_blackbox_http_targets:

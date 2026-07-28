@@ -1,15 +1,15 @@
 ---
 - name: Include OS-specific variables.
-  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts.os_family }}.yml"
 - name: Install pipewire
   become: true
   community.general.pacman:
     name: "{{ __pipewire_packages }}"
     state: present
-  when: ansible_distribution == 'Archlinux'
+  when: ansible_facts.distribution == 'Archlinux'
 
 - name: Install pipewire on Debian
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
   block:
     - name: Install repository
       become: true

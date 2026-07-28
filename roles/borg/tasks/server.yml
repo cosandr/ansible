@@ -39,7 +39,7 @@
     # Only bother if using non-standard path
     - borg_home is not match('^/home/')
     - borg_home is not match('^/root/')
-    - ansible_selinux.status == "enabled"
+    - ansible_facts.selinux.status == "enabled"
   block:
     - name: Install SELinux libraries
       ansible.builtin.dnf:

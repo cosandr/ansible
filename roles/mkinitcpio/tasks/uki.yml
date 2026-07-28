@@ -29,7 +29,7 @@
           disk: "{{ esp_disk }}"
           part: "{{ esp_part }}"
           loader: "{{ mkinitcpio_uefi_path.replace(esp_mount, '', 1) }}/{{ filename }}"
-          label: "{{ item.label | default(ansible_distribution + ' ' + item.name) }}"
+          label: "{{ item.label | default(ansible_facts.distribution + ' ' + item.name) }}"
       loop: "{{ mkinitcpio_kernels }}"
       loop_control:
         label: "{{ item.name }}"
@@ -44,7 +44,7 @@
           disk: "{{ esp_disk }}"
           part: "{{ esp_part }}"
           loader: "{{ mkinitcpio_uefi_path.replace(esp_mount, '', 1) }}/{{ filename }}"
-          label: "{{ item.label | default(ansible_distribution + ' ' + item.name + ' fallback') }}"
+          label: "{{ item.label | default(ansible_facts.distribution + ' ' + item.name + ' fallback') }}"
       loop: "{{ mkinitcpio_kernels }}"
       loop_control:
         label: "{{ item.name }}"

@@ -6,6 +6,6 @@ go_arch_map:
   armv7l: 'arm'
   armv6l: 'arm'
 
-go_arch: "{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}"
+go_arch: "{{ go_arch_map[ansible_facts.architecture] | default(ansible_facts.architecture) }}"
 
 _cadvisor_binary_install_dir: '/usr/local/bin'

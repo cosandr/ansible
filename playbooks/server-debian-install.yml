@@ -8,16 +8,17 @@
   gather_facts: false
   become: true
   vars:
-    ansible_os_family: Debian
-    ansible_distribution: Debian
-    ansible_distribution_release: "bookworm"
+    ansible_facts:
+      os_family: Debian
+      distribution: Debian
+      distribution_release: "bookworm"
     chroot_path: "/mnt"
     wipe_root_disk: false
     luks_name: "cryptlvm01"
-    esp_label: "{{ ansible_distribution | upper }}-ESP"
-    boot_label: "{{ ansible_distribution | upper }}-BOOT"
-    btrfs_root_label: "{{ ansible_distribution | upper }}-BTRFS"
-    swap_label: "{{ ansible_distribution | upper }}-SWAP"
+    esp_label: "{{ ansible_facts.distribution | upper }}-ESP"
+    boot_label: "{{ ansible_facts.distribution | upper }}-BOOT"
+    btrfs_root_label: "{{ ansible_facts.distribution | upper }}-BTRFS"
+    swap_label: "{{ ansible_facts.distribution | upper }}-SWAP"
     luks_passphrase: "changemelater"
     default_root_size: "100%FREE"
     default_swap_size: 16
@@ -62,7 +63,7 @@
       - initramfs-tools-core
       - network-manager
     post_bootstrap_pkg:
-      - "linux-image-amd64{% if deb_backports_kernel | default(true) | bool %}/{{ ansible_distribution_release | lower }}-backports{% endif %}"
+      - "linux-image-amd64{% if deb_backports_kernel | default(true) | bool %}/{{ ansible_facts.distribution_release | lower }}-backports{% endif %}"
       - apparmor-utils
       - auditd
       - ca-certificates
@@ -372,7 +373,7 @@
         debootstrap --arch amd64
           --exclude={{ debootstrap_exclude | join(',') }}
           --include={{ debootstrap_include | join(',') }}
-          {{ ansible_distribution_release | lower }} {{ chroot_path }} http://deb.debian.org/debian
+          {{ ansible_facts.distribution_release | lower }} {{ chroot_path }} http://deb.debian.org/debian
       args:
         creates: "{{ chroot_path }}/etc/fstab"
       tags: ["bootstrap"]
@@ -396,13 +397,13 @@
     - name: Copy apt sources
       ansible.builtin.copy:
         content: |
-          deb http://deb.debian.org/debian {{ ansible_distribution_release | lower }} main contrib non-free non-free-firmware
+          deb http://deb.debian.org/debian {{ ansible_facts.distribution_release | lower }} main contrib non-free non-free-firmware
 
-          deb http://deb.debian.org/debian {{ ansible_distribution_release | lower }}-updates main contrib non-free non-free-firmware
+          deb http://deb.debian.org/debian {{ ansible_facts.distribution_release | lower }}-updates main contrib non-free non-free-firmware
 
-          deb http://deb.debian.org/debian-security {{ ansible_distribution_release | lower }}-security main contrib non-free non-free-firmware
+          deb http://deb.debian.org/debian-security {{ ansible_facts.distribution_release | lower }}-security main contrib non-free non-free-firmware
 
-          deb http://deb.debian.org/debian {{ ansible_distribution_release | lower }}-backports main contrib non-free non-free-firmware
+          deb http://deb.debian.org/debian {{ ansible_facts.distribution_release | lower }}-backports main contrib non-free non-free-firmware
         dest: "{{ chroot_path }}/etc/apt/sources.list"
         owner: root
         group: root

@@ -7,7 +7,7 @@
   pre_tasks:
     - name: End host if Mac
       ansible.builtin.meta: end_host
-      when: ansible_distribution == "MacOSX"
+      when: ansible_facts.distribution == "MacOSX"
       tags: ["always"]
 
     - name: Check if GDM is active  # noqa command-instead-of-module
@@ -53,7 +53,7 @@
       community.general.pacman:
         name: "{{ pacman_packages }}"
         state: present
-      when: ansible_distribution == 'Archlinux'
+      when: ansible_facts.distribution == 'Archlinux'
       tags: ["pacman"]
   tasks:
     - name: Enable resume dracut module
@@ -67,7 +67,7 @@
           add_dracutmodules+=" resume "
       when:
         - "'laptops' in group_names"
-        - ansible_os_family == 'RedHat'
+        - ansible_facts.os_family == 'RedHat'
       notify: Dracut regenerate
       tags: ["hibernate"]
 
@@ -77,7 +77,7 @@
         name: "{{ pacman_i3_packages }}"
         state: present
       when:
-        - ansible_distribution == 'Archlinux'
+        - ansible_facts.distribution == 'Archlinux'
         - desktop_environment in ["i3", "sway"]
       tags: ["i3"]
 
@@ -87,7 +87,7 @@
         name: "{{ pacman_sway_packages }}"
         state: present
       when:
-        - ansible_distribution == 'Archlinux'
+        - ansible_facts.distribution == 'Archlinux'
         - desktop_environment == "sway"
       tags: ["sway"]
 
@@ -184,14 +184,14 @@
       ansible.builtin.systemd:
         name: linux-modules-cleanup.service
         enabled: true
-      when: ansible_distribution == 'Archlinux'
+      when: ansible_facts.distribution == 'Archlinux'
 
     - name: Enable paccache timer
       ansible.builtin.systemd:
         name: paccache.timer
         enabled: true
         state: started
-      when: ansible_distribution == 'Archlinux'
+      when: ansible_facts.distribution == 'Archlinux'
 
   handlers:
     - name: Dracut regenerate  # noqa no-changed-when
@@ -216,18 +216,18 @@
       tags: ["laptop"]
 
     - role: arch-common
-      when: ansible_distribution == 'Archlinux'
+      when: ansible_facts.distribution == 'Archlinux'
       tags: ["arch-common"]
 
     - role: firewall_config
       tags: ["firewall"]
 
     - role: reflector
-      when: ansible_distribution == 'Archlinux'
+      when: ansible_facts.distribution == 'Archlinux'
       tags: ["reflector"]
 
     - role: locale_conf
-      when: ansible_os_family != 'RedHat'
+      when: ansible_facts.os_family != 'RedHat'
       tags: ["locale"]
 
     - role: sudo
@@ -244,17 +244,17 @@
       tags: ["chezmoi"]
 
     - role: sbctl
-      when: ansible_distribution == 'Archlinux'
+      when: ansible_facts.distribution == 'Archlinux'
       tags: ["sbctl"]
 
     - role: mkinitcpio
-      when: ansible_distribution == 'Archlinux'
+      when: ansible_facts.distribution == 'Archlinux'
       tags: ["mkinitcpio"]
 
     - role: paru
       vars:
         aur_name: paru-bin
-      when: ansible_distribution == 'Archlinux'
+      when: ansible_facts.distribution == 'Archlinux'
       tags: ["paru"]
 
     - role: spotify
@@ -270,7 +270,7 @@
       vars:
         # No idea why this is needed
         aur_packages: "{{ hostvars[inventory_hostname].aur_packages }}"
-      when: ansible_distribution == 'Archlinux'
+      when: ansible_facts.distribution == 'Archlinux'
       tags: ["aur"]
 
     - role: sshd
@@ -295,7 +295,7 @@
     - role: cups
       when:
         - "'laptops' in group_names"
-        - ansible_distribution == 'Archlinux'
+        - ansible_facts.distribution == 'Archlinux'
       tags: ["cups"]
 
     - role: xorg
@@ -305,7 +305,7 @@
 
     - role: xidlehook
       when:
-        - ansible_distribution == 'Archlinux'
+        - ansible_facts.distribution == 'Archlinux'
         - desktop_environment == "i3"
       tags: ["xidlehook"]
 
@@ -315,7 +315,7 @@
 
     - role: gnome
       when:
-        - ansible_distribution == 'Archlinux'
+        - ansible_facts.distribution == 'Archlinux'
         - desktop_environment == "gnome"
       tags: ["gnome"]
 
@@ -332,7 +332,7 @@
       vars:
         aur_packages: "{{ aur_i3_packages }}"
       when:
-        - ansible_distribution == 'Archlinux'
+        - ansible_facts.distribution == 'Archlinux'
         - desktop_environment in ["i3", "sway"]
       tags: ["i3"]
 
@@ -340,7 +340,7 @@
       vars:
         aur_packages: "{{ aur_sway_packages }}"
       when:
-        - ansible_distribution == 'Archlinux'
+        - ansible_facts.distribution == 'Archlinux'
         - desktop_environment == "sway"
       tags: ["sway"]
 

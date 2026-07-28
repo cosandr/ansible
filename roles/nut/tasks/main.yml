@@ -2,7 +2,7 @@
 
 - name: Include OS vars
   ansible.builtin.include_vars:
-    file: "{{ ansible_os_family }}.yml"
+    file: "{{ ansible_facts.os_family }}.yml"
   when: nut_config_dir is not defined
 
 - name: Include server tasks

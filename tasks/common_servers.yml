@@ -2,7 +2,7 @@
 
 - name: Install packages
   tags: ["pkg"]
-  when: ansible_os_family is defined
+  when: ansible_facts.os_family is defined
   block:
     - name: Install DNF packages
       ansible.builtin.dnf:
@@ -10,7 +10,7 @@
         state: present
       when:
         - dnf_packages | default([])
-        - ansible_os_family == 'RedHat'
+        - ansible_facts.os_family == 'RedHat'
       tags: ["dnf"]
 
     - name: Block APT packages
@@ -28,7 +28,7 @@
         mode: "0644"
       when:
         - deb_block_packages | default([])
-        - ansible_os_family == 'Debian'
+        - ansible_facts.os_family == 'Debian'
       tags: ["apt"]
 
     - name: Install APT packages
@@ -37,7 +37,7 @@
         state: present
       when:
         - deb_packages | default([])
-        - ansible_os_family == 'Debian'
+        - ansible_facts.os_family == 'Debian'
       tags: ["apt"]
 
 - name: Install common packages
@@ -62,14 +62,14 @@
   ansible.builtin.dnf:
     name: rocky-release-security
     state: present
-  when: ansible_distribution == "Rocky"
+  when: ansible_facts.distribution == "Rocky"
   tags: ["rocky"]
 
 - name: Install Rocky security repo GPG key
   ansible.builtin.rpm_key:
     key: /etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-SIG-Security
     state: present
-  when: ansible_distribution == "Rocky"
+  when: ansible_facts.distribution == "Rocky"
   tags: ["rocky"]
 
 - name: Setup hostname
@@ -154,7 +154,7 @@
     name: hifis.toolkit.unattended_upgrades
     apply:
       tags: ["upgrades", "unattended-upgrades"]
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
   tags: ["upgrades", "unattended-upgrades"]
 
 - name: Configure auto upgrades (RedHat)
@@ -162,7 +162,7 @@
     name: cosandr.dnf_automatic
     apply:
       tags: ["upgrades", "dnf_automatic"]
-  when: ansible_os_family == 'RedHat'
+  when: ansible_facts.os_family == 'RedHat'
   tags: ["upgrades", "dnf_automatic"]
 
 - name: Setup node exporter
@@ -250,7 +250,7 @@
     apply:
       tags: ["selinux", "selinux_modules"]
   when:
-    - ansible_os_family == 'RedHat'
+    - ansible_facts.os_family == 'RedHat'
     - selinux_modules | default([])
   tags: ["selinux", "selinux_modules"]
 

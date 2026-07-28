@@ -27,7 +27,7 @@
 
     - name: Add pgdg repo
       ansible.builtin.apt_repository:
-        repo: "deb [signed-by=/etc/apt/keyrings/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release | lower }}-pgdg main" # noqa yaml[line-length]
+        repo: "deb [signed-by=/etc/apt/keyrings/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt {{ ansible_facts.distribution_release | lower }}-pgdg main" # noqa yaml[line-length]
         state: present
         filename: pgdg
       tags: ["apt", "postgres"]
@@ -188,7 +188,7 @@
         name: wheel
         state: present
         system: true
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'
       tags: ["user"]
 
     - name: Create my user
@@ -212,7 +212,7 @@
         groups:
           - adm
         append: true
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'
       tags: ["user"]
 
     - name: Ensure user home permissions are correct

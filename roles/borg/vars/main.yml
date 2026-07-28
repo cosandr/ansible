@@ -2,6 +2,6 @@
 
 __borg_pkg_map:
   Archlinux: "borg"
-__borg_is_unraid: "{{ (ansible_kernel | lower).find('unraid') != -1 }}"
+__borg_is_unraid: "{{ (ansible_facts.kernel | lower).find('unraid') != -1 }}"
 __borg_script_path: "{{ borg_backup_script_path }}/backup-{{ conf.name }}"
 __borg_script_mode: "0750"

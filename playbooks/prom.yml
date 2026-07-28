@@ -59,8 +59,8 @@
             state: true
             persistent: true
           when:
-            - ansible_os_family == 'RedHat'
-            - ansible_selinux.status == "enabled"
+            - ansible_facts.os_family == 'RedHat'
+            - ansible_facts.selinux.status == "enabled"
 
     - name: Copy Mikrotik CA
       ansible.builtin.copy:
@@ -72,7 +72,7 @@
       vars:
         __path_deb: "/usr/local/share/ca-certificates"
         __path_el: "/etc/pki/ca-trust/source/anchors"
-        __path: "{{ __path_el if ansible_os_family == 'RedHat' else __path_deb }}"
+        __path: "{{ __path_el if ansible_facts.os_family == 'RedHat' else __path_deb }}"
       notify: Update CA trust
       tags: ["mktxp"]
 
@@ -84,7 +84,7 @@
           - python3-venv
         state: present
       tags: ["mktxp"]
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'
 
   roles:
     - role: ipmi_exporter
@@ -105,9 +105,9 @@
     - name: Update CA trust EL # noqa no-changed-when
       listen: Update CA trust
       ansible.builtin.command: /usr/bin/update-ca-trust
-      when: ansible_os_family == 'RedHat'
+      when: ansible_facts.os_family == 'RedHat'
 
     - name: Update CA trust Debian # noqa no-changed-when
       listen: Update CA trust
       ansible.builtin.command: /usr/sbin/update-ca-certificates
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'

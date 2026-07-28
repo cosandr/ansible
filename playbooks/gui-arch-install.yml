@@ -6,8 +6,9 @@
   gather_facts: false
   become: true
   vars:
-    ansible_os_family: Archlinux
-    ansible_distribution: Archlinux
+    ansible_facts:
+      os_family: Archlinux
+      distribution: Archlinux
     env_name: "{{ mkinitcpio_uefi_prefix }}"
     src_host: "{{ lookup('pipe', 'hostname') | lower }}"
     chroot_path: "/mnt/{{ env_name }}"

@@ -5,7 +5,7 @@ chroot_path: ""
 sys_timezone: "Europe/Oslo"
 hwclock_sync: true
 
-makepkg_jobs: "{{ ansible_processor_vcpus | default('4') }}"
+makepkg_jobs: "{{ ansible_facts.processor_vcpus | default('4') }}"
 makepkg_march: "native"
 makepkg_mtune: "native"
 

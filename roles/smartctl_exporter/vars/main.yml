@@ -8,5 +8,5 @@ go_arch_map:
   armv6l: 'armv6'
   armv5l: 'armv5'
 
-go_arch: "{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}"
+go_arch: "{{ go_arch_map[ansible_facts.architecture] | default(ansible_facts.architecture) }}"
 smartctl_exporter_filename: "smartctl_exporter-{{ smartctl_exporter_version }}.linux-{{ go_arch }}"

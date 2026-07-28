@@ -5,11 +5,11 @@
   aur:
     name: "{{ discord_aur_package_name }}"
     state: present
-  when: ansible_distribution == 'Archlinux'
+  when: ansible_facts.distribution == 'Archlinux'
 
 - name: Install Discord
   become: true
   ansible.builtin.apt:
     deb: https://discord.com/api/download?platform=linux&format=deb
     state: present
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'

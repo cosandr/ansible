@@ -90,7 +90,7 @@
     proto: "tcp"
     setype: "ssh_port_t"
     state: "present"
-  when: ansible_selinux.status == "enabled"
+  when: ansible_facts.selinux.status == "enabled"
 
 - name: Change firewalld ssh service port
   ansible.builtin.template:

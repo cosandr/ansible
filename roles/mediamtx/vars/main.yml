@@ -6,7 +6,7 @@ go_arch_map:
   armv7l: 'armv7'
   armv6l: 'armv6'
 
-go_arch: "{{ go_arch_map[ansible_architecture] | default(ansible_architecture) }}"
+go_arch: "{{ go_arch_map[ansible_facts.architecture] | default(ansible_facts.architecture) }}"
 mediamtx_filename: "mediamtx_v{{ mediamtx_version }}_linux_{{ go_arch }}"
 
 mediamtx_checksum_url: "https://github.com/bluenviron/mediamtx/releases/download/v{{ mediamtx_version }}/checksums.sha256"

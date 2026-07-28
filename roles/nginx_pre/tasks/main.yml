@@ -38,8 +38,8 @@
     group: root
     mode: "0644"
   when:
-    - ansible_os_family == 'RedHat'
-    - ansible_distribution != 'Fedora'
+    - ansible_facts.os_family == 'RedHat'
+    - ansible_facts.distribution != 'Fedora'
   tags: ["nginx"]
 
 - name: Allow nginx proxy
@@ -48,8 +48,8 @@
     state: true
     persistent: true
   when:
-    - ansible_os_family == 'RedHat'
-    - ansible_selinux.status == "enabled"
+    - ansible_facts.os_family == 'RedHat'
+    - ansible_facts.selinux.status == "enabled"
   tags: ["nginx"]
 
 - name: Allow nginx proxy
@@ -58,8 +58,8 @@
     state: true
     persistent: true
   when:
-    - ansible_os_family == 'RedHat'
-    - ansible_selinux.status == "enabled"
+    - ansible_facts.os_family == 'RedHat'
+    - ansible_facts.selinux.status == "enabled"
     - nginx_nis_enabled
   tags: ["nginx"]
 

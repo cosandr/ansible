@@ -19,7 +19,7 @@ port     = {{ ansible_port }}
 {{ k }} = {{ v }}
 {% endfor %}
 
-{% if ansible_selinux.status == 'enabled' %}
+{% if ansible_facts.selinux.status == 'enabled' %}
 [selinux-ssh]
 enabled  = true
 logpath  = %(auditd_log)s

@@ -61,7 +61,7 @@
     __sbctl_efibootmgr: "{{ __sbctl_efibootmgr | default([]) + [tmp_dict_efi] }}"
   vars:
     tmp_dict:
-      label: "{{ item.label | default(ansible_distribution + ' ' + item.kernel) }}"
+      label: "{{ item.label | default(ansible_facts.distribution + ' ' + item.kernel) }}"
       kernel_path: "{{ item.kernel_path | default('vmlinuz-' + item.kernel) }}"
       initrd: "{{ item.initrd | default('initramfs-' + item.kernel + '.img') }}"
       bundle: "{{ item.bundle | default(item.kernel + '.efi') }}"

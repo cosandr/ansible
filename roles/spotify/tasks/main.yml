@@ -1,6 +1,6 @@
 ---
 - name: Install spotify on Arch Linux
-  when: ansible_distribution == 'Archlinux'
+  when: ansible_facts.distribution == 'Archlinux'
   block:
     - name: Import GPG key # noqa: no-changed-when
       become: true
@@ -17,7 +17,7 @@
         state: present
 
 - name: Install spotify on Debian
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
   block:
     - name: Install key
       become: true

@@ -1,7 +1,7 @@
 ---
 
 - name: Debian repo install
-  when: ansible_distribution == 'Debian'
+  when: ansible_facts.distribution == 'Debian'
   block:
     - name: Copy syncthing GPG key
       ansible.builtin.copy:

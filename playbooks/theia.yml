@@ -11,20 +11,20 @@
           ansible.builtin.copy:
             content: |
               Package: src:zfs-linux
-              Pin: release n={{ ansible_distribution_release | lower }}-backports
+              Pin: release n={{ ansible_facts.distribution_release | lower }}-backports
               Pin-Priority: 990
             dest: "/etc/apt/preferences.d/90_zfs"
             owner: root
             group: root
             mode: "0644"
-          when: ansible_distribution_version | int < 13
+          when: ansible_facts.distribution_version | int < 13
           tags: ["apt", "install"]
 
         - name: Install ZFS requirements
           ansible.builtin.apt:
             name:
               - dpkg-dev
-              - "linux-headers-amd64{% if deb_backports_kernel %}/{{ ansible_distribution_release | lower }}-backports{% endif %}"
+              - "linux-headers-amd64{% if deb_backports_kernel %}/{{ ansible_facts.distribution_release | lower }}-backports{% endif %}"
             state: present
           tags: ["install"]
 

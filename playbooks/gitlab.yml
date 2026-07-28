@@ -43,7 +43,7 @@
         setype: ssh_home_t
         state: present
       notify: Restore git contexts
-      when: ansible_selinux.status == "enabled"
+      when: ansible_facts.selinux.status == "enabled"
       tags: ["gitlab", "selinux"]
 
     - name: Add garbage collection job
@@ -128,7 +128,7 @@
           ansible.builtin.dnf:
             name: podman-plugins
             state: present
-          when: ansible_os_family == 'RedHat'
+          when: ansible_facts.os_family == 'RedHat'
 
         - name: Get user status
           ansible.builtin.command:

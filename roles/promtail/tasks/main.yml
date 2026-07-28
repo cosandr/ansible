@@ -32,13 +32,13 @@
     name: promtail
     enabled: true
     state: started
-  when: ansible_os_family != 'Slackware'
+  when: ansible_facts.os_family != 'Slackware'
 
 - name: Start promtail [Slackware]
   ansible.builtin.command: /etc/rc.d/rc.promtail start
   register: __sysv_start
   changed_when: "'already running' not in __sysv_start.stdout"
-  when: ansible_os_family == 'Slackware'
+  when: ansible_facts.os_family == 'Slackware'
 
 - name: Include firewall role
   ansible.builtin.include_role:

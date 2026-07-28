@@ -7,7 +7,7 @@ fail2ban_maxretry: "5"
 fail2ban_ignoreip:
   - "127.0.0.1/8"
   - "::1"
-  - "{{ ansible_default_ipv4.network }}/24"
+  - "{{ ansible_facts.default_ipv4.network }}/24"
 fail2ban_sshd_extra: {}
   # maxretry: 2
   # bantime: 8h

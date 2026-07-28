@@ -3,10 +3,10 @@
 - name: Include OS-specific vars if possible
   ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
-    - files: ["{{ ansible_distribution }}.yml"]
+    - files: ["{{ ansible_facts.distribution }}.yml"]
       skip: true
   when:
-    - ansible_distribution is defined
+    - ansible_facts.distribution is defined
     - not xorg_packages
   tags: ["install"]
 

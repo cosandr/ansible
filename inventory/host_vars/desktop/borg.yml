@@ -9,7 +9,7 @@ borg_backups:
     target_host: "theia"
     ssh_check: "{{ hostvars['theia'].borg_ssh_check_general }}"
     repo: "{{ hostvars['theia'].borg_remote_repo_general }}/arch"
-    archive_name: "{{ ansible_hostname }}"
+    archive_name: "{{ ansible_facts.hostname }}"
     pre_run: |
       BACKUP_USER_HOME=$(getent passwd {{ my_user }} | cut -d : -f 6)
     paths:
@@ -36,7 +36,7 @@ borg_backups:
     target_host: "theia"
     ssh_check: "{{ hostvars['theia'].borg_ssh_check_general }}"
     repo: "{{ hostvars['theia'].borg_remote_repo_general }}/windows"
-    archive_name: "{{ ansible_hostname }}"
+    archive_name: "{{ ansible_facts.hostname }}"
     pre_run: |
       drives=('c' 'd')
       declare -a unlocked

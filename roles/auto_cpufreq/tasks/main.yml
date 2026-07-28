@@ -7,7 +7,7 @@
     name: "auto-cpufreq"
     state: present
   tags: ["install"]
-  when: ansible_distribution == 'Archlinux'
+  when: ansible_facts.distribution == 'Archlinux'
 
 - name: Configure auto-cpufreq
   ansible.builtin.template:

@@ -9,4 +9,4 @@ chezmoi_arch_map:
     x86_64: 'x86_64'
     aarch64: 'aarch64'
 
-chezmoi_arch: "{{ chezmoi_arch_map.get(ansible_os_family, chezmoi_arch_map['Debian'])[ansible_architecture] | default(ansible_architecture) }}"
+chezmoi_arch: "{{ chezmoi_arch_map.get(ansible_facts.os_family, chezmoi_arch_map['Debian'])[ansible_facts.architecture] | default(ansible_facts.architecture) }}"

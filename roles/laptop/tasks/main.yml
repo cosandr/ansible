@@ -165,4 +165,4 @@
     value: "{{ i915_perf_stream_paranoid }}"
     state: present
     sysctl_file: /etc/sysctl.d/50-i915.conf
-  when: "'GenuineIntel' in ansible_processor"
+  when: "'GenuineIntel' in ansible_facts.processor"

@@ -1,7 +1,7 @@
 ---
 
 postfix_extra_packages: []
-postfix_hostname: "{{ ansible_fqdn }}"
+postfix_hostname: "{{ ansible_facts.fqdn }}"
 postfix_interfaces:
   - all
 
