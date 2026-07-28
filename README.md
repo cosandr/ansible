@@ -2,12 +2,10 @@
 
 ## Venv setup
 
-This repo doesn't support Ansible 12 or later, using a venv is recommended.
-
 ```sh
-pyenv install 3.12.12
-pyenv virtualenv 3.12.12 ansible-11
-pyenv activate ansible-11
+pyenv install 3.14.6
+pyenv virtualenv 3.14.6 ansible-14
+pyenv activate ansible-14
 pip install -U pip wheel setuptools
 pip install -U -r requirements.txt -r requirements-venv.txt
 ```
