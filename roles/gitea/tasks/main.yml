@@ -3,10 +3,10 @@
 - name: Check vars
   ansible.builtin.assert:
     that:
-      - gitea_secret_key
-      - gitea_internal_token
-      - gitea_jwt_secret
-      - gitea_oauth2_jwt_secret
+      - gitea_secret_key | length > 0
+      - gitea_internal_token | length > 0
+      - gitea_jwt_secret | length > 0
+      - gitea_oauth2_jwt_secret | length > 0
 
 - name: Include installation tasks
   ansible.builtin.include_tasks:

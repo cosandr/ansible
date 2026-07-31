@@ -21,7 +21,7 @@
       retries: 5
       check_mode: false
 
-    - name: "Set cadvisor version to {{ _latest_release.json.tag_name[1:] }}"
+    - name: "Set cadvisor version to {{ _latest_release.json.tag_name[1:] | default('N/A') }}"
       ansible.builtin.set_fact:
         cadvisor_version: "{{ _latest_release.json.tag_name[1:] }}"
 

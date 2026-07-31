@@ -17,7 +17,7 @@
       retries: 5
       check_mode: false
 
-    - name: "Set nvidia_exporter version to {{ _latest_release.json.tag_name[1:] }}"
+    - name: "Set nvidia_exporter version to {{ _latest_release.json.tag_name[1:] | default('N/A') }}"
       ansible.builtin.set_fact:
         nvidia_exporter_version: "{{ _latest_release.json.tag_name[1:] }}"
 

@@ -16,7 +16,7 @@
       retries: 5
       check_mode: false
 
-    - name: "Set fzf version to {{ _latest_release.json.tag_name }}"
+    - name: "Set fzf version to {{ _latest_release.json.tag_name | default('N/A') }}"
       ansible.builtin.set_fact:
         fzf_version: "{{ _latest_release.json.tag_name }}"
 
