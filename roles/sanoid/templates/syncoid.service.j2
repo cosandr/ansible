@@ -3,6 +3,9 @@
 Description=Sync {{ item.1.name }}
 Requires=zfs.target
 After=zfs.target
+{% if item.1.extra_unit is defined %}
+{{ item.1.extra_unit }}
+{% endif %}
 
 [Service]
 Environment=HOME=/root
@@ -11,6 +14,9 @@ ExecStart={{ sanoid_bin_dir }}/syncoid \
     {{ o }} \
 {% endfor %}
     "{{ item.1.src }}" "{{ item.1.dest }}"
+{% if item.1.extra_service is defined %}
+{{ item.1.extra_service }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target

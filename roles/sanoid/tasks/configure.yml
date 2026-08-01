@@ -57,7 +57,10 @@
 - name: Set list facts
   ansible.builtin.set_fact:
     _timers_present_list: "{{ _timers_present | json_query('files[*].path') | default([]) }}"
-    _timers_copied_list: "{{ _timers_copied.results | json_query('[*].dest') | default([]) }}"
+    _timers_copied_list: "{{ _timers_copied_tmp + _timers_copied_tmp_check }}"
+  vars:
+    _timers_copied_tmp: "{{ _timers_copied.results | json_query('[*].dest') | default([]) }}"
+    _timers_copied_tmp_check: "{{ _timers_copied.results | json_query('[*].invocation.dest') | default([]) }}"
   when: syncoid_provisioning_synced
 
 - name: Remove configs not present on deployer machine (synchronize)

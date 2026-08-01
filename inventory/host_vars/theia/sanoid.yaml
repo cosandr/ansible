@@ -14,6 +14,13 @@ syncoid_timers:
       - "--no-sync-snap"
       - "--delete-target-snapshots"
       - "--skip-parent"
+    # Retry 3 times, assuming max runtime is ~1 hour.
+    extra_unit: |
+      StartLimitIntervalSec=14400
+      StartLimitBurst=3
+    extra_service: |
+      Restart=on-failure
+      RestartSec=30
 
 sanoid_backup_modules:
   "nvme":
