@@ -24,6 +24,16 @@
       notify: Reboot
       when: ansible_facts.os_family == 'Debian'
 
+    # Even though dist-upgrade is used, old kernel versions remain, filling up /boot
+    # autoremove cleans them up
+    - name: Autoclean/remove with apt
+      ansible.builtin.apt:
+        autoclean: true
+        autoremove: true
+      tags: ["autoremove"]
+      register: __autoremove_result
+      when: ansible_facts.os_family == 'Debian'
+
     - name: Print dnf results
       ansible.builtin.debug:
         msg: "{{ __dnf_result.results }}"
@@ -37,6 +47,15 @@
       when:
         - __apt_result is defined
         - __apt_result.stdout_lines | default([]) | length > 0
+
+    - name: Print autoremove results
+      ansible.builtin.debug:
+        msg: "{{ __autoremove_result.stdout_lines }}"
+      tags: ["autoremove"]
+      when:
+        - __autoremove_result is defined
+        - __autoremove_result is changed
+        - __autoremove_result.stdout_lines | default([]) | length > 0
 
   handlers:
     - name: Reboot
