@@ -1,0 +1,42 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Destroy nspawn machines
+  hosts: nspawn
+  gather_facts: false
+  pre_tasks:
+    - name: Warn if no limit was passed
+      run_once: true
+      ansible.builtin.pause:
+        prompt: "WARNING: No limit in use"
+      when: ansible_limit | default(false) is falsy
+  tasks:
+    - name: Stop machine
+      delegate_to: "{{ nspawn_host }}"
+      ansible.builtin.systemd:
+        name: "systemd-nspawn@{{ inventory_hostname }}.service"
+        state: stopped
+        enabled: false
+
+    - name: Check if machine dir already exists
+      delegate_to: "{{ nspawn_host }}"
+      ansible.builtin.stat:
+        path: "{{ nspawn_machine_root_dir }}/etc/fstab"
+      register: __machine_check
+      tags: ["btrfs"]
+
+    - name: Delete machine subvolume # noqa no-changed-when
+      delegate_to: "{{ nspawn_host }}"
+      ansible.builtin.command:
+        cmd: "btrfs subvolume delete {{ nspawn_machine_root_dir }}"
+      when: __machine_check.stat.exists
+      tags: ["btrfs"]
+
+    - name: Remove configs
+      delegate_to: "{{ nspawn_host }}"
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "/etc/systemd/nspawn/{{ inventory_hostname }}.nspawn"
+        - "/etc/systemd/system.control/systemd-nspawn@{{ inventory_hostname }}.service.d"
