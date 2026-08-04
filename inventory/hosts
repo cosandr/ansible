@@ -2,7 +2,7 @@
 # BEGIN AUTO GENERATED VARIABLES
 localgw     ansible_host="10.0.10.64"
 docker      ansible_host="10.0.10.88"
-gitlab01    ansible_host="10.0.10.90"
+gitlab      ansible_host="10.0.10.90"
 gitrun01    ansible_host="10.0.10.92"
 loki01      ansible_host="10.0.10.96"
 nextcloud01 ansible_host="10.0.10.104"
@@ -78,11 +78,11 @@ ansible_group_priority=2
 
 [libvirt]
 docker host_subnet=docker host_num=0
-unifios host_net=mgmt host_subnet=unifios host_num=0
+gitlab host_subnet=gitlab host_num=0
 localgw host_subnet=localgw host_num=0
+unifios host_net=mgmt host_subnet=unifios host_num=0
 
 [libvirt:children]
-gitlab
 gitrun
 
 [libvirt:vars]
@@ -119,12 +119,6 @@ u7pro host_num=6
 [unifi:vars]
 host_net=mgmt
 host_subnet=switches
-
-[gitlab]
-gitlab01 host_num=0
-
-[gitlab:vars]
-host_subnet=gitlab
 
 [gitrun]
 gitrun01 host_num=0

@@ -46,17 +46,15 @@ nginx_extra_conf_options: |
     }
 
     upstream gitlab_main {
-      server {{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_nginx_listen_port }};
+      server {{ hostvars['gitlab'].ansible_host }}:{{ hostvars['gitlab'].gitlab_nginx_listen_port }};
     }
 
     upstream gitlab_registry {
-      server {{ hostvars['gitlab01'].ansible_host }}:{{ hostvars['gitlab01'].gitlab_registry_nginx_listen_port }};
+      server {{ hostvars['gitlab'].ansible_host }}:{{ hostvars['gitlab'].gitlab_registry_nginx_listen_port }};
     }
 
     upstream gitlab-ssh {
-  {% for h in groups['gitlab'] %}
-      server {{ hostvars[h].ansible_host }}:{{ hostvars[h].gitlab_sshd_port }};
-  {% endfor %}
+      server {{ hostvars['gitlab'].ansible_host }}:{{ hostvars['gitlab'].gitlab_sshd_port }};
     }
 
     server {

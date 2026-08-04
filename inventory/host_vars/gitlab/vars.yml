@@ -1,31 +1,27 @@
 ---
 
+domain: "{{ domains['dv'] }}"
+
 node_exporter_web_listen_address: '0.0.0.0:9100'
 node_exporter_port: "{{ node_exporter_web_listen_address.split(':')[1] }}"
 # Using gitlab's embedded node exporter
 node_exporter_installed: false
+
+gitlab_edition: "gitlab-ee"
 gitlab_config_template: "{{ repo_base_dir }}/files/gitlab/gitlab.rb.j2"
-
-domain: "{{ domains['dv'] }}"
-
 gitlab_backup_keep_time: 604800  # 7 days
 gitlab_backup_upload_remote_directory: "."
 gitlab_backup_upload_connection:
   provider: "Local"
   local_root: "/mnt/backups"
-
 gitlab_time_zone: "Europe/Oslo"
-
 gitlab_ssl_certificate: "/etc/gitlab/ssl/main.crt"
 gitlab_ssl_certificate_key: "/etc/gitlab/ssl/main.key"
 gitlab_create_self_signed_cert: false
 gitlab_nginx_listen_port: 8443
 gitlab_nginx_trusted_addresses: "{{ subnets.vm.localgw + subnets.mt.webgw }}"
-
 gitlab_registry_nginx_listen_port: 5000
-
 gitlab_sshd_port: 2222
-
 gitlab_gc_oncalendar: "Tue,Fri 02:00:00"
 
 prometheus_blackbox_http_targets:
