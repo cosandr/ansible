@@ -1,0 +1,23 @@
+---
+
+- name: Install elastic_exporter
+  ansible.builtin.include_tasks: install.yml
+  tags: ["install"]
+
+- name: Create or update systemd service unit
+  ansible.builtin.template:
+    src: elasticsearch-exporter.service.j2
+    dest: /etc/systemd/system/elasticsearch-exporter.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart elasticsearch-exporter
+
+- name: Enable and start elasticsearch-exporter
+  ansible.builtin.systemd:
+    name: elasticsearch-exporter
+    state: started
+    enabled: true
+    daemon_reload: true

@@ -1,0 +1,9 @@
+---
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart elasticsearch-exporter
+  ansible.builtin.systemd:
+    name: elasticsearch-exporter
+    state: restarted

@@ -1,0 +1,7 @@
+---
+
+elastic_exporter_version: "latest"
+elastic_exporter_web_listen_address: ":9114"
+elastic_exporter_required_services:
+  - network-online.target
+elastic_exporter_es_config: []
