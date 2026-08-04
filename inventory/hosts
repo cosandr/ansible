@@ -6,6 +6,7 @@ gitlab      ansible_host="10.0.10.90"
 gitrun01    ansible_host="10.0.10.92"
 loki01      ansible_host="10.0.10.96"
 nextcloud01 ansible_host="10.0.10.104"
+gitos       ansible_host="10.0.10.106"
 prom01      ansible_host="10.0.10.108"
 desktop     ansible_host="10.0.50.64"
 laptop      ansible_host="10.0.50.65"   wireguard_ip="10.4.20.65"
@@ -81,6 +82,7 @@ docker host_subnet=docker host_num=0
 gitlab host_subnet=gitlab host_num=0
 localgw host_subnet=localgw host_num=0
 unifios host_net=mgmt host_subnet=unifios host_num=0
+gitos host_subnet=gitos host_num=0
 
 [libvirt:children]
 gitrun

@@ -1,0 +1,9 @@
+{
+  "index_patterns": ["*"],
+  "priority": 0,
+  "template": {
+    "settings": {
+      "number_of_replicas": 0
+    }
+  }
+}

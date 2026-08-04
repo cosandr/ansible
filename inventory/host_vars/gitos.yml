@@ -1,0 +1,21 @@
+---
+
+vm_cpus: 4
+vm_mem: 3072
+
+firewall_rules:
+  - port: 9200
+    sources: "{{ subnets.vm.gitlab }}"
+
+  - port: "{{ elastic_exporter_port }}"
+    sources: "{{ node_exporter_allow_ips }}"
+
+opensearch_heap_size: "{{ vm_mem // 2 }}m"
+# renovate: datasource=github-releases depName=prometheus-community/elasticsearch_exporter
+elastic_exporter_version: "1.11.0"
+elastic_exporter_port: 9114
+elastic_exporter_web_listen_address: ":{{ elastic_exporter_port }}"
+elastic_exporter_es_config:
+  - es.indices
+  - es.node="{{ inventory_hostname }}"
+  - es.uri="http://127.0.0.1:9200"

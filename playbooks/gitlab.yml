@@ -1,6 +1,85 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
+- name: Setup GitLab OpenSearch
+  hosts: gitos
+  gather_facts: true
+  tasks:
+    - name: Add OpenSearch apt repository
+      ansible.builtin.deb822_repository:
+        name: opensearch
+        types: deb
+        uris: https://artifacts.opensearch.org/releases/bundle/opensearch/3.x/apt
+        suites: stable
+        components: main
+        signed_by: https://artifacts.opensearch.org/publickeys/opensearch-release.pgp
+
+    - name: Install OpenSearch package
+      ansible.builtin.apt:
+        name: opensearch
+        state: present
+        update_cache: true
+      environment:
+        DISABLE_INSTALL_DEMO_CONFIG: "true"
+        DISABLE_SECURITY_PLUGIN: "true"
+
+    - name: Configure OpenSearch
+      ansible.builtin.copy:
+        dest: /etc/opensearch/opensearch.yml
+        content: |
+          cluster.name: gitlab
+          node.name: {{ inventory_hostname }}
+          network.host: 0.0.0.0
+          http.port: 9200
+          discovery.type: single-node
+          plugins.security.disabled: true
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart opensearch
+
+    - name: Configure OpenSearch heap size
+      ansible.builtin.copy:
+        dest: /etc/opensearch/jvm.options.d/heap.options
+        content: |
+          -Xms{{ opensearch_heap_size }}
+          -Xmx{{ opensearch_heap_size }}
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart opensearch
+
+    - name: Enable and start OpenSearch
+      ansible.builtin.systemd:
+        name: opensearch
+        enabled: true
+        state: started
+
+    - name: Wait for OpenSearch to be ready
+      ansible.builtin.uri:
+        url: http://127.0.0.1:9200/
+        status_code: 200
+      register: opensearch_ready
+      retries: 10
+      delay: 3
+      until: opensearch_ready.status == 200
+
+    - name: Apply default index template
+      ansible.builtin.uri:
+        url: http://127.0.0.1:9200/_index_template/default
+        method: PUT
+        body: "{{ lookup('file', repo_base_dir + '/files/gitos/index_defaults') }}"
+        body_format: json
+        status_code: 200
+  roles:
+    - role: elastic_exporter
+      tags: ["elastic_exporter"]
+  handlers:
+    - name: Restart opensearch
+      ansible.builtin.systemd:
+        name: opensearch
+        state: restarted
+
 - name: Setup Gitlab
   hosts: gitlab
   gather_facts: true
