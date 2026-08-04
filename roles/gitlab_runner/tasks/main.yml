@@ -22,21 +22,15 @@
   tags: ["install"]
 
 # https://packages.gitlab.com/install/repositories/runner/gitlab-runner/script.deb.sh
-- name: Download APT key
-  ansible.builtin.get_url:
-    url: https://packages.gitlab.com/gpgkey/gpg.key
-    dest: /etc/apt/keyrings/runner_gitlab-runner-archive-keyring.gpg
-    owner: root
-    group: root
-    mode: "0644"
-  when: ansible_facts.os_family == 'Debian'
-  tags: ["install"]
-
 - name: Add runner repo
-  ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/etc/apt/keyrings/runner_gitlab-runner-archive-keyring.gpg] https://packages.gitlab.com/runner/gitlab-runner/{{ ansible_facts.distribution | lower }} {{ ansible_facts.distribution_release | lower }} main"
+  ansible.builtin.deb822_repository:
+    name: gitlab-runner
+    types: deb
+    uris: "https://packages.gitlab.com/runner/gitlab-runner/{{ ansible_facts.distribution | lower }}"
+    suites: "{{ ansible_facts.distribution_release | lower }}"
+    components: main
+    signed_by: https://packages.gitlab.com/gpgkey/gpg.key
     state: present
-    filename: gitlab-runner
   when: ansible_facts.os_family == 'Debian'
   tags: ["install"]
 
@@ -44,6 +38,7 @@
   ansible.builtin.package:
     name: "gitlab-runner"
     state: present
+    update_cache: true
   tags: ["install"]
 
 - name: Ensure override dir exists
