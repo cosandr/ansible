@@ -1,6 +1,19 @@
 ---
 
 domain: "{{ domains['hb'] }}"
+deb_packages:
+  - jq
+
+gitlab_runner_systemd_override: |
+  [Service]
+  ExecStart=
+  ExecStart=/usr/bin/gitlab-runner run --config /etc/gitlab-runner/config.toml --working-directory /home/gitlab-runner --service gitlab-runner --user {{ my_user }}
+gitlab_runner_limit: 1
+gitlab_runners:
+  # Tags: docker-host
+  - name: "Docker Host Runner"
+    executor: shell
+    token: "{{ vault_runner_token }}"
 
 __unattended_package_blacklist_3:
   - ".*cuda.*"

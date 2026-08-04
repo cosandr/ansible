@@ -11,4 +11,3 @@ https://docs.ansible.com/projects/ansible/latest/porting_guides/porting_guide_14
 `rg -n -U -P '^([ \t]*)when:[ \t]*(\n(\1[ \t]+\S.*)?)*'`
 
 Keep an eye on warning and remove `allow_broken_conditionals` from ansible.cfg when done.
-

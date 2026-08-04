@@ -29,6 +29,9 @@
 
     - role: systemd
       tags: ["systemd"]
+
+    - role: gitlab_runner
+      tags: ["runner"]
   tasks:
     - name: Install Nvidia driver deps
       ansible.builtin.apt:
@@ -98,40 +101,33 @@
         creates: /etc/docker/daemon.json
       tags: ["nvidia"]
 
-    - name: Setup runner access
+    - name: Create my user
+      ansible.builtin.user:
+        name: "{{ my_user }}"
+        password: "{{ my_user_pass }}"
+        create_home: true
+        groups:
+          - sudo
+          - docker
+        append: true
+        uid: 1000
+      tags: ["user"]
+
+    - name: Ensure runner home owned by correct user
+      ansible.builtin.file:
+        path: /home/gitlab-runner
+        state: directory
+        owner: "{{ my_user }}"
+        group: "{{ my_user }}"
+        mode: "0700"
       tags: ["runner"]
-      block:
-        - name: Create gitlab-runner user
-          ansible.builtin.user:
-            name: gitlab-runner
-            state: present
-            create_home: true
 
-        - name: Copy entrypoint
-          ansible.builtin.copy:
-            src: "{{ repo_base_dir }}/files/docker/runner-entrypoint.sh"
-            dest: "/home/gitlab-runner/entrypoint"
-            owner: root
-            group: root
-            mode: "0755"
-
-        - name: Copy SSH key
-          ansible.posix.authorized_key:
-            user: gitlab-runner
-            key: "{{ lookup('file', repo_base_dir + '/files/gitlab/runner_ssh.pub') }}"
-            key_options: 'command="/home/gitlab-runner/entrypoint",restrict'
-
-        - name: Copy sudo scripts
-          ansible.builtin.template:
-            src: "{{ repo_base_dir }}/files/docker/sudo-runner-{{ item }}.sh.j2"
-            dest: "/usr/local/bin/sudo-runner-{{ item }}"
-            owner: root
-            group: root
-            mode: "0755"
-          loop:
-            - git
-            - script
-            - up
+    # https://docs.gitlab.com/runner/shells/#shell-profile-loading
+    - name: Remove .bash_logout
+      ansible.builtin.file:
+        path: "/home/{{ my_user }}/.bash_logout"
+        state: absent
+      tags: ["runner"]
 
   post_tasks:
     - name: Ensure override dir exists
@@ -155,18 +151,6 @@
         mode: "0644"
       notify: Reload systemd
       tags: ["docker"]
-
-    - name: Create my user
-      ansible.builtin.user:
-        name: "{{ my_user }}"
-        password: "{{ my_user_pass }}"
-        create_home: true
-        groups:
-          - sudo
-          - docker
-        append: true
-        uid: 1000
-      tags: ["user"]
 
     - name: Configure user SSH keys
       ansible.posix.authorized_key:
