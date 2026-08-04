@@ -24,7 +24,7 @@
   post_tasks:
     # Required for gitlab backup to work
     - name: Ensure tar is installed
-      ansible.builtin.dnf:
+      ansible.builtin.package:
         name: tar
         state: present
 

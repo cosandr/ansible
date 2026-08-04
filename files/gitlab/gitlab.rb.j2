@@ -1,6 +1,8 @@
 # The URL through which GitLab will be accessed.
 external_url "{{ gitlab_external_url }}"
 
+gitlab_rails['usage_ping_enabled'] = false
+
 # gitlab.yml configuration
 gitlab_rails['time_zone'] = "{{ gitlab_time_zone }}"
 gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
@@ -14,13 +16,13 @@ gitlab_rails['gitlab_default_theme'] = "{{ gitlab_default_theme }}"
 
 # GitLab Nginx
 ## See https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/settings/nginx.md
-nginx['listen_port'] = "{{ gitlab_nginx_listen_port }}"
-nginx['listen_https'] = true
-nginx['proxy_protocol'] = true
-nginx['real_ip_trusted_addresses'] = {{ gitlab_nginx_trusted_addresses | to_json }}
-nginx['redirect_http_to_https'] = false
-nginx['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
-nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
+gitlab_rails['nginx']['listen_port'] = "{{ gitlab_nginx_listen_port }}"
+gitlab_rails['nginx']['listen_https'] = true
+gitlab_rails['nginx']['proxy_protocol'] = true
+gitlab_rails['nginx']['real_ip_trusted_addresses'] = {{ gitlab_nginx_trusted_addresses | to_json }}
+gitlab_rails['nginx']['redirect_http_to_https'] = false
+gitlab_rails['nginx']['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
+gitlab_rails['nginx']['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
 
 letsencrypt['enable'] = false
 
@@ -72,13 +74,13 @@ gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_backup_upload_remote
 registry['enable'] = true
 registry['registry_http_addr'] = "127.0.0.1:5005"
 registry_external_url "{{ gitlab_registry_external_url }}"
-registry_nginx['listen_port'] = {{ gitlab_registry_nginx_listen_port }}
-registry_nginx['listen_https'] = true
-registry_nginx['proxy_protocol'] = true
-registry_nginx['real_ip_trusted_addresses'] = {{ gitlab_nginx_trusted_addresses | to_json }}
-registry_nginx['redirect_http_to_https'] = false
-registry_nginx['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
-registry_nginx['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
+registry['nginx']['listen_port'] = {{ gitlab_registry_nginx_listen_port }}
+registry['nginx']['listen_https'] = true
+registry['nginx']['proxy_protocol'] = true
+registry['nginx']['real_ip_trusted_addresses'] = {{ gitlab_nginx_trusted_addresses | to_json }}
+registry['nginx']['redirect_http_to_https'] = false
+registry['nginx']['ssl_certificate'] = "{{ gitlab_ssl_certificate }}"
+registry['nginx']['ssl_certificate_key'] = "{{ gitlab_ssl_certificate_key }}"
 
 node_exporter['listen_address'] = '{{ node_exporter_web_listen_address }}'
 node_exporter['flags'] = {
