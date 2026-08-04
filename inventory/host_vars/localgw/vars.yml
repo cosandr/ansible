@@ -5,13 +5,10 @@ ansible_port: 5622
 
 nginx_exporter_web_listen_address: "{{ ansible_host }}:{{ nginx_exporter_port }}"
 
-group_prometheus_node_labels:
-  group: "localgw"
-  ignore_down: "true"
 # Workaround very bizare bug where wireguard_interface ends up defined as "wg0"
 wireguard_interface: false
 
 swapfile_size: 1G
 
-group_promtail_external_labels:
-  group: "localgw"
+deb_packages:
+  - gnupg2

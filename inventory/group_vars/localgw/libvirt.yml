@@ -1,8 +1,0 @@
----
-
-vm_template: "rocky9_packer.{{ vm_disk_format }}"
-vm_os_id: "http://rockylinux.org/rocky/9"
-vm_cpus: 1
-vm_mem: 1024
-
-vm_root_size: "10G"

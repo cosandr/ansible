@@ -1,0 +1,6 @@
+---
+
+vm_cpus: 1
+vm_mem: 1024
+
+vm_root_size: "10G"

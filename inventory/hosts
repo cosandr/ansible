@@ -1,6 +1,6 @@
 [all]
 # BEGIN AUTO GENERATED VARIABLES
-localgw01   ansible_host="10.0.10.64"
+localgw     ansible_host="10.0.10.64"
 docker      ansible_host="10.0.10.88"
 gitlab01    ansible_host="10.0.10.90"
 gitrun01    ansible_host="10.0.10.92"
@@ -79,11 +79,11 @@ ansible_group_priority=2
 [libvirt]
 docker host_subnet=docker host_num=0
 unifios host_net=mgmt host_subnet=unifios host_num=0
+localgw host_subnet=localgw host_num=0
 
 [libvirt:children]
 gitlab
 gitrun
-localgw
 
 [libvirt:vars]
 host_net=vm
@@ -151,16 +151,8 @@ loki01 host_num=0
 [loki:vars]
 host_subnet=loki
 
-[localgw]
-localgw01 host_num=0
-
-[localgw:vars]
-host_subnet=localgw
-
 [webgw]
 webgw01 host_wg_num=0
-
-[webgw:children]
 localgw
 
 [webgw:vars]

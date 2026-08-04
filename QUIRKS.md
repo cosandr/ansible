@@ -17,15 +17,7 @@ sudo -u lego env LEGO_PATH=/etc/lego /usr/local/bin/lego
 ```
 Push certs if needed
 ```sh
-ansible localgw01 -m shell -a "{% for d in lego_certificates.keys() %}echo /usr/local/bin/pg-cert-push --name {{ d }} --public-key /etc/lego/certificates/{{ d }}.crt --private-key /etc/lego/certificates/{{ d }}.key --chain /etc/lego/certificates/{{ d }}.issuer.crt; {% endfor %}"
-```
-
-Pull on other nodes and fix services
-
-```sh
-ansible localgw -a '/usr/local/bin/pg-cert-pull-systemd'
-ansible localgw -a 'systemctl restart nginx'
-ansible localgw -a 'systemctl restart nginx_exporter'
+ansible localgw -m shell -a "{% for d in lego_certificates.keys() %}echo /usr/local/bin/pg-cert-push --name {{ d }} --public-key /etc/lego/certificates/{{ d }}.crt --private-key /etc/lego/certificates/{{ d }}.key --chain /etc/lego/certificates/{{ d }}.issuer.crt; {% endfor %}"
 ```
 
 ## webgw
