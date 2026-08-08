@@ -116,50 +116,10 @@
         state: directory
       tags: ["gitlab"]
 
-    - name: Ensure correct SELinux context for git .ssh
-      community.general.sefcontext:
-        target: "/var/opt/gitlab/.ssh(/.*)?"
-        setype: ssh_home_t
-        state: present
-      notify: Restore git contexts
-      when: ansible_facts.selinux.status == "enabled"
-      tags: ["gitlab", "selinux"]
-
-    - name: Add garbage collection job
-      ansible.builtin.template:
-        src: "{{ repo_base_dir }}/files/gitlab/registry-garbage-collect.timer.j2"
-        dest: "/etc/systemd/system/registry-garbage-collect.timer"
-        owner: root
-        group: root
-        mode: "0644"
-      notify:
-        - Reload systemd
-        - Enable and start garbage collection
-      tags: ["gitlab", "gc"]
-
-    - name: Copy garbage collection service
-      ansible.builtin.copy:
-        src: "{{ repo_base_dir }}/files/gitlab/registry-garbage-collect.service"
-        dest: "/etc/systemd/system/registry-garbage-collect.service"
-        owner: root
-        group: root
-        mode: "0644"
-      notify: Reload systemd
-      tags: ["gitlab", "gc"]
-
   handlers:
-    - name: Restore git contexts  # noqa no-changed-when - handler
-      ansible.builtin.command: restorecon -r /var/opt/gitlab/.ssh
-
     - name: Reload systemd
       ansible.builtin.systemd:
         daemon_reload: true
-
-    - name: Enable and start garbage collection
-      ansible.builtin.systemd:
-        name: registry-garbage-collect.timer
-        state: started
-        enabled: true
 
 - name: Setup Gitlab runners
   hosts: gitrun
