@@ -33,3 +33,8 @@ samba_shares:
     comment: "Rust Storage"
     path: "/mnt/tank"
     writable: true
+
+  nvme:
+    comment: "NVMe Pool"
+    path: "/mnt/nvme"
+    writable: true
