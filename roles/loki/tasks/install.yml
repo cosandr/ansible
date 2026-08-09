@@ -46,7 +46,7 @@
   become: false
   ansible.builtin.get_url:
     url: "https://github.com/grafana/loki/releases/download/v{{ loki_version }}/loki-linux-{{ go_arch }}.zip"
-    dest: "/tmp/loki-linux-{{ go_arch }}.zip"
+    dest: "/tmp/loki-linux-{{ loki_version }}-{{ go_arch }}.zip"
     checksum: "sha256:{{ (__loki_checksums | select('search', 'loki-linux-' + go_arch + '.zip') | first).split()[0] }}"
   register: _download_archive
   until: _download_archive is succeeded
@@ -56,20 +56,29 @@
   delegate_to: localhost
   check_mode: false
 
+- name: Create temporary dir
+  become: false
+  delegate_to: localhost
+  check_mode: false
+  ansible.builtin.file:
+    path: "/tmp/loki-linux-{{ loki_version }}-{{ go_arch }}"
+    state: directory
+    mode: "0755"
+
 - name: Unpack Loki binary
   become: false
   diff: false
   ansible.builtin.unarchive:
-    src: "/tmp/loki-linux-{{ go_arch }}.zip"
-    dest: "/tmp"
-    creates: "/tmp/loki-linux-{{ go_arch }}"
+    src: "/tmp/loki-linux-{{ loki_version }}-{{ go_arch }}.zip"
+    dest: "/tmp/loki-linux-{{ loki_version }}-{{ go_arch }}"
+    creates: "/tmp/loki-linux-{{ loki_version }}-{{ go_arch }}/loki-linux-{{ go_arch }}"
   delegate_to: localhost
   check_mode: false
 
 - name: Install Loki binary
   diff: false
   ansible.builtin.copy:
-    src: "/tmp/loki-linux-{{ go_arch }}"
+    src: "/tmp/loki-linux-{{ loki_version }}-{{ go_arch }}/loki-linux-{{ go_arch }}"
     dest: "/usr/local/bin/loki"
     mode: "0755"
     owner: root
