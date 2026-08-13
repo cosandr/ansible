@@ -8,7 +8,7 @@ collections:
   - name: community.docker
     version: '5.2.1'
   - name: community.general
-    version: '13.2.0'
+    version: '13.3.0'
   - name: community.routeros
     version: '3.21.0'
   - name: community.libvirt
