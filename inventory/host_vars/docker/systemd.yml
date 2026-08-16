@@ -12,7 +12,7 @@ systemd_units:
         [Service]
         Type=oneshot
         RemainAfterExit=true
-        ExecStart=/usr/bin/nvidia-smi -pl 250
+        ExecStart=/usr/bin/nvidia-smi -pl 100
 
         [Install]
         WantedBy=multi-user.target
@@ -40,3 +40,29 @@ systemd_units:
 
         [Install]
         WantedBy=multi-user.target
+
+  - name: docker-auto-prune
+    service:
+      content: |
+        [Unit]
+        Description=Prune Docker
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        ExecStart=/usr/bin/docker system prune -af
+
+    timer:
+      enabled: true
+      state: started
+      content: |
+        [Unit]
+        Description=Automatically prune Docker every week
+
+        [Timer]
+        OnCalendar=*-*-01,14 08:00:00
+        RandomizedDelaySec=15m
+        Persistent=true
+
+        [Install]
+        WantedBy=timers.target
