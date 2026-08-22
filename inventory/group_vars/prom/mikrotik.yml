@@ -14,13 +14,13 @@ mktxp_config: >-
       "hostname": hostvars[h].ansible_host,
       "username": "prometheus",
       "password": lookup('community.general.passwordstore', 'network/mt_prom_pass'),
-      "dhcp": hostvars[h].mt_dhcp_servers is defined,
-      "dhcp_lease": hostvars[h].mt_dhcp_servers is defined,
-      "connection_stats": hostvars[h].mt_firewall_rules is defined,
-      "firewall": hostvars[h].mt_firewall_rules is defined,
-      "ipv6_firewall": hostvars[h].mt_firewall_rules_ipv6 is defined,
-      "route": hostvars[h].mt_firewall_rules is defined,
-      "bgp": hostvars[h].mt_bgp_peers is defined,
+      "dhcp": 'mt_dhcp_servers' in hostvars[h],
+      "dhcp_lease": 'mt_dhcp_servers' in hostvars[h],
+      "connection_stats": 'mt_firewall_rules' in hostvars[h],
+      "firewall": 'mt_firewall_rules' in hostvars[h],
+      "ipv6_firewall": 'mt_firewall_rules_ipv6' in hostvars[h],
+      "route": 'mt_firewall_rules' in hostvars[h],
+      "bgp": 'mt_bgp_peers' in hostvars[h],
     }
   }) -}}
   {%- endfor -%}
