@@ -1,0 +1,13 @@
+---
+
+groups:
+  - name: NUT Alerts
+    rules:
+      - alert: MikrotikErrorLogDetected
+        expr: count_over_time({job="mikrotik-syslog", level="error"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "MikroTik Error on {{ $labels.host }}"
+          description: "Router {{ $labels.host }} has generated error-level logs in the last 5 minutes. Topic: {{ $labels.topics }}."
