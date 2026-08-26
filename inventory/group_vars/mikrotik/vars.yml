@@ -34,16 +34,20 @@ mt_interface_list: >-
   {%- endfor -%}
   {{ tmp }}
 
+# NOTE: Ansible doesn't set some options (severity, time format)
+# set prom01 add-topics-string=yes syslog-severity=info
 mt_logging_actions: >-
   {%- set tmp = [] -%}
   {%- for h in groups['prom'] -%}
   {{- tmp.append({
+    "add-topics-string": "yes",
     "name": h,
+    "remote-port": hostvars[h].promtail_mt_syslog_port,
     "remote": hostvars[h].ansible_host,
-    "remote-port": 514,
-    "target": "remote",
     "src-address": host_ips.mgmt,
+    "syslog-severity": "info",
     "syslog-time-format": "bsd-syslog",
+    "target": "remote",
   }) -}}
   {%- endfor -%}
   {{ tmp }}

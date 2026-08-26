@@ -56,6 +56,10 @@ firewall_rules:
   - port: 514
     protocol: udp
     sources: ["{{ hostvars['udr7'].ansible_host }}", "{{ hostvars['udr7'].wireguard_ip }}"]
+  # Promtail syslog from Mikrotiks
+  - port: "{{ promtail_mt_syslog_port }}"
+    protocol: udp
+    sources: "{{ subnets.mgmt.switches }}"
   # Loki sends alerts too
   - port: "{{ alertmanager_port }}"
     sources: "{{ subnets.vm.loki }}"
