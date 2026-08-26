@@ -23,6 +23,7 @@ mt_ipv6_nd:
 mt_ipv6_dhcp_client:
   - pool-name: pool1
     interface: "{{ mt_wan_port }}"
+    script: "{{ lookup('template', repo_base_dir + '/files/mikrotik/cloudflare-ddns-dhcp-client.rsc.j2', template_vars={'ipv4': false}) }}"
     add-default-route: true
     request: address,prefix
 
@@ -73,3 +74,5 @@ mt_queue_simple:
     name: WAN
     queue: WAN-rx/WAN-tx
     target: "{{ mt_wan_port }}"
+
+mt_ddns_cf: "{{ vault_mt_ddns_cf }}"

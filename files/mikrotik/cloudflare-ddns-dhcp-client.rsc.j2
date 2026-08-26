@@ -1,0 +1,56 @@
+# https://github.com/klayf96/routeros-cloudflare-ddns/blob/main/cloudflare-ddns-dhcp-client.rsc
+# https://help.mikrotik.com/docs/spaces/ROS/pages/24805500/DHCP#DHCP-Properties
+# https://help.mikrotik.com/docs/spaces/ROS/pages/24805500/DHCP#DHCP-Properties.1
+
+{% if ipv4 %}
+:if ($bound=1) do={
+{% else %}
+:if ($"na-valid"=1) do={
+{% endif %}
+  :do {
+    :local cfDomainName "{{ mt_ddns_cf.name }}"
+    :local cfDNSZoneId  "{{ mt_ddns_cf.zone_id }}"
+
+    :local wanAddr $"{{ 'lease-address' if ipv4 else 'na-address' }}"
+    :delay 1s;
+
+    :local cfGetURL "https://api.cloudflare.com/client/v4/zones/$cfDNSZoneId/dns_records?type={{ 'A' if ipv4 else 'AAAA' }}&name=$cfDomainName"
+    :local cfHeader "Authorization: Bearer {{ mt_ddns_cf.token }}, Content-Type: application/json"
+    :local cfDNSGet ""
+    :local cfResult ""
+    :local cfDNSPut ""
+    :local numResults 0
+
+    :do {
+      :set cfDNSGet ([/tool/fetch mode=https check-certificate=yes http-method=get output=user http-header-field=$cfHeader url=$cfGetURL as-value]->"data")
+      :set cfResult ([:deserialize from=json value=$cfDNSGet]->"result")
+      :set numResults ([:len $cfResult])
+    } on-error={
+      :log error "[Cloudflare DDNS] failed to get records: $cfDNSGet"
+      :error "[Cloudflare DDNS] domain credentials are incorrect or the server cannot be accessed."
+    }
+
+    :if ($numResults=1) do={
+      :local cfDNSRecordId ($cfResult->0->"id")
+      :local cfDNSTtl      ($cfResult->0->"ttl")
+      :local cfDNSProxied  ($cfResult->0->"proxied")
+      :local cfPrevAddr    ($cfResult->0->"content")
+
+      :if ($cfPrevAddr=$wanAddr) do={
+        :log info "[Cloudflare DDNS] current IP address is already registered and will not be updated."
+      } else={
+        :do {
+          :local cfUpdateURL    "https://api.cloudflare.com/client/v4/zones/$cfDNSZoneId/dns_records/$cfDNSRecordId"
+          :local cfUpdateData   "{\"type\":\"{{ 'A' if ipv4 else 'AAAA' }}\",\"name\":\"$cfDomainName\",\"content\":\"$wanAddr\",\"ttl\":$cfDNSTtl,\"proxied\":$cfDNSProxied}"
+          :set cfDNSPut ([/tool/fetch mode=https check-certificate=yes http-method=put output=user http-header-field=$cfHeader http-data=$cfUpdateData url=$cfUpdateURL as-value]->"data")
+          :log info "[Cloudflare DDNS] DNS record updated: $cfPrevAddr -> $wanAddr"
+        } on-error={
+          :log error "[Cloudflare DDNS] PUT failed: $cfDNSPut"
+          :error "[Cloudflare DDNS] an error occurred while updating the dns record."
+          }
+      }
+    } else={
+      :log error "[Cloudflare DDNS] need exactly 1 {{ 'A' if ipv4 else 'AAAA' }} record for $cfDomainName, found $numResults."
+      }
+  }
+} else={:log warning "[Cloudflare DDNS] dhcp-client detected a change, waiting for an address lease."}

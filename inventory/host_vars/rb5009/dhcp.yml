@@ -14,6 +14,7 @@ mt_ip_pools: >-
 
 mt_dhcp_clients:
   - interface: "{{ mt_wan_port }}"
+    script: "{{ lookup('template', repo_base_dir + '/files/mikrotik/cloudflare-ddns-dhcp-client.rsc.j2', template_vars={'ipv4': true}) }}"
     disabled: false
 
 mt_dhcp_servers: >-
