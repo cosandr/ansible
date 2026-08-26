@@ -1,7 +1,7 @@
 ---
 
 # renovate: datasource=github-releases depName=go-acme/lego
-lego_version: "v5.3.1"
+lego_version: "v5.4.0"
 lego_certificates: >-
   {%- set tmp = {} -%}
   {%- for k, v in domains.items() -%}
