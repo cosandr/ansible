@@ -1,4 +1,4 @@
 ansible==14.2.0
 ansible-lint==26.6.0
-molecule==26.6.0 # https://github.com/ansible/molecule/releases
+molecule==26.8.0 # https://github.com/ansible/molecule/releases
 molecule-plugins[podman]==26.7.15 # https://github.com/ansible-community/molecule-plugins/releases
