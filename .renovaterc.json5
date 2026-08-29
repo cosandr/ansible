@@ -32,6 +32,7 @@
     {
       matchManagers: ["pip_requirements", "ansible-galaxy"],
       schedule: ["every 2 weeks on friday"],
+      groupName: "controller",
     },
   ],
 }
