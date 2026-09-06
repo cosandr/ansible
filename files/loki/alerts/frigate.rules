@@ -1,0 +1,12 @@
+---
+
+groups:
+  - name: Frigate Alerts
+    rules:
+      - alert: FrigateUnableToReadFrames
+        expr: count_over_time({container="frigate"} |= "Unable to read frames"[5m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Frigate is failing to read frames on {{ $labels.host }}"
