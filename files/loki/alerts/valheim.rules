@@ -1,0 +1,12 @@
+---
+
+groups:
+  - name: Valheim Alerts
+    rules:
+      - alert: ValheimFailedSave
+        expr: count_over_time({container="valheim"} |~ "(?i)error saving world"[5m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Valheim is failing to save world"
