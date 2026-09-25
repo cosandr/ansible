@@ -7,7 +7,23 @@ __promtail_scrape_configs_2:
           - localhost
         labels:
           job: gitlab
-          __path__: /var/log/gitlab/gitlab-rails/production_json.log
+          __path__: "/var/log/gitlab/gitlab-rails/{production,api}_json.log"
+
+    pipeline_stages:
+      - json:
+          expressions:
+            time: "time"
+
+      - timestamp:
+          source: time
+          format: RFC3339Nano
+
+      - template:
+          source: message
+          template: '{% raw %}{{ omit (mustFromJson .Entry) "time" | mustToJson }}{% endraw %}'
+
+      - output:
+          source: message
 
   - job_name: nginx
     static_configs:
