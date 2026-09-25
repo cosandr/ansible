@@ -15,6 +15,10 @@ __mt_ipv6_addresses_manual:
   - interface: GENERAL
     from-pool: pool1
     address: "{{ mt_wan_ipv6_pool | ansible.utils.ipsubnet(64, 1) | ansible.utils.ipaddr('1') }}"
+  # Needed for ::/0 to work from clients, i.e. NAT
+  - interface: WG1
+    from-pool: pool1
+    address: "{{ mt_wan_ipv6_pool | ansible.utils.ipsubnet(64, 2) | ansible.utils.ipaddr('1') }}"
 
 mt_ipv6_nd:
   - interface: all

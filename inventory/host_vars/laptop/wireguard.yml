@@ -4,6 +4,10 @@ wireguard_interface: "mt"
 wireguard_addresses:
   - "{{ wireguard_ip }}/{{ wg_net[host_wg_net].cidr | ansible.utils.ipaddr('prefix') | string }}"
 
+mt_wg_allowed_addresses:
+  - "{{ wireguard_addresses[0] | ansible.utils.ipaddr('address') | ansible.utils.ipaddr('host') }}"
+  - "::/0"
+
 wireguard_dns_list:
   - "{{ hostvars['rb5009'].wireguard_ip }}"
   - "{{ domains['hb'] }}"
