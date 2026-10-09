@@ -2,14 +2,15 @@
 # https://github.com/akpw/mktxp/blob/main/mktxp/cli/config/_mktxp.conf
 [MKTXP]
     listen = '{{ mktxp_listen_address }}'
-    socket_timeout = {{ mktxp_system_config.socket_timeout | default(30) }}
+    socket_timeout = {{ mktxp_system_config.socket_timeout | default(5) }}
 
     initial_delay_on_failure = {{ mktxp_system_config.initial_delay_on_failure | default(120) }}
     max_delay_on_failure = {{ mktxp_system_config.max_delay_on_failure | default(900) }}
     delay_inc_div = {{ mktxp_system_config.delay_inc_div | default(5) }}
 
-    bandwidth = {{ mktxp_system_config.bandwidth | default(true) }}
-    bandwidth_test_interval = {{ mktxp_system_config.bandwidth_test_interval | default(420) }}
+    bandwidth = {{ mktxp_system_config.bandwidth | default(false) }}
+    bandwidth_test_dns_server = {{ mktxp_system_config.bandwidth_test_dns_server | default('8.8.8.8') }}
+    bandwidth_test_interval = {{ mktxp_system_config.bandwidth_test_interval | default(600) }}
     minimal_collect_interval = {{ mktxp_system_config.minimal_collect_interval | default(5) }}
 
     verbose_mode = {{ mktxp_system_config.verbose_mode | default(false) }}
@@ -17,6 +18,52 @@
     fetch_routers_in_parallel = {{ mktxp_system_config.fetch_routers_in_parallel | default(true) }}
     max_worker_threads = {{ mktxp_system_config.max_worker_threads | default(5) }}
     max_scrape_duration = {{ mktxp_system_config.max_scrape_duration | default(30) }}
-    total_max_scrape_duration = {{ mktxp_system_config.total_max_scrape_duration | default(60) }}
+    total_max_scrape_duration = {{ mktxp_system_config.total_max_scrape_duration | default(90) }}
+    http_server_threads = {{ mktxp_system_config.http_server_threads | default(16) }}
 
+    persistent_router_connection_pool = {{ mktxp_system_config.persistent_router_connection_pool | default(true) }}
+    persistent_dhcp_cache = {{ mktxp_system_config.persistent_dhcp_cache | default(true) }}
     compact_default_conf_values = {{ mktxp_system_config.compact_default_conf_values | default(false) }}
+    prometheus_headers_deduplication = {{ mktxp_system_config.prometheus_headers_deduplication | default(false) }}
+
+    probe_connection_pool = {{ mktxp_system_config.probe_connection_pool | default(false) }}
+    probe_connection_pool_ttl = {{ mktxp_system_config.probe_connection_pool_ttl | default(300) }}
+    probe_connection_pool_max_size = {{ mktxp_system_config.probe_connection_pool_max_size | default(128) }}
+
+
+[RSC]
+    base_dir = './exports'                    # Default destination directory for split .rsc files
+    numbered_files = True                     # Prefix output files with numbers according to handler_order
+    wrap_lines = False                        # Wrap long command lines with backslashes
+    wrap_column = 80                          # Column width for line wrapping
+    extract_scripts = False                   # For the split command, extracts scripts to standalone .rsc sidecar files
+    strip_mac_addresses = False               # Strip dynamic MAC addresses
+    ssh_port = 22                             # Default SSH port for live exports
+    ssh_timeout = 15                          # SSH connection timeout in seconds
+    show_sensitive = False                    # Default sensitive data export setting
+
+    handler_order = base, wifi, system, ip, dhcp-leases, firewall, lte, wireguard
+
+    handler_base = /interface bridge, /interface ethernet, /interface vlan, /interface list, /interface macvlan, /interface ovpn-server
+    handler_wifi = /caps-man, /interface wifi, /interface wireless
+    handler_system = /system, /user, /certificate, /zerotier, /ppp, /queue, /snmp, /interface l2tp-server, /interface sstp-server, /ip smb, /ip neighbor discovery-settings, /ip settings, /ipv6 settings, /ip ipsec, /ip service, /ip ssh, /ipv6 nd, /routing bfd, /routing bgp, /routing ospf, /tool bandwidth-server, /tool mac-server, /tool romon, /tool e-mail, /tool netwatch, /tool traffic-monitor, /app, /ip kid-control, /caps-man access-list
+    handler_dhcp-leases = /ip dhcp-server lease
+    handler_ip = /ip address, /ipv6 address, /ip pool, /ipv6 pool, /ip dhcp-client, /ip dhcp-server, /ipv6 dhcp-client, /ipv6 dhcp-server, /ip dns, /ip route, /ipv6 route, /ip cloud, /routing table, /routing rule
+    handler_firewall = /ip firewall, /ipv6 firewall
+    handler_lte = /interface lte, /tool sms
+    handler_wireguard = /interface wireguard
+
+
+[DIAG]
+    # Wireless & CAPsMAN defaults
+    low_signal_threshold = -75          # Default dBm threshold for --low-signal (matches <= -75 dBm)
+    min_signal_threshold = -60          # Default dBm threshold for --min-signal (matches >= -60 dBm)
+    low_rate_threshold = '18M'          # Default rate for --low-rate (matches <= 18 Mbps)
+    recent_duration = '15m'             # Default duration for --recent (matches uptime <= 15m)
+
+    # IP Connections & Bandwidth defaults
+    top_connections_count = 10          # Default limit for connection stats --top
+    rate_above_threshold = '1M'         # Default rate for kid control / bandwidth --rate-above
+
+    # Interface Monitor defaults
+    degraded_threshold = '100M'         # Default rate for interface monitor --degraded (matches < 100 Mbps or half-duplex)

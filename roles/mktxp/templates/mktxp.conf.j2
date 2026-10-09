@@ -12,35 +12,52 @@
     # this affects configuration of all routers, unless overloaded on their specific levels
 
     enabled = True          # turns metrics collection for this RouterOS device on / off
+    module_only = False     # use this entry only as a probe module (skip /metrics collection)
     hostname = localhost    # RouterOS IP address
     port = 8729             # RouterOS IP Port
 
     username = username     # RouterOS user, needs to have 'read' and 'api' permissions
     password = password
+    credentials_file = ""   # To use an external file in YAML format for both username and password, specify the path here
+
+    custom_labels = None    # Custom labels to be injected to all device metrics, comma-separated key:value (or key=value) pairs
 
     use_ssl = True                  # enables connection via API-SSL servis
     no_ssl_certificate = False      # enables API_SSL connect without router SSL certificate
     ssl_certificate_verify = True   # turns SSL certificate verification on / off
+    ssl_check_hostname = True       # check if the hostname matches the peer cert’s hostname
+    ssl_ca_file = ""                # path to the certificate authority file to validate against, leave empty to use system store
     plaintext_login = True          # for legacy RouterOS versions below 6.43 use False
 
+    health = False                  # System Health metrics
     installed_packages = False      # Installed packages
     dhcp = False                    # DHCP general metrics
     dhcp_lease = False              # DHCP lease metrics
 
     connections = False             # IP connections metrics
     connection_stats = False        # Open IP connections metrics
+    connection_stats_destinations = False   # Set to True to track individual destination IPs/ports (Warning: High Cardinality)
 
-    interface = True                # Interfaces traffic metrics
+    interface = True                    # Interfaces traffic metrics
+    interface_with_default_name = False # Append default_name label to interface metrics
+    routerboard = False                 # RouterBOARD inventory / firmware metrics
+    wireguard_peers = False             # Wireguard peers metrics
+    bridge_vlan = False                 # Bridge VLAN metrics
 
-    route = False                   # IPv4 Routes metrics
-    pool = True                     # IPv4 Pool metrics
-    firewall = False                # IPv4 Firewall rules traffic metrics
-    neighbor = False                # IPv4 Reachable Neighbors
+    route = False                     # IPv4 Routes metrics
+    pool = True                       # IPv4 Pool metrics
+    firewall = False                  # IPv4 Firewall rules traffic metrics
+    neighbor = False                  # IPv4 Reachable Neighbors
+    address_list = None               # Firewall Address List metrics, a comma-separated list of names
+    total_address_list_counts = False # Firewall Address List total counts across all lists (set False if large lists cause timeouts)
+    dns = False                       # DNS stats
 
     ipv6_route = False              # IPv6 Routes metrics
     ipv6_pool = False               # IPv6 Pool metrics
     ipv6_firewall = False           # IPv6 Firewall rules traffic metrics
     ipv6_neighbor = False           # IPv6 Reachable Neighbors
+    ipv6_address_list = None        # IPv6 Firewall Address List metrics, a comma-separated list of names
+    ipv6_total_address_list_counts = False # IPv6 Firewall Address List total counts across all lists (set False if large lists cause timeouts)
 
     poe = False                     # POE metrics
     monitor = True                  # Interface monitor metrics
@@ -50,6 +67,14 @@
     wireless_clients = False        # WLAN clients metrics
     capsman = False                 # CAPsMAN general metrics
     capsman_clients = False         # CAPsMAN clients metrics
+    w60g = False                    # W60G metrics
+
+    eoip = False                    # EoIP status metrics
+    gre = False                     # GRE status metrics
+    ipip = False                    # IPIP status metrics
+    lte = False                     # LTE signal and status metrics (requires additional 'test' permission policy on RouterOS v6)
+    ipsec = False                   # IPSec active peer metrics
+    switch_port = False             # Switch Port metrics
 
     kid_control_assigned = False    # Allow Kid Control metrics for connected devices with assigned users
     kid_control_dynamic = False     # Allow Kid Control metrics for all connected devices, including those without assigned user
@@ -57,11 +82,18 @@
     user = False                    # Active Users metrics
     queue = False                   # Queues metrics
 
+    bfd = False                     # BFD sessions metrics
     bgp = False                     # BGP sessions metrics
+    routing_stats = False           # Routing process stats
+    certificate = False             # Certificates metrics
+
+    container = False               # Containers metrics
 
     remote_dhcp_entry = None        # An MKTXP entry to provide for remote DHCP info / resolution
     remote_capsman_entry = None     # An MKTXP entry to provide for remote capsman info
 
-    use_comments_over_names = False # when available, forces using comments over the interfaces names
-
+    interface_name_format = name    # Format to use for interface / resource names, allowed values: 'name', 'comment', or 'combined'
+                                        # 'name': use interface name only (e.g. 'ether1')
+                                        # 'comment': use comment if available, fallback to name if not
+                                        # 'combined': use both (e.g. 'ether1 (Office Switch)')
     check_for_updates = False       # check for available ROS updates
