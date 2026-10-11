@@ -1,0 +1,11 @@
+#!/usr/bin/env -S ansible-playbook
+---
+
+- name: Common server tasks
+  hosts: servers, !syno, !udr7
+  gather_facts: true
+  tasks:
+    - name: Include common tasks
+      ansible.builtin.include_tasks:
+        file: ../tasks/common_servers.yml
+      tags: ["always"]
