@@ -3,7 +3,7 @@
 vm_cpus: 16
 vm_mem: 32768
 
-vm_root_size: "100G"
+vm_root_size: "150G"
 
 vm_pci_devices:
   - address:

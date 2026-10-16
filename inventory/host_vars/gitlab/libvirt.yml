@@ -3,7 +3,7 @@
 vm_cpus: 4
 vm_mem: 12288
 
-vm_root_size: "20G"
+vm_root_size: "40G"
 vm_virtiofs_mounts:
   - source: "/mnt/nvme/gitlab"
     target: "gitlab-data"
