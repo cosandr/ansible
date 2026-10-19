@@ -56,7 +56,7 @@
 
     - name: Pin nvidia driver
       ansible.builtin.apt:
-        name: nvidia-driver-pinning-595
+        name: nvidia-driver-pinning-615
         state: present
       tags: ["nvidia"]
 
