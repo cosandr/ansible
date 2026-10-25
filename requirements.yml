@@ -12,7 +12,7 @@ collections:
   - name: community.routeros
     version: '3.22.0'
   - name: community.libvirt
-    version: '2.3.0'
+    version: '2.4.0'
   # https://github.com/hifis-net/ansible-collection-toolkit
   - name: hifis.toolkit
     version: '7.0.1'
