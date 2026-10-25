@@ -6,3 +6,6 @@ firewall_rules:
 
   - port: "{{ nvidia_exporter_port }}"
     sources: "{{ node_exporter_allow_ips }}"
+
+  - port: 32400
+    sources: "{{ [all_net.general.cidr, all_net.vm.cidr] + subnets.mt.trusted }}"
