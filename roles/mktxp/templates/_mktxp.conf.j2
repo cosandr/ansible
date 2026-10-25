@@ -30,6 +30,8 @@
     probe_connection_pool_ttl = {{ mktxp_system_config.probe_connection_pool_ttl | default(300) }}
     probe_connection_pool_max_size = {{ mktxp_system_config.probe_connection_pool_max_size | default(128) }}
 
+    enable_probe = {{ mktxp_system_config.enable_probe | default(false) }}
+    probe_allowed_targets = {{ mktxp_system_config.probe_allowed_targets | default('None') }}
 
 [RSC]
     base_dir = './exports'                    # Default destination directory for split .rsc files

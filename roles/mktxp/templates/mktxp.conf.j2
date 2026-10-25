@@ -13,6 +13,7 @@
 
     enabled = True          # turns metrics collection for this RouterOS device on / off
     module_only = False     # use this entry only as a probe module (skip /metrics collection)
+    probe_allowed_targets = None # Allowed probe targets for dynamic modules: CIDRs, IPs, hostnames (e.g. 192.168.88.0/24, *.corp.local, or * for all)
     hostname = localhost    # RouterOS IP address
     port = 8729             # RouterOS IP Port
 
@@ -49,6 +50,7 @@
     firewall = False                  # IPv4 Firewall rules traffic metrics
     neighbor = False                  # IPv4 Reachable Neighbors
     address_list = None               # Firewall Address List metrics, a comma-separated list of names
+    address_list_entries = False      # Emit individual address list entry metrics (set False if large lists cause high cardinality / only counts are needed)
     total_address_list_counts = False # Firewall Address List total counts across all lists (set False if large lists cause timeouts)
     dns = False                       # DNS stats
 
@@ -57,6 +59,7 @@
     ipv6_firewall = False           # IPv6 Firewall rules traffic metrics
     ipv6_neighbor = False           # IPv6 Reachable Neighbors
     ipv6_address_list = None        # IPv6 Firewall Address List metrics, a comma-separated list of names
+    ipv6_address_list_entries = False # Emit individual IPv6 address list entry metrics (set False if large lists cause high cardinality / only counts are needed)
     ipv6_total_address_list_counts = False # IPv6 Firewall Address List total counts across all lists (set False if large lists cause timeouts)
 
     poe = False                     # POE metrics
@@ -97,3 +100,6 @@
                                         # 'comment': use comment if available, fallback to name if not
                                         # 'combined': use both (e.g. 'ether1 (Office Switch)')
     check_for_updates = False       # check for available ROS updates
+
+    rsc_ssh_port = None             # Custom SSH port for live RSC exports (defaults to 22 if None)
+    rsc_ssh_user = None             # Custom SSH user for live RSC exports (defaults to router 'username' if None)
