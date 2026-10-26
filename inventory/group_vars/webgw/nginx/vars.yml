@@ -31,7 +31,6 @@ nginx_extra_conf_options: |
       abs.{{ domains['dv'] }} docker_traefik;
       dawarich.{{ domains['dv'] }} docker_traefik;
       immich.{{ domains['dv'] }} docker_traefik;
-      jellyfin.{{ domains['dv'] }} docker_traefik;
   {% endif %}
       default nginx_local;
     }
