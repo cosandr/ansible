@@ -20,7 +20,7 @@ Push certs if needed
 ansible localgw -m shell -a "{% for d in lego_certificates.keys() %}echo /usr/local/bin/pg-cert-push --name {{ d }} --public-key /etc/lego/certificates/{{ d }}.crt --private-key /etc/lego/certificates/{{ d }}.key --chain /etc/lego/certificates/{{ d }}.issuer.crt; {% endfor %}"
 ```
 
-## webgw
+## cloudgw
 
 After deploy, install pre-reqs
 
@@ -29,12 +29,12 @@ dnf install -y firewalld vim net-tools
 ```
 
 ```sh
-./playbooks/webgw.yml -l webgw01 -t user -e ansible_port=22
-./playbooks/webgw.yml -l webgw01 -t sshd
-./playbooks/webgw.yml -l webgw01
-ansible webgw01 -m dnf -a 'name=NetworkManager state=absent'
-ansible webgw01 -m dnf -a 'name=cloud-init state=absent'
-./playbooks/prom.yml -l webgw01
+./playbooks/webgw.yml -l cloudgw -t user -e ansible_port=22
+./playbooks/webgw.yml -l cloudgw -t sshd
+./playbooks/webgw.yml -l cloudgw
+ansible cloudgw -m dnf -a 'name=NetworkManager state=absent'
+ansible cloudgw -m dnf -a 'name=cloud-init state=absent'
+./playbooks/prom.yml -l cloudgw
 ```
 
 If restoring SSH host keys

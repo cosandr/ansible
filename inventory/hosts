@@ -28,7 +28,7 @@ u7pro       ansible_host="10.0.100.6"
 theia       ansible_host="10.0.100.16"
 unifios     ansible_host="10.0.100.112"
 syno        ansible_host="10.0.100.128"
-webgw01     wireguard_ip="10.4.20.80"
+cloudgw     wireguard_ip="10.4.20.80"
 udr7        wireguard_ip="10.4.20.98"
 # END AUTO GENERATED VARIABLES
 
@@ -129,7 +129,7 @@ gitrun01 host_num=0
 host_subnet=gitrun
 
 [prom_common]
-webgw01
+cloudgw
 
 [prom_common:children]
 prom
@@ -148,7 +148,7 @@ loki01 host_num=0
 host_subnet=loki
 
 [webgw]
-webgw01 host_wg_num=0
+cloudgw host_wg_num=0
 localgw
 
 [webgw:vars]

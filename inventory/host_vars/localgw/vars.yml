@@ -1,6 +1,6 @@
 ---
 
-# gitlab-ssh is on 22, consider adding second IP for consistency with webgw01?
+# gitlab-ssh is on 22, consider adding second IP for consistency with cloudgw?
 ansible_port: 5622
 
 nginx_exporter_web_listen_address: "{{ ansible_host }}:{{ nginx_exporter_port }}"
