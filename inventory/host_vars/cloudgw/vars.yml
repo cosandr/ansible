@@ -37,18 +37,8 @@ networkd_config:
     {% endfor %}
     Gateway=fe80::1
 
-  eth1: |
-    [Match]
-    Name=eth1
-
-    [Network]
-    DHCP=ipv4
-    LinkLocalAddressing=no
-    IPv6AcceptRA=no
-
 host_nic_names:
   - eth0
-  - eth1
 
 node_exporter_no_collectors:
   - mdadm
