@@ -6,6 +6,7 @@ custom_cas:
 crowdsec_collections:
   - crowdsecurity/traefik
   - gauth-fr/immich
+  - LePresidente/jellyfin
   - plague-doctor/audiobookshelf
 crowdsec_acquis_d:
   - name: immich
@@ -28,6 +29,12 @@ crowdsec_acquis_d:
       - /mnt/containers/traefik/data/log/*.log
       labels:
         type: traefik
+  - name: jellyfin
+    content: |
+      filenames:
+      - /mnt/containers/jellyfin/data/log/log_*.log
+      labels:
+        type: jellyfin
 crowdsec_scenarios:
   - name: dawarich-brute-force
     content: |
