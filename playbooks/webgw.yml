@@ -36,7 +36,7 @@
       vars:
         ssh_host_check: "{{ ansible_ssh_host }}"
         user_passwordless_sudo: true
-        user_groups: ["wheel"]
+        user_groups: ["sudo"]
       tags: ["user"]
 
 - name: Configure gateways

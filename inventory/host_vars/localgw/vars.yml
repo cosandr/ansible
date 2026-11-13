@@ -9,6 +9,3 @@ nginx_exporter_web_listen_address: "{{ ansible_host }}:{{ nginx_exporter_port }}
 wireguard_interface: false
 
 swapfile_size: 1G
-
-deb_packages:
-  - gnupg2

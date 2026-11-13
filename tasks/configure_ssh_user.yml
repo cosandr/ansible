@@ -54,4 +54,6 @@
       become: true
       check_mode: false
       changed_when: false
-      ansible.builtin.shell: /usr/bin/test $EUID -eq 0
+      ansible.builtin.shell:
+        cmd: "/usr/bin/test $EUID -eq 0"
+        executable: /bin/bash
