@@ -18,3 +18,11 @@ pgbackrest_repos:
   - path: /mnt/tank/backup/pgbackrest
     retention-full: "7"
     retention-diff: "3"
+
+pgbackrest_global_config:
+  log-level-file: "info"
+  log-level-console: "info"
+  start-fast: "y"
+  delta: "y"
+  # Required for PrivateTemp to work
+  lock-path: /var/lib/postgresql/pgbackrest-lock
