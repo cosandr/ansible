@@ -43,12 +43,6 @@
   hosts: webgw
   gather_facts: true
   pre_tasks:
-    - name: Install epel
-      ansible.builtin.include_role:
-        name: epel
-      tags: ["install"]
-      when: ansible_facts.os_family == 'RedHat'
-
     - name: Set fail2ban facts
       ansible.builtin.set_fact:
         fail2ban_ignoreip: "{{ (__f2b_extra_ignore + hostvars['laptop'].wireguard_mt_allowed_ips) | flatten }}"

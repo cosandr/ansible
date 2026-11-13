@@ -4,15 +4,6 @@
   tags: ["pkg"]
   when: ansible_facts.os_family is defined
   block:
-    - name: Install DNF packages
-      ansible.builtin.dnf:
-        name: "{{ dnf_packages }}"
-        state: present
-      when:
-        - dnf_packages | default([]) | length > 0
-        - ansible_facts.os_family == 'RedHat'
-      tags: ["dnf"]
-
     - name: Block APT packages
       ansible.builtin.copy:
         content: |
@@ -57,20 +48,6 @@
     follow: false
   when: resolv_config | default('') != ''
   tags: ["resolv"]
-
-- name: Install Rocky security repo
-  ansible.builtin.dnf:
-    name: rocky-release-security
-    state: present
-  when: ansible_facts.distribution == "Rocky"
-  tags: ["rocky"]
-
-- name: Install Rocky security repo GPG key
-  ansible.builtin.rpm_key:
-    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-Rocky-SIG-Security
-    state: present
-  when: ansible_facts.distribution == "Rocky"
-  tags: ["rocky"]
 
 - name: Setup hostname
   ansible.builtin.include_role:
@@ -157,14 +134,6 @@
   when: ansible_facts.os_family == 'Debian'
   tags: ["upgrades", "unattended-upgrades"]
 
-- name: Configure auto upgrades (RedHat)
-  ansible.builtin.include_role:
-    name: cosandr.dnf_automatic
-    apply:
-      tags: ["upgrades", "dnf_automatic"]
-  when: ansible_facts.os_family == 'RedHat'
-  tags: ["upgrades", "dnf_automatic"]
-
 - name: Setup custom CAs
   ansible.builtin.include_role:
     name: install_custom_ca
@@ -234,23 +203,6 @@
     enabled: true
   when: fstrim_timer_enabled | default(false)
   tags: ["fstrim"]
-
-- name: Check if dnf.conf exists
-  ansible.builtin.stat:
-    path: /etc/dnf/dnf.conf
-  register: __dnf_conf
-  tags: ["dnf"]
-
-- name: Disable deltarpm
-  community.general.ini_file:
-    path: /etc/dnf/dnf.conf
-    create: false
-    no_extra_spaces: true
-    section: main
-    option: deltarpm
-    value: false
-  when: __dnf_conf.stat.exists
-  tags: ["dnf"]
 
 - name: Setup NUT
   ansible.builtin.include_role:

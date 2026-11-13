@@ -21,7 +21,7 @@ groups:
       description: Node memory is filling up ({{ printf "%.2f" $value }}% active)
 
   - alert: HostSystemdServiceCrashed
-    expr: node_systemd_unit_state{state="failed", name!="dnf-makecache.service"} == 1
+    expr: node_systemd_unit_state{state="failed"} == 1
     for: 5m
     labels:
       severity: warning

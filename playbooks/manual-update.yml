@@ -1,28 +1,18 @@
 #!/usr/bin/env -S ansible-playbook
 ---
 
-- name: Upgrade OS with dnf or apt
+- name: Upgrade OS with apt
   hosts: servers, !romsto, !syno, !udr7
   gather_facts: true
   become: true
   strategy: free
   tasks:
-    - name: Upgrade with dnf # noqa package-latest
-      ansible.builtin.dnf:
-        name: '*'
-        state: latest
-        update_cache: true
-      register: __dnf_result
-      notify: Reboot
-      when: ansible_facts.os_family == 'RedHat'
-
     - name: Upgrade with apt
       ansible.builtin.apt:
         update_cache: true
         upgrade: dist
       register: __apt_result
       notify: Reboot
-      when: ansible_facts.os_family == 'Debian'
 
     # Even though dist-upgrade is used, old kernel versions remain, filling up /boot
     # autoremove cleans them up
@@ -32,14 +22,6 @@
         autoremove: true
       tags: ["autoremove"]
       register: __autoremove_result
-      when: ansible_facts.os_family == 'Debian'
-
-    - name: Print dnf results
-      ansible.builtin.debug:
-        msg: "{{ __dnf_result.results }}"
-      when:
-        - __dnf_result is defined
-        - __dnf_result.results | default([]) | length > 0
 
     - name: Print apt results
       ansible.builtin.debug:

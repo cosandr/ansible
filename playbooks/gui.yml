@@ -56,21 +56,6 @@
       when: ansible_facts.distribution == 'Archlinux'
       tags: ["pacman"]
   tasks:
-    - name: Enable resume dracut module
-      become: true
-      ansible.builtin.copy:
-        dest: /etc/dracut.conf.d/resume.conf
-        owner: root
-        group: root
-        mode: "0644"
-        content: |
-          add_dracutmodules+=" resume "
-      when:
-        - "'laptops' in group_names"
-        - ansible_facts.os_family == 'RedHat'
-      notify: Dracut regenerate
-      tags: ["hibernate"]
-
     - name: Install i3 packages (pacman)
       become: true
       community.general.pacman:
@@ -194,10 +179,6 @@
       when: ansible_facts.distribution == 'Archlinux'
 
   handlers:
-    - name: Dracut regenerate  # noqa no-changed-when
-      become: true
-      ansible.builtin.command: dracut -f --regenerate-all
-
     - name: Restart fwupd
       become: true
       ansible.builtin.systemd:
@@ -227,7 +208,6 @@
       tags: ["reflector"]
 
     - role: locale_conf
-      when: ansible_facts.os_family != 'RedHat'
       tags: ["locale"]
 
     - role: sudo

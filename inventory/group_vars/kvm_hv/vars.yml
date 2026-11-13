@@ -38,10 +38,6 @@ btrfs_subvols:
 btrfs_scrub_targets:
   - /
 
-__dnf_automatic_excludes_3:
-  - "libvirt*"
-  - "qemu*"
-
 __unattended_package_blacklist_3:
   - "libvirt.*"
   - "qemu.*"
