@@ -189,6 +189,34 @@
         postgres_service_name: "{{ postgresql_daemon }}"
       tags: ["prometheus-stack", "postgres_exporter"]
 
+  post_tasks:
+    - name: Ensure nginx default config is absent
+      ansible.builtin.file:
+        path: /etc/nginx/conf.d/default.conf
+        state: absent
+      tags: ["nginx"]
+      notify: Restart nginx
+
+    - name: Install nginx AppArmor profile
+      ansible.builtin.template:
+        src: "{{ repo_base_dir }}/files/theia/usr.sbin.nginx.j2"
+        dest: /etc/apparmor.d/usr.sbin.nginx
+        owner: root
+        group: root
+        mode: "0644"
+      tags: ["nginx", "apparmor"]
+      notify:
+        - Reload nginx appamor profile
+        - Restart nginx
   handlers:
+    - name: Reload nginx appamor profile # noqa no-changed-when
+      ansible.builtin.command:
+        cmd: apparmor_parser -r /etc/apparmor.d/usr.sbin.nginx
+
+    - name: Restart nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
+
     - name: Dracut regenerate  # noqa no-changed-when - handler
       ansible.builtin.command: dracut -f

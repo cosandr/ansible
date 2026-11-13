@@ -1,0 +1,57 @@
+{{ ansible_managed | comment }}
+
+# Starts in complain mode: remove "flags=(complain)" below to enforce.
+
+abi <abi/3.0>,
+
+#include <tunables/global>
+
+/usr/sbin/nginx flags=(complain) {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+  #include <abstractions/openssl>
+
+  # Master starts as root, binds its ports, then drops to the www-data user.
+  capability chown,
+  capability dac_override,
+  capability dac_read_search,
+  capability net_bind_service,
+  capability setgid,
+  capability setuid,
+  # capability sys_resource,   # needed if worker_rlimit_nofile is set above the default limit
+
+  # Sockets: TCP only
+  network inet stream,
+  network inet6 stream,
+
+  # Binary, self re-exec on binary upgrade (USR2), dynamic modules
+  /usr/sbin/nginx mrix,
+  /usr/lib/nginx/modules/*.so mr,
+
+  # Configuration
+  /etc/nginx/ r,
+  /etc/nginx/** r,
+
+  # Logs
+  /var/log/nginx/ r,
+  /var/log/nginx/** rw,
+
+  # Runtime
+  /run/nginx.pid rw,
+  /run/nginx.lock rw,
+
+  # http{} temp/cache dirs (client bodies, proxy buffering)
+  /var/cache/nginx/ r,
+  /var/cache/nginx/** rwk,
+
+  # Static files (direct, main, /pip aliases, autoindex listings), read-only
+  /var/www/ r,
+  /var/www/** r,
+
+  # php-fpm
+  /run/php/php-fpm.sock rw,
+
+  # Signalling between master and workers, and from systemd (reload/stop)
+  signal (send, receive) peer=/usr/sbin/nginx,
+  signal (receive) peer=unconfined,
+}
