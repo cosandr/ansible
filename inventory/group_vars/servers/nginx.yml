@@ -31,7 +31,9 @@ nginx_extra_http_options: |
       default upgrade;
       ''      close;
   }
-
+  {% if nginx_secret_configs | default([]) | selectattr('name', 'eq', 'crowdsec_metrics_token.conf') %}
+  include /etc/nginx/crowdsec_metrics_token.conf;
+  {% endif %}
 
 nginx_provisioning_synced: true
 nginx_remove_default_vhost: true

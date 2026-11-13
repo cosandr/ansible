@@ -71,3 +71,15 @@
     group: root
     mode: "0644"
   tags: ["nginx", "logrotate"]
+
+- name: Add secret configs
+  ansible.builtin.copy:
+    content: "{{ item.content }}"
+    dest: "/etc/nginx/{{ item.name }}"
+    owner: root
+    group: root
+    mode: "0600"
+  loop: "{{ nginx_secret_configs }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: ["nginx"]

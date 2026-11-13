@@ -1,0 +1,14 @@
+---
+
+nginx_secret_configs:
+  - name: crowdsec_metrics_token.conf
+    content: |
+      map $http_authorization $crowdsec_metrics_authorized {
+        default 0;
+        "Bearer {{ vault_crowdsec_metrics_token }}" 1;
+      }
+
+__nginx_vhosts_1:
+  - filename: direct.conf
+    server_name: direct
+    template: "{{ repo_base_dir }}/files/webgw/nginx/direct.conf.j2"
