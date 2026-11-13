@@ -6,6 +6,12 @@ crowdsec_machines: >-
   {%- for h in groups['servers'] if hostvars[h].crowdsec_installed | default(false) -%}
   {{- tmp.append({"name": hostvars[h].crowdsec_local_api_credentials.login, "password": hostvars[h].crowdsec_local_api_credentials.password}) -}}
   {%- endfor -%}
+  {{- tmp.append(
+    {
+      "name": "crowdsec-web-ui",
+      "password": lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits'], length=24, seed='crowdsec-web-ui' ~ vault_crowdsec_lapi_seed)
+    }
+  ) -}}
   {{ tmp }}
 crowdsec_api_server_tls:
   cert_file: "/etc/ssl/localcerts/crowdsec.crt"
