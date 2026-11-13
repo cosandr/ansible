@@ -1,0 +1,11 @@
+---
+
+- name: Update CA trust EL # noqa no-changed-when
+  listen: Update CA trust
+  ansible.builtin.command: /usr/bin/update-ca-trust
+  when: ansible_facts.os_family == 'RedHat'
+
+- name: Update CA trust Debian # noqa no-changed-when
+  listen: Update CA trust
+  ansible.builtin.command: /usr/sbin/update-ca-certificates
+  when: ansible_facts.os_family == 'Debian'

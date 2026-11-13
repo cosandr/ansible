@@ -1,0 +1,9 @@
+---
+
+custom_cas: []
+  # - name: example.crt
+  #   src: path_to_crt.crt
+  #   # optional
+  #   owner: someone
+  #   group: someone
+  #   mode: "0640"

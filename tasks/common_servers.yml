@@ -165,6 +165,14 @@
   when: ansible_facts.os_family == 'RedHat'
   tags: ["upgrades", "dnf_automatic"]
 
+- name: Setup custom CAs
+  ansible.builtin.include_role:
+    name: install_custom_ca
+    apply:
+      tags: ["ca"]
+  tags: ["ca"]
+  when: custom_cas | default([]) | length > 0
+
 - name: Setup node exporter
   ansible.builtin.include_role:
     name: node_exporter

@@ -1,0 +1,18 @@
+---
+
+- name: Copy custom CAs
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ __path }}/{{ item.name }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0644') }}"
+  vars:
+    __path_deb: "/usr/local/share/ca-certificates"
+    __path_el: "/etc/pki/ca-trust/source/anchors"
+    __path: "{{ __path_el if ansible_facts.os_family == 'RedHat' else __path_deb }}"
+  loop: "{{ custom_cas }}"
+  notify: Update CA trust
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers

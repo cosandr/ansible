@@ -6,3 +6,7 @@ prometheus_blackbox_icmp_targets:
   - "{{ wireguard_ip | default(ansible_host) }}"
   - "google.com"
   - "1.1.1.1"
+
+custom_cas:
+  - name: "mt-ca.crt"
+    src: "{{ repo_base_dir }}/files/mikrotik/ca.crt"
