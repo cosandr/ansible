@@ -1,0 +1,50 @@
+---
+
+crowdsec_installed: true
+custom_cas:
+  - "{{ cloudgw_custom_ca }}"
+crowdsec_collections:
+  - crowdsecurity/traefik
+  - gauth-fr/immich
+  - plague-doctor/audiobookshelf
+crowdsec_acquis_d:
+  - name: immich
+    content: |
+      source: docker
+      container_name:
+        - immich_server
+      labels:
+        type: immich
+  - name: audiobookshelf
+    content: |
+      source: docker
+      container_name:
+        - audiobookshelf
+      labels:
+        type: audiobookshelf
+  - name: traefik
+    content: |
+      filenames:
+      - /mnt/containers/traefik/data/log/*.log
+      labels:
+        type: traefik
+crowdsec_scenarios:
+  - name: dawarich-brute-force
+    content: |
+      {% raw %}
+      type: leaky
+      name: user/dawarich-brute-force
+      description: "Detect Dawarich sign-in brute force via Traefik router"
+      filter: "evt.Meta.service == 'http' && evt.Parsed.traefik_router_name == 'dawarich@docker' && evt.Parsed.request_uri == '/users/sign_in' && evt.Parsed.verb == 'POST'"
+      capacity: 5
+      leakspeed: "10s"
+      blackhole: "15m"
+      groupby: evt.Meta.source_ip
+      labels:
+        service: http
+        confidence: 3
+        scope: ip
+        remediation: true
+        type: brute-force
+        message: "Dawarich brute-force attack detected from {{evt.Meta.source_ip}}"
+      {% endraw %}

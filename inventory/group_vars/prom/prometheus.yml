@@ -43,6 +43,18 @@ __prom_cadvisor_configs: >-
   {%- endfor -%}
   {{ tmp }}
 
+__prom_crowdsec_configs: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups[__prom_auto_target_group] if hostvars[h].prometheus_crowdsec_targets | default([]) | length > 0 -%}
+  {{- tmp.append(
+    {
+      "targets": hostvars[h].prometheus_crowdsec_targets,
+      "labels": hostvars[h].prometheus_node_labels,
+    }
+  ) -}}
+  {%- endfor -%}
+  {{ tmp }}
+
 __extra_prometheus_scrape_configs:
   - job_name: 'blackbox_http4'
     scrape_interval: 1m
@@ -210,9 +222,7 @@ __extra_prometheus_scrape_configs:
 
   - job_name: 'crowdsec'
     scrape_interval: 1m
-    static_configs:
-      - targets: ["{{ hostvars['cloudgw'].wireguard_ip }}:6060"]
-        labels: "{{ hostvars['cloudgw'].prometheus_node_labels }}"
+    static_configs: "{{ __prom_crowdsec_configs }}"
 
   - job_name: 'nginx'
     scrape_interval: 60s

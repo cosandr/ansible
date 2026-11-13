@@ -1,0 +1,50 @@
+---
+
+- name: Register previously copied files
+  ansible.builtin.find:
+    paths: "{{ __crowdsec_sync_dir }}"
+    patterns:
+      - "ansible.*.yaml"
+  register: __crowdsec_present
+  when: crowdsec_provisioning_synced
+
+- name: Configure files
+  ansible.builtin.copy:
+    dest: "{{ __crowdsec_sync_dir }}/ansible.{{ item.name }}.yaml"
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      {{ ansible_managed | comment }}
+      {{ item.content }}
+  loop: "{{ (__crowdsec_sync_items | selectattr('state', 'undefined') | list) + (__crowdsec_sync_items | selectattr('state', 'defined') | selectattr('state', 'eq', 'present') | list) }}"
+  loop_control:
+    label: "{{ item.name }}"
+  register: __crowdsec_copied
+  notify: Restart CrowdSec
+
+- name: Delete absent files
+  ansible.builtin.file:
+    path: "{{ __crowdsec_sync_dir }}/ansible.{{ item.name }}.yaml"
+    state: absent
+  loop: "{{ __crowdsec_sync_items | selectattr('state', 'defined') | selectattr('state', 'eq', 'absent') | list }}"
+  loop_control:
+    label: "{{ item.name }}"
+  notify: Restart CrowdSec
+
+- name: Set synchronize facts
+  ansible.builtin.set_fact:
+    __crowdsec_present_list: "{{ __crowdsec_present | json_query('files[*].path') | default([]) }}"
+    __crowdsec_copied_list: "{{ __crowdsec_copied_tmp + __crowdsec_copied_tmp_check }}"
+  vars:
+    __crowdsec_copied_tmp: "{{ __crowdsec_copied.results | json_query('[*].dest') | default([]) }}"
+    __crowdsec_copied_tmp_check: "{{ __crowdsec_copied.results | json_query('[*].invocation.dest') | default([]) }}"
+  when: crowdsec_provisioning_synced
+
+- name: Remove files not present on deployer machine (synchronize)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ __crowdsec_present_list | difference(__crowdsec_copied_list) }}"
+  when: crowdsec_provisioning_synced
+  notify: Restart CrowdSec

@@ -1,0 +1,40 @@
+---
+
+crowdsec_prometheus_listen_addr: ""
+crowdsec_prometheus_listen_port: 6060
+crowdsec_api_server_enable: true
+crowdsec_api_server_listen_uri: "127.0.0.1:8080"
+crowdsec_api_server_trusted_ips:
+  - 127.0.0.1
+  - ::1
+crowdsec_api_server_tls: {}
+  # cert_file: /etc/crowdsec/ssl/cert.pem
+  # key_file: /etc/crowdsec/ssl/key.pem
+crowdsec_local_api_credentials: {}
+  # url: https://crowdsec.example.com:8080
+  # user: user
+  # password: password
+crowdsec_machines: {}
+  # - name: example
+  #   password: yep
+crowdsec_firewall_bouncer_installed: false
+crowdsec_collections: []
+crowdsec_acquis_d: []
+  # - name: nginx
+  #   content: |
+  #     filenames:
+  #       - /var/log/nginx/sites/*.log
+  #     labels:
+  #       type: nginx
+  #     source: file
+crowdsec_provisioning_synced: true
+crowdsec_allowlists: []
+  # - name: home_internet
+  #   description: "Home IPs"
+  #   items:
+  #     - 10.0.0.1
+  #     - 2001:db8::10:1
+crowdsec_scenarios: []
+  # - name: example
+  #   content: |
+  #     stuff

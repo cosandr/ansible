@@ -34,10 +34,13 @@ __firewall_rules_1:
     zone: internal
     sources: "{{ node_exporter_allow_ips }}"
 
-  # https://doc.crowdsec.net/docs/next/observability/prometheus
-  - port: "6060"
+  - port: "{{ crowdsec_prometheus_listen_port }}"
     zone: internal
     sources: "{{ node_exporter_allow_ips }}"
+
+  - port: "8080"
+    zone: internal
+    sources: ["{{ all_net.vm.cidr }}"]
 
 mt_firewall_address_lists:
   - address: "{{ wireguard_ip }}"

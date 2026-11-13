@@ -49,6 +49,10 @@ __firewall_rules_2:
     zone: internal
     sources: "{{ wireguard_interface | default(false) | ternary(node_exporter_allow_ips, []) }}"
 
+  - port: "{{ crowdsec_prometheus_listen_port }}"
+    zone: internal
+    sources: "{{ wireguard_interface | default(false) | ternary(node_exporter_allow_ips, []) }}"
+
 __firewall_rules_3: >-
   {%- set tmp = [] -%}
   {%- if wireguard_endpoint is defined -%}

@@ -71,7 +71,47 @@
       ansible.builtin.include_tasks:
         file: ../tasks/common_servers.yml
       tags: ["always"]
+
+    - name: Create /etc/ssl/localcerts
+      ansible.builtin.file:
+        path: /etc/ssl/localcerts
+        owner: root
+        group: root
+        mode: "0755"
+        state: directory
+      when: ownca_cert_list is defined
+      tags: ["ownca"]
+
+    - name: Copy Crowdsec public key
+      ansible.builtin.copy:
+        src: "{{ ownca_cert_list[0].publickey_path }}"
+        dest: "{{ crowdsec_api_server_tls.cert_file }}"
+        owner: root
+        group: root
+        mode: "0644"
+      when:
+        - ownca_cert_list is defined
+        - crowdsec_api_server_tls is defined
+      tags: ["ownca"]
+
+    - name: Copy Crowdsec private key
+      ansible.builtin.copy:
+        src: "{{ ownca_cert_list[0].privatekey_path }}"
+        dest: "{{ crowdsec_api_server_tls.key_file }}"
+        owner: root
+        group: root
+        mode: "0600"
+      when:
+        - ownca_cert_list is defined
+        - crowdsec_api_server_tls is defined
+      tags: ["ownca"]
   roles:
+    - role: ownca
+      tags: ["ownca"]
+      when:
+        - ownca_cert_list is defined
+        - "'generate' in ansible_run_tags"
+
     - role: wireguard
       when: wireguard_addresses is defined
       tags: ["wireguard"]

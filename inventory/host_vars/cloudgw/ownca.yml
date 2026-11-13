@@ -1,0 +1,21 @@
+---
+
+ca_passphrase: "{{ lookup('community.general.passwordstore', 'ansible/cloudgw_ca_pass') }}"
+ca_privatekey_path: "{{ repo_base_dir }}/files/cloudgw/ca.key"
+
+ownca_ca_list:
+  - cn: "{{ inventory_hostname }} CA"
+    passphrase: "{{ ca_passphrase }}"
+    publickey_path: "{{ cloudgw_custom_ca.src }}"
+    privatekey_path: "{{ ca_privatekey_path }}"
+
+ownca_cert_list:
+  - privatekey_path: "{{ repo_base_dir }}/files/cloudgw/crowdsec.key"
+    publickey_path: "{{ repo_base_dir }}/files/cloudgw/crowdsec.crt"
+    cn: "{{ inventory_hostname }}-crowdsec"
+    subject_alt_name:
+      - "DNS:cloudgw.{{ all_net.mt.domain }}"
+      - "IP:{{ wireguard_ip }}"
+    ca_passphrase: "{{ ca_passphrase }}"
+    ca_publickey_path: "{{ cloudgw_custom_ca.src }}"
+    ca_privatekey_path: "{{ ca_privatekey_path }}"

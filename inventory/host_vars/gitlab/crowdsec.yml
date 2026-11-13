@@ -1,0 +1,14 @@
+---
+
+crowdsec_installed: true
+custom_cas:
+  - "{{ cloudgw_custom_ca }}"
+crowdsec_collections:
+  - timokoessler/gitlab
+crowdsec_acquis_d:
+  - name: gitlab
+    content: |
+      filenames:
+      - /var/log/gitlab/gitlab-rails/production_json.log
+      labels:
+        type: gitlab

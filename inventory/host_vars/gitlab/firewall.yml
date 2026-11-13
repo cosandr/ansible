@@ -21,6 +21,9 @@ firewall_rules:
   - port: "{{ node_exporter_port }}"
     zone: internal
 
+  - port: "{{ crowdsec_prometheus_listen_port }}"
+    zone: internal
+
 firewalld_services:
   - name: cockpit
     zone: public

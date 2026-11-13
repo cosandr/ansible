@@ -1,0 +1,14 @@
+---
+
+crowdsec_installed: true
+custom_cas:
+  - "{{ cloudgw_custom_ca }}"
+crowdsec_acquis_d:
+  - name: nginx
+    content: |
+      filenames:
+        - {{ nginx_sites_logs }}/*.log
+        - /var/log/nginx/*.log
+      labels:
+        type: nginx
+      source: file

@@ -1,0 +1,269 @@
+---
+
+- name: Add CrowdSec repository (Debian)
+  ansible.builtin.deb822_repository:
+    name: crowdsec
+    types: [deb]
+    uris: https://packagecloud.io/crowdsec/crowdsec/any
+    suites: [any]
+    components: [main]
+    signed_by: https://packagecloud.io/crowdsec/crowdsec/gpgkey
+    state: present
+  when: ansible_facts.os_family == 'Debian'
+  tags: ["install"]
+
+- name: Add CrowdSec repository (DNF)
+  ansible.builtin.copy:
+    dest: "/etc/yum.repos.d/crowdsec_crowdsec.repo"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    content: |
+      [crowdsec_crowdsec]
+      name=crowdsec_crowdsec
+      baseurl=https://packagecloud.io/crowdsec/crowdsec/rpm_any/rpm_any/$basearch
+      repo_gpgcheck=1
+      gpgcheck=1
+      enabled=1
+      gpgkey=https://packagecloud.io/crowdsec/crowdsec/gpgkey
+             https://packagecloud.io/crowdsec/crowdsec/gpgkey/crowdsec-crowdsec-C822EDD6B39954A1.pub.gpg
+             https://packagecloud.io/crowdsec/crowdsec/gpgkey/crowdsec-crowdsec-FED78314A2468CCF.pub.gpg
+      sslverify=1
+      sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+      metadata_expire=3600
+  when: ansible_facts.os_family == 'RedHat'
+  tags: ["install"]
+
+- name: Install CrowdSec
+  ansible.builtin.package:
+    name: crowdsec
+    state: present
+    # DNF doesn't need this, apt would fail to find package after fresh repo install
+    update_cache: "{{ ansible_facts.os_family == 'Debian' }}"
+  tags: ["install"]
+
+- name: Install or uninstall firewall bouncer
+  ansible.builtin.package:
+    name: crowdsec-firewall-bouncer-nftables
+    state: "{{ 'present' if crowdsec_firewall_bouncer_installed else 'absent' }}"
+  tags: ["install"]
+
+- name: Copy config file
+  ansible.builtin.template:
+    src: config.yaml.j2
+    dest: /etc/crowdsec/config.yaml
+    owner: root
+    group: root
+    mode: "0600"
+    validate: "crowdsec -t -c %s"
+  notify: Restart CrowdSec
+
+- name: Configure LAPI credentials
+  ansible.builtin.copy:
+    content: |
+      {{ ansible_managed | comment }}
+      {{ crowdsec_local_api_credentials | to_nice_yaml(indent=2) }}
+    dest: /etc/crowdsec/local_api_credentials.yaml
+    owner: root
+    group: root
+    mode: "0600"
+  when: crowdsec_local_api_credentials | length > 0
+  notify: Restart CrowdSec
+
+- name: Ensure CrowdSec is enabled and running
+  ansible.builtin.systemd:
+    name: crowdsec.service
+    enabled: true
+    state: started
+
+# [
+#   {
+#     "created_at": "2026-11-03T21:48:05.677675762Z",
+#     "updated_at": "2026-11-03T21:48:05.677675922Z",
+#     "last_push": "2026-11-03T21:48:05.677676042Z",
+#     "machineId": "test",
+#     "isValidated": true,
+#     "auth_type": "password",
+#     "os": "?"
+#   }
+# ]
+- name: Configure machines
+  tags: ["machines"]
+  when: crowdsec_api_server_enable
+  block:
+    - name: Get current machines
+      ansible.builtin.command:
+        cmd: "cscli machines list -o json"
+      changed_when: false
+      check_mode: false
+      register: __machines_list
+
+    - name: Parse current machines
+      ansible.builtin.set_fact:
+        crowdsec_machines_list: "{{ __machines_list.stdout | from_json }}"
+
+    - name: Add missing machines
+      ansible.builtin.command:
+        cmd: "cscli machine add {{ item.name }} --password {{ item.password }} -f /dev/null"
+      register: __output
+      changed_when: "'successfully added' in __output.stderr"
+      loop: "{{ crowdsec_machines | rejectattr('name', 'in', crowdsec_machines_list | map(attribute='machineId') | list) | list }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Set facts for machines
+      ansible.builtin.set_fact:
+        crowdsec_machines_delete: >-
+          {%- set tmp = [] -%}
+          {%- for m in crowdsec_machines_list if m['machineId'] not in (crowdsec_machines | map(attribute='name')) -%}
+          {{- tmp.append(m['machineId']) -}}
+          {%- endfor -%}
+          {{ tmp }}
+
+    - name: Remove machines not in list
+      ansible.builtin.command:
+        cmd: "cscli machine delete {{ item }}"
+      register: __output
+      changed_when: "'deleted successfully' in __output.stderr"
+      loop: "{{ crowdsec_machines_delete }}"
+
+# {
+#  "collections": [
+#   {
+#    "name": "crowdsecurity/auditd",
+#    "local_version": "0.7",
+#    "local_path": "/etc/crowdsec/collections/auditd.yaml",
+#    "description": "auditd support : parsers and scenarios",
+#    "utf8_status": "✔️  enabled",
+#    "status": "enabled"
+#   }
+#  ]
+# }
+- name: Configure collections
+  when: crowdsec_collections | length > 0
+  tags: ["collections"]
+  block:
+    - name: Get current collections
+      ansible.builtin.command:
+        cmd: "cscli collections list -o json"
+      changed_when: false
+      check_mode: false
+      register: __collections_list
+
+    - name: Parse current collections
+      ansible.builtin.set_fact:
+        crowdsec_collections_list: "{{ (__collections_list.stdout | from_json)['collections'] }}"
+
+    - name: Install missing collections
+      ansible.builtin.command:
+        cmd: "cscli collections install {{ missing_collections | join(' ') }}"
+      register: __output
+      changed_when: "'Nothing to install or remove' not in __output.stdout"
+      vars:
+        missing_collections: "{{ crowdsec_collections | difference(crowdsec_collections_list | map(attribute='name')) }}"
+      notify: Restart CrowdSec
+      when: missing_collections | length > 0
+
+- name: Sync acquisition files
+  ansible.builtin.include_tasks:
+    file: sync_d.yml
+    apply:
+      tags: ["acquis"]
+  vars:
+    __crowdsec_sync_dir: /etc/crowdsec/acquis.d
+    __crowdsec_sync_items: "{{ crowdsec_acquis_d }}"
+  tags: ["acquis"]
+
+- name: Sync scenarios
+  ansible.builtin.include_tasks:
+    file: sync_d.yml
+    apply:
+      tags: ["scenarios"]
+  vars:
+    __crowdsec_sync_dir: /etc/crowdsec/scenarios
+    __crowdsec_sync_items: "{{ crowdsec_scenarios }}"
+  tags: ["scenarios"]
+
+# [
+#   {
+#     "created_at": "2026-02-20T20:52:54.826Z",
+#     "description": "Home public IPs",
+#     "items": [
+#       {
+#         "created_at": "2026-02-20T20:57:20.693Z",
+#         "expiration": "0001-01-01T00:00:00.000Z",
+#         "value": "<redacted>"
+#       }
+#     ],
+#     "name": "home_internet",
+#     "updated_at": "2026-02-20T20:57:20.694Z"
+#   }
+# ]
+- name: Configure allowlist
+  tags: ["allowlist"]
+  when: crowdsec_api_server_enable
+  block:
+    - name: Get current allowlists
+      ansible.builtin.command:
+        cmd: "cscli allowlist list -o json"
+      changed_when: false
+      check_mode: false
+      register: __allowlist_list
+
+    - name: Parse current allowlists
+      ansible.builtin.set_fact:
+        crowdsec_allowlist_list: "{{ __allowlist_list.stdout | from_json }}"
+
+    - name: Set allowlist facts
+      ansible.builtin.set_fact:
+        # map + difference keeps only name, need full item
+        crowdsec_missing_allowlists: >-
+          {%- set tmp = [] -%}
+          {%- for item in crowdsec_allowlists if item['name'] not in (crowdsec_allowlist_list | map(attribute='name')) -%}
+          {{- tmp.append(item) -}}
+          {%- endfor -%}
+          {{ tmp }}
+        crowdsec_extra_allowlist_values: >-
+          {%- set tmp = [] -%}
+          {%- for item in crowdsec_allowlists -%}
+          {%- for actual_item in crowdsec_allowlist_list if actual_item["name"] == item["name"] -%}
+          {%- set val_diff = (actual_item["items"] | map(attribute='value')) | difference(item["items"]) -%}
+          {%- if val_diff | length > 0 -%}
+          {{- tmp.append({"name": item["name"], "items": val_diff}) -}}
+          {%- endif -%}
+          {%- endfor -%}
+          {%- endfor -%}
+          {{ tmp }}
+
+    - name: Create missing allowlists
+      ansible.builtin.command:
+        argv: ["cscli", "allowlist", "create", "{{ item.name }}", "-d", "{{ item.description }}"]
+      register: __out
+      changed_when: "'created successfully' in __out.stdout"
+      loop: "{{ crowdsec_missing_allowlists }}"
+
+    # Adding all is safe, only what's missing is added
+    - name: Add configured values to allowlist
+      ansible.builtin.command:
+        cmd: "cscli allowlist add {{ item.name }} {{ item['items'] | join(' ') }}"
+      register: __out
+      changed_when: "'added' in __out.stdout"
+      loop: "{{ crowdsec_allowlists }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Remove extra values from allowlist
+      ansible.builtin.command:
+        cmd: "cscli allowlist remove {{ item.name }} {{ item['items'] | join(' ') }}"
+      register: __out
+      changed_when: "'removed' in __out.stdout"
+      loop: "{{ crowdsec_extra_allowlist_values }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Remove extra allowlists
+      ansible.builtin.command:
+        cmd: "cscli allowlist delete {{ item }}"
+      register: __out
+      changed_when: "'deleted successfully' in __out.stdout"
+      loop: "{{ (crowdsec_allowlist_list | map(attribute='name')) | difference(crowdsec_allowlists | map(attribute='name')) }}"

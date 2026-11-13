@@ -49,3 +49,17 @@ root_pass_hash: "{{ lookup('community.general.passwordstore', 'ansible/server_ro
 smartctl_exporter_version: "0.15.0"
 smartctl_exporter_port: 9633
 smartctl_exporter_listen_address: "{{ host_ips.vm | default(ansible_host) }}:{{ smartctl_exporter_port }}"
+crowdsec_api_server_enable: false
+crowdsec_prometheus_listen_addr: "{{ wireguard_ip | default(ansible_host) }}"
+crowdsec_prometheus_listen_port: 6060
+crowdsec_local_api_credentials:
+  url: "https://{{ hostvars['cloudgw'].wireguard_ip }}:8080"
+  login: "{{ inventory_hostname }}"
+  password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits'], length=24, seed=inventory_hostname ~ vault_crowdsec_lapi_seed) }}"
+
+cloudgw_custom_ca:
+  name: "cloudgw-ca.crt"
+  src: "{{ repo_base_dir }}/files/cloudgw/ca.crt"
+
+__prometheus_crowdsec_targets: ["{{ crowdsec_prometheus_listen_addr + ':' + crowdsec_prometheus_listen_port | string }}"]
+prometheus_crowdsec_targets: "{{ __prometheus_crowdsec_targets if crowdsec_installed | default(false) else [] }}"

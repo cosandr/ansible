@@ -277,3 +277,11 @@
       tags: ["postfix"]
   when: postfix_main_config | default([]) | length > 0
   tags: ["postfix"]
+
+- name: Setup Crowdsec
+  ansible.builtin.include_role:
+    name: crowdsec
+    apply:
+      tags: ["crowdsec"]
+  tags: ["crowdsec"]
+  when: crowdsec_installed | default(false)

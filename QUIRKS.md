@@ -53,3 +53,5 @@ If restoring SSH host keys
 chmod 600 /etc/ssh/ssh_host_{ecdsa,ed25519,rsa}_key
 systemctl restart sshd
 ```
+
+Need to fix crowdsec bouncer api_url in `/etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml` after LAPI URL is changed from localhost. Then restart it with `systemctl restart crowdsec-firewall-bouncer`

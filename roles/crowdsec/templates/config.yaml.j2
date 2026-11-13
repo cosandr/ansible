@@ -1,0 +1,64 @@
+# https://github.com/crowdsecurity/crowdsec/blob/master/config/config.yaml
+# https://docs.crowdsec.net/docs/configuration/crowdsec_configuration/#configuration-directives
+common:
+  daemonize: true
+  log_media: file
+  log_level: info
+  log_dir: /var/log/
+  log_max_size: 20
+  compress_logs: true
+  log_max_files: 10
+config_paths:
+  config_dir: /etc/crowdsec/
+  data_dir: /var/lib/crowdsec/data/
+  simulation_path: /etc/crowdsec/simulation.yaml
+  hub_dir: /etc/crowdsec/hub/
+  index_path: /etc/crowdsec/hub/.index.json
+  notification_dir: /etc/crowdsec/notifications/
+  plugin_dir: /usr/lib64/crowdsec/plugins/
+crowdsec_service:
+  #console_context_path: /etc/crowdsec/console/context.yaml
+  acquisition_path: /etc/crowdsec/acquis.yaml
+  acquisition_dir: /etc/crowdsec/acquis.d
+  parser_routines: 1
+cscli:
+  output: human
+  color: auto
+db_config:
+  log_level: info
+  type: sqlite
+  db_path: /var/lib/crowdsec/data/crowdsec.db
+  #max_open_conns: 100
+  #user:
+  #password:
+  #db_name:
+  #host:
+  #port:
+  flush:
+    max_items: 5000
+    max_age: 7d
+plugin_config:
+  user: nobody # plugin process would be ran on behalf of this user
+  group: nobody # plugin process would be ran on behalf of this group
+api:
+  client:
+    insecure_skip_verify: false
+    credentials_path: /etc/crowdsec/local_api_credentials.yaml
+  server:
+    enable: {{ crowdsec_api_server_enable }}
+    log_level: info
+    listen_uri: "{{ crowdsec_api_server_listen_uri }}"
+    profiles_path: /etc/crowdsec/profiles.yaml
+    console_path: /etc/crowdsec/console.yaml
+    online_client: # Central API credentials (to push signals and receive bad IPs)
+      credentials_path: /etc/crowdsec/online_api_credentials.yaml
+    trusted_ips: {{ crowdsec_api_server_trusted_ips | to_json }}
+{% if crowdsec_api_server_tls | length > 0 %}
+    tls:
+      {{ crowdsec_api_server_tls | to_nice_yaml(indent=2) | indent(6) }}
+{% endif %}
+prometheus:
+  enabled: {{ crowdsec_prometheus_listen_addr | length > 0 }}
+  level: full
+  listen_addr: "{{ crowdsec_prometheus_listen_addr }}"
+  listen_port: {{ crowdsec_prometheus_listen_port }}

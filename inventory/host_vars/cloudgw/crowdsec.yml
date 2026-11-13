@@ -1,0 +1,18 @@
+---
+
+crowdsec_firewall_bouncer_installed: true
+crowdsec_machines: >-
+  {%- set tmp = [] -%}
+  {%- for h in groups['servers'] if hostvars[h].crowdsec_installed | default(false) -%}
+  {{- tmp.append({"name": hostvars[h].crowdsec_local_api_credentials.login, "password": hostvars[h].crowdsec_local_api_credentials.password}) -}}
+  {%- endfor -%}
+  {{ tmp }}
+crowdsec_api_server_tls:
+  cert_file: "/etc/ssl/localcerts/crowdsec.crt"
+  key_file: "/etc/ssl/localcerts/crowdsec.key"
+crowdsec_api_server_enable: true
+crowdsec_api_server_listen_uri: "{{ wireguard_ip }}:8080"
+crowdsec_api_server_trusted_ips:
+  - 127.0.0.1
+  - ::1
+  - "{{ all_net.vm.cidr }}"
