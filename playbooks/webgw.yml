@@ -122,3 +122,15 @@
     - role: postfix_exporter
       tags: ["postfix_exporter"]
       when: postfix_exporter_port is defined
+  post_tasks:
+    - name: Ensure nginx default config is absent
+      ansible.builtin.file:
+        path: /etc/nginx/conf.d/default.conf
+        state: absent
+      notify: Restart nginx
+
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.systemd:
+        name: nginx
+        state: restarted
