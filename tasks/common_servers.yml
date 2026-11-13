@@ -252,16 +252,6 @@
   when: __dnf_conf.stat.exists
   tags: ["dnf"]
 
-- name: Setup SELinux policies
-  ansible.builtin.include_role:
-    name: selinux_modules
-    apply:
-      tags: ["selinux", "selinux_modules"]
-  when:
-    - ansible_facts.os_family == 'RedHat'
-    - selinux_modules | default([]) | length > 0
-  tags: ["selinux", "selinux_modules"]
-
 - name: Setup NUT
   ansible.builtin.include_role:
     name: nut

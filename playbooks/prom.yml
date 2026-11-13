@@ -53,15 +53,6 @@
               }
           notify: Restart rsyslog
 
-        - name: Allow rsyslog remote connections
-          ansible.posix.seboolean:
-            name: nis_enabled
-            state: true
-            persistent: true
-          when:
-            - ansible_facts.os_family == 'RedHat'
-            - ansible_facts.selinux.status == "enabled"
-
     - name: Install mktxp deps
       ansible.builtin.apt:
         name:

@@ -43,19 +43,6 @@
   hosts: webgw
   gather_facts: true
   pre_tasks:
-    - name: Enable SELinux
-      ansible.posix.selinux:
-        policy: targeted
-        state: enforcing
-      register: __selinux_state
-      when: ansible_facts.selinux.status == "enabled"
-      tags: ["selinux"]
-
-    - name: Reboot if required
-      ansible.builtin.reboot:
-      when: __selinux_state.reboot_required | default(false)
-      tags: ["selinux"]
-
     - name: Install epel
       ansible.builtin.include_role:
         name: epel
