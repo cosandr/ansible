@@ -119,6 +119,10 @@ __mt_firewall_address_lists_manual:
   - address: "{{ hostvars['p9p'].wireguard_ip }}"
     list: roaming-general
     comment: p9p
+  # TODO: IPsec Site-to-Site so Unifi stops NATing
+  - address: "{{ hostvars['udr7'].wireguard_ip }}"
+    list: allow-webservers
+    comment: "Rom router"
 
 __mt_firewall_address_lists_auto: >-
   {%- set tmp = [] -%}
