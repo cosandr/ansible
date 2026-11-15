@@ -10,6 +10,8 @@ nginx_error_log_options: "warn"
 nginx_error_log: "/var/log/nginx/error.log {{ nginx_error_log_options }}"
 nginx_sites_logs: "/var/log/nginx/sites"
 
+# Doesn't listen on 443, no need
+nginx_default_reject_ssl: false
 nginx_extra_conf_options: ""
 
 nginx_extra_http_options: |
