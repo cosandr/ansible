@@ -1,0 +1,4 @@
+---
+
+nginx_harden_paths: []
+nginx_harden_bind_ports: []

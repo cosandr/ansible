@@ -1,0 +1,42 @@
+{{ ansible_managed | comment }}
+[Service]
+NoNewPrivileges=yes
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_SETUID CAP_SETGID CAP_CHOWN CAP_DAC_OVERRIDE CAP_DAC_READ_SEARCH CAP_KILL
+RestrictSUIDSGID=yes
+
+# Filesystem: everything read-only except what nginx writes.
+# Read-only entries in nginx_harden_paths need nothing here; "strict" already makes them read-only.
+# Sockets are never listed: a bind mount would pin the old inode when the socket is recreated.
+ProtectSystem=strict
+ReadWritePaths=/var/log/nginx /var/cache/nginx /run
+{% for item in nginx_harden_paths | default([]) if not (item.ro | default(true)) and (item.type | default('dir')) != 'socket' %}
+ReadWritePaths={{ item.path }}
+{% endfor %}
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectProc=invisible
+ProcSubset=pid
+
+# Kernel and system
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictNamespaces=yes
+# Breaks nginx only if "pcre_jit on;" is set in nginx.conf (it is off by default).
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+
+# Network: only these address families and only these listening ports.
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+SocketBindDeny=any
+{% for port in nginx_harden_bind_ports | mandatory %}
+SocketBindAllow=tcp:{{ port }}
+{% endfor %}

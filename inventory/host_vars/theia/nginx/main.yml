@@ -4,6 +4,12 @@ nginx_listen_v4: "{{ host_ips.vm }}"
 nginx_ports:
   www: 8013
 
+nginx_harden_bind_ports: [80, 8013]
+nginx_harden_paths:
+  - path: /var/www
+  - path: /run/php/php-fpm.sock
+    type: socket
+
 nginx_access_log_options: "main buffer=16k flush=2m"
 nginx_access_log: "/var/log/nginx/access.log {{ nginx_access_log_options }}"
 nginx_error_log_options: "warn"

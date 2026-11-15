@@ -1,20 +1,19 @@
 {{ ansible_managed | comment }}
 
-# Starts in complain mode: remove "flags=(complain)" below to enforce.
-
 abi <abi/3.0>,
 
 #include <tunables/global>
 
-/usr/sbin/nginx flags=(complain) {
+/usr/sbin/nginx {% if nginx_aa_complain | default(true) %}flags=(complain) {% endif %}{
   #include <abstractions/base>
   #include <abstractions/nameservice>
   #include <abstractions/openssl>
 
-  # Master starts as root, binds its ports, then drops to the www-data user.
+  # Master starts as root, binds its ports, then drops to the worker user and signals workers.
   capability chown,
   capability dac_override,
   capability dac_read_search,
+  capability kill,
   capability net_bind_service,
   capability setgid,
   capability setuid,
@@ -32,6 +31,9 @@ abi <abi/3.0>,
   /etc/nginx/ r,
   /etc/nginx/** r,
 
+  # Unsure, seems related to systemd hardening
+  /etc/machine-id r,
+
   # Logs
   /var/log/nginx/ r,
   /var/log/nginx/** rw,
@@ -44,14 +46,21 @@ abi <abi/3.0>,
   /var/cache/nginx/ r,
   /var/cache/nginx/** rwk,
 
-  # Static files (direct, main, /pip aliases, autoindex listings), read-only
-  /var/www/ r,
-  /var/www/** r,
-
-  # php-fpm
-  /run/php/php-fpm.sock rw,
-
   # Signalling between master and workers, and from systemd (reload/stop)
   signal (send, receive) peer=/usr/sbin/nginx,
   signal (receive) peer=unconfined,
+
+  # Host-specific paths
+{% for item in nginx_harden_paths %}
+{% set perm = 'r' if item.ro | default(true) else 'rw' %}
+{% set kind = item.type | default('dir') %}
+{% if kind == 'dir' %}
+  {{ item.path }}/ {{ perm }},
+  {{ item.path }}/** {{ perm }},
+{% elif kind == 'file' %}
+  {{ item.path }} {{ perm }},
+{% elif kind == 'socket' %}
+  {{ item.path }} rw,
+{% endif %}
+{% endfor %}
 }

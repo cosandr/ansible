@@ -1,0 +1,57 @@
+---
+
+- name: Install nginx AppArmor profile
+  ansible.builtin.template:
+    src: "usr.sbin.nginx.j2"
+    dest: /etc/apparmor.d/usr.sbin.nginx
+    owner: root
+    group: root
+    mode: "0644"
+  when: nginx_harden_paths | length > 0
+  tags: ["apparmor"]
+  notify:
+    - Reload nginx appamor profile
+    - Restart nginx
+
+- name: Remove nginx AppArmor profile
+  ansible.builtin.file:
+    path: /etc/apparmor.d/usr.sbin.nginx
+    state: absent
+  when: nginx_harden_paths | length == 0
+  tags: ["apparmor"]
+  notify:
+    - Reload nginx appamor profile
+    - Restart nginx
+
+- name: Ensure nginx override dir exists
+  ansible.builtin.file:
+    path: "/etc/systemd/system/nginx.service.d"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: nginx_harden_bind_ports | length > 0
+  tags: ["systemd"]
+
+- name: Setup nginx service overrides
+  ansible.builtin.template:
+    src: "override.conf.j2"
+    dest: "/etc/systemd/system/nginx.service.d/override.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  when: nginx_harden_bind_ports | length > 0
+  notify:
+    - Reload systemd
+    - Restart nginx
+  tags: ["systemd"]
+
+- name: Remove nginx systemd override
+  ansible.builtin.file:
+    path: /etc/systemd/system/nginx.service.d
+    state: absent
+  when: nginx_harden_bind_ports | length == 0
+  tags: ["systemd"]
+  notify:
+    - Reload systemd
+    - Restart nginx

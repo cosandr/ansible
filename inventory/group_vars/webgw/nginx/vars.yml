@@ -6,6 +6,11 @@ nginx_provisioning_synced_excludes:
   - "manual-*.conf"
   - "private-*.conf"
 
+nginx_harden_bind_ports: [22, 80, 443, 8443]
+nginx_harden_paths:
+  - path: /etc/lego/certificates
+  - path: /etc/ssl/localcerts
+
 nginx_listen_http: |-
   listen {% if nginx_listen_v4 is defined %}{{ nginx_listen_v4 }}:{% endif %}80;
   {% if nginx_listen_v6 is defined %}
