@@ -73,7 +73,7 @@ alertmanager_inhibit_rules:
       - alertname = HostOutOfMemory
     equal: ['instance']
 
-  # Silence slow probe is probe failed
+  # Silence slow probe if probe failed
   - source_matchers:
       - alertname = BlackboxProbeFailed
     target_matchers:
@@ -86,3 +86,10 @@ alertmanager_inhibit_rules:
     target_matchers:
       - job =~ "blackbox.*"
     equal: ['__host_ip']
+
+  # Silence temp down if battery is dead
+  - source_matchers:
+      - alertname = HassBatteryDead
+    target_matchers:
+      - alertname = HassTemperatureSensorDown
+    equal: ['instance', 'device']
