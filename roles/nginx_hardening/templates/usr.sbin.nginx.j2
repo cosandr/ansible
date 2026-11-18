@@ -4,7 +4,7 @@ abi <abi/3.0>,
 
 #include <tunables/global>
 
-/usr/sbin/nginx {% if nginx_aa_complain | default(true) %}flags=(complain) {% endif %}{
+/usr/sbin/nginx {
   #include <abstractions/base>
   #include <abstractions/nameservice>
   #include <abstractions/openssl>
@@ -40,6 +40,7 @@ abi <abi/3.0>,
 
   # Runtime
   /run/nginx.pid rw,
+  /run/nginx.pid.oldbin rw,
   /run/nginx.lock rw,
 
   # http{} temp/cache dirs (client bodies, proxy buffering)
