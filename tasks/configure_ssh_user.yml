@@ -25,7 +25,7 @@
       ansible.builtin.user:
         name: "{{ ansible_conf_user }}"
         create_home: true
-        password: "{{ ansible_user_password }}"
+        password: "{{ ansible_user_password | password_hash('sha512') }}"
         groups: "{{ user_groups }}"
 
     - name: Configure user SSH keys
