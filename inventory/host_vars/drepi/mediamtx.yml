@@ -15,7 +15,7 @@ mediamtx_paths:
     rpiCameraHDR: true
     rpiCameraDenoise: cdn_hq
     rpiCameraCodec: softwareH264  # hardware maxes out at 1080p
-    rpiCameraFPS: 15
+    rpiCameraFPS: 9
     rpiCameraAfMode: manual
     rpiCameraLensPosition: 0.0
     rpiCameraTextOverlayEnable: true
